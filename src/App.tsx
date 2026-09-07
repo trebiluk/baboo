@@ -80,9 +80,8 @@ export default function App() {
           {viewMode === 'plan' ? <ErrorBoundary label="plan"><PlanCanvas /></ErrorBoundary> : <View3DStub />}
           {demoMode && <div className="demo-watermark">DEMO</div>}
         </main>
-        <TeachingDrawer />
       </div>
-      {/* Outside grid so it does not create an implicit column */}
+      <TeachingDrawer />
       <DebugDrawer />
       <CustomizePanel />
       <NewProjectModal />
