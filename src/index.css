@@ -1,2 +1,4 @@
-/* Baboo 1.0.12 Stark — full sheet lives locally; tokens first */
-:root { --aw-accent: #6E72F5; }
+/* Baboo 1.0.12 — split so GitHub write can carry the sheet */
+@import './styles/tokens.css';
+@import './styles/chrome.css';
+@import './styles/panels.css';

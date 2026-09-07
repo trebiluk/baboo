@@ -1,0 +1,206 @@
+/*
+  Baboo — Stark DEFAULT: white + black field · periwinkle flash (#6E72F5 / #8B8DFF).
+  Picker: stark / ink / projector only. Dream purple = TechWorks Board only — NOT Baboo default / NOT in picker.
+  Vibe: quiet luxury studio · not royal blue · not worksheet.
+  Flat Lexend-ish; hard bevel / single specular; no toy glow stacks; no white-flash hovers.
+*/
+:root {
+  --aw-bg: #FFFFFF;
+  --aw-surface: #F4F4F6;
+  --aw-elevated: #FFFFFF;
+  --aw-cyan: #8B8DFF;
+  --aw-accent: #6E72F5;
+  --aw-royal: #6E72F5;
+  --aw-indigo: #5B5FE8;
+  --aw-violet: #8B8DFF;
+  --aw-purple: #C5C7FF;
+  --aw-deep: #3F3DB8;
+  --aw-border: #E4E4EA;
+  --aw-paw: #e85820;
+  --aw-fg: #0A0A0A;
+  --aw-muted: #3F3F46;
+  --aw-subtle: #71717A;
+  --aw-due: #E11D48;
+  --aw-ok: #15803D;
+  --aw-canvas: #F2F2F5;
+  --aw-plan-line: #0A0A0A;
+  --aw-plan-dim: #3F3F46;
+  --aw-plan-wall-ext: #111111;
+  --aw-plan-wall-int: #52525B;
+  --aw-plan-grid: #E4E4EA;
+  --aw-plan-grid-axis: #A1A1AA;
+  --aw-hover: #ECECEF;
+  --aw-on-accent: #FFFFFF;
+  --aw-scrim: color-mix(in srgb, #0A0A0A 38%, transparent);
+  --aw-logo-grad: linear-gradient(90deg, #C5C7FF 0%, #8B8DFF 42%, #6E72F5 100%);
+  --aw-shine: inset 0 1px 0 color-mix(in oklab, #fff 70%, transparent);
+
+  --bg: var(--aw-bg);
+  --surface: var(--aw-surface);
+  --surface-2: var(--aw-elevated);
+  --border: var(--aw-border);
+  --text: var(--aw-fg);
+  --muted: var(--aw-muted);
+  --accent: var(--aw-royal);
+  --accent-hot: var(--aw-deep);
+  --danger: var(--aw-due);
+  --ok: var(--aw-ok);
+
+  --aw-z-canvas: 0;
+  --aw-z-overlays: 10;
+  --aw-z-labels: 20;
+  --aw-z-selection: 30;
+  --aw-z-chrome: 40;
+  --aw-z-floating: 50;
+  --aw-z-drawers: 60;
+  --aw-z-catalogs: 70;
+
+  --aw3d-sky-zenith: #8EB6D8;
+  --aw3d-sky-mid: #B7CCE0;
+  --aw3d-sky-horizon: #D6E2EE;
+  --aw3d-horizon-line: #A8D4E8;
+  --aw3d-ground: #5F6F52;
+  --aw3d-ground-deep: #4A5642;
+  --aw3d-ground-edge: #6D7A62;
+  --aw3d-fog: #C5D0DC;
+
+  --aw-z-modals: 80;
+  --aw-z-toasts: 90;
+  --aw-z-blockers: 100;
+
+  --z-canvas: var(--aw-z-canvas);
+  --z-overlay: var(--aw-z-overlays);
+  --z-chrome: var(--aw-z-chrome);
+  --z-side: var(--aw-z-catalogs);
+  --z-drawer: var(--aw-z-drawers);
+  --z-modal: var(--aw-z-modals);
+  --z-toast: var(--aw-z-toasts);
+
+  color-scheme: light;
+  font-family: Archivo, "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: var(--aw-fg);
+  background: var(--aw-bg);
+  line-height: 1.4;
+}
+
+html[data-gui-theme="stark"] {
+  --aw-bg: #FFFFFF;
+  --aw-surface: #F4F4F6;
+  --aw-elevated: #FFFFFF;
+  --aw-cyan: #8B8DFF;
+  --aw-accent: #6E72F5;
+  --aw-royal: #6E72F5;
+  --aw-indigo: #5B5FE8;
+  --aw-violet: #8B8DFF;
+  --aw-purple: #C5C7FF;
+  --aw-deep: #3F3DB8;
+  --aw-border: #E4E4EA;
+  --aw-fg: #0A0A0A;
+  --aw-muted: #3F3F46;
+  --aw-subtle: #71717A;
+  --aw-ok: #15803D;
+  --aw-canvas: #F2F2F5;
+  --aw-plan-line: #0A0A0A;
+  --aw-plan-dim: #3F3F46;
+  --aw-plan-wall-ext: #111111;
+  --aw-plan-wall-int: #52525B;
+  --aw-plan-grid: #E4E4EA;
+  --aw-plan-grid-axis: #A1A1AA;
+  --aw-hover: #ECECEF;
+  --aw-on-accent: #FFFFFF;
+  --aw-scrim: color-mix(in srgb, #0A0A0A 38%, transparent);
+  --aw-logo-grad: linear-gradient(90deg, #C5C7FF 0%, #8B8DFF 42%, #6E72F5 100%);
+  --aw-shine: inset 0 1px 0 color-mix(in oklab, #fff 70%, transparent);
+  --accent-hot: var(--aw-deep);
+  color-scheme: light;
+}
+
+html[data-gui-theme="ink"] {
+  --aw-bg: #07070C;
+  --aw-surface: #101018;
+  --aw-elevated: #181822;
+  --aw-cyan: #8B8DFF;
+  --aw-accent: #8B8DFF;
+  --aw-royal: #6E72F5;
+  --aw-indigo: #A8AAFF;
+  --aw-violet: #C5C7FF;
+  --aw-purple: #C5C7FF;
+  --aw-deep: #5B5FE8;
+  --aw-border: color-mix(in oklab, #8B8DFF 26%, transparent);
+  --aw-fg: #F4F4F5;
+  --aw-muted: #A1A1AA;
+  --aw-subtle: #71717A;
+  --aw-ok: #4ade80;
+  --aw-canvas: #101018;
+  --aw-plan-line: #F4F4F5;
+  --aw-plan-dim: #A1A1AA;
+  --aw-plan-wall-ext: #E4E4EA;
+  --aw-plan-wall-int: #A1A1AA;
+  --aw-plan-grid: #1A1A24;
+  --aw-plan-grid-axis: #2A2A36;
+  --aw-hover: color-mix(in srgb, var(--aw-elevated) 78%, black);
+  --aw-on-accent: #0A0A0A;
+  --aw-scrim: color-mix(in srgb, #07070C 78%, black);
+  --aw-logo-grad: linear-gradient(90deg, #C5C7FF 0%, #8B8DFF 45%, #6E72F5 100%);
+  --aw-shine: inset 0 1px 0 color-mix(in oklab, #fff 14%, transparent);
+  --accent-hot: var(--aw-cyan);
+  color-scheme: dark;
+}
+
+html[data-gui-theme="projector"] {
+  --aw-bg: #F7F7F8;
+  --aw-surface: #EEEEF1;
+  --aw-elevated: #FFFFFF;
+  --aw-cyan: #5B5FE8;
+  --aw-accent: #5B5FE8;
+  --aw-royal: #3F3DB8;
+  --aw-indigo: #3F3DB8;
+  --aw-violet: #5B5FE8;
+  --aw-purple: #6E72F5;
+  --aw-deep: #2E2C8A;
+  --aw-border: #C8C8D0;
+  --aw-fg: #050505;
+  --aw-muted: #27272A;
+  --aw-subtle: #52525B;
+  --aw-ok: #166534;
+  --aw-canvas: #E8E8EE;
+  --aw-plan-line: #050505;
+  --aw-plan-dim: #27272A;
+  --aw-plan-wall-ext: #050505;
+  --aw-plan-wall-int: #3F3F46;
+  --aw-plan-grid: #D4D4DC;
+  --aw-plan-grid-axis: #A1A1AA;
+  --aw-hover: #E4E4EA;
+  --aw-on-accent: #FFFFFF;
+  --aw-scrim: color-mix(in srgb, #050505 42%, transparent);
+  --aw-logo-grad: linear-gradient(90deg, #8B8DFF 0%, #6E72F5 50%, #3F3DB8 100%);
+  --aw-shine: inset 0 1px 0 color-mix(in oklab, #fff 62%, transparent);
+  --accent-hot: var(--aw-deep);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  background: var(--aw-bg);
+  color: var(--aw-fg);
+}
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+
+button, .tool-btn, .ghost-btn, .ver-chip, .title-input, .save-chip, .catalog-card, .template-card {
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 120ms ease;
+}
+
+.aw-pressable:active {
+  transform: translateY(0.5px);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--aw-accent) 45%, transparent);
+  outline: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  button, .tool-btn, .ghost-btn, .ver-chip, .title-input, .save-chip, .catalog-card, .template-card {
+    transition: none;
+  }
+  .aw-pressable:active { transform: none; }
+}
