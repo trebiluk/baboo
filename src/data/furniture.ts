@@ -22,4 +22,7 @@ export const FURNITURE_CATALOG: CatalogItem[] = [
   { id: 'mech-closet', name: 'Mech Closet', category: 'Utility', w: 3, h: 3, color: '#5a6670', shape: 'rect' },
   { id: 'washer', name: 'Washer', category: 'Utility', w: 2.5, h: 2.5, color: '#6a7888', shape: 'appliance' },
   { id: 'dryer', name: 'Dryer', category: 'Utility', w: 2.5, h: 2.5, color: '#6a7888', shape: 'appliance' },
+  { id: 'stairs', name: 'Stairs', category: 'Plan', w: 3.5, h: 8, color: '#6b7280', shape: 'rect' },
+  { id: 'fireplace', name: 'Fireplace', category: 'Plan', w: 5, h: 2, color: '#7c2d12', shape: 'rect' },
+  { id: 'column', name: 'Column', category: 'Plan', w: 1.25, h: 1.25, color: '#57534e', shape: 'circle' },
 ];

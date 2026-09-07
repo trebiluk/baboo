@@ -12,6 +12,8 @@ import { DebugDrawer } from './components/DebugDrawer';
 import { DriveWizard } from './components/DriveWizard';
 import { ChangelogModal } from './components/ChangelogModal';
 import { Toast } from './components/Toast';
+import { Plan2DOverlay } from './components/Plan2DOverlay';
+import { duplicateSelected, rotateSelected90 } from './lib/plan2d';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { useProjectStore } from './store/useProjectStore';
 import { applyGuiTheme, DEFAULT_GUI_THEME } from './data/themes';
@@ -26,41 +28,25 @@ export default function App() {
   const cancelWallDraft = useProjectStore((s) => s.cancelWallDraft);
   const setTool = useProjectStore((s) => s.setTool);
 
-  useEffect(() => {
-    void init();
-  }, [init]);
+  useEffect(() => { void init(); }, [init]);
 
   const guiTheme = useProjectStore((s) => s.doc.settings.guiTheme);
-
+  useEffect(() => { applyGuiTheme(guiTheme ?? DEFAULT_GUI_THEME); }, [guiTheme]);
   useEffect(() => {
-    applyGuiTheme(guiTheme ?? DEFAULT_GUI_THEME);
-  }, [guiTheme]);
-
-  useEffect(() => {
-    if (viewMode !== 'plan') {
-      setTool('select');
-      cancelWallDraft();
-    }
+    if (viewMode !== 'plan') { setTool('select'); cancelWallDraft(); }
   }, [viewMode, setTool, cancelWallDraft]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
-      if (e.key === 'Delete' || e.key === 'Backspace') {
-        e.preventDefault();
-        deleteSelected();
-      } else if (e.key === 'Escape') {
-        cancelWallDraft();
-        useProjectStore.getState().clearSelection();
-      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
-        e.preventDefault();
-        if (e.shiftKey) redo();
-        else undo();
-      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'y') {
-        e.preventDefault();
-        redo();
-      } else if (e.key === 'v') setTool('select');
+      if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deleteSelected(); }
+      else if (e.key === 'Escape') { cancelWallDraft(); useProjectStore.getState().clearSelection(); }
+      else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); if (e.shiftKey) redo(); else undo(); }
+      else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
+      else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'd') { e.preventDefault(); duplicateSelected(); }
+      else if (e.key === 'r') rotateSelected90();
+      else if (e.key === 'v') setTool('select');
       else if (e.key === 'w') setTool('wall');
       else if (e.key === 'd') setTool('door');
       else if (e.key === 'n') setTool('window');
@@ -78,6 +64,7 @@ export default function App() {
         {viewMode === 'plan' ? <FurnitureSidebar /> : null}
         <main className="stage-area">
           {viewMode === 'plan' ? <ErrorBoundary label="plan"><PlanCanvas /></ErrorBoundary> : <View3DStub />}
+          {viewMode === 'plan' ? <Plan2DOverlay /> : null}
           {demoMode && <div className="demo-watermark">DEMO</div>}
         </main>
       </div>
