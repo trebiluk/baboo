@@ -1,0 +1,14 @@
+.stage-area { position: relative; }
+.plan-2d-overlay { position: absolute; inset: 0; z-index: var(--aw-z-overlays); pointer-events: none; }
+.plan-2d-overlay.plan-2d-capture { pointer-events: auto; cursor: crosshair; }
+.plan-2d-bar { pointer-events: auto; position: absolute; left: 12px; top: 12px; display: flex; align-items: center; gap: 6px; padding: 6px; border-radius: 10px; border: 1px solid var(--aw-border); background: color-mix(in srgb, var(--aw-elevated) 92%, transparent); }
+.plan-2d-hint { font-size: 12px; color: var(--aw-muted); padding: 0 6px; }
+.plan-room-label { pointer-events: auto; position: absolute; transform: translate(-50%, -50%); border: 1px solid var(--aw-border); background: var(--aw-elevated); color: var(--aw-fg); font-weight: 650; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; }
+.plan-measure-dot { position: absolute; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 999px; background: var(--aw-accent); }
+.plan-measure-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.plan-measure-svg line { stroke: var(--aw-accent); stroke-width: 2; stroke-dasharray: 6 4; }
+.plan-measure-tag { position: absolute; transform: translate(-50%, -120%); background: var(--aw-accent); color: var(--aw-on-accent); font-size: 12px; font-weight: 650; padding: 3px 8px; border-radius: 999px; }
+.plan-north { pointer-events: none; position: absolute; right: 16px; top: 16px; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--aw-fg); font-size: 11px; font-weight: 750; }
+.plan-north-arrow { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 16px solid var(--aw-fg); }
+.plan-scale { pointer-events: none; position: absolute; right: 16px; bottom: 44px; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-size: 11px; color: var(--aw-muted); }
+.plan-scale-bar { width: 96px; height: 6px; border: 1px solid var(--aw-fg); background: repeating-linear-gradient(90deg, var(--aw-fg) 0 24px, var(--aw-elevated) 24px 48px); }
