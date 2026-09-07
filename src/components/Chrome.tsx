@@ -63,7 +63,6 @@ export function Chrome() {
     };
   }, [moreOpen]);
 
-  // Teacher gate: ?teacher=1 or localStorage, Alt+D still works via DebugPanel
   useEffect(() => {
     try {
       const q = new URLSearchParams(window.location.search);
@@ -175,11 +174,11 @@ export function Chrome() {
         </button>
         <span className="view-only-chip" hidden={viewMode === 'plan'} title="Switch to 2D Plan to edit">View only</span>
 
-        <button type="button" className="ghost-btn aw-pressable chrome-primary" onClick={exportJson} title="Download your plan file for class">Save file</button>
-        <button type="button" className="ghost-btn aw-pressable chrome-primary" onClick={toggleTeaching}>
+        <button type="button" className="ghost-btn aw-pressable chrome-cta" onClick={exportJson} title="Download your plan file for class">Save file</button>
+        <button type="button" className={`ghost-btn aw-pressable${teachingOpen ? ' active' : ''}`} onClick={toggleTeaching}>
           {teachingOpen ? 'Close Teach' : 'Teach'}
         </button>
-        <button type="button" className="ghost-btn aw-pressable chrome-primary" onClick={toggleHelp}>Help</button>
+        <button type="button" className="ghost-btn aw-pressable" onClick={toggleHelp}>Help</button>
 
         <button type="button" className="ghost-btn aw-pressable chrome-desk" onClick={() => openNewProject(true)}>New</button>
         <button type="button" className="ghost-btn aw-pressable chrome-desk" onClick={() => exportGalleryCard()} title="Make a class board card (alias only)">Class card</button>
