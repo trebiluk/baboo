@@ -1,4 +1,4 @@
-/** Baboo GUI chrome themes — Stark default: white + black + periwinkle flash. Dream = TechWorks only. */
+/** Baboo GUI chrome themes — Diego GO: stark default; ink + projector optional. Dream = TechWorks Board only. */
 import type { GuiThemeId } from '../types';
 
 export interface ThemeOption {
