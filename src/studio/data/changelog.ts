@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '1.0.32',
+    date: '2026-09-09',
+    bullets: [
+      'Copyright: © 2026 Richard Kulibert Jr.',
+    ],
+  },
+  {
     version: '1.0.31',
     date: '2026-09-09',
     bullets: [

@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 1.0.32 — 2026-09-09
+- Copyright: © 2026 Richard Kulibert Jr.
+
 ## 1.0.31 — 2026-09-09
 - Toolbar icons redrawn so they stay clear when tiny — same black stroke, same periwinkle flash
 - Clip is a cut corner now, not scissors. Tree, bed, and path each have their own picture

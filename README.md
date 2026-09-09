@@ -2,6 +2,9 @@
 
 Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 
+**© 2026 Richard Kulibert Jr.**  
+
+
 **Version 1.0.31** — Stark theme (white + black, periwinkle flash).
 
 Draw walls, doors, windows, rooms, furniture, and plants. Check access. Teach from the side rail. Plans save on the device as `.archworks.json`.

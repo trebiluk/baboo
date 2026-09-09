@@ -8,7 +8,7 @@ export const DEDICATION_LINE =
   'Baboo is dedicated in honor of Dr. Donna Matteson, and named for Baboo — her beloved Bichon frise.';
 
 /** COPYRIGHT.md */
-export const COPYRIGHT_LINE = '© 2026 Diego Rogers';
+export const COPYRIGHT_LINE = '© 2026 Richard Kulibert Jr.';
 
 export function HelpModal() {
   const open = useProjectStore((s) => s.helpOpen);

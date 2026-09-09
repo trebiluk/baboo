@@ -6,6 +6,7 @@ import { DEFAULT_SKILL_LEVEL, skillInfo, toolsForLevel } from '../data/skill';
 import { BABOO_LOGO } from '../logo';
 import { Icon, type IconName } from '../icons';
 import { ClassShareModal } from './ClassShareModal';
+import { COPYRIGHT_LINE } from './HelpModal';
 
 const TOOLS: { id: Tool; label: string; tip?: string; icon: IconName }[] = [
   { id: 'select', label: 'Select', tip: 'Click something to move it', icon: 'select' },
@@ -147,6 +148,7 @@ export function Chrome() {
           ) : null}
         </div>
         <span className="brand-purpose" title="What Baboo is for">Draw a house for class</span>
+        <span className="copyright-line copyright-chrome" title={COPYRIGHT_LINE}>{COPYRIGHT_LINE}</span>
         <input
           className="title-input"
           value={title}
