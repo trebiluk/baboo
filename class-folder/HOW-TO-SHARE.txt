@@ -1,0 +1,14 @@
+Baboo — class folder
+====================
+
+Copy this whole folder onto the share kids already use
+(N: drive, a USB stick, or a Chromebook Downloads folder).
+
+Each student opens index.html in Chrome.
+  • Files app → index.html → Open with Chrome
+  • Do not use a Drive "preview" — that will not run the studio
+
+Plans autosave on that Chromebook. To turn in work:
+  Save file → upload the .archworks.json to Classroom.
+
+Baboo does not log in and does not need the internet once this folder is copied.

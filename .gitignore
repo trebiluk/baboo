@@ -3,3 +3,15 @@ dist
 .DS_Store
 *.local
 .vite
+.vercel
+.tanstack
+.grok
+screenshots
+artifacts
+attachments
+.env
+.env.*
+*.log
+.project_id
+.node_modules.lock
+startup.sh
