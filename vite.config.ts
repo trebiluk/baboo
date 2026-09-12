@@ -170,7 +170,9 @@ export default defineConfig(({ command, isPreview }) => ({
     ...(command === "build" || isPreview
       ? [
           nitro({
-            preset: "vercel",
+            // Cloudflare Pages sets CF_PAGES=1. Leave Vercel as the default
+            // output so other hosts keep working.
+            preset: process.env.CF_PAGES ? "cloudflare-pages" : "vercel",
             // Auto-registers server/middleware/* (the PWA install page +
             // manifest + head-tag middleware). Nitro v3 defaults serverDir to
             // false, so removing this silently unwires /?install=1 on deploys.
