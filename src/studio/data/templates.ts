@@ -18,6 +18,7 @@ export const STYLE_TEMPLATES: StyleTemplate[] = [
   { id: 'tudor', name: 'Tudor', blurb: 'Compact L-ish starter — steep gable vocabulary.' },
   { id: 'yurt', name: 'Yurt', blurb: 'Round tent-house · cone roof · open middle.' },
   { id: 'tiny-home', name: 'Tiny Home', blurb: 'Small contest house · trailer or container type · checklist of parts.', badge: 'Contest' },
+  { id: 'dog-house', name: 'Dog House', blurb: 'Baboo’s contest · a snug outdoor den · she judges from the book.', badge: 'Contest' },
 ];
 
 function emptyFloor(name = 'Floor 1'): Floor {
@@ -33,8 +34,9 @@ function emptyFloor(name = 'Floor 1'): Floor {
     dimensions: [],
     notes: [],
     landscape: [],
+    sketches: [],
     roof: null,
-    layers: { structure: true, openings: true, furniture: true, rooms: true, dims: true, landscape: false, roof: true },
+    layers: { structure: true, openings: true, furniture: true, rooms: true, dims: true, landscape: false, sketch: true, roof: true },
   };
 }
 
@@ -328,6 +330,9 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
     floor.rooms = [room('living', 9, 5, 'Tiny home')];
     challengeIds.push('C-TINY-HOME-CONTEST');
     assignmentId = 'tiny-home-contest';
+  } else if (styleId === 'dog-house') {
+    challengeIds.push('C-DOG-HOUSE-CONTEST');
+    assignmentId = 'dog-house-contest';
   }
 
   const roofStyleId = DEFAULT_ROOF_BY_STYLE[styleId] ?? null;
@@ -343,7 +348,11 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
       updatedAt: now,
       styleId,
       teachingMeta: {
-        unitId: styleId === 'tiny-home' ? 'tiny-home-contest' : 'unit-1',
+        unitId: styleId === 'tiny-home'
+          ? 'tiny-home-contest'
+          : styleId === 'dog-house'
+            ? 'dog-house-contest'
+            : 'unit-1',
         challengeIds,
         assignmentId,
       },

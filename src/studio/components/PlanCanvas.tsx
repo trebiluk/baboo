@@ -49,6 +49,9 @@ export function PlanCanvas() {
   const lastRef = useRef<{ x: number; y: number } | null>(null);
   const panning = useRef(false);
   const pendingTap = useRef<{ screen: { x: number; y: number }; world: { x: number; y: number } } | null>(null);
+  const sketching = useRef(false);
+  const liveStrokeRef = useRef<number[] | null>(null);
+  const [liveStroke, setLiveStroke] = useState<number[] | null>(null);
   const layerRef = useRef<Konva.Layer>(null);
   const livePan = useRef({ x: panX, y: panY });
   const liveZoom = useRef(zoom);
@@ -83,6 +86,14 @@ export function PlanCanvas() {
   useEffect(() => {
     liveZoom.current = zoom;
   }, [zoom]);
+
+  useEffect(() => {
+    if (tool !== 'sketch') {
+      sketching.current = false;
+      liveStrokeRef.current = null;
+      setLiveStroke(null);
+    }
+  }, [tool]);
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -166,6 +177,9 @@ export function PlanCanvas() {
 
     if (pointersRef.current.size >= 2) {
       pendingTap.current = null;
+      sketching.current = false;
+      liveStrokeRef.current = null;
+      setLiveStroke(null);
       const pts = [...pointersRef.current.values()];
       const a = pts[0];
       const b = pts[1];
@@ -188,6 +202,13 @@ export function PlanCanvas() {
 
     const store = useProjectStore.getState();
     const shift = e.evt.shiftKey;
+    if (tool === 'sketch') {
+      sketching.current = true;
+      const pts = [world.x, world.y];
+      liveStrokeRef.current = pts;
+      setLiveStroke(pts);
+      return;
+    }
     if (tool === 'wall') {
       if (store.wallMode === 'clip') {
         store.chamferAt(world);
@@ -213,7 +234,7 @@ export function PlanCanvas() {
     const hit = store.hitAt(world);
     const sel = store.selected;
     const same = !!(hit && sel && hit.kind === sel.kind && hit.id === sel.id);
-    const movable = same && (hit?.kind === 'furniture' || hit?.kind === 'landscape' || hit?.kind === 'note' || hit?.kind === 'dim' || hit?.kind === 'opening');
+    const movable = same && (hit?.kind === 'furniture' || hit?.kind === 'landscape' || hit?.kind === 'note' || hit?.kind === 'dim' || hit?.kind === 'opening' || hit?.kind === 'sketch');
 
     if (isCoarse) {
       if (movable) {
@@ -284,6 +305,16 @@ export function PlanCanvas() {
 
     const world = toWorld(pos.x, pos.y);
     if (e.evt.shiftKey !== shiftHeld) setShiftHeld(e.evt.shiftKey);
+    if (sketching.current && liveStrokeRef.current) {
+      const pts = liveStrokeRef.current;
+      const lx = pts[pts.length - 2];
+      const ly = pts[pts.length - 1];
+      if (Math.hypot(world.x - lx, world.y - ly) >= 0.12) {
+        pts.push(world.x, world.y);
+        setLiveStroke(pts.slice());
+      }
+      return;
+    }
     if (tool === 'wall' || tool === 'door' || tool === 'window' || tool === 'room' || tool === 'dim') {
       setHover(world);
     }
@@ -305,6 +336,15 @@ export function PlanCanvas() {
         pinchRef.current = null;
         useProjectStore.getState().setPanZoom(livePan.current.x, livePan.current.y, liveZoom.current);
       }
+      return;
+    }
+    if (sketching.current) {
+      sketching.current = false;
+      const pts = liveStrokeRef.current;
+      liveStrokeRef.current = null;
+      setLiveStroke(null);
+      if (pts) useProjectStore.getState().addSketch(pts);
+      lastRef.current = null;
       return;
     }
     if (pendingTap.current) {
@@ -423,7 +463,8 @@ export function PlanCanvas() {
     floor.furniture.length +
     (floor.rooms ?? []).length +
     (floor.dimensions ?? []).length +
-    (floor.notes ?? []).length;
+    (floor.notes ?? []).length +
+    (floor.sketches ?? []).length;
   const packed = floor.furniture.length >= 120 || objectCount >= 400;
   const showFurnLabels = !packed && zoom >= 16;
   const showDims = floor.layers.dims && !packed;
@@ -511,6 +552,35 @@ export function PlanCanvas() {
               closed
               fill={roomType(selectedRoomKind).color}
               opacity={0.18}
+              listening={false}
+            />
+          )}
+
+          {floor.layers.sketch !== false && (floor.sketches ?? []).map((sk) => {
+            const on = selected?.kind === 'sketch' && selected.id === sk.id;
+            return (
+              <Line
+                key={sk.id}
+                points={sk.points}
+                stroke={on ? accent : (lightPlan ? '#4B5563' : '#C5D0EA')}
+                strokeWidth={(on ? 3.2 : 2.2) / zoom}
+                opacity={on ? 0.95 : 0.72}
+                lineCap="round"
+                lineJoin="round"
+                tension={0.32}
+                listening={false}
+              />
+            );
+          })}
+          {liveStroke && liveStroke.length >= 4 && (
+            <Line
+              points={liveStroke}
+              stroke={accent}
+              strokeWidth={2.6 / zoom}
+              opacity={0.9}
+              lineCap="round"
+              lineJoin="round"
+              tension={0.32}
               listening={false}
             />
           )}
@@ -786,6 +856,12 @@ export function PlanCanvas() {
             : (wallDraft
             ? (skillRank(skillLevel) <= 1 ? 'Nice — now click where it ends' : 'Click where the wall ends')
             : (skillRank(skillLevel) <= 1 ? 'Click a corner to start, then the other end' : 'Wall → click start → click end')))
+          : tool === 'sketch'
+            ? (liveStroke
+              ? 'Keep dragging — lift to finish the stroke'
+              : (skillRank(skillLevel) <= 1
+                ? 'Drag like a pencil. Then tap the sketch → Trace to make walls.'
+                : 'Drag to sketch · tap a stroke → Trace to walls'))
           : tool === 'door' || tool === 'window'
             ? (skillRank(skillLevel) <= 1 ? 'Click right on a wall. Then the little menu can change it.' : 'Click on a wall — or tap an existing door to edit')
             : tool === 'furniture'

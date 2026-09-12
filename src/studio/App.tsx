@@ -5,6 +5,7 @@ import { FurnitureSidebar } from './components/FurnitureSidebar';
 import { RoomSidebar } from './components/RoomSidebar';
 import { TeachingDrawer } from './components/TeachingDrawer';
 import { AccessDrawer } from './components/AccessDrawer';
+import { ContestDrawer } from './components/ContestDrawer';
 import { CustomizePanel } from './components/CustomizePanel';
 import { NewProjectModal } from './components/NewProjectModal';
 import { HelpModal } from './components/HelpModal';
@@ -18,6 +19,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToolRail } from './components/ToolRail';
 import { DockRail } from './components/DockRail';
 import { CoachBanner } from './components/CoachBanner';
+import { VersionChip } from './components/VersionChip';
 import { useProjectStore } from './store/useProjectStore';
 import { applyGuiTheme, DEFAULT_GUI_THEME } from './data/themes';
 
@@ -74,21 +76,24 @@ export default function App() {
       } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'y') {
         e.preventDefault();
         redo();
-      } else if (e.key === 'v') setTool('select');
-      else if (e.key === 'w') setTool('wall');
-      else if (e.key === 'd') setTool('door');
-      else if (e.key === 'n') setTool('window');
-      else if (e.key === 'f') setTool('furniture');
-      else if (e.key === 'r') setTool('room');
-      else if (e.key === 'm') setTool('dim');
-      else if (e.key === 't') setTool('note');
-      else if (e.key === 'l') setTool('plant');
-      else if (e.key === 'h') setTool('pan');
-      else if (e.key === '0') { e.preventDefault(); fitPlan(); }
-      else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'd') {
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'd') {
         e.preventDefault();
         duplicateSelected();
-      } else if (e.key === ']') rotateSelected(1);
+      } else if (e.altKey || e.metaKey || e.ctrlKey) {
+        return;
+      } else if (e.key.toLowerCase() === 'v') setTool('select');
+      else if (e.key.toLowerCase() === 's') setTool('sketch');
+      else if (e.key.toLowerCase() === 'w') setTool('wall');
+      else if (e.key.toLowerCase() === 'd') setTool('door');
+      else if (e.key.toLowerCase() === 'n') setTool('window');
+      else if (e.key.toLowerCase() === 'f') setTool('furniture');
+      else if (e.key.toLowerCase() === 'r') setTool('room');
+      else if (e.key.toLowerCase() === 'm') setTool('dim');
+      else if (e.key.toLowerCase() === 't') setTool('note');
+      else if (e.key.toLowerCase() === 'l') setTool('plant');
+      else if (e.key.toLowerCase() === 'h') setTool('pan');
+      else if (e.key === '0') { e.preventDefault(); fitPlan(); }
+      else if (e.key === ']') rotateSelected(1);
       else if (e.key === '[') rotateSelected(-1);
     };
     window.addEventListener('keydown', onKey);
@@ -105,11 +110,13 @@ export default function App() {
             {viewMode === 'plan' && <CoachBanner />}
             {demoMode && <div className="demo-watermark">DEMO</div>}
           </main>
+          <VersionChip floating />
           <ToolRail />
           <FurnitureSidebar />
           <RoomSidebar />
           <TeachingDrawer />
           <ErrorBoundary label="access"><AccessDrawer /></ErrorBoundary>
+          <ErrorBoundary label="contest"><ContestDrawer /></ErrorBoundary>
           <HelpModal />
           <CustomizePanel />
           <DockRail />

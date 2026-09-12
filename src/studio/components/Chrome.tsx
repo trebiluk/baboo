@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
-import { APP_VERSION } from '../version';
 import type { Tool } from '../types';
 import { DEFAULT_SKILL_LEVEL, skillInfo, toolsForLevel } from '../data/skill';
 import { BABOO_LOGO } from '../logo';
 import { Icon, type IconName } from '../icons';
 import { ClassShareModal } from './ClassShareModal';
 import { COPYRIGHT_LINE } from './HelpModal';
+import { VersionChip } from './VersionChip';
 
 const TOOLS: { id: Tool; label: string; tip?: string; icon: IconName }[] = [
   { id: 'select', label: 'Select', tip: 'Click something to move it', icon: 'select' },
+  { id: 'sketch', label: 'Sketch', tip: 'Drag like a pencil, then Trace into walls', icon: 'sketch' },
   { id: 'wall', label: 'Wall', tip: 'Click start, then click end', icon: 'wall' },
   { id: 'door', label: 'Door', tip: 'Click on a wall', icon: 'door' },
   { id: 'window', label: 'Window', tip: 'Click on a wall', icon: 'window' },
@@ -22,7 +23,7 @@ const TOOLS: { id: Tool; label: string; tip?: string; icon: IconName }[] = [
 ];
 
 /** Edit tools hidden in 3D (view-only). Select stays so chrome does not look empty. */
-const HIDDEN_IN_3D: Tool[] = ['wall', 'door', 'window', 'furniture', 'room', 'dim', 'note', 'plant', 'pan'];
+const HIDDEN_IN_3D: Tool[] = ['sketch', 'wall', 'door', 'window', 'furniture', 'room', 'dim', 'note', 'plant', 'pan'];
 
 
 export function Chrome() {
@@ -43,16 +44,15 @@ export function Chrome() {
   const toggleHelp = useProjectStore((s) => s.toggleHelp);
   const toggleDebug = useProjectStore((s) => s.toggleDebug);
   const seedCrowd = useProjectStore((s) => s.seedCrowd);
-  const toggleChangelog = useProjectStore((s) => s.toggleChangelog);
   const openDriveWizard = useProjectStore((s) => s.openDriveWizard);
   const toggleAccess = useProjectStore((s) => s.toggleAccess);
+  const toggleContest = useProjectStore((s) => s.toggleContest);
   const setViewMode = useProjectStore((s) => s.setViewMode);
   const setRenderTier = useProjectStore((s) => s.setRenderTier);
   const viewMode = useProjectStore((s) => s.viewMode);
   const teachingOpen = useProjectStore((s) => s.teachingOpen);
   const fileRef = useRef<HTMLInputElement>(null);
   const moreRef = useRef<HTMLDivElement>(null);
-  const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [moreOpen, setMoreOpen] = useState(false);
   const [teacherChrome, setTeacherChrome] = useState(false);
   const [classShareOpen, setClassShareOpen] = useState(false);
@@ -84,6 +84,9 @@ export function Chrome() {
         setTeacherChrome(true);
       }
     } catch { /* ignore */ }
+    const onTeacher = () => setTeacherChrome(true);
+    window.addEventListener('baboo-teacher', onTeacher);
+    return () => window.removeEventListener('baboo-teacher', onTeacher);
   }, []);
 
   const statusLabel =
@@ -94,22 +97,6 @@ export function Chrome() {
   const runAndClose = (fn: () => void) => () => {
     setMoreOpen(false);
     fn();
-  };
-
-  const clearPress = () => {
-    if (pressTimer.current) {
-      clearTimeout(pressTimer.current);
-      pressTimer.current = null;
-    }
-  };
-
-  const onVerPointerDown = () => {
-    clearPress();
-    pressTimer.current = setTimeout(() => {
-      try { localStorage.setItem('baboo-teacher', '1'); } catch { /* ignore */ }
-      setTeacherChrome(true);
-      toggleDebug();
-    }, 700);
   };
 
   const skillLevel = useProjectStore((s) => s.doc.settings.skillLevel) ?? DEFAULT_SKILL_LEVEL;
@@ -131,18 +118,7 @@ export function Chrome() {
             decoding="async"
           />
           <span className="brand-name">Baboo</span>
-          <button
-            type="button"
-            className="ver-chip aw-pressable"
-            onClick={toggleChangelog}
-            onPointerDown={onVerPointerDown}
-            onPointerUp={clearPress}
-            onPointerLeave={clearPress}
-            onPointerCancel={clearPress}
-            title="Changelog · long-press for Teacher"
-          >
-            v{APP_VERSION}
-          </button>
+          <VersionChip onTeacher={() => setTeacherChrome(true)} />
           {fileShare ? (
             <span className="save-chip" title="Opened from a class folder — no server">Class share</span>
           ) : null}
@@ -186,20 +162,21 @@ export function Chrome() {
 
       <div className="chrome-right">
         <button type="button" className="ghost-btn aw-pressable chrome-ico" onClick={undo} title="Undo" disabled={!isPlan}>
-          <Icon name="undo" /> Undo
+          <Icon name="undo" /> <span className="chrome-label">Undo</span>
         </button>
         <button type="button" className="ghost-btn aw-pressable chrome-ico" onClick={redo} title="Redo" disabled={!isPlan}>
-          <Icon name="redo" /> Redo
+          <Icon name="redo" /> <span className="chrome-label">Redo</span>
         </button>
         <button type="button" className="ghost-btn aw-pressable chrome-wide keep-phone chrome-ico" onClick={fitPlan} title="Fit the house on the grid (0)" disabled={!isPlan}>
-          <Icon name="fit" /> Fit
+          <Icon name="fit" /> <span className="chrome-label">Fit</span>
         </button>
         <button
           type="button"
           className={`ghost-btn aw-pressable chrome-ico ${viewMode === 'plan' ? 'active' : ''}`}
           onClick={() => { setRenderTier(0); setViewMode('plan'); }}
+          title="2D Plan"
         >
-          <Icon name="plan" /> 2D Plan
+          <Icon name="plan" /> <span className="chrome-label">2D Plan</span>
         </button>
         <button
           type="button"
@@ -207,21 +184,21 @@ export function Chrome() {
           onClick={() => { setRenderTier(1); setViewMode('solid3d'); }}
           title="3D is view-only"
         >
-          <Icon name="view3d" /> 3D View
+          <Icon name="view3d" /> <span className="chrome-label">3D View</span>
         </button>
         <span className="view-only-chip" hidden={viewMode === 'plan'} title="Switch to 2D Plan to edit">View only</span>
 
         <button type="button" className="ghost-btn aw-pressable chrome-primary chrome-ico" onClick={exportJson} title="Download your plan file for class">
-          <Icon name="save" /> Save file
+          <Icon name="save" /> <span className="chrome-label">Save file</span>
         </button>
         <button type="button" className="ghost-btn aw-pressable chrome-wide chrome-ico" onClick={() => openNewProject(true)}>
-          <Icon name="new" /> New
+          <Icon name="new" /> <span className="chrome-label">New</span>
         </button>
         <button type="button" className="ghost-btn aw-pressable chrome-phone-only chrome-ico" onClick={toggleTeaching}>
-          <Icon name="teach" /> {teachingOpen ? 'Close Teach' : 'Teach'}
+          <Icon name="teach" /> <span className="chrome-label">{teachingOpen ? 'Close Teach' : 'Teach'}</span>
         </button>
         <button type="button" className="ghost-btn aw-pressable chrome-phone-only chrome-ico" onClick={toggleHelp}>
-          <Icon name="help" /> Help
+          <Icon name="help" /> <span className="chrome-label">Help</span>
         </button>
 
         <div className="chrome-more" ref={moreRef}>
@@ -231,13 +208,15 @@ export function Chrome() {
             aria-expanded={moreOpen}
             aria-haspopup="menu"
             onClick={() => setMoreOpen((v) => !v)}
+            title="More"
           >
-            <Icon name="more" /> More
+            <Icon name="more" /> <span className="chrome-label">More</span>
           </button>
           {moreOpen && (
             <div className="chrome-more-menu" role="menu">
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => openNewProject(true))}><Icon name="new" /> New</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => exportGalleryCard())}><Icon name="note" /> Class card</button>
+              <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => toggleContest())}><Icon name="contest" /> Baboo’s contest</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => toggleAccess())}><Icon name="access" /> Access check</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => openDriveWizard(true))}><Icon name="drive" /> Drive</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => setClassShareOpen(true))}><Icon name="folder" /> Class folder</button>

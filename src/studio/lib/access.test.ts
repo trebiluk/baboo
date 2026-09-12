@@ -28,10 +28,11 @@ function boxFloor(w: number, h: number): Floor {
     dimensions: [],
     notes: [],
     landscape: [],
+    sketches: [],
     roof: null,
     layers: {
       structure: true, openings: true, furniture: true, rooms: true,
-      dims: true, landscape: false, roof: true,
+      dims: true, landscape: false, sketch: true, roof: true,
     },
   };
 }

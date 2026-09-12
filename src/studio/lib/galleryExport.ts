@@ -2,6 +2,7 @@ import type { ProjectDocument, TypologyShell } from '../types';
 import { APP_VERSION } from '../version';
 import { STYLE_TEMPLATES } from '../data/templates';
 import { roofStyleName } from './roof';
+import { judgeDogHouse, ribbonLabel } from './contest';
 
 /** SCHEMA.md — gallery export (FERPA alias-only; Chromebook lean — no blob bytes). */
 export const GALLERY_CARD_FORMAT = 'archworks-gallery-card' as const;
@@ -18,6 +19,8 @@ export type GalleryCardDocument = {
     roofLabel: string;
     /** Tiny Home shell only; null for regular houses. */
     shell: TypologyShell | null;
+    /** Best Dog House ribbon when judged; omit for other styles. */
+    contestRibbon?: string | null;
     areaSqFt: number | null;
     reflection: string;
     createdAt: string;
@@ -78,6 +81,9 @@ export function buildGalleryCard(
       styleName: styleDisplayName(doc),
       roofLabel: roofDisplayLabel(doc),
       shell: tinyHomeShell(doc),
+      contestRibbon: doc.settings.styleId === 'dog-house'
+        ? ribbonLabel(judgeDogHouse(doc.floors[0], { roofStyleId: doc.settings.roofStyleId }).ribbon)
+        : null,
       areaSqFt: null,
       reflection: (opts.reflection ?? '').trim().slice(0, 500),
       createdAt: new Date().toISOString(),

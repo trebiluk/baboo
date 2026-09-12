@@ -49,6 +49,7 @@ export function DebugPanel() {
       notes: (f.notes ?? []).length,
       dims: (f.dimensions ?? []).length,
       landscape: (f.landscape ?? []).length,
+      sketches: (f.sketches ?? []).length,
     }),
     [f],
   );
@@ -188,7 +189,7 @@ export function DebugPanel() {
             <div>
               <dt>On the plan</dt>
               <dd>
-                {counts.walls} walls · {counts.openings} openings · {counts.rooms} rooms · {counts.furniture} furniture
+                {counts.walls} walls · {counts.openings} openings · {counts.rooms} rooms · {counts.sketches} sketches · {counts.furniture} furniture
               </dd>
             </div>
           </dl>

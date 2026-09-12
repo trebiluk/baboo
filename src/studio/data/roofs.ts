@@ -41,6 +41,7 @@ export const DEFAULT_ROOF_BY_STYLE: Record<StyleId, RoofStyleId | null> = {
   tudor: 'gable',
   yurt: 'conical',
   'tiny-home': 'shed',
+  'dog-house': 'gable',
 };
 
 export function roofDefaultForStyle(styleId: StyleId | string): RoofStyleId | null {

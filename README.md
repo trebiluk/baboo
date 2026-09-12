@@ -5,9 +5,9 @@ Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 **© 2026 Richard Kulibert Jr.**  
 
 
-**Version 1.0.31** — Stark theme (white + black, periwinkle flash).
+**Version 1.0.37** — Floating version chip, phone tools, Access sheets over rails.
 
-Draw walls, doors, windows, rooms, furniture, and plants. Check access. Teach from the side rail. Plans save on the device as `.archworks.json`.
+Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the side rail. Plans save on the device as `.archworks.json`.
 
 ## Run locally
 
@@ -36,12 +36,13 @@ npm run pack:share
 - **Class folder** is a copy-to-the-share pack — Chrome, no login
 - No Google login inside the app
 
-## What’s in 1.0.31
+## What’s in 1.0.37
 
-- Matched toolbar icons for every draw tool, Teach, Access, Help, and Settings
-- Clip is a cut corner, not scissors
-- Tree, bed, and path each have their own picture
-- 2D Plan / 3D View marks, plus Drive, class folder, import, and delete
+- Floating version chip on phones — tap for what’s new, hold for Teacher
+- Sketch, Wall, and Door stay on the left — one tap. More opens the rest
+- Access and Teach sit on top of the rails on a landscape phone
+- Best Dog House Contest: New → Dog House, then Contest
+- Sketch is the first tool; Trace turns a pencil line into straight walls
 
 See [CHANGELOG.md](CHANGELOG.md) for the rest.
 

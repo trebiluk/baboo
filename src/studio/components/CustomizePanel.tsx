@@ -133,6 +133,7 @@ export function CustomizePanel() {
               ['rooms', 'Room names'],
               ['dims', 'Size labels'],
               ['landscape', 'Plants'],
+              ['sketch', 'Sketches'],
               ['roof', 'Roof lines'],
             ] as const).map(([key, label]) => (
               <label key={key} className="field check">

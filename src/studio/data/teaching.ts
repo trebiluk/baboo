@@ -4,7 +4,8 @@ export const UNIT_1 = {
   goal: 'Make one room that feels like a real size on the grid.',
   steps: [
     'Open Settings. Turn on grid. Turn on snap.',
-    'Draw the outside walls of one simple room.',
+    'Sketch the rooms first — Tools → Sketch, then drag like a pencil.',
+    'Tap the sketch → Trace, or draw the outside walls with two clicks.',
     'Place one door.',
     'Place one window.',
     'Look at the size labels. Do they look right?',
@@ -12,6 +13,23 @@ export const UNIT_1 = {
     'Name the room. Room tool → pick a type → click inside the walls.',
   ],
   doneLooksLike: 'Closed room · named · door · window · clear sizes · roof named.',
+};
+
+export const DOG_HOUSE_UNIT = {
+  id: 'dog-house-contest',
+  title: 'Best Dog House Contest',
+  goal: 'A snug outdoor den Baboo would pick — textbook size, not a people house.',
+  steps: [
+    'Sketch the den first. Tools → Sketch, then drag.',
+    'Trace or hard-line walls. Close the box.',
+    'One door. Tap it and pick 12" or 18" — dogs are not 3 feet wide.',
+    'Slide the door off-center so wind and rain miss the bed.',
+    'Keep a pitched roof (gable or shed). Flat roofs puddle.',
+    'Put size labels on two walls.',
+    'Plant a tree for summer shade.',
+    'Open Contest — Baboo judges from the textbook list.',
+  ],
+  doneLooksLike: 'Closed den · 8–18 sq ft · dog-sized offset door · pitched roof · shade tree · Baboo’s ribbon',
 };
 
 export const CHALLENGES = [
@@ -59,6 +77,17 @@ export const CHALLENGES = [
     ],
   },
   {
+    id: 'C-DOG-HOUSE-CONTEST',
+    title: 'Best Dog House Contest',
+    prompt:
+      '1. New → Dog House.\n2. Sketch a snug den, then Trace or Wall until it closes.\n3. One door: tap it and pick 12" or 18" — not a people door.\n4. Slide the door off-center so wind misses the bed.\n5. Keep a gable or shed roof.\n6. Label two walls. Plant a tree for shade.\n7. Open Contest — Baboo judges from the textbook list.',
+    rubric: [
+      { id: 'r1', text: 'Closed den about 8–18 sq ft (body heat, not a bedroom)', points: 4 },
+      { id: 'r2', text: 'One 12–18" door, offset from center', points: 3 },
+      { id: 'r3', text: 'Pitched roof + size labels + shade tree', points: 3 },
+    ],
+  },
+  {
     id: 'C-BRIEF',
     title: 'Challenge — Name the rooms',
     prompt:
@@ -72,6 +101,8 @@ export const CHALLENGES = [
 ];
 
 export const VOCAB = [
+  { term: 'Sketch', def: 'A freehand pencil line on the plan. Sketch first, then hard-line walls.' },
+  { term: 'Trace', def: 'Turn a sketch into straight walls. The pencil line stays as an underlay.' },
   { term: 'Scale', def: 'Drawing size vs real size. Example: 1 grid = 1 ft.' },
   { term: 'Floor plan', def: 'Looking down at the rooms from above.' },
   { term: 'Room', def: 'A closed space with a name — kitchen, bath, bedroom.' },
@@ -96,6 +127,9 @@ export const VOCAB = [
   { term: 'Accessible route', def: 'A 3-foot-wide path a wheelchair can roll — door to rooms.' },
   { term: 'Clear width', def: 'The open space through a door. ADA asks for 32 inches.' },
   { term: 'Turning circle', def: 'A 5-foot circle so a wheelchair can spin around, usually in a bath.' },
+  { term: 'Den', def: 'A snug sleeping box. A dog house is one room, not a people plan.' },
+  { term: 'Offset door', def: 'Opening not in the middle of the wall — wind and rain miss the bed.' },
+  { term: 'Body heat', def: 'A den just big enough stays warm. Too big and the dog cannot heat it.' },
 ];
 
 /** Stub prompts for build reflections (Diego). */

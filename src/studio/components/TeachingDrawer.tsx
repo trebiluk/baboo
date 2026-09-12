@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { UNIT_1, CHALLENGES, VOCAB, REFLECTION_PROMPTS, UTILITY_CHECKLIST, ROOM_CHECKLIST } from '../data/teaching';
+import { UNIT_1, DOG_HOUSE_UNIT, CHALLENGES, VOCAB, REFLECTION_PROMPTS, UTILITY_CHECKLIST, ROOM_CHECKLIST } from '../data/teaching';
 import { STYLE_TEMPLATES } from '../data/templates';
 import { useProjectStore } from '../store/useProjectStore';
 import { exteriorFloorAreaSqFt, roofStyleName } from '../lib/roof';
@@ -9,6 +9,7 @@ import { DEFAULT_SKILL_LEVEL, NOVICE_UNIT_STEPS, skillRank } from '../data/skill
 export function TeachingDrawer() {
   const open = useProjectStore((s) => s.teachingOpen);
   const toggle = useProjectStore((s) => s.toggleTeaching);
+  const toggleContest = useProjectStore((s) => s.toggleContest);
   const doc = useProjectStore((s) => s.doc);
   const styleId = doc.settings.styleId;
   const style = STYLE_TEMPLATES.find((t) => t.id === styleId);
@@ -20,8 +21,14 @@ export function TeachingDrawer() {
   const hasUtility = (ids: string[]) => ids.some((id) => catalogIds.has(id));
   const skillLevel = doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
   const rank = skillRank(skillLevel);
-  const unitSteps = rank === 0 ? NOVICE_UNIT_STEPS : UNIT_1.steps;
+  const unit = styleId === 'dog-house' ? DOG_HOUSE_UNIT : UNIT_1;
+  const unitSteps = styleId === 'dog-house'
+    ? DOG_HOUSE_UNIT.steps
+    : (rank === 0 ? NOVICE_UNIT_STEPS : UNIT_1.steps);
   const challenges = CHALLENGES.filter((c) => {
+    if (styleId === 'dog-house') {
+      return c.id === 'C-DOG-HOUSE-CONTEST' || c.id === 'C-ROOF-NAME';
+    }
     if (rank === 0) return c.id === 'ch-scale-room';
     if (rank === 1) return c.id !== 'C-TINY-HOME-CONTEST';
     return true;
@@ -84,12 +91,17 @@ export function TeachingDrawer() {
           </section>
 
           <section>
-            <h3>{UNIT_1.title}</h3>
-            <p>{UNIT_1.goal}</p>
+            <h3>{unit.title}</h3>
+            <p>{unit.goal}</p>
             <ol>
               {unitSteps.map((s) => <li key={s}>{s}</li>)}
             </ol>
-            <p className="done-like"><strong>Done looks like:</strong> {UNIT_1.doneLooksLike}</p>
+            <p className="done-like"><strong>Done looks like:</strong> {unit.doneLooksLike}</p>
+            {styleId === 'dog-house' && (
+              <button type="button" className="primary-btn aw-pressable" style={{ marginTop: 10 }} onClick={toggleContest}>
+                Ask Baboo to judge
+              </button>
+            )}
           </section>
 
           {style && style.id !== 'blank' && (
@@ -100,6 +112,7 @@ export function TeachingDrawer() {
             </section>
           )}
 
+          {styleId !== 'dog-house' && (
           <section>
             <h3>Build reflections</h3>
             {REFLECTION_PROMPTS.map((r) => (
@@ -109,8 +122,9 @@ export function TeachingDrawer() {
               </article>
             ))}
           </section>
+          )}
 
-          {rank >= 1 && (
+          {rank >= 1 && styleId !== 'dog-house' && (
           <section>
             <h3>Named rooms</h3>
             <p className="muted">Room tool → pick a type → click inside closed walls.</p>
@@ -128,7 +142,7 @@ export function TeachingDrawer() {
           </section>
           )}
 
-          {rank >= 2 && (
+          {rank >= 2 && styleId !== 'dog-house' && (
           <section>
             <h3>Utility + storage checklist</h3>
             <p className="muted">Every student project needs common-sense spaces.</p>
@@ -170,7 +184,16 @@ export function TeachingDrawer() {
           <section>
             <h3>Vocab</h3>
             <dl className="vocab-list">
-              {VOCAB.map((v) => (
+              {(styleId === 'dog-house'
+                ? VOCAB.filter((v) =>
+                    [
+                      'Sketch', 'Trace', 'Scale', 'Floor plan', 'Dimension',
+                      'Door swing', 'Opening', 'Grid', 'Snap', 'Gable', 'Shed',
+                      'Flat', 'Ridge', 'Den', 'Offset door', 'Body heat', 'Floor area',
+                    ].includes(v.term),
+                  )
+                : VOCAB
+              ).map((v) => (
                 <div key={v.term}>
                   <dt>{v.term}</dt>
                   <dd>{v.def}</dd>

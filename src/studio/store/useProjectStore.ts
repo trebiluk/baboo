@@ -3,6 +3,7 @@ import type {
   Floor, FurnitureItem, Opening, ProjectDocument, ProjectSettings,
   SaveStatus, StyleId, Tool, ViewMode, RenderTier, Point, Wall, RoofStyleId,
   TypologyShell, Room, RoomKind, DimItem, NoteItem, LandscapeItem, PlantKind,
+  SketchStroke,
 } from '../types';
 import { blankProject, buildTemplateProject } from '../data/templates';
 import { APP_VERSION } from '../version';
@@ -10,8 +11,9 @@ import { FURNITURE_CATALOG } from '../data/furniture';
 import { plantType } from '../data/landscape';
 import {
   dist, findOrCreateNode, hitFurniture, hitOpening, hitWall, nearestWall,
-  snapPoint, uid, hitDimension, hitNote, hitLandscape,
+  snapPoint, uid, hitDimension, hitNote, hitLandscape, hitSketch,
   snapWallEnd, splitWallsAtNode, wallLength, wallAngle,
+  simplifyPolyline, polylineLength, polylinePoints,
 } from '../lib/geometry';
 import { chamferCorner, nearestChamferable } from '../lib/chamfer';
 import { findEnclosedFace, formatArea, hitRoom, polygonArea } from '../lib/rooms';
@@ -49,6 +51,7 @@ type Sel =
   | { kind: 'dim'; id: string }
   | { kind: 'note'; id: string }
   | { kind: 'landscape'; id: string }
+  | { kind: 'sketch'; id: string }
   | null;
 
 interface Store {
@@ -61,6 +64,7 @@ interface Store {
   selectedRoomKind: RoomKind;
   teachingOpen: boolean;
   accessOpen: boolean;
+  contestOpen: boolean;
   catalogOpen: boolean;
   customizeOpen: boolean;
   helpOpen: boolean;
@@ -111,6 +115,7 @@ interface Store {
   setPanZoom: (panX: number, panY: number, zoom?: number) => void;
   toggleTeaching: () => void;
   toggleAccess: () => void;
+  toggleContest: () => void;
   toggleCatalog: () => void;
   setCatalogOpen: (open: boolean) => void;
   closeOverlays: () => void;
@@ -156,8 +161,10 @@ interface Store {
   placeNote: (p: Point) => void;
   renameNote: (id: string, text: string) => void;
   placePlant: (p: Point) => void;
+  addSketch: (points: number[]) => void;
+  traceSketch: (id?: string) => void;
   selectAt: (p: Point) => void;
-  hitAt: (p: Point) => { kind: 'furniture' | 'landscape' | 'note' | 'dim' | 'opening' | 'wall' | 'room'; id: string } | null;
+  hitAt: (p: Point) => { kind: 'furniture' | 'landscape' | 'note' | 'dim' | 'opening' | 'wall' | 'sketch' | 'room'; id: string } | null;
   moveSelected: (dx: number, dy: number) => void;
   endMove: () => void;
   debugJson: () => string;
@@ -201,6 +208,7 @@ export const useProjectStore = create<Store>((set, get) => ({
   // Drawers overlay the plan — stay closed so the grid is the first view
   teachingOpen: false,
   accessOpen: false,
+  contestOpen: false,
   customizeOpen: false,
   helpOpen: false,
   newProjectOpen: false,
@@ -265,7 +273,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     if (!isToolUnlocked(tool, skill)) {
       const need = skillInfo(levelRequiredFor(tool)).label;
       get().showToast(
-        `${({ dim: 'Size', note: 'Note', plant: 'Plant' } as Record<string, string>)[tool] ?? (tool[0].toUpperCase() + tool.slice(1))} unlocks at ${need}. Change level in Settings.`,
+        `${({ dim: 'Size', note: 'Note', plant: 'Plant', sketch: 'Sketch' } as Record<string, string>)[tool] ?? (tool[0].toUpperCase() + tool.slice(1))} unlocks at ${need}. Change level in Settings.`,
         toastMs(skill, 3200),
       );
       return;
@@ -304,6 +312,11 @@ export const useProjectStore = create<Store>((set, get) => ({
     for (const n of f.notes ?? []) pts.push({ x: n.x, y: n.y });
     for (const d of f.dimensions ?? []) {
       pts.push({ x: d.ax, y: d.ay }, { x: d.bx, y: d.by });
+    }
+    for (const sk of f.sketches ?? []) {
+      for (let i = 0; i + 1 < sk.points.length; i += 2) {
+        pts.push({ x: sk.points[i], y: sk.points[i + 1] });
+      }
     }
     const { w, h } = get().viewport;
     if (!pts.length || w < 40 || h < 40) {
@@ -454,11 +467,20 @@ export const useProjectStore = create<Store>((set, get) => ({
   toggleTeaching: () => set((s) => ({
     teachingOpen: !s.teachingOpen,
     accessOpen: false,
+    contestOpen: false,
     helpOpen: false,
     customizeOpen: false,
   })),
   toggleAccess: () => set((s) => ({
     accessOpen: !s.accessOpen,
+    contestOpen: false,
+    teachingOpen: false,
+    helpOpen: false,
+    customizeOpen: false,
+  })),
+  toggleContest: () => set((s) => ({
+    contestOpen: !s.contestOpen,
+    accessOpen: false,
     teachingOpen: false,
     helpOpen: false,
     customizeOpen: false,
@@ -469,6 +491,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     catalogOpen: false,
     teachingOpen: false,
     accessOpen: false,
+    contestOpen: false,
     helpOpen: false,
     customizeOpen: false,
     toolsPinned: false,
@@ -489,6 +512,7 @@ export const useProjectStore = create<Store>((set, get) => ({
   minimizePanels: () => set((s) => ({
     teachingOpen: false,
     accessOpen: false,
+    contestOpen: false,
     helpOpen: false,
     customizeOpen: false,
     panelsPinned: false,
@@ -498,12 +522,14 @@ export const useProjectStore = create<Store>((set, get) => ({
     customizeOpen: !s.customizeOpen,
     teachingOpen: false,
     accessOpen: false,
+    contestOpen: false,
     helpOpen: false,
   })),
   toggleHelp: () => set((s) => ({
     helpOpen: !s.helpOpen,
     teachingOpen: false,
     accessOpen: false,
+    contestOpen: false,
     customizeOpen: false,
   })),
   toggleDebug: () => set((s) => ({ debugOpen: !s.debugOpen })),
@@ -603,7 +629,11 @@ export const useProjectStore = create<Store>((set, get) => ({
       toolsPinned: skillLevel === 'novice',
     });
     get().markDirty();
-    get().showToast(`${doc.meta.title} is ready — go draw`);
+    get().showToast(
+      styleId === 'dog-house'
+        ? 'Baboo’s contest — sketch a snug den, then ask her to judge'
+        : `${doc.meta.title} is ready — go draw`,
+    );
     setTimeout(() => get().fitPlan(), 80);
   },
   exportJson: () => {
@@ -662,6 +692,9 @@ export const useProjectStore = create<Store>((set, get) => ({
       }
       if (selected.kind === 'landscape') {
         return { ...f, landscape: (f.landscape ?? []).filter((x) => x.id !== selected.id) };
+      }
+      if (selected.kind === 'sketch') {
+        return { ...f, sketches: (f.sketches ?? []).filter((x) => x.id !== selected.id) };
       }
       return { ...f, furniture: f.furniture.filter((x) => x.id !== selected.id) };
     });
@@ -758,11 +791,12 @@ export const useProjectStore = create<Store>((set, get) => ({
       return;
     }
     get().pushHistory();
+    const dogHouse = get().doc.settings.styleId === 'dog-house';
     const opening: Opening = {
       id: uid('o'),
       wallId: hit.wall.id,
       t: hit.t,
-      width: type === 'door' ? 3 : 3.5,
+      width: type === 'door' ? (dogHouse ? 1.5 : 3) : 3.5,
       type,
       symbolKind: type === 'door' ? 'swingDoor' : 'windowFixed',
       swing: 'left',
@@ -774,8 +808,12 @@ export const useProjectStore = create<Store>((set, get) => ({
     });
     get().markDirty();
     get().showToast(
-      type === 'door' ? 'Door is in — change swing or size in the menu' : 'Window is in — drag to slide it',
-      toastMs(get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL, 2400),
+      type === 'door'
+        ? (get().doc.settings.styleId === 'dog-house'
+          ? 'Door is in — tap it, pick 12" or 18", then slide it off-center'
+          : 'Door is in — change swing or size in the menu')
+        : 'Window is in — drag to slide it',
+      toastMs(get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL, 2800),
     );
   },
 
@@ -1040,6 +1078,104 @@ export const useProjectStore = create<Store>((set, get) => ({
     get().markDirty();
   },
 
+  addSketch: (points) => {
+    const simplified = simplifyPolyline(points, 0.12);
+    if (simplified.length < 4 || polylineLength(simplified) < 0.4) return;
+    get().pushHistory();
+    const item: SketchStroke = { id: uid('sk'), points: simplified };
+    set({
+      doc: withFloor(get().doc, (f) => ({
+        ...f,
+        sketches: [...(f.sketches ?? []), item],
+        layers: { ...f.layers, sketch: true },
+      })),
+      selected: { kind: 'sketch', id: item.id },
+    });
+    get().markDirty();
+    const skill = get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
+    if (skillRank(skill) <= 1) {
+      get().showToast('Sketch is in. Keep drawing, or Trace to make walls.', toastMs(skill, 3200));
+    }
+  },
+
+  traceSketch: (id) => {
+    const selected = get().selected;
+    const sketches = get().floor().sketches ?? [];
+    const sketchId = id
+      ?? (selected?.kind === 'sketch' ? selected.id : null)
+      ?? sketches[sketches.length - 1]?.id
+      ?? null;
+    if (!sketchId) {
+      get().showToast('Sketch first, then Trace', 2400);
+      return;
+    }
+    const sketch = (get().floor().sketches ?? []).find((s) => s.id === sketchId);
+    if (!sketch) return;
+    const simple = simplifyPolyline(sketch.points, 0.85);
+    const pts = polylinePoints(simple);
+    if (pts.length < 2) {
+      get().showToast('Sketch is too short to trace — draw bigger');
+      return;
+    }
+    const s = get().doc.settings;
+    const merge = s.snap ? s.gridSize * 0.4 : 0.35;
+    const kind = get().wallKind;
+    const thick = kind === 'interior' ? 0.35 : 0.5;
+    get().pushHistory();
+    let added = 0;
+    set({
+      doc: withFloor(get().doc, (f) => {
+        let nodes = [...f.nodes];
+        let walls = [...f.walls];
+        let openings = [...f.openings];
+        let prev = snapPoint(pts[0], s.gridSize, s.snap);
+        for (let i = 1; i < pts.length; i++) {
+          const endPt = snapWallEnd(prev, pts[i], {
+            ortho: s.ortho !== false,
+            forceOrtho: false,
+            snap: s.snap,
+            gridSize: s.gridSize,
+          });
+          if (Math.hypot(endPt.x - prev.x, endPt.y - prev.y) < 0.75) continue;
+          const aRes = findOrCreateNode(nodes, prev, merge);
+          nodes = aRes.nodes;
+          const bRes = findOrCreateNode(nodes, endPt, merge);
+          nodes = bRes.nodes;
+          if (aRes.id === bRes.id) continue;
+          const dup = walls.some(
+            (w) => (w.a === aRes.id && w.b === bRes.id) || (w.a === bRes.id && w.b === aRes.id),
+          );
+          if (dup) {
+            prev = endPt;
+            continue;
+          }
+          ({ walls, openings } = splitWallsAtNode(walls, openings, nodes, aRes.id, merge));
+          ({ walls, openings } = splitWallsAtNode(walls, openings, nodes, bRes.id, merge));
+          walls.push({
+            id: uid('w'), a: aRes.id, b: bRes.id, kind, thickness: thick,
+          });
+          added += 1;
+          prev = endPt;
+        }
+        if (added === 0) return f;
+        return refreshRoof({ ...f, nodes, walls, openings }, get().doc.settings.roofStyleId ?? null);
+      }),
+      selected: null,
+      tool: 'select',
+    });
+    get().markDirty();
+    if (added === 0) {
+      get().showToast('Sketch is too wiggly — draw bigger, then Trace', 3200);
+    } else {
+      get().showToast(
+        added === 1
+          ? 'Traced 1 wall — sketch stays as an underlay'
+          : `Traced ${added} walls — sketch stays as an underlay`,
+        toastMs(get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL, 2800),
+      );
+    }
+  },
+
   selectAt: (p) => {
     const hit = get().hitAt(p);
     set({ selected: hit });
@@ -1059,6 +1195,8 @@ export const useProjectStore = create<Store>((set, get) => ({
     if (oid) return { kind: 'opening', id: oid };
     const wid = hitWall(f.walls, f.nodes, p);
     if (wid) return { kind: 'wall', id: wid };
+    const sid = hitSketch(f.sketches ?? [], p);
+    if (sid) return { kind: 'sketch', id: sid };
     const rid = hitRoom(f.rooms ?? [], f.nodes, f.walls, p);
     if (rid) return { kind: 'room', id: rid };
     return null;
@@ -1117,6 +1255,21 @@ export const useProjectStore = create<Store>((set, get) => ({
               ? { ...d, ax: d.ax + dx, ay: d.ay + dy, bx: d.bx + dx, by: d.by + dy }
               : d,
           ),
+        })),
+      });
+    } else if (selected.kind === 'sketch') {
+      set({
+        doc: withFloor(doc, (f) => ({
+          ...f,
+          sketches: (f.sketches ?? []).map((sk) => {
+            if (sk.id !== selected.id) return sk;
+            const points = sk.points.slice();
+            for (let i = 0; i + 1 < points.length; i += 2) {
+              points[i] += dx;
+              points[i + 1] += dy;
+            }
+            return { ...sk, points };
+          }),
         })),
       });
     } else if (selected.kind === 'wall') {
@@ -1270,6 +1423,7 @@ export const useProjectStore = create<Store>((set, get) => ({
       dimensions: (get().floor().dimensions ?? []).length,
       notes: (get().floor().notes ?? []).length,
       landscape: get().floor().landscape.length,
+      sketches: (get().floor().sketches ?? []).length,
       roof: get().floor().roof?.styleId ?? null,
     },
   }, null, 2),

@@ -13,7 +13,7 @@ export const SKILL_LEVELS: {
     id: 'novice',
     label: 'Novice',
     blurb: 'First time — we go slow',
-    help: 'Extra tips. Walls, doors, and pan only.',
+    help: 'Extra tips. Sketch, walls, doors, and pan.',
   },
   {
     id: 'beginner',
@@ -47,6 +47,7 @@ const RANK: Record<SkillLevel, number> = {
 
 const TOOL_MIN_RANK: Record<Tool, number> = {
   select: 0,
+  sketch: 0,
   wall: 0,
   door: 0,
   pan: 0,
@@ -72,8 +73,16 @@ export function skillInfo(level: SkillLevel) {
 
 export function toolsForLevel(level: SkillLevel): Tool[] {
   const rank = skillRank(level);
-  const order: Tool[] = ['select', 'wall', 'door', 'window', 'furniture', 'room', 'dim', 'note', 'plant', 'pan'];
+  const order: Tool[] = ['select', 'sketch', 'wall', 'door', 'window', 'furniture', 'room', 'dim', 'note', 'plant', 'pan'];
   return order.filter((t) => TOOL_MIN_RANK[t] <= rank);
+}
+
+/** Tools that unlock at the next skill step — shown locked so kids see what’s coming. */
+export function upcomingTools(level: SkillLevel): Tool[] {
+  const next = skillRank(level) + 1;
+  if (next > 3) return [];
+  const order: Tool[] = ['select', 'sketch', 'wall', 'door', 'window', 'furniture', 'room', 'dim', 'note', 'plant', 'pan'];
+  return order.filter((t) => TOOL_MIN_RANK[t] === next);
 }
 
 export function isToolUnlocked(tool: Tool, level: SkillLevel): boolean {
@@ -110,17 +119,100 @@ export type CoachStep = {
   title: string;
   body: string;
   tool?: Tool;
+  panel?: 'contest' | 'teach';
 };
 
+function nextDogHouseCoach(floor: Floor, level: SkillLevel): CoachStep | null {
+  const walls = floor.walls.length;
+  const doors = floor.openings.filter((o: Opening) => o.type === 'door');
+  const sketches = (floor.sketches ?? []).length;
+  const closed = walls > 2 && listInteriorFaces(floor.nodes, floor.walls).length > 0;
+  const trees = (floor.landscape ?? []).filter((x) => x.kind === 'tree').length;
+  const dims = (floor.dimensions ?? []).length;
+
+  if (walls === 0 && sketches === 0) {
+    return {
+      id: 'sketch',
+      title: 'Sketch Baboo a den',
+      body: 'Tools → Sketch. Drag a small box — a dog house is not a people bedroom.',
+      tool: 'sketch',
+    };
+  }
+  if (walls === 0) {
+    return {
+      id: 'trace',
+      title: 'Hard-line the den',
+      body: 'Tap the sketch → Trace, or pick Wall and click along it.',
+      tool: 'wall',
+    };
+  }
+  if (!closed) {
+    return {
+      id: 'close',
+      title: 'Close the den',
+      body: 'Walls have to meet. Rain stays out only when it’s a box.',
+      tool: 'wall',
+    };
+  }
+  if (doors.length === 0) {
+    return {
+      id: 'door',
+      title: 'A way in — dog-sized',
+      body: 'Pick Door, click a wall, then tap it and pick 12" or 18".',
+      tool: 'door',
+    };
+  }
+  if (doors[0].width > 1.75) {
+    return {
+      id: 'dog-door',
+      title: 'Shrink that door',
+      body: 'That’s a people door. Tap it → 12" or 18". Heat pours out of a 3-foot opening.',
+      tool: 'select',
+    };
+  }
+  if (Math.abs(doors[0].t - 0.5) < 0.12) {
+    return {
+      id: 'offset',
+      title: 'Slide it off-center',
+      body: 'A door in the middle lets wind hit the bed. Drag it toward a corner.',
+      tool: 'select',
+    };
+  }
+  if (dims === 0 && isToolUnlocked('dim', level)) {
+    return {
+      id: 'dim',
+      title: 'Label the size',
+      body: 'Size tool → two clicks on a wall. The book wants numbers you can read.',
+      tool: 'dim',
+    };
+  }
+  if (trees === 0 && isToolUnlocked('plant', level)) {
+    return {
+      id: 'shade',
+      title: 'Shade for summer',
+      body: 'Plant a tree beside the den. Textbook: shade in July.',
+      tool: 'plant',
+    };
+  }
+  return {
+    id: 'judge',
+    title: 'Ask Baboo to judge',
+    body: 'Open Contest. She scores this den against the textbook list.',
+    panel: 'contest',
+  };
+}
+
 /** Next help step from what is missing on the plan — quieter as skill goes up. */
-export function nextCoach(level: SkillLevel, floor: Floor): CoachStep | null {
+export function nextCoach(level: SkillLevel, floor: Floor, styleId?: string): CoachStep | null {
   const rank = skillRank(level);
   if (rank >= 3) return null;
+  if (styleId === 'dog-house') return nextDogHouseCoach(floor, level);
 
   const walls = floor.walls.length;
   const doors = floor.openings.filter((o: Opening) => o.type === 'door').length;
   const windows = floor.openings.filter((o: Opening) => o.type === 'window').length;
   const rooms = (floor.rooms ?? []).length;
+  const sketches = (floor.sketches ?? []).length;
   const closed = walls > 2 && listInteriorFaces(floor.nodes, floor.walls).length > 0;
 
   if (rank === 2) {
@@ -135,11 +227,19 @@ export function nextCoach(level: SkillLevel, floor: Floor): CoachStep | null {
     return null;
   }
 
+  if (walls === 0 && sketches === 0) {
+    return {
+      id: 'sketch',
+      title: 'Sketch the house first',
+      body: 'Open Tools, pick Sketch. Drag like a pencil. Architecture starts on paper.',
+      tool: 'sketch',
+    };
+  }
   if (walls === 0) {
     return {
-      id: 'wall',
-      title: 'Let’s draw a wall',
-      body: 'Open Tools, pick Wall. Two clicks: a start corner, then the other end.',
+      id: 'trace',
+      title: 'Now hard-line a wall',
+      body: 'Tap the sketch → Trace, or pick Wall and click along it.',
       tool: 'wall',
     };
   }
@@ -190,8 +290,8 @@ export function nextCoach(level: SkillLevel, floor: Floor): CoachStep | null {
 }
 
 export const NOVICE_UNIT_STEPS = [
-  'Open Tools on the left. Pick Wall — I saved it for you.',
-  'Click a start corner, then an end corner. Make a box.',
+  'Open Tools on the left. Pick Sketch — draw the rooms like a pencil.',
+  'Tap the sketch → Trace, or pick Wall and hard-line over it.',
   'Pick Door. Click on one wall so we can walk in.',
   'Read the size labels. Do they feel like a real room?',
 ];

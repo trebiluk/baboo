@@ -1,4 +1,4 @@
-import type { Point, Wall, Opening, Node, FurnitureItem, DimItem, NoteItem, LandscapeItem } from '../types';
+import type { Point, Wall, Opening, Node, FurnitureItem, DimItem, NoteItem, LandscapeItem, SketchStroke } from '../types';
 
 export function uid(prefix = 'id'): string {
   return `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
@@ -269,3 +269,71 @@ export function splitWallsAtNode(
   }
   return { walls: nextWalls, openings: nextOpen };
 }
+
+export function polylinePoints(flat: number[]): Point[] {
+  const out: Point[] = [];
+  for (let i = 0; i + 1 < flat.length; i += 2) out.push({ x: flat[i], y: flat[i + 1] });
+  return out;
+}
+
+export function flattenPoints(pts: Point[]): number[] {
+  const out: number[] = [];
+  for (const p of pts) out.push(p.x, p.y);
+  return out;
+}
+
+export function polylineLength(flat: number[]): number {
+  let len = 0;
+  for (let i = 2; i + 1 < flat.length; i += 2) {
+    len += Math.hypot(flat[i] - flat[i - 2], flat[i + 1] - flat[i - 1]);
+  }
+  return len;
+}
+
+/** Ramer–Douglas–Peucker. `flat` is [x,y,x,y,…]; `epsilon` is in plan-feet. */
+export function simplifyPolyline(flat: number[], epsilon: number): number[] {
+  const pts = polylinePoints(flat);
+  if (pts.length <= 2) return flat.slice();
+  const keep = new Array(pts.length).fill(false);
+  keep[0] = true;
+  keep[pts.length - 1] = true;
+  const rec = (a: number, b: number) => {
+    let maxD = 0;
+    let idx = -1;
+    for (let i = a + 1; i < b; i++) {
+      const d = distToSegment(pts[a], pts[b], pts[i]);
+      if (d > maxD) {
+        maxD = d;
+        idx = i;
+      }
+    }
+    if (maxD > epsilon && idx >= 0) {
+      keep[idx] = true;
+      rec(a, idx);
+      rec(idx, b);
+    }
+  };
+  rec(0, pts.length - 1);
+  const out: number[] = [];
+  for (let i = 0; i < pts.length; i++) {
+    if (keep[i]) {
+      out.push(pts[i].x, pts[i].y);
+    }
+  }
+  return out;
+}
+
+export function hitSketch(items: SketchStroke[], p: Point, thr = 0.5): string | null {
+  for (let i = items.length - 1; i >= 0; i--) {
+    const pts = items[i].points;
+    for (let j = 2; j + 1 < pts.length; j += 2) {
+      if (distToSegment(
+        { x: pts[j - 2], y: pts[j - 1] },
+        { x: pts[j], y: pts[j + 1] },
+        p,
+      ) <= thr) return items[i].id;
+    }
+  }
+  return null;
+}
+

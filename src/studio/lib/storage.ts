@@ -58,6 +58,7 @@ function normalizeDoc(data: ProjectDocument): ProjectDocument {
       rooms: f.layers?.rooms ?? true,
       dims: f.layers?.dims ?? true,
       landscape: f.layers?.landscape ?? false,
+      sketch: f.layers?.sketch ?? true,
       roof: f.layers?.roof ?? true,
     };
     let roof = f.roof ?? null;
@@ -70,6 +71,11 @@ function normalizeDoc(data: ProjectDocument): ProjectDocument {
       dimensions: Array.isArray(f.dimensions) ? f.dimensions : [],
       notes: Array.isArray(f.notes) ? f.notes : [],
       landscape: Array.isArray(f.landscape) ? f.landscape : [],
+      sketches: Array.isArray((f as { sketches?: unknown }).sketches)
+        ? (f as { sketches: { id: string; points: number[] }[] }).sketches.filter(
+          (s) => s && typeof s.id === 'string' && Array.isArray(s.points) && s.points.length >= 4 && s.points.length % 2 === 0,
+        )
+        : [],
       roof,
       layers,
     };

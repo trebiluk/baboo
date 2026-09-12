@@ -6,6 +6,8 @@ import type { Point } from '../types';
 import { Icon } from '../icons';
 
 const DOOR_WIDTHS = [
+  { v: 1, label: '12"' },
+  { v: 1.5, label: '18"' },
   { v: 2.5, label: "2'6\"" },
   { v: 32 / 12, label: "2'8\"" },
   { v: 3, label: "3'0\"" },
@@ -50,6 +52,18 @@ export function selectedAnchor(
     const d = (floor.dimensions ?? []).find((x) => x.id === selected.id);
     return d ? { x: (d.ax + d.bx) / 2, y: (d.ay + d.by) / 2 } : null;
   }
+  if (selected.kind === 'sketch') {
+    const sk = (floor.sketches ?? []).find((x) => x.id === selected.id);
+    if (!sk || sk.points.length < 2) return null;
+    let minX = sk.points[0], maxX = sk.points[0], minY = sk.points[1], maxY = sk.points[1];
+    for (let i = 2; i + 1 < sk.points.length; i += 2) {
+      if (sk.points[i] < minX) minX = sk.points[i];
+      if (sk.points[i] > maxX) maxX = sk.points[i];
+      if (sk.points[i + 1] < minY) minY = sk.points[i + 1];
+      if (sk.points[i + 1] > maxY) maxY = sk.points[i + 1];
+    }
+    return { x: (minX + maxX) / 2, y: maxY };
+  }
   if (selected.kind === 'wall') {
     const w = floor.walls.find((x) => x.id === selected.id);
     if (!w) return null;
@@ -73,12 +87,14 @@ export function ObjectMenu({
   const selected = useProjectStore((s) => s.selected);
   const floor = useProjectStore((s) => s.doc.floors[0]);
   const units = useProjectStore((s) => s.doc.settings.units) || 'ft';
+  const styleId = useProjectStore((s) => s.doc.settings.styleId);
   const patchOpening = useProjectStore((s) => s.patchOpening);
   const patchWall = useProjectStore((s) => s.patchWall);
   const patchRoom = useProjectStore((s) => s.patchRoom);
   const renameRoom = useProjectStore((s) => s.renameRoom);
   const renameNote = useProjectStore((s) => s.renameNote);
   const deleteSelected = useProjectStore((s) => s.deleteSelected);
+  const traceSketch = useProjectStore((s) => s.traceSketch);
   const rotateSelected = useProjectStore((s) => s.rotateSelected);
   const duplicateSelected = useProjectStore((s) => s.duplicateSelected);
   const clearSelection = useProjectStore((s) => s.clearSelection);
@@ -118,6 +134,9 @@ export function ObjectMenu({
                 </button>
               ))}
             </div>
+            {o.type === 'door' && styleId === 'dog-house' && (
+              <p className="object-menu-meta">Baboo wants 12" or 18", then slide it off-center.</p>
+            )}
             {o.type === 'door' && (
               <div className="object-menu-row">
                 <button
@@ -288,6 +307,22 @@ export function ObjectMenu({
             <button type="button" className="object-menu-x aw-pressable" aria-label="Close" onClick={clearSelection}>×</button>
           </div>
           <p className="object-menu-meta">Drag to move the label</p>
+          <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
+        </>
+      )}
+
+      {selected.kind === 'sketch' && (
+        <>
+          <div className="object-menu-head">
+            <strong>Sketch</strong>
+            <button type="button" className="object-menu-x aw-pressable" aria-label="Close" onClick={clearSelection}>×</button>
+          </div>
+          <p className="object-menu-meta">Pencil underlay · drag to move</p>
+          <div className="object-menu-row">
+            <button type="button" className="object-chip aw-pressable" onClick={() => traceSketch()}>
+              Trace to walls
+            </button>
+          </div>
           <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
         </>
       )}

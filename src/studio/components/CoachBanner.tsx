@@ -6,19 +6,22 @@ import { useProjectStore } from '../store/useProjectStore';
 export function CoachBanner() {
   const floor = useProjectStore((s) => s.doc.floors[0]);
   const skillLevel = useProjectStore((s) => s.doc.settings.skillLevel) ?? DEFAULT_SKILL_LEVEL;
+  const styleId = useProjectStore((s) => s.doc.settings.styleId);
   const setTool = useProjectStore((s) => s.setTool);
   const setToolsPinned = useProjectStore((s) => s.setToolsPinned);
   const toggleTeaching = useProjectStore((s) => s.toggleTeaching);
+  const toggleContest = useProjectStore((s) => s.toggleContest);
   const teachingOpen = useProjectStore((s) => s.teachingOpen);
+  const contestOpen = useProjectStore((s) => s.contestOpen);
   const customizeOpen = useProjectStore((s) => s.customizeOpen);
   const helpOpen = useProjectStore((s) => s.helpOpen);
   const newProjectOpen = useProjectStore((s) => s.newProjectOpen);
   const [dismissed, setDismissed] = useState<string | null>(null);
 
-  const step = nextCoach(skillLevel, floor);
+  const step = nextCoach(skillLevel, floor, styleId);
 
-  if (skillRank(skillLevel) > 1) return null;
-  if (teachingOpen || customizeOpen || helpOpen || newProjectOpen) return null;
+  if (skillRank(skillLevel) > 1 && styleId !== 'dog-house') return null;
+  if (teachingOpen || contestOpen || customizeOpen || helpOpen || newProjectOpen) return null;
   if (!step || dismissed === step.id) return null;
 
   return (
@@ -46,6 +49,14 @@ export function CoachBanner() {
               }}
             >
               Show me
+            </button>
+          ) : step.panel === 'contest' ? (
+            <button
+              type="button"
+              className="primary-btn aw-pressable"
+              onClick={toggleContest}
+            >
+              Ask Baboo
             </button>
           ) : (
             <button

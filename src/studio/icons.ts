@@ -4,6 +4,7 @@ const base = `${import.meta.env.BASE_URL}icons`;
 
 export const ICON = {
   select: `${base}/select.png`,
+  sketch: `${base}/sketch.png`,
   wall: `${base}/wall.png`,
   door: `${base}/door.png`,
   window: `${base}/window.png`,
@@ -37,6 +38,7 @@ export const ICON = {
   folder: `${base}/folder.png`,
   import: `${base}/import.png`,
   drive: `${base}/drive.png`,
+  contest: `${base}/contest.png`,
 } as const;
 
 export type IconName = keyof typeof ICON;

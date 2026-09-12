@@ -1,4 +1,4 @@
-export type Tool = 'select' | 'wall' | 'door' | 'window' | 'furniture' | 'room' | 'dim' | 'note' | 'plant' | 'pan';
+export type Tool = 'select' | 'sketch' | 'wall' | 'door' | 'window' | 'furniture' | 'room' | 'dim' | 'note' | 'plant' | 'pan';
 export type ViewMode = 'plan' | 'solid3d' | 'materials' | 'lighting' | 'walkthrough';
 export type RenderTier = 0 | 1 | 2 | 3;
 
@@ -15,7 +15,8 @@ export type StyleId =
   | 'modern'
   | 'tudor'
   | 'yurt'
-  | 'tiny-home';
+  | 'tiny-home'
+  | 'dog-house';
 
 /**
  * Roof styles — ROOF-STYLES-MVP.md + Diego grass/sod for Hobbit + conical for Yurt.
@@ -112,6 +113,12 @@ export interface LandscapeItem {
   label: string;
 }
 
+/** Freehand pencil stroke in plan-feet. points is a flat [x,y,x,y,…] list. */
+export interface SketchStroke {
+  id: string;
+  points: number[];
+}
+
 /** Named enclosed space. Polygon is derived from walls around (x, y). */
 export type RoomKind =
   | 'entry'
@@ -146,6 +153,7 @@ export interface Floor {
   dimensions: DimItem[];
   notes: NoteItem[];
   landscape: LandscapeItem[];
+  sketches: SketchStroke[];
   roof: RoofGeometry | null;
   layers: {
     structure: boolean;
@@ -154,6 +162,7 @@ export interface Floor {
     rooms: boolean;
     dims: boolean;
     landscape: boolean;
+    sketch: boolean;
     roof: boolean;
   };
 }

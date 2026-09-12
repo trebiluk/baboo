@@ -4,6 +4,7 @@ import {
   isToolUnlocked,
   nextCoach,
   toolsForLevel,
+  upcomingTools,
   skillRank,
   levelRequiredFor,
 } from './skill';
@@ -22,10 +23,11 @@ function emptyFloor(): Floor {
     dimensions: [],
     notes: [],
     landscape: [],
+    sketches: [],
     roof: null,
     layers: {
       structure: true, openings: true, furniture: true, rooms: true,
-      dims: true, landscape: false, roof: true,
+      dims: true, landscape: false, sketch: true, roof: true,
     },
   };
 }
@@ -48,8 +50,9 @@ function closedBox(): Floor {
 
 describe('skill levels', () => {
   it('unlocks tools in order', () => {
-    assert.deepEqual(toolsForLevel('novice'), ['select', 'wall', 'door', 'pan']);
+    assert.deepEqual(toolsForLevel('novice'), ['select', 'sketch', 'wall', 'door', 'pan']);
     assert.equal(isToolUnlocked('window', 'novice'), false);
+    assert.ok(isToolUnlocked('sketch', 'novice'));
     assert.ok(isToolUnlocked('window', 'beginner'));
     assert.equal(isToolUnlocked('furniture', 'beginner'), false);
     assert.ok(isToolUnlocked('furniture', 'moderate'));
@@ -60,15 +63,26 @@ describe('skill levels', () => {
     assert.equal(skillRank('expert'), 3);
     assert.equal(levelRequiredFor('furniture'), 'moderate');
     assert.equal(levelRequiredFor('window'), 'beginner');
+    assert.deepEqual(upcomingTools('novice'), ['window', 'room', 'dim', 'note']);
+    assert.deepEqual(upcomingTools('beginner'), ['furniture', 'plant']);
+    assert.deepEqual(upcomingTools('moderate'), []);
+    assert.deepEqual(upcomingTools('expert'), []);
   });
 
   it('coaches novices on an empty plan and stays quiet for experts', () => {
     const f = emptyFloor();
     const novice = nextCoach('novice', f);
-    assert.equal(novice?.id, 'wall');
+    assert.equal(novice?.id, 'sketch');
     assert.equal(nextCoach('expert', f), null);
     const moderate = nextCoach('moderate', f);
     assert.equal(moderate?.id, 'wall');
+  });
+
+  it('asks a novice to trace after a sketch', () => {
+    const f = emptyFloor();
+    f.sketches.push({ id: 'sk1', points: [0, 0, 8, 0, 8, 6] });
+    assert.equal(nextCoach('novice', f)?.id, 'trace');
+    assert.equal(nextCoach('beginner', f)?.id, 'trace');
   });
 
   it('walks beginner help from closed walls to door then window then room', () => {
@@ -86,5 +100,20 @@ describe('skill levels', () => {
     assert.equal(nextCoach('beginner', f)?.id, 'done');
     assert.equal(nextCoach('novice', f)?.id, 'novice-done');
     assert.equal(nextCoach('moderate', f), null);
+  });
+
+  it('coaches the dog-house contest instead of windows', () => {
+    const f = emptyFloor();
+    assert.equal(nextCoach('beginner', f, 'dog-house')?.id, 'sketch');
+    const box = closedBox();
+    assert.equal(nextCoach('beginner', box, 'dog-house')?.id, 'door');
+    box.openings.push({
+      id: 'd1', wallId: 'w1', t: 0.5, width: 3, type: 'door', symbolKind: 'swingDoor',
+    });
+    assert.equal(nextCoach('beginner', box, 'dog-house')?.id, 'dog-door');
+    box.openings[0].width = 1.5;
+    assert.equal(nextCoach('beginner', box, 'dog-house')?.id, 'offset');
+    box.openings[0].t = 0.22;
+    assert.equal(nextCoach('beginner', box, 'dog-house')?.id, 'dim');
   });
 });

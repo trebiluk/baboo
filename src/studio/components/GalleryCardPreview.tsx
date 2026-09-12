@@ -5,6 +5,7 @@ import { STYLE_TEMPLATES } from '../data/templates';
 import { textureName } from '../data/textures';
 import { shellDisplayName } from '../data/typology';
 import { DEFAULT_GALLERY_ALIAS } from '../lib/galleryExport';
+import { judgeDogHouse, ribbonLabel } from '../lib/contest';
 
 /** Share-gallery card — aliases only (SHARE-GALLERY.md · FERPA). */
 export function GalleryCardPreview({
@@ -28,6 +29,10 @@ export function GalleryCardPreview({
   const tex = textureName(settings.textureId);
   const isTiny = settings.styleId === 'tiny-home' || settings.typology?.kind === 'tiny-home';
   const shellLabel = isTiny ? shellDisplayName(settings.typology?.shell ?? 'trailer') : '';
+  const floor = useProjectStore((s) => s.doc.floors[0]);
+  const contestRibbon = settings.styleId === 'dog-house'
+    ? ribbonLabel(judgeDogHouse(floor, { roofStyleId: settings.roofStyleId }).ribbon)
+    : null;
 
   return (
     <article
@@ -58,6 +63,12 @@ export function GalleryCardPreview({
             <div>
               <dt>Shell</dt>
               <dd>{shellLabel}</dd>
+            </div>
+          ) : null}
+          {contestRibbon ? (
+            <div>
+              <dt>Baboo</dt>
+              <dd>{contestRibbon}</dd>
             </div>
           ) : null}
           <div>
