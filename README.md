@@ -5,7 +5,7 @@ Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 **© 2026 Richard Kulibert Jr.**  
 
 
-**Version 1.0.37** — Floating version chip, phone tools, Access sheets over rails.
+**Version 1.0.38** — Polish pass: even New Plan cards, one phone version pill.
 
 Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the side rail. Plans save on the device as `.archworks.json`.
 
@@ -36,11 +36,11 @@ npm run pack:share
 - **Class folder** is a copy-to-the-share pack — Chrome, no login
 - No Google login inside the app
 
-## What’s in 1.0.37
+## What’s in 1.0.38
 
-- Floating version chip on phones — tap for what’s new, hold for Teacher
+- New plan cards sit even; Contest is a quiet chip; Close is in the header
+- Phones keep one version pill on the grid — the top bar stays icons
 - Sketch, Wall, and Door stay on the left — one tap. More opens the rest
-- Access and Teach sit on top of the rails on a landscape phone
 - Best Dog House Contest: New → Dog House, then Contest
 - Sketch is the first tool; Trace turns a pencil line into straight walls
 

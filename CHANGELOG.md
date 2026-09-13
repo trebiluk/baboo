@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 1.0.38 — 2026-09-13
+- New plan cards sit even, Contest is a quiet chip, and Close lives in the header
+- Phones keep one version pill on the grid — the top bar stays icons. Drawers get a grab bar
+
 ## 1.0.37 — 2026-09-09
 - Floating version chip on phones — tap for what’s new, hold for Teacher. Follow it even when the top bar is icons-only
 - Access and Teach sheets sit on top of the tool rails, so landscape phones can still read the list

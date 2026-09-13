@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '1.0.38',
+    date: '2026-09-13',
+    bullets: [
+      'New plan cards sit even, Contest is a quiet chip, and Close lives in the header',
+      'Phones keep one version pill on the grid — the top bar stays icons. Drawers get a grab bar',
+    ],
+  },
+  {
     version: '1.0.37',
     date: '2026-09-09',
     bullets: [

@@ -20,6 +20,7 @@ import { ToolRail } from './components/ToolRail';
 import { DockRail } from './components/DockRail';
 import { CoachBanner } from './components/CoachBanner';
 import { VersionChip } from './components/VersionChip';
+import { usePhoneChrome } from './hooks/usePhoneChrome';
 import { useProjectStore } from './store/useProjectStore';
 import { applyGuiTheme, DEFAULT_GUI_THEME } from './data/themes';
 
@@ -43,6 +44,7 @@ export default function App() {
   }, [init]);
 
   const guiTheme = useProjectStore((s) => s.doc.settings.guiTheme);
+  const phoneChrome = usePhoneChrome();
 
   useEffect(() => {
     applyGuiTheme(guiTheme ?? DEFAULT_GUI_THEME);
@@ -101,7 +103,7 @@ export default function App() {
   }, [deleteSelected, undo, redo, cancelWallDraft, setTool, closeOverlays, minimizeTools, duplicateSelected, rotateSelected, fitPlan]);
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${phoneChrome ? ' is-phone' : ''}`}>
       <Chrome />
       <div className={`workspace${viewMode !== 'plan' ? ' workspace-3d' : ''}`}>
         <div className="stage-stack">

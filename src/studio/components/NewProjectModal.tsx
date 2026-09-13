@@ -13,10 +13,22 @@ export function NewProjectModal() {
   const setSkillLevel = useProjectStore((s) => s.setSkillLevel);
   if (!open) return null;
 
+  const dismiss = () => close(false);
+
   return (
-    <div className="modal-backdrop">
-      <div className="panel-card new-project-modal" role="dialog" aria-label="New plan">
-        <h2>Let's start a plan</h2>
+    <div className="modal-backdrop" onClick={dismiss}>
+      <div
+        className="panel-card new-project-modal"
+        role="dialog"
+        aria-labelledby="new-plan-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="drawer-head">
+          <h2 id="new-plan-title">Let's start a plan</h2>
+          <button type="button" className="ghost-btn secondary-btn aw-pressable" onClick={dismiss}>
+            Close
+          </button>
+        </div>
         <p className="muted">Pick a house to start from, or a blank grid. You can always start over.</p>
         <SkillPicker value={skillLevel} onChange={setSkillLevel} legend="How should I help?" />
         <div className="template-grid">
@@ -31,17 +43,17 @@ export function NewProjectModal() {
               >
                 <strong>
                   {t.name}
-                  {t.badge ? <span className="save-chip" style={{ marginLeft: 6, fontSize: 11 }}>{t.badge}</span> : null}
+                  {t.badge ? <span className="template-badge">{t.badge}</span> : null}
                 </strong>
                 <span>{t.blurb}</span>
-                <em className="muted" style={{ fontSize: 12, marginTop: 4, display: 'block' }}>
-                  Roof: {roofStyleName(roof)}
-                </em>
+                <em className="template-roof">Roof: {roofStyleName(roof)}</em>
               </button>
             );
           })}
         </div>
-        <button type="button" className="ghost-btn secondary-btn aw-pressable" onClick={() => close(false)}>Cancel</button>
+        <button type="button" className="ghost-btn secondary-btn aw-pressable" onClick={dismiss}>
+          Cancel
+        </button>
       </div>
     </div>
   );

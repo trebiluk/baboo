@@ -60,7 +60,10 @@ export function CustomizePanel() {
         aria-labelledby="customize-title"
       >
         <div className="drawer-head">
-          <h2 id="customize-title">Settings</h2>
+          <div className="drawer-head-title">
+            <span className="sheet-handle" aria-hidden="true" />
+            <h2 id="customize-title">Settings</h2>
+          </div>
           <button type="button" className="ghost-btn secondary-btn aw-pressable" onClick={toggle}>
             Close
           </button>

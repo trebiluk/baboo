@@ -25,10 +25,13 @@ export function HelpModal() {
       />
       <aside className="drawer help-drawer" role="dialog" aria-label="Help">
         <div className="drawer-head">
-          <h2 id="help-title">Help · About</h2>
+          <div className="drawer-head-title">
+            <span className="sheet-handle" aria-hidden="true" />
+            <h2 id="help-title">Help · About</h2>
+          </div>
           <button type="button" className="ghost-btn secondary-btn aw-pressable" onClick={toggle}>Close</button>
         </div>
-        <p className="muted">Baboo {APP_VERSION} — sketch first, then two clicks make a wall. Hover Tools on the left if you get stuck.</p>
+        <p className="muted">Baboo {APP_VERSION} — sketch first, then two clicks make a wall. Open Tools on the left if you get stuck.</p>
         <ul className="help-list">
           <li><strong>Sketch</strong> — drag like a pencil. Architecture starts here. Tap a sketch → Trace to turn it into walls. The pencil line stays as an underlay.</li>
           <li><strong>Wall</strong> — click start, click end. Pull 45° for a slanted corner, or Wall → Clip and click a sharp corner.</li>
