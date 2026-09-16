@@ -2,12 +2,13 @@
 
 Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 
-**© 2026 Richard Kulibert Jr.**  
+**© 2026 Richard Kulibert Jr.**
 
-
-**Version 1.0.38** — Polish pass: even New Plan cards, one phone version pill.
+**Version 1.1.7** — Dollhouse drawing views (isometric, oblique, elevation, orthographic). Full look-only 3D. ELL vocab. Architect sheet.
 
 Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the side rail. Plans save on the device as `.archworks.json`.
+
+Live classroom: [baboo.kulibert.net](https://baboo.kulibert.net)
 
 ## Run locally
 
@@ -15,8 +16,6 @@ Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Tra
 npm install
 npm run dev
 ```
-
-Open the URL Vite prints (this build listens on port 8080).
 
 ```bash
 npm run build
@@ -36,13 +35,13 @@ npm run pack:share
 - **Class folder** is a copy-to-the-share pack — Chrome, no login
 - No Google login inside the app
 
-## What’s in 1.0.38
+## What’s in 1.1.7
 
-- New plan cards sit even; Contest is a quiet chip; Close is in the header
-- Phones keep one version pill on the grid — the top bar stays icons
-- Sketch, Wall, and Door stay on the left — one tap. More opens the rest
-- Best Dog House Contest: New → Dog House, then Contest
-- Sketch is the first tool; Trace turns a pencil line into straight walls
+- Dollhouse turns Front / Right / Rear / Left
+- Drawing views: Isometric, Oblique (cabinet), Elevation, Orthographic + Top (a plan)
+- 3D orbit, materials, lighting, walkthrough — still view-only
+- Teach English CAD words for grades 5–8 ELL (7 languages)
+- Architect sheet: title block, north, scale, kitchen triangle
 
 See [CHANGELOG.md](CHANGELOG.md) for the rest.
 

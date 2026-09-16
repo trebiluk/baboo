@@ -27,6 +27,12 @@ export const THEME_OPTIONS: ThemeOption[] = [
     blurb: 'Stage-bright · hard contrast',
     colorScheme: 'light',
   },
+  {
+    id: 'blocky',
+    name: 'Blocky',
+    blurb: 'Chunky cubes · grass and dirt — Minecraft-inspired',
+    colorScheme: 'light',
+  },
 ];
 
 /** Stark is Baboo GUI default. */
@@ -37,7 +43,7 @@ export const STARK_FLASH = '#6E72F5';
 export const STARK_FLASH_SOFT = '#8B8DFF';
 
 export function isGuiThemeId(v: unknown): v is GuiThemeId {
-  return v === 'stark' || v === 'ink' || v === 'projector';
+  return v === 'stark' || v === 'ink' || v === 'projector' || v === 'blocky';
 }
 
 export function themeColorScheme(id: GuiThemeId): 'light' | 'dark' {

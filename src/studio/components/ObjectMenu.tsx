@@ -1,9 +1,10 @@
+import { useEffect, useState } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
-import { formatLength, pointOnWall, wallEnds, wallLength } from '../lib/geometry';
+import { formatLength, wallLength } from '../lib/geometry';
 import { ROOM_CATALOG, roomType } from '../data/rooms';
 import { formatArea, polygonArea, roomPolygon } from '../lib/rooms';
-import type { Point } from '../types';
 import { Icon } from '../icons';
+import { TEXTURE_PACKS } from '../data/textures';
 
 const DOOR_WIDTHS = [
   { v: 1, label: '12"' },
@@ -24,66 +25,21 @@ function near(a: number, b: number) {
   return Math.abs(a - b) < 0.04;
 }
 
-export function selectedAnchor(
-  selected: { kind: string; id: string } | null,
-  floor: ReturnType<typeof useProjectStore.getState>['doc']['floors'][0],
-): Point | null {
-  if (!selected) return null;
-  if (selected.kind === 'opening') {
-    const o = floor.openings.find((x) => x.id === selected.id);
-    if (!o) return null;
-    const wall = floor.walls.find((w) => w.id === o.wallId);
-    if (!wall) return null;
-    return pointOnWall(wall, floor.nodes, o.t);
-  }
-  if (selected.kind === 'furniture') {
-    const f = floor.furniture.find((x) => x.id === selected.id);
-    return f ? { x: f.x, y: f.y + f.h / 2 } : null;
-  }
-  if (selected.kind === 'landscape') {
-    const f = (floor.landscape ?? []).find((x) => x.id === selected.id);
-    return f ? { x: f.x, y: f.y + f.h / 2 } : null;
-  }
-  if (selected.kind === 'note') {
-    const n = (floor.notes ?? []).find((x) => x.id === selected.id);
-    return n ? { x: n.x, y: n.y + 0.6 } : null;
-  }
-  if (selected.kind === 'dim') {
-    const d = (floor.dimensions ?? []).find((x) => x.id === selected.id);
-    return d ? { x: (d.ax + d.bx) / 2, y: (d.ay + d.by) / 2 } : null;
-  }
-  if (selected.kind === 'sketch') {
-    const sk = (floor.sketches ?? []).find((x) => x.id === selected.id);
-    if (!sk || sk.points.length < 2) return null;
-    let minX = sk.points[0], maxX = sk.points[0], minY = sk.points[1], maxY = sk.points[1];
-    for (let i = 2; i + 1 < sk.points.length; i += 2) {
-      if (sk.points[i] < minX) minX = sk.points[i];
-      if (sk.points[i] > maxX) maxX = sk.points[i];
-      if (sk.points[i + 1] < minY) minY = sk.points[i + 1];
-      if (sk.points[i + 1] > maxY) maxY = sk.points[i + 1];
-    }
-    return { x: (minX + maxX) / 2, y: maxY };
-  }
-  if (selected.kind === 'wall') {
-    const w = floor.walls.find((x) => x.id === selected.id);
-    if (!w) return null;
-    const e = wallEnds(w, floor.nodes);
-    return e ? { x: (e.a.x + e.b.x) / 2, y: (e.a.y + e.b.y) / 2 } : null;
-  }
-  if (selected.kind === 'room') {
-    const r = (floor.rooms ?? []).find((x) => x.id === selected.id);
-    return r ? { x: r.x, y: r.y + 0.7 } : null;
-  }
-  return null;
+function DockHead({ title, onCollapse, onClose }: { title: string; onCollapse: () => void; onClose: () => void }) {
+  return (
+    <div className="object-menu-head">
+      <strong>{title}</strong>
+      <span className="object-menu-actions">
+        <button type="button" className="inspect-collapse aw-pressable" onClick={onCollapse} title="Collapse" aria-label="Collapse edit panel">
+          <Icon name="min" />
+        </button>
+        <button type="button" className="object-menu-x aw-pressable" aria-label="Close" onClick={onClose}>×</button>
+      </span>
+    </div>
+  );
 }
 
-export function ObjectMenu({
-  left, top, flip,
-}: {
-  left: number;
-  top: number;
-  flip?: boolean;
-}) {
+export function ObjectMenu() {
   const selected = useProjectStore((s) => s.selected);
   const floor = useProjectStore((s) => s.doc.floors[0]);
   const units = useProjectStore((s) => s.doc.settings.units) || 'ft';
@@ -98,18 +54,47 @@ export function ObjectMenu({
   const rotateSelected = useProjectStore((s) => s.rotateSelected);
   const duplicateSelected = useProjectStore((s) => s.duplicateSelected);
   const clearSelection = useProjectStore((s) => s.clearSelection);
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    setCollapsed(false);
+  }, [selected?.kind, selected?.id]);
+
   if (!selected) return null;
 
+  const title =
+    selected.kind === 'opening' ? (floor.openings.find((x) => x.id === selected.id)?.type === 'window' ? 'Window' : 'Door')
+      : selected.kind === 'wall' ? 'Wall'
+        : selected.kind === 'furniture' ? (floor.furniture.find((x) => x.id === selected.id)?.label ?? 'Furniture')
+          : selected.kind === 'landscape' ? (floor.landscape.find((x) => x.id === selected.id)?.label ?? 'Plant')
+            : selected.kind === 'room' ? 'Room'
+              : selected.kind === 'note' ? 'Note'
+                : selected.kind === 'dim' ? 'Size'
+                  : selected.kind === 'sketch' ? 'Sketch'
+                    : 'Edit';
+
   return (
-    <div
-      className={`object-menu${flip ? ' is-above' : ''}`}
-      style={{ left, top }}
+    <aside
+      className={`inspect-dock${collapsed ? ' is-min' : ''}`}
       onPointerDown={(e) => e.stopPropagation()}
       onPointerUp={(e) => e.stopPropagation()}
       role="dialog"
-      aria-label="Object options"
+      aria-label="Edit selection"
+      aria-expanded={!collapsed}
     >
-      {selected.kind === 'opening' && (() => {
+      {collapsed ? (
+        <button
+          type="button"
+          className="inspect-chip aw-pressable"
+          onClick={() => setCollapsed(false)}
+          title="Open edit panel"
+        >
+          <Icon name="list" />
+          <span>{title}</span>
+        </button>
+      ) : (
+        <div className="object-menu">
+          {selected.kind === 'opening' && (() => {
         const o = floor.openings.find((x) => x.id === selected.id);
         if (!o) return null;
         const wall = floor.walls.find((w) => w.id === o.wallId);
@@ -118,10 +103,7 @@ export function ObjectMenu({
         const slide = o.symbolKind === 'slidingDoor';
         return (
           <>
-            <div className="object-menu-head">
-              <strong>{o.type === 'door' ? 'Door' : 'Window'}</strong>
-              <button type="button" className="object-menu-x aw-pressable" aria-label="Close" onClick={clearSelection}>×</button>
-            </div>
+            <DockHead title={o.type === 'door' ? 'Door' : 'Window'} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
             <div className="object-menu-row" role="group" aria-label="Width">
               {widths.map((w) => (
                 <button
@@ -191,10 +173,7 @@ export function ObjectMenu({
         if (!w) return null;
         return (
           <>
-            <div className="object-menu-head">
-              <strong>Wall</strong>
-              <button type="button" className="object-menu-x aw-pressable" aria-label="Close" onClick={clearSelection}>×</button>
-            </div>
+            <DockHead title="Wall" onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
             <div className="object-menu-row">
               <button
                 type="button"
@@ -212,6 +191,24 @@ export function ObjectMenu({
               </button>
               <span className="object-menu-meta">{formatLength(wallLength(w, floor.nodes), units)}</span>
             </div>
+            <p className="object-menu-meta">Wallpaper</p>
+            <div className="object-menu-row" role="group" aria-label="Wallpaper">
+              {TEXTURE_PACKS.filter((p) => p.id !== 'import:local').map((p) => {
+                const on = (p.id === 'pack:plain' && !w.finishId) || w.finishId === p.id;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={`object-chip tex-swatch aw-pressable${on ? ' active' : ''}`}
+                    style={{ background: p.previewCss }}
+                    title={p.name}
+                    onClick={() => patchWall(w.id, { finishId: p.id === 'pack:plain' ? null : p.id })}
+                  >
+                    {p.name}
+                  </button>
+                );
+              })}
+            </div>
             <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
           </>
         );
@@ -222,10 +219,7 @@ export function ObjectMenu({
         if (!f) return null;
         return (
           <>
-            <div className="object-menu-head">
-              <strong>{f.label}</strong>
-              <button type="button" className="object-menu-x aw-pressable" aria-label="Close" onClick={clearSelection}>×</button>
-            </div>
+            <DockHead title={f.label} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
             <div className="object-menu-row">
               <button type="button" className="object-chip aw-pressable" onClick={() => rotateSelected(1)}><Icon name="rotate" /> Rotate</button>
               <button type="button" className="object-chip aw-pressable" onClick={duplicateSelected}><Icon name="copy" /> Copy</button>
@@ -241,10 +235,7 @@ export function ObjectMenu({
         if (!f) return null;
         return (
           <>
-            <div className="object-menu-head">
-              <strong>{f.label}</strong>
-              <button type="button" className="object-menu-x aw-pressable" aria-label="Close" onClick={clearSelection}>×</button>
-            </div>
+            <DockHead title={f.label} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
             <p className="object-menu-meta">Drag to move</p>
             <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
           </>
@@ -257,10 +248,7 @@ export function ObjectMenu({
         const poly = roomPolygon(r, floor.nodes, floor.walls);
         return (
           <>
-            <div className="object-menu-head">
-              <strong>Room</strong>
-              <button type="button" className="object-menu-x aw-pressable" aria-label="Close" onClick={clearSelection}>×</button>
-            </div>
+            <DockHead title="Room" onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
             <label className="object-menu-field">
               <span>Name</span>
               <input value={r.name} onChange={(e) => renameRoom(r.id, e.target.value)} aria-label="Room name" />
@@ -287,10 +275,7 @@ export function ObjectMenu({
         if (!n) return null;
         return (
           <>
-            <div className="object-menu-head">
-              <strong>Note</strong>
-              <button type="button" className="object-menu-x aw-pressable" aria-label="Close" onClick={clearSelection}>×</button>
-            </div>
+            <DockHead title="Note" onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
             <label className="object-menu-field">
               <span>Text</span>
               <input value={n.text} onChange={(e) => renameNote(n.id, e.target.value)} aria-label="Note text" />
@@ -302,10 +287,7 @@ export function ObjectMenu({
 
       {selected.kind === 'dim' && (
         <>
-          <div className="object-menu-head">
-            <strong>Size</strong>
-            <button type="button" className="object-menu-x aw-pressable" aria-label="Close" onClick={clearSelection}>×</button>
-          </div>
+          <DockHead title="Size" onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
           <p className="object-menu-meta">Drag to move the label</p>
           <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
         </>
@@ -313,10 +295,7 @@ export function ObjectMenu({
 
       {selected.kind === 'sketch' && (
         <>
-          <div className="object-menu-head">
-            <strong>Sketch</strong>
-            <button type="button" className="object-menu-x aw-pressable" aria-label="Close" onClick={clearSelection}>×</button>
-          </div>
+          <DockHead title="Sketch" onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
           <p className="object-menu-meta">Pencil underlay · drag to move</p>
           <div className="object-menu-row">
             <button type="button" className="object-chip aw-pressable" onClick={() => traceSketch()}>
@@ -326,6 +305,8 @@ export function ObjectMenu({
           <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
         </>
       )}
-    </div>
+        </div>
+      )}
+    </aside>
   );
 }

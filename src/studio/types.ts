@@ -1,6 +1,7 @@
 export type Tool = 'select' | 'sketch' | 'wall' | 'door' | 'window' | 'furniture' | 'room' | 'dim' | 'note' | 'plant' | 'pan';
-export type ViewMode = 'plan' | 'solid3d' | 'materials' | 'lighting' | 'walkthrough';
+export type ViewMode = 'plan' | 'dollhouse' | 'solid3d' | 'materials' | 'lighting' | 'walkthrough';
 export type RenderTier = 0 | 1 | 2 | 3;
+export type DollProj = 'iso' | 'oblique' | 'elevation' | 'ortho';
 
 /** House style templates (Diego expand 1.0.2 — Curriculum list may refine). */
 export type StyleId =
@@ -59,6 +60,8 @@ export interface Wall {
   b: string;
   kind: 'exterior' | 'interior';
   thickness: number;
+  /** Wallpaper pack id for this wall (Dollhouse). */
+  finishId?: string | null;
 }
 
 export interface Opening {
@@ -184,8 +187,18 @@ export interface TypologySettings {
   inventory: TypologyInventoryItem[];
 }
 
-/** Baboo GUI chrome — stark | ink | projector (Customize). Dream = TechWorks Board only. */
-export type GuiThemeId = 'stark' | 'ink' | 'projector';
+/** Baboo GUI chrome — stark | ink | projector | blocky (Customize). Dream = TechWorks Board only. */
+export type GuiThemeId = 'stark' | 'ink' | 'projector' | 'blocky';
+
+/** Solid 3D sky look. */
+export type SkyPreset = 'day' | 'dusk' | 'overcast';
+/** Yard under the house in Solid 3D. */
+export type SiteFinish = 'grass' | 'gravel' | 'pad';
+/** Wall tint in Solid 3D. */
+export type WallTintId = 'sand' | 'white' | 'clay' | 'slate' | 'sage' | 'sky';
+
+/** Classroom UI language. Cubano is Cuban Spanish, distinct from Español. */
+export type Locale = 'en' | 'es' | 'cu' | 'uk' | 'ru' | 'ti' | 'fa';
 
 /** How much help vs how many tools — Settings and New project. */
 export type SkillLevel = 'novice' | 'beginner' | 'moderate' | 'expert';
@@ -221,6 +234,28 @@ export interface ProjectSettings {
    * Never inline bytes in JSON — Chromebook lean-save law.
    */
   imageBlobRef: string | null;
+  /** Solid 3D sky. Default day. */
+  skyPreset: SkyPreset;
+  /** Yard under the house. Default grass. */
+  siteFinish: SiteFinish;
+  /** Wall tint in Solid 3D. */
+  wallTintId: WallTintId;
+  /** Furniture boxes in Solid 3D (view-only). Default on. */
+  showFurniture3d: boolean;
+  /** Dollhouse drawing system. Default isometric. */
+  dollProj: DollProj;
+  /** Dollhouse turn: 0 front, 90 right, 180 rear, 270 left. */
+  dollYaw: 0 | 90 | 180 | 270;
+  /** Orthographic looking straight down (a plan). */
+  dollTop: boolean;
+  /** Classroom language. Default English. */
+  locale: Locale;
+  /** Special-ed: 52px tap targets + always-on labels. */
+  udlFat: boolean;
+  /** Special-ed: larger type on coach, toast, Teach, hints. */
+  udlType: boolean;
+  /** ELL grades 5–8: show English CAD words first so kids learn them. Default on. */
+  ellEnglish: boolean;
   /** Tiny Home typology + inventory checklist (omit for regular houses). */
   typology?: TypologySettings;
 }

@@ -4,12 +4,14 @@ import type { StyleId } from '../types';
 import { DEFAULT_SKILL_LEVEL } from '../data/skill';
 import { SkillPicker } from './SkillPicker';
 import { roofDefaultForStyle, roofStyleName } from '../lib/roof';
+import { t } from '../data/i18n';
 
 export function NewProjectModal() {
   const open = useProjectStore((s) => s.newProjectOpen);
   const close = useProjectStore((s) => s.openNewProject);
   const start = useProjectStore((s) => s.newFromTemplate);
   const skillLevel = useProjectStore((s) => s.doc.settings.skillLevel) ?? DEFAULT_SKILL_LEVEL;
+  const locale = useProjectStore((s) => s.doc.settings.locale);
   const setSkillLevel = useProjectStore((s) => s.setSkillLevel);
   if (!open) return null;
 
@@ -24,35 +26,35 @@ export function NewProjectModal() {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="drawer-head">
-          <h2 id="new-plan-title">Let's start a plan</h2>
+          <h2 id="new-plan-title">{t(locale, 'new.title')}</h2>
           <button type="button" className="ghost-btn secondary-btn aw-pressable" onClick={dismiss}>
-            Close
+            {t(locale, 'chrome.close')}
           </button>
         </div>
-        <p className="muted">Pick a house to start from, or a blank grid. You can always start over.</p>
-        <SkillPicker value={skillLevel} onChange={setSkillLevel} legend="How should I help?" />
+        <p className="muted">{t(locale, 'new.lead')}</p>
+        <SkillPicker value={skillLevel} onChange={setSkillLevel} legend={t(locale, 'new.help')} />
         <div className="template-grid">
-          {STYLE_TEMPLATES.map((t) => {
-            const roof = roofDefaultForStyle(t.id);
+          {STYLE_TEMPLATES.map((tpl) => {
+            const roof = roofDefaultForStyle(tpl.id);
             return (
               <button
-                key={t.id}
+                key={tpl.id}
                 type="button"
                 className="template-card aw-pressable"
-                onClick={() => start(t.id as StyleId)}
+                onClick={() => start(tpl.id as StyleId)}
               >
                 <strong>
-                  {t.name}
-                  {t.badge ? <span className="template-badge">{t.badge}</span> : null}
+                  {tpl.name}
+                  {tpl.badge ? <span className="template-badge">{tpl.badge}</span> : null}
                 </strong>
-                <span>{t.blurb}</span>
+                <span>{tpl.blurb}</span>
                 <em className="template-roof">Roof: {roofStyleName(roof)}</em>
               </button>
             );
           })}
         </div>
         <button type="button" className="ghost-btn secondary-btn aw-pressable" onClick={dismiss}>
-          Cancel
+          {t(locale, 'new.cancel')}
         </button>
       </div>
     </div>

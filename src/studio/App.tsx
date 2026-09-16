@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Chrome } from './components/Chrome';
 import { PlanCanvas } from './components/PlanCanvas';
+import { DollhouseCanvas } from './components/DollhouseCanvas';
 import { FurnitureSidebar } from './components/FurnitureSidebar';
 import { RoomSidebar } from './components/RoomSidebar';
 import { TeachingDrawer } from './components/TeachingDrawer';
@@ -20,9 +21,11 @@ import { ToolRail } from './components/ToolRail';
 import { DockRail } from './components/DockRail';
 import { CoachBanner } from './components/CoachBanner';
 import { VersionChip } from './components/VersionChip';
+import { ObjectMenu } from './components/ObjectMenu';
 import { usePhoneChrome } from './hooks/usePhoneChrome';
 import { useProjectStore } from './store/useProjectStore';
 import { applyGuiTheme, DEFAULT_GUI_THEME } from './data/themes';
+import { applyDocumentLocale, localeOption } from './data/i18n';
 
 export default function App() {
   const init = useProjectStore((s) => s.init);
@@ -44,6 +47,10 @@ export default function App() {
   }, [init]);
 
   const guiTheme = useProjectStore((s) => s.doc.settings.guiTheme);
+  const locale = useProjectStore((s) => s.doc.settings.locale);
+  const udlFat = useProjectStore((s) => s.doc.settings.udlFat);
+  const udlType = useProjectStore((s) => s.doc.settings.udlType);
+  const ellEnglish = useProjectStore((s) => s.doc.settings.ellEnglish !== false);
   const phoneChrome = usePhoneChrome();
 
   useEffect(() => {
@@ -51,10 +58,25 @@ export default function App() {
   }, [guiTheme]);
 
   useEffect(() => {
-    if (viewMode !== 'plan') {
-      setTool('select');
+    applyDocumentLocale(locale);
+    const root = document.documentElement;
+    root.toggleAttribute('data-udl-fat', !!udlFat);
+    root.toggleAttribute('data-udl-type', !!udlType);
+    root.toggleAttribute('data-ell-english', !!ellEnglish && locale !== 'en');
+  }, [locale, udlFat, udlType, ellEnglish]);
+
+  useEffect(() => {
+    if (viewMode === 'plan') return;
+    const t = useProjectStore.getState().tool;
+    if (viewMode === 'dollhouse') {
+      if (t !== 'select' && t !== 'furniture' && t !== 'plant' && t !== 'pan') {
+        setTool('select');
+      }
       cancelWallDraft();
+      return;
     }
+    setTool('select');
+    cancelWallDraft();
   }, [viewMode, setTool, cancelWallDraft]);
 
   useEffect(() => {
@@ -84,34 +106,44 @@ export default function App() {
       } else if (e.altKey || e.metaKey || e.ctrlKey) {
         return;
       } else if (e.key.toLowerCase() === 'v') setTool('select');
-      else if (e.key.toLowerCase() === 's') setTool('sketch');
-      else if (e.key.toLowerCase() === 'w') setTool('wall');
-      else if (e.key.toLowerCase() === 'd') setTool('door');
-      else if (e.key.toLowerCase() === 'n') setTool('window');
-      else if (e.key.toLowerCase() === 'f') setTool('furniture');
-      else if (e.key.toLowerCase() === 'r') setTool('room');
-      else if (e.key.toLowerCase() === 'm') setTool('dim');
-      else if (e.key.toLowerCase() === 't') setTool('note');
-      else if (e.key.toLowerCase() === 'l') setTool('plant');
-      else if (e.key.toLowerCase() === 'h') setTool('pan');
+      else if (e.key.toLowerCase() === 's') { if (viewMode === 'plan') setTool('sketch'); }
+      else if (e.key.toLowerCase() === 'w') { if (viewMode === 'plan') setTool('wall'); }
+      else if (e.key.toLowerCase() === 'd') { if (viewMode === 'plan') setTool('door'); }
+      else if (e.key.toLowerCase() === 'n') { if (viewMode === 'plan') setTool('window'); }
+      else if (e.key.toLowerCase() === 'f') { if (viewMode === 'plan' || viewMode === 'dollhouse') setTool('furniture'); }
+      else if (e.key.toLowerCase() === 'r') { if (viewMode === 'plan') setTool('room'); }
+      else if (e.key.toLowerCase() === 'm') { if (viewMode === 'plan') setTool('dim'); }
+      else if (e.key.toLowerCase() === 't') { if (viewMode === 'plan') setTool('note'); }
+      else if (e.key.toLowerCase() === 'l') { if (viewMode === 'plan' || viewMode === 'dollhouse') setTool('plant'); }
+      else if (e.key.toLowerCase() === 'h') { if (viewMode === 'plan' || viewMode === 'dollhouse') setTool('pan'); }
       else if (e.key === '0') { e.preventDefault(); fitPlan(); }
       else if (e.key === ']') rotateSelected(1);
       else if (e.key === '[') rotateSelected(-1);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [deleteSelected, undo, redo, cancelWallDraft, setTool, closeOverlays, minimizeTools, duplicateSelected, rotateSelected, fitPlan]);
+  }, [deleteSelected, undo, redo, cancelWallDraft, setTool, closeOverlays, minimizeTools, duplicateSelected, rotateSelected, fitPlan, viewMode]);
 
   return (
-    <div className={`app-shell${phoneChrome ? ' is-phone' : ''}`}>
+    <div
+      className={`app-shell${phoneChrome ? ' is-phone' : ''}`}
+      lang={localeOption(locale).htmlLang}
+    >
       <Chrome />
-      <div className={`workspace${viewMode !== 'plan' ? ' workspace-3d' : ''}`}>
+      <div className={`workspace${viewMode !== 'plan' && viewMode !== 'dollhouse' ? ' workspace-3d' : ''}`}>
         <div className="stage-stack">
           <main className="stage-area">
-            {viewMode === 'plan' ? <ErrorBoundary label="plan"><PlanCanvas /></ErrorBoundary> : <View3DStub />}
-            {viewMode === 'plan' && <CoachBanner />}
+            {viewMode === 'plan' ? (
+              <ErrorBoundary label="plan"><PlanCanvas /></ErrorBoundary>
+            ) : viewMode === 'dollhouse' ? (
+              <ErrorBoundary label="dollhouse"><DollhouseCanvas /></ErrorBoundary>
+            ) : (
+              <View3DStub />
+            )}
+            {(viewMode === 'plan' || viewMode === 'dollhouse') && <CoachBanner />}
             {demoMode && <div className="demo-watermark">DEMO</div>}
           </main>
+          <ObjectMenu />
           <VersionChip floating />
           <ToolRail />
           <FurnitureSidebar />

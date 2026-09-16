@@ -1,15 +1,19 @@
-import { useEffect } from 'react';
-import { UNIT_1, DOG_HOUSE_UNIT, CHALLENGES, VOCAB, REFLECTION_PROMPTS, UTILITY_CHECKLIST, ROOM_CHECKLIST } from '../data/teaching';
+import { useEffect, useMemo, useState } from 'react';
+import { UNIT_1, DOG_HOUSE_UNIT, CHALLENGES, VOCAB, REFLECTION_PROMPTS, UTILITY_CHECKLIST, ROOM_CHECKLIST, vocabGloss, ellVocabCard, ellPracticeEntries, vocabHomeWord } from '../data/teaching';
 import { STYLE_TEMPLATES } from '../data/templates';
 import { useProjectStore } from '../store/useProjectStore';
 import { exteriorFloorAreaSqFt, roofStyleName } from '../lib/roof';
 import { FURNITURE_CATALOG } from '../data/furniture';
 import { DEFAULT_SKILL_LEVEL, NOVICE_UNIT_STEPS, skillRank } from '../data/skill';
+import { t, localeOption, asLocale } from '../data/i18n';
+import type { Locale, Floor, StyleId } from '../types';
+import { runArchitectCheck, type ArchCheck, type ArchHit } from '../lib/architect';
 
 export function TeachingDrawer() {
   const open = useProjectStore((s) => s.teachingOpen);
   const toggle = useProjectStore((s) => s.toggleTeaching);
   const toggleContest = useProjectStore((s) => s.toggleContest);
+  const setSelected = useProjectStore((s) => s.setSelected);
   const doc = useProjectStore((s) => s.doc);
   const styleId = doc.settings.styleId;
   const style = STYLE_TEMPLATES.find((t) => t.id === styleId);
@@ -20,6 +24,8 @@ export function TeachingDrawer() {
   const catalogIds = new Set(floor.furniture.map((f) => f.catalogId));
   const hasUtility = (ids: string[]) => ids.some((id) => catalogIds.has(id));
   const skillLevel = doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
+  const locale = doc.settings.locale;
+  const ellEnglish = doc.settings.ellEnglish !== false;
   const rank = skillRank(skillLevel);
   const unit = styleId === 'dog-house' ? DOG_HOUSE_UNIT : UNIT_1;
   const unitSteps = styleId === 'dog-house'
@@ -65,21 +71,38 @@ export function TeachingDrawer() {
         aria-label="Dismiss teaching"
         onClick={toggle}
       />
-      <aside className="drawer teaching-drawer" role="dialog" aria-label="Teaching">
+      <aside
+        className="drawer teaching-drawer"
+        role="dialog"
+        aria-label={t(locale, 'teach.title')}
+        lang={localeOption(locale).htmlLang}
+        dir={localeOption(locale).dir}
+      >
         <div className="drawer-head">
           <div className="drawer-head-title">
             <span className="sheet-handle" aria-hidden="true" />
-            <h2>Teach</h2>
+            <h2>{t(locale, 'teach.title')}</h2>
           </div>
           <button type="button" className="ghost-btn aw-pressable" onClick={toggle}>
-            Close
+            {t(locale, 'chrome.close')}
           </button>
         </div>
 
         <div className="teaching-drawer-body">
-          <p className="muted teach-hello">One step at a time. Hide this whenever you want the whole grid.</p>
+          <p className="muted teach-hello">{t(locale, 'teach.hello')}</p>
           <section>
-            <h3>Plan readout</h3>
+            <h3>{t(locale, 'teach.read.title')}</h3>
+            <p className="muted dense-lead">{t(locale, 'teach.read.lead')}</p>
+            <ArchitectReadout
+              locale={locale}
+              floor={floor}
+              units={doc.settings.units}
+              styleId={styleId}
+              onHit={setSelected}
+            />
+          </section>
+          <section>
+            <h3>{t(locale, 'teach.readout')}</h3>
             <p>
               Approx. floor area:{' '}
               <strong>{area != null ? `${area} sq ft` : '— (draw exterior walls)'}</strong>
@@ -91,15 +114,15 @@ export function TeachingDrawer() {
           </section>
 
           <section>
-            <h3>{unit.title}</h3>
-            <p>{unit.goal}</p>
+            <h3>{styleId === 'dog-house' ? t(locale, 'teach.dog.title') : t(locale, 'teach.unit1.title')}</h3>
+            <p>{styleId === 'dog-house' ? t(locale, 'teach.dog.goal') : t(locale, 'teach.unit1.goal')}</p>
             <ol>
               {unitSteps.map((s) => <li key={s}>{s}</li>)}
             </ol>
-            <p className="done-like"><strong>Done looks like:</strong> {unit.doneLooksLike}</p>
+            <p className="done-like"><strong>{t(locale, 'teach.done')}</strong> {unit.doneLooksLike}</p>
             {styleId === 'dog-house' && (
               <button type="button" className="primary-btn aw-pressable" style={{ marginTop: 10 }} onClick={toggleContest}>
-                Ask Baboo to judge
+                {t(locale, 'teach.judge')}
               </button>
             )}
           </section>
@@ -167,7 +190,7 @@ export function TeachingDrawer() {
           )}
 
           <section>
-            <h3>Challenges</h3>
+            <h3>{t(locale, 'teach.challenges')}</h3>
             {challenges.map((c) => (
               <article key={c.id} className="challenge-card">
                 <h4>{c.title}</h4>
@@ -182,27 +205,217 @@ export function TeachingDrawer() {
           </section>
 
           <section>
-            <h3>Vocab</h3>
+            <h3>{t(locale, 'teach.vocab')}</h3>
+            {ellEnglish && asLocale(locale) !== 'en' ? (
+              <p className="muted dense-lead">{t(locale, 'teach.ell.lead')}</p>
+            ) : null}
             <dl className="vocab-list">
               {(styleId === 'dog-house'
                 ? VOCAB.filter((v) =>
                     [
-                      'Sketch', 'Trace', 'Scale', 'Floor plan', 'Dimension',
+                      'Sketch', 'Trace', 'Wall', 'Door', 'Window', 'Scale', 'Floor plan', 'Dimension',
                       'Door swing', 'Opening', 'Grid', 'Snap', 'Gable', 'Shed',
                       'Flat', 'Ridge', 'Den', 'Offset door', 'Body heat', 'Floor area',
                     ].includes(v.term),
                   )
                 : VOCAB
-              ).map((v) => (
+              ).map((v) => {
+                if (ellEnglish) {
+                  const card = ellVocabCard(locale, v);
+                  return (
+                    <div key={v.term} className="vocab-ell">
+                      <dt>
+                        <span className="vocab-ell-en" lang="en">{card.en}</span>
+                        {card.home ? (
+                          <span className="vocab-ell-home">
+                            {' '}{t(locale, 'teach.ell.means')} {card.home}
+                          </span>
+                        ) : null}
+                      </dt>
+                      <dd>
+                        <span className="vocab-ell-say" lang="en">{t(locale, 'teach.ell.say')}: {card.en}</span>
+                        <span className="vocab-ell-def" lang="en">{card.defEn}</span>
+                        {card.defHome ? <span className="vocab-ell-def-home">{card.defHome}</span> : null}
+                      </dd>
+                    </div>
+                  );
+                }
+                const gloss = vocabGloss(locale, v);
+                return (
                 <div key={v.term}>
-                  <dt>{v.term}</dt>
-                  <dd>{v.def}</dd>
+                  <dt>{gloss.term}</dt>
+                  <dd>{gloss.def}</dd>
                 </div>
-              ))}
+                );
+              })}
             </dl>
           </section>
+
+          {ellEnglish && asLocale(locale) !== 'en' ? (
+            <EllWordPractice locale={locale} dogHouse={styleId === 'dog-house'} />
+          ) : null}
         </div>
       </aside>
     </>
+  );
+}
+
+function architectMark(status: ArchCheck['status'], locale: Locale) {
+  if (status === 'pass') return t(locale, 'teach.read.pass');
+  if (status === 'warn') return t(locale, 'teach.read.warn');
+  if (status === 'fail') return t(locale, 'teach.read.fail');
+  return t(locale, 'teach.read.skip');
+}
+
+function selectArchHit(hit: ArchHit, onHit: (sel: { kind: ArchHit['kind']; id: string }) => void) {
+  onHit({ kind: hit.kind, id: hit.id });
+}
+
+function ArchitectReadout({
+  locale, floor, units, styleId, onHit,
+}: {
+  locale: Locale;
+  floor: Floor;
+  units: 'ft' | 'm';
+  styleId: StyleId;
+  onHit: (sel: { kind: ArchHit['kind']; id: string }) => void;
+}) {
+  let report;
+  try {
+    report = runArchitectCheck(floor, units, styleId);
+  } catch {
+    report = { checks: [] as ArchCheck[], pass: 0, warn: 0, fail: 0, skip: 0 };
+  }
+  return (
+    <ul className="access-list">
+      {report.checks.map((c) => (
+        <li key={c.id}>
+          <button
+            type="button"
+            className={`access-row access-${c.status} aw-pressable`}
+            onClick={() => { if (c.hit) selectArchHit(c.hit, onHit); }}
+            disabled={!c.hit}
+          >
+            <span className="access-mark">{architectMark(c.status, locale)}</span>
+            <strong>{c.title}</strong>
+            <span>{c.detail}</span>
+            <em>{c.tip}</em>
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function shuffle<T>(items: T[]): T[] {
+  const a = [...items];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function EllWordPractice({ locale, dogHouse }: { locale: Locale; dogHouse: boolean }) {
+  const entries = useMemo(() => ellPracticeEntries(dogHouse), [dogHouse]);
+  const [nonce, setNonce] = useState(0);
+  const enOrder = useMemo(() => shuffle(entries.map((e) => e.term)), [entries, nonce]);
+  const homeOrder = useMemo(
+    () => shuffle(entries.map((e) => ({ en: e.term, home: vocabHomeWord(locale, e) }))),
+    [entries, locale, nonce],
+  );
+  const [pickedEn, setPickedEn] = useState<string | null>(null);
+  const [pickedHome, setPickedHome] = useState<string | null>(null);
+  const [matched, setMatched] = useState<Set<string>>(() => new Set());
+  const [miss, setMiss] = useState(false);
+
+  useEffect(() => {
+    setPickedEn(null);
+    setPickedHome(null);
+    setMatched(new Set());
+    setMiss(false);
+  }, [locale, dogHouse, nonce]);
+
+  const resolve = (nextEn: string | null, nextHome: string | null) => {
+    if (!nextEn || !nextHome) return;
+    if (nextEn === nextHome) {
+      setMatched((prev) => new Set(prev).add(nextEn));
+      setPickedEn(null);
+      setPickedHome(null);
+      setMiss(false);
+      return;
+    }
+    setMiss(true);
+    window.setTimeout(() => {
+      setMiss(false);
+      setPickedEn(null);
+      setPickedHome(null);
+    }, 450);
+  };
+
+  const done = matched.size === entries.length && entries.length > 0;
+
+  return (
+    <section className="ell-practice" aria-label={t(locale, 'teach.ell.title')}>
+      <h3>{t(locale, 'teach.ell.title')}</h3>
+      <p className="muted dense-lead">{t(locale, 'teach.ell.match')}</p>
+      <p className="ell-practice-score">
+        {t(locale, 'teach.ell.score', { n: String(matched.size), total: String(entries.length) })}
+      </p>
+      <div className={`ell-practice-grid${miss ? ' is-miss' : ''}`}>
+        <div className="ell-practice-col" lang="en">
+          {enOrder.map((en) => {
+            const on = matched.has(en);
+            return (
+              <button
+                key={en}
+                type="button"
+                className={`ell-chip aw-pressable${on ? ' is-matched' : ''}${pickedEn === en ? ' is-picked' : ''}`}
+                disabled={on}
+                aria-pressed={pickedEn === en}
+                onClick={() => {
+                  const next = en;
+                  setPickedEn(next);
+                  resolve(next, pickedHome);
+                }}
+              >
+                {en}
+              </button>
+            );
+          })}
+        </div>
+        <div className="ell-practice-col">
+          {homeOrder.map((row) => {
+            const on = matched.has(row.en);
+            return (
+              <button
+                key={row.en}
+                type="button"
+                className={`ell-chip ell-chip-home aw-pressable${on ? ' is-matched' : ''}${pickedHome === row.en ? ' is-picked' : ''}`}
+                disabled={on}
+                aria-pressed={pickedHome === row.en}
+                onClick={() => {
+                  const next = row.en;
+                  setPickedHome(next);
+                  resolve(pickedEn, next);
+                }}
+              >
+                {row.home}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      {done ? (
+        <p className="ell-practice-done">{t(locale, 'teach.ell.done')}</p>
+      ) : null}
+      <button
+        type="button"
+        className="ghost-btn aw-pressable"
+        onClick={() => setNonce((n) => n + 1)}
+      >
+        {t(locale, 'teach.ell.again')}
+      </button>
+    </section>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
 import { Icon, type IconName } from '../icons';
 import { usePhoneChrome } from '../hooks/usePhoneChrome';
+import { t, asLocale } from '../data/i18n';
 
 const PANELS = [
   { id: 'teach' as const, label: 'Teach', tip: 'Lesson prompts, vocab, challenges', icon: 'teach' as IconName },
@@ -27,6 +28,7 @@ export function DockRail() {
   const minimizePanels = useProjectStore((s) => s.minimizePanels);
   const chromeEpoch = useProjectStore((s) => s.chromeEpoch);
   const phone = usePhoneChrome();
+  const locale = asLocale(useProjectStore((s) => s.doc.settings.locale));
   const [hover, setHover] = useState(false);
   const [focus, setFocus] = useState(false);
   const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -78,7 +80,7 @@ export function DockRail() {
   return (
     <nav
       className={`dock-rail ${expanded ? 'is-open' : 'is-min'}${busy ? ' is-behind-sheet' : ''}`}
-      aria-label="Studio panels"
+      aria-label={t(locale, 'chrome.panels')}
       aria-expanded={expanded}
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
@@ -92,11 +94,11 @@ export function DockRail() {
           type="button"
           className="dock-rail-btn dock-rail-chip aw-pressable"
           onClick={() => setPanelsPinned(true)}
-          title="Show Teach, Contest, Access, Help, and Settings"
-          aria-label="Show Teach, Contest, Access, Help, and Settings"
+          title={t(locale, 'chrome.showPanels')}
+          aria-label={t(locale, 'chrome.showPanels')}
         >
           <Icon name={current.icon} />
-          <span className="dock-rail-label">{current.label}</span>
+          <span className="dock-rail-label">{t(locale, `chrome.${current.id === 'settings' ? 'settings' : current.id}`)}</span>
         </button>
       )}
       {PANELS.map((p) => (
@@ -111,19 +113,19 @@ export function DockRail() {
           aria-hidden={!expanded}
         >
           <Icon name={p.icon} />
-          <span className="dock-rail-label">{p.label}</span>
+          <span className="dock-rail-label">{t(locale, `chrome.${p.id === 'settings' ? 'settings' : p.id}`)}</span>
         </button>
       ))}
       <button
         type="button"
         className="dock-rail-btn dock-rail-min aw-pressable"
         onClick={minimizePanels}
-        title="Hide panels (Esc)"
+        title={t(locale, 'chrome.hidePanels')}
         tabIndex={expanded ? 0 : -1}
         aria-hidden={!expanded}
       >
         <Icon name="min" />
-        <span className="dock-rail-label">Hide</span>
+        <span className="dock-rail-label">{t(locale, 'chrome.hide')}</span>
       </button>
     </nav>
   );

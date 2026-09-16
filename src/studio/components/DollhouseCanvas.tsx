@@ -1,0 +1,579 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Stage, Layer, Line, Rect, Text, Circle } from 'react-konva';
+import type Konva from 'konva';
+import { useProjectStore } from '../store/useProjectStore';
+import { wallEnds } from '../lib/geometry';
+import {
+  project,
+  unproject,
+  projectPoints,
+  painterDepth,
+  nextYaw,
+  yawToFace,
+  DOLL_PROJS,
+  WALL_H,
+  type DollProj,
+  type ProjSpec,
+  type YawDeg,
+} from '../lib/iso';
+import { packTileCanvas, textureStrokeFallback } from '../lib/texturePattern';
+import { DEFAULT_GUI_THEME } from '../data/themes';
+import { t } from '../data/i18n';
+import type { Wall } from '../types';
+
+type WallFace = {
+  wall: Wall;
+  depth: number;
+  points: number[];
+  texId: string | null;
+};
+
+export function DollhouseCanvas() {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ w: 800, h: 600 });
+  const [pan, setPan] = useState({ x: 80, y: 80 });
+  const [zoom, setZoom] = useState(1);
+  const panning = useRef(false);
+  const last = useRef<{ x: number; y: number } | null>(null);
+  const pointers = useRef(new Map<number, { x: number; y: number }>());
+  const pinch = useRef<{ dist: number; zoom: number; pan: { x: number; y: number }; mid: { x: number; y: number } } | null>(null);
+  const pendingTap = useRef<{ x: number; y: number } | null>(null);
+  const dragging = useRef(false);
+
+  const floor = useProjectStore((s) => s.doc.floors[0]);
+  const settings = useProjectStore((s) => s.doc.settings);
+  const setSettings = useProjectStore((s) => s.setSettings);
+  const selected = useProjectStore((s) => s.selected);
+  const setSelected = useProjectStore((s) => s.setSelected);
+  const clearSelection = useProjectStore((s) => s.clearSelection);
+  const tool = useProjectStore((s) => s.tool);
+  const placeFurniture = useProjectStore((s) => s.placeFurniture);
+  const placePlant = useProjectStore((s) => s.placePlant);
+  const moveSelected = useProjectStore((s) => s.moveSelected);
+  const endMove = useProjectStore((s) => s.endMove);
+  const fitNonce = useProjectStore((s) => s.fitNonce);
+  const light = (settings.guiTheme ?? DEFAULT_GUI_THEME) !== 'ink';
+  const blocky = settings.guiTheme === 'blocky';
+  const spec: ProjSpec = {
+    kind: (settings.dollProj ?? 'iso') as DollProj,
+    yaw: (settings.dollYaw ?? 0) as YawDeg,
+    top: settings.dollProj === 'ortho' && settings.dollTop === true,
+  };
+  const face = yawToFace(spec.yaw, spec.top);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      const w = el.clientWidth || 800;
+      const h = el.clientHeight || 600;
+      setSize({ w, h });
+      useProjectStore.getState().setViewport(w, h);
+    });
+    ro.observe(el);
+    setSize({ w: el.clientWidth || 800, h: el.clientHeight || 600 });
+    const block = (e: TouchEvent) => e.preventDefault();
+    el.addEventListener('touchmove', block, { passive: false });
+    return () => {
+      ro.disconnect();
+      el.removeEventListener('touchmove', block);
+    };
+  }, []);
+
+  const fit = useCallback(() => {
+    const pts: { x: number; y: number }[] = [];
+    for (const n of floor.nodes) pts.push(project(n.x, n.y, 0, spec), project(n.x, n.y, WALL_H, spec));
+    for (const f of floor.furniture) pts.push(project(f.x, f.y, 0, spec));
+    for (const L of floor.landscape ?? []) pts.push(project(L.x, L.y, 0, spec));
+    if (!pts.length) {
+      setPan({ x: size.w / 2, y: size.h / 3 });
+      setZoom(1);
+      return;
+    }
+    let minX = pts[0].x, maxX = pts[0].x, minY = pts[0].y, maxY = pts[0].y;
+    for (const p of pts) {
+      if (p.x < minX) minX = p.x;
+      if (p.x > maxX) maxX = p.x;
+      if (p.y < minY) minY = p.y;
+      if (p.y > maxY) maxY = p.y;
+    }
+    const bw = Math.max(80, maxX - minX + 80);
+    const bh = Math.max(80, maxY - minY + 80);
+    const z = Math.min(2.2, Math.max(0.35, 0.82 * Math.min(size.w / bw, size.h / bh)));
+    setZoom(z);
+    setPan({
+      x: size.w / 2 - ((minX + maxX) / 2) * z,
+      y: size.h / 2 - ((minY + maxY) / 2) * z,
+    });
+  }, [floor.nodes, floor.furniture, floor.landscape, size.w, size.h, spec.kind, spec.yaw, spec.top]);
+
+  useEffect(() => { fit(); }, [fit, fitNonce]);
+
+  const houseTex = settings.textureId ?? null;
+  const tiles = useMemo(() => {
+    const ids = new Set<string>();
+    if (houseTex) ids.add(houseTex);
+    for (const w of floor.walls) if (w.finishId) ids.add(w.finishId);
+    const map = new Map<string, HTMLCanvasElement>();
+    for (const id of ids) {
+      const c = packTileCanvas(id);
+      if (c) map.set(id, c);
+    }
+    return map;
+  }, [floor.walls, houseTex]);
+
+  const floorPoly = useMemo(() => {
+    const outline = floor.roof?.outline;
+    if (outline && outline.length >= 3) return projectPoints(outline.map((p) => ({ x: p.x, y: p.y, z: 0 })), spec);
+    if (floor.nodes.length < 3) return [];
+    return projectPoints(floor.nodes.map((n) => ({ x: n.x, y: n.y, z: 0 })), spec);
+  }, [floor.roof, floor.nodes, spec.kind, spec.yaw, spec.top]);
+
+  const lidPoly = useMemo(() => {
+    const outline = floor.roof?.outline;
+    if (outline && outline.length >= 3) return projectPoints(outline.map((p) => ({ x: p.x, y: p.y, z: WALL_H })), spec);
+    return [];
+  }, [floor.roof, spec.kind, spec.yaw, spec.top]);
+
+  const wallFaces = useMemo(() => {
+    const faces: WallFace[] = [];
+    for (const w of floor.walls) {
+      const e = wallEnds(w, floor.nodes);
+      if (!e) continue;
+      const texId = w.finishId || houseTex;
+      faces.push({
+        wall: w,
+        depth: painterDepth((e.a.x + e.b.x) / 2, (e.a.y + e.b.y) / 2, spec),
+        points: projectPoints([
+          { x: e.a.x, y: e.a.y, z: 0 },
+          { x: e.b.x, y: e.b.y, z: 0 },
+          { x: e.b.x, y: e.b.y, z: WALL_H },
+          { x: e.a.x, y: e.a.y, z: WALL_H },
+        ], spec),
+        texId: texId && texId !== 'pack:plain' ? texId : null,
+      });
+    }
+    faces.sort((a, b) => a.depth - b.depth);
+    return faces;
+  }, [floor.walls, floor.nodes, houseTex, spec.kind, spec.yaw, spec.top]);
+
+  const screenToWorld = (sx: number, sy: number) => {
+    const ix = (sx - pan.x) / zoom;
+    const iy = (sy - pan.y) / zoom;
+    return unproject(ix, iy, spec);
+  };
+
+  const pointerInWrap = (ev: { clientX: number; clientY: number }) => {
+    const rect = wrapRef.current?.getBoundingClientRect();
+    if (!rect) return { x: 0, y: 0 };
+    return { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
+  };
+
+  const onPointerDown = (ev: Konva.KonvaEventObject<PointerEvent>) => {
+    const pos = pointerInWrap(ev.evt);
+    pointers.current.set(ev.evt.pointerId, pos);
+    try { (ev.evt.target as Element | null)?.setPointerCapture?.(ev.evt.pointerId); } catch { /* ignore */ }
+
+    if (pointers.current.size >= 2) {
+      pendingTap.current = null;
+      dragging.current = false;
+      const pts = [...pointers.current.values()];
+      const a = pts[0];
+      const b = pts[1];
+      pinch.current = {
+        dist: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)),
+        zoom,
+        pan: { ...pan },
+        mid: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 },
+      };
+      panning.current = false;
+      return;
+    }
+
+    if (tool === 'pan' || ev.evt.button === 1 || ev.evt.shiftKey) {
+      panning.current = true;
+      last.current = pos;
+      return;
+    }
+
+    const name = typeof (ev.target as { name?: () => string }).name === 'function'
+      ? (ev.target as { name: () => string }).name()
+      : '';
+    const onEmpty = ev.target === ev.currentTarget || name === 'doll-floor' || name === 'doll-bg';
+    if (onEmpty) {
+      pendingTap.current = pos;
+      return;
+    }
+    if (tool === 'select' && (name === 'doll-furn' || name === 'doll-plant')) {
+      dragging.current = true;
+      last.current = pos;
+    }
+  };
+
+  const onPointerMove = (ev: Konva.KonvaEventObject<PointerEvent>) => {
+    const pos = pointerInWrap(ev.evt);
+    pointers.current.set(ev.evt.pointerId, pos);
+
+    if (pinch.current && pointers.current.size >= 2) {
+      const pts = [...pointers.current.values()];
+      const a = pts[0];
+      const b = pts[1];
+      const distNow = Math.max(1, Math.hypot(a.x - b.x, a.y - b.y));
+      const next = Math.min(3, Math.max(0.3, pinch.current.zoom * (distNow / pinch.current.dist)));
+      const k = next / pinch.current.zoom;
+      const mx = (a.x + b.x) / 2;
+      const my = (a.y + b.y) / 2;
+      setZoom(next);
+      setPan({
+        x: mx - (pinch.current.mid.x - pinch.current.pan.x) * k,
+        y: my - (pinch.current.mid.y - pinch.current.pan.y) * k,
+      });
+      return;
+    }
+
+    if (pendingTap.current) {
+      const dx = pos.x - pendingTap.current.x;
+      const dy = pos.y - pendingTap.current.y;
+      if (Math.hypot(dx, dy) > 10) {
+        panning.current = true;
+        last.current = pendingTap.current;
+        pendingTap.current = null;
+      } else {
+        return;
+      }
+    }
+
+    if (panning.current && last.current) {
+      const dx = pos.x - last.current.x;
+      const dy = pos.y - last.current.y;
+      last.current = pos;
+      setPan((p) => ({ x: p.x + dx, y: p.y + dy }));
+      return;
+    }
+
+    if (dragging.current && last.current && tool === 'select') {
+      const a = screenToWorld(last.current.x, last.current.y);
+      const b = screenToWorld(pos.x, pos.y);
+      last.current = pos;
+      moveSelected(b.x - a.x, b.y - a.y);
+    }
+  };
+
+  const onPointerUp = (ev?: Konva.KonvaEventObject<PointerEvent>) => {
+    if (ev?.evt?.pointerId != null) pointers.current.delete(ev.evt.pointerId);
+    else pointers.current.clear();
+
+    if (pinch.current) {
+      if (pointers.current.size < 2) pinch.current = null;
+      return;
+    }
+
+    if (pendingTap.current) {
+      const world = screenToWorld(pendingTap.current.x, pendingTap.current.y);
+      pendingTap.current = null;
+      if (tool === 'furniture') placeFurniture(world);
+      else if (tool === 'plant') placePlant(world);
+      else clearSelection();
+    }
+
+    if (dragging.current) {
+      dragging.current = false;
+      endMove();
+    }
+    panning.current = false;
+    last.current = null;
+  };
+
+  const pickWall = (id: string) => (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
+    e.cancelBubble = true;
+    setSelected({ kind: 'wall', id });
+  };
+
+  return (
+    <div ref={wrapRef} className="plan-canvas dollhouse-canvas" style={{ touchAction: 'none' }}>
+      <Stage
+        width={size.w}
+        height={size.h}
+        x={pan.x}
+        y={pan.y}
+        scaleX={zoom}
+        scaleY={zoom}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        onWheel={(e) => {
+          e.evt.preventDefault();
+          const rect = wrapRef.current?.getBoundingClientRect();
+          if (!rect) return;
+          const mx = e.evt.clientX - rect.left;
+          const my = e.evt.clientY - rect.top;
+          const factor = e.evt.deltaY < 0 ? 1.08 : 1 / 1.08;
+          const next = Math.min(3, Math.max(0.3, zoom * factor));
+          const k = next / zoom;
+          setZoom(next);
+          setPan({ x: mx - (mx - pan.x) * k, y: my - (my - pan.y) * k });
+        }}
+      >
+        <Layer>
+          <Rect
+            name="doll-bg"
+            x={-4000}
+            y={-4000}
+            width={8000}
+            height={8000}
+            fill={light ? '#e8edf2' : '#121820'}
+          />
+          {floorPoly.length >= 6 && (
+            <Line
+              name="doll-floor"
+              points={floorPoly}
+              closed
+              fill={light ? (blocky ? '#7cb342' : '#cfd8c8') : '#3d4a38'}
+            stroke={blocky ? '#1a1208' : (light ? '#9aa890' : '#6d7a62')}
+            strokeWidth={(blocky ? 3 : 1.5) / zoom}
+            />
+          )}
+          {lidPoly.length >= 6 && !spec.top && (
+            <Line
+              points={lidPoly}
+              closed
+              dash={[6 / zoom, 5 / zoom]}
+              stroke={light ? '#8b8dff' : '#c5c7ff'}
+              strokeWidth={1.25 / zoom}
+              opacity={0.55}
+              listening={false}
+            />
+          )}
+          {wallFaces.map((face) => {
+            const sel = selected?.kind === 'wall' && selected.id === face.wall.id;
+            const fill = textureStrokeFallback(face.texId) ?? (face.wall.kind === 'exterior'
+              ? (light ? '#d8dce8' : '#3a4560')
+              : (light ? '#ece4d4' : '#4a4034'));
+            const tile = face.texId ? tiles.get(face.texId) : undefined;
+            return (
+              <Line
+                key={face.wall.id}
+                points={face.points}
+                closed
+                fill={fill}
+                fillPatternImage={tile as CanvasImageSource as HTMLImageElement}
+                fillPatternRepeat="repeat"
+                fillPriority={tile ? 'pattern' : 'color'}
+                fillPatternScaleX={tile ? 0.22 : 1}
+                fillPatternScaleY={tile ? 0.22 : 1}
+                stroke={sel ? '#6e72f5' : (blocky ? '#1a1208' : (light ? '#2a2a32' : '#c5d0ea'))}
+                strokeWidth={(sel ? 3 : (blocky ? 2.5 : 1.25)) / zoom}
+                onClick={pickWall(face.wall.id)}
+                onTap={pickWall(face.wall.id)}
+              />
+            );
+          })}
+          {floor.openings.map((o) => {
+            const wall = floor.walls.find((w) => w.id === o.wallId);
+            if (!wall) return null;
+            const e = wallEnds(wall, floor.nodes);
+            if (!e) return null;
+            const dx = e.b.x - e.a.x;
+            const dy = e.b.y - e.a.y;
+            const len = Math.max(0.01, Math.hypot(dx, dy));
+            const t0 = o.t - o.width / (2 * len);
+            const t1 = o.t + o.width / (2 * len);
+            const z0 = o.type === 'door' ? 0 : 3;
+            const z1 = o.type === 'door' ? 7 : 6.5;
+            const a = { x: e.a.x + dx * t0, y: e.a.y + dy * t0 };
+            const b = { x: e.a.x + dx * t1, y: e.a.y + dy * t1 };
+            const sel = selected?.kind === 'opening' && selected.id === o.id;
+            return (
+              <Line
+                key={o.id}
+                points={projectPoints([
+                  { x: a.x, y: a.y, z: z0 },
+                  { x: b.x, y: b.y, z: z0 },
+                  { x: b.x, y: b.y, z: z1 },
+                  { x: a.x, y: a.y, z: z1 },
+                ], spec)}
+                closed
+                fill={o.type === 'door' ? (light ? '#8b5a2b' : '#6b4220') : (light ? '#b9d7ee' : '#3d6a88')}
+                stroke={sel ? '#6e72f5' : '#1a1a1a'}
+                strokeWidth={(sel ? 2.5 : 1) / zoom}
+                onClick={(evt) => {
+                  evt.cancelBubble = true;
+                  setSelected({ kind: 'opening', id: o.id });
+                }}
+                onTap={(evt) => {
+                  evt.cancelBubble = true;
+                  setSelected({ kind: 'opening', id: o.id });
+                }}
+              />
+            );
+          })}
+          {floor.furniture.map((f) => {
+            const z = 2.4;
+            const sel = selected?.kind === 'furniture' && selected.id === f.id;
+            const top = projectPoints([
+              { x: f.x, y: f.y, z },
+              { x: f.x + f.w, y: f.y, z },
+              { x: f.x + f.w, y: f.y + f.h, z },
+              { x: f.x, y: f.y + f.h, z },
+            ], spec);
+            return (
+              <Line
+                key={f.id}
+                name="doll-furn"
+                points={top}
+                closed
+                fill={sel ? '#c5c7ff' : (light ? '#c4b8a0' : '#6a5e4e')}
+                stroke={sel ? '#6e72f5' : (blocky ? '#1a1208' : '#3f3f46')}
+                strokeWidth={(sel ? 2 : (blocky ? 2 : 1)) / zoom}
+                onClick={(evt) => {
+                  evt.cancelBubble = true;
+                  setSelected({ kind: 'furniture', id: f.id });
+                }}
+                onTap={(evt) => {
+                  evt.cancelBubble = true;
+                  setSelected({ kind: 'furniture', id: f.id });
+                }}
+              />
+            );
+          })}
+          {(floor.landscape ?? []).filter((L) => L.kind === 'tree').map((L) => {
+            const crown = project(L.x + L.w / 2, L.y + L.h / 2, 10, spec);
+            const sel = selected?.kind === 'landscape' && selected.id === L.id;
+            return (
+              <Circle
+                key={L.id}
+                name="doll-plant"
+                x={crown.x}
+                y={crown.y}
+                radius={18}
+                fill={light ? '#5f8f52' : '#3d6a38'}
+                stroke={sel ? '#6e72f5' : '#2f4a28'}
+                strokeWidth={(sel ? 2.5 : 1) / zoom}
+                onClick={(evt) => {
+                  evt.cancelBubble = true;
+                  setSelected({ kind: 'landscape', id: L.id });
+                }}
+                onTap={(evt) => {
+                  evt.cancelBubble = true;
+                  setSelected({ kind: 'landscape', id: L.id });
+                }}
+              />
+            );
+          })}
+          {floor.rooms.map((r) => {
+            const p = project(r.x, r.y, 0.2, spec);
+            return (
+              <Text
+                key={r.id}
+                x={p.x - 24}
+                y={p.y}
+                width={48}
+                align="center"
+                text={r.name}
+                fontSize={11 / Math.max(0.6, zoom)}
+                fill={light ? '#1a1a1a' : '#f4f4f5'}
+                listening={false}
+              />
+            );
+          })}
+        </Layer>
+      </Stage>
+      <div className="doll-proj" role="toolbar" aria-label={t(settings.locale, 'doll.proj')}>
+        <div className="doll-proj-row">
+          {DOLL_PROJS.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              className={`doll-chip${spec.kind === p.id ? ' active' : ''} aw-pressable`}
+              onClick={() => setSettings({ dollProj: p.id, dollTop: false })}
+            >
+              {t(settings.locale, `doll.proj.${p.id}`)}
+            </button>
+          ))}
+        </div>
+        <div className="doll-proj-row">
+          <button
+            type="button"
+            className="doll-chip aw-pressable"
+            aria-label={t(settings.locale, 'doll.turn.left')}
+            onClick={() => setSettings({ dollYaw: nextYaw(spec.yaw, -1), dollTop: false })}
+          >
+            ◀
+          </button>
+          {(['front', 'right', 'rear', 'left'] as const).map((id) => (
+            <button
+              key={id}
+              type="button"
+              className={`doll-chip${face === id ? ' active' : ''} aw-pressable`}
+              onClick={() => setSettings({
+                dollYaw: id === 'right' ? 90 : id === 'rear' ? 180 : id === 'left' ? 270 : 0,
+                dollTop: false,
+              })}
+            >
+              {t(settings.locale, `doll.face.${id}`)}
+            </button>
+          ))}
+          {spec.kind === 'ortho' ? (
+            <button
+              type="button"
+              className={`doll-chip${spec.top ? ' active' : ''} aw-pressable`}
+              onClick={() => setSettings({ dollProj: 'ortho', dollTop: true })}
+            >
+              {t(settings.locale, 'doll.face.top')}
+            </button>
+          ) : null}
+          <button
+            type="button"
+            className="doll-chip aw-pressable"
+            aria-label={t(settings.locale, 'doll.turn.right')}
+            onClick={() => setSettings({ dollYaw: nextYaw(spec.yaw, 1), dollTop: false })}
+          >
+            ▶
+          </button>
+          <AxisGizmo spec={spec} light={light} />
+        </div>
+        <p className="doll-proj-lesson">
+          {t(settings.locale, spec.top ? 'doll.lesson.ortho.top' : `doll.lesson.${spec.kind}`)}
+        </p>
+      </div>
+      <div className="canvas-hint">
+        {floor.walls.length === 0
+          ? t(settings.locale, 'hint.doll.empty')
+          : tool === 'furniture'
+            ? t(settings.locale, 'hint.doll.furn')
+            : tool === 'plant'
+              ? t(settings.locale, 'hint.doll.plant')
+              : t(settings.locale, 'hint.doll.paper')}
+      </div>
+    </div>
+  );
+}
+
+function AxisGizmo({ spec, light }: { spec: ProjSpec; light: boolean }) {
+  const o = project(0, 0, 0, spec);
+  const axes = [
+    { id: 'X', p: project(3, 0, 0, spec), stroke: '#c45c4a' },
+    { id: 'Y', p: project(0, 3, 0, spec), stroke: '#3d8a5a' },
+    { id: 'Z', p: project(0, 0, 3, spec), stroke: '#4a6ec8' },
+  ];
+  let max = 1;
+  for (const a of axes) max = Math.max(max, Math.hypot(a.p.x - o.x, a.p.y - o.y));
+  const k = 22 / max;
+  const ox = 28;
+  const oy = 30;
+  return (
+    <svg className="doll-gizmo" width="56" height="44" viewBox="0 0 56 44" aria-hidden="true">
+      {axes.map((a) => {
+        const x = ox + (a.p.x - o.x) * k;
+        const y = oy + (a.p.y - o.y) * k;
+        return (
+          <g key={a.id}>
+            <line x1={ox} y1={oy} x2={x} y2={y} stroke={a.stroke} strokeWidth="2" />
+            <text x={x} y={y - 2} fill={light ? '#1a1a1a' : '#f4f4f5'} fontSize="9" fontWeight="700">{a.id}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}

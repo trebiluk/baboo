@@ -96,10 +96,10 @@ export function levelRequiredFor(tool: Tool): SkillLevel {
 
 export function toastMs(level: SkillLevel, base = 2400): number {
   const rank = skillRank(level);
-  if (rank <= 0) return base + 1400;
-  if (rank === 1) return base + 600;
+  if (rank <= 0) return Math.max(3800, base + 1600);
+  if (rank === 1) return Math.max(3200, base + 900);
   if (rank >= 3) return Math.max(1400, base - 800);
-  return base;
+  return Math.max(2600, base);
 }
 
 export function readSkillPref(): SkillLevel {

@@ -1,13 +1,20 @@
-import { judgeDogHouse, ribbonLabel, type ContestCheck, type ContestHit } from '../lib/contest';
+import { judgeDogHouse, type ContestCheck, type ContestHit, type ContestRibbon } from '../lib/contest';
 import { BABOO_LOGO } from '../logo';
 import { useProjectStore } from '../store/useProjectStore';
 import { Icon } from '../icons';
+import { t, tt, asLocale } from '../data/i18n';
+import type { Locale } from '../types';
 
-function mark(status: ContestCheck['status']) {
-  if (status === 'pass') return 'Baboo says yes';
-  if (status === 'warn') return 'Almost';
-  if (status === 'fail') return 'Not yet';
-  return 'Start here';
+function mark(status: ContestCheck['status'], locale: Locale) {
+  return t(locale, `contest.mark.${status}`);
+}
+
+function contestQuote(ribbon: ContestRibbon, fail: number, locale: Locale) {
+  if (ribbon === 'best') return t(locale, 'contest.quote.best');
+  if (ribbon === 'blue') return t(locale, 'contest.quote.blue');
+  if (ribbon === 'red') return t(locale, 'contest.quote.red');
+  if (ribbon === 'honor' || fail > 0) return t(locale, 'contest.quote.honor');
+  return t(locale, 'contest.quote.keep');
 }
 
 function selectHit(hit: ContestHit) {
@@ -23,6 +30,7 @@ export function ContestDrawer() {
   const roofStyleId = useProjectStore((s) => s.doc.settings.roofStyleId);
   const exportJson = useProjectStore((s) => s.exportJson);
   const styleId = useProjectStore((s) => s.doc.settings.styleId);
+  const locale = asLocale(useProjectStore((s) => s.doc.settings.locale));
 
   if (!open) return null;
 
@@ -32,11 +40,11 @@ export function ContestDrawer() {
   } catch {
     report = {
       checks: [], pass: 0, warn: 0, fail: 0, skip: 0,
-      score: 0, max: 100, ribbon: 'keep' as const, quote: 'Draw a little more and ask me again.',
+      score: 0, max: 100, ribbon: 'keep' as const, quote: t(locale, 'contest.quote.keep'),
     };
   }
 
-  const ribbon = ribbonLabel(report.ribbon);
+  const ribbon = t(locale, `contest.ribbon.${report.ribbon}`);
   const contesting = styleId === 'dog-house';
 
   return (
@@ -44,34 +52,32 @@ export function ContestDrawer() {
       <button
         type="button"
         className="teaching-backdrop"
-        aria-label="Dismiss contest"
+        aria-label={t(locale, 'contest.dismiss')}
         onClick={toggle}
       />
-      <aside className="drawer contest-drawer" role="dialog" aria-label="Best Dog House Contest">
+      <aside className="drawer contest-drawer" role="dialog" aria-label={t(locale, 'contest.aria')}>
         <div className="drawer-head">
           <div className="drawer-head-title">
             <span className="sheet-handle" aria-hidden="true" />
-            <h2>Contest</h2>
+            <h2>{t(locale, 'contest.title')}</h2>
           </div>
           <button type="button" className="ghost-btn secondary-btn aw-pressable" onClick={toggle}>
-            Close
+            {t(locale, 'chrome.close')}
           </button>
         </div>
 
         <div className={`contest-score contest-score-${report.ribbon}`}>
           <img className="contest-score-mascot" src={BABOO_LOGO} alt="" width={48} height={48} />
           <div>
-            <span className="contest-kicker">Baboo judges</span>
+            <span className="contest-kicker">{t(locale, 'contest.kicker')}</span>
             <strong>{ribbon}</strong>
-            <p>{report.quote}</p>
-            <p className="contest-points">{report.score} / {report.max} textbook points</p>
+            <p>{contestQuote(report.ribbon, report.fail, locale)}</p>
+            <p className="contest-points">{t(locale, 'contest.points', { score: String(report.score), max: String(report.max) })}</p>
           </div>
         </div>
 
         <p className="muted teach-hello">
-          {contesting
-            ? 'Best Dog House Contest — I pick the den that follows the book.'
-            : 'Any plan can be judged as a dog house. New → Dog House starts the assignment.'}
+          {contesting ? t(locale, 'contest.hello') : t(locale, 'contest.helloAny')}
         </p>
 
         <ul className="access-list">
@@ -83,8 +89,8 @@ export function ContestDrawer() {
                 onClick={() => { if (c.hit) selectHit(c.hit); }}
                 disabled={!c.hit}
               >
-                <span className="access-mark">{mark(c.status)} · {c.points}/{c.max}</span>
-                <strong>{c.title}</strong>
+                <span className="access-mark">{mark(c.status, locale)} · {c.points}/{c.max}</span>
+                <strong>{tt(locale, `contest.check.${c.id}.title`, c.title)}</strong>
                 <span>{c.detail}</span>
                 <em>{c.tip}</em>
               </button>
@@ -98,11 +104,10 @@ export function ContestDrawer() {
           style={{ marginTop: 12 }}
           onClick={exportJson}
         >
-          <Icon name="save" /> Save file for the board
+          <Icon name="save" /> {t(locale, 'contest.save')}
         </button>
         <p className="muted access-legal">
-          Baboo scores a snug closed den, dog-sized offset door, pitched roof, turning room,
-          and summer shade. Classroom check from textbook shelter rules — not a kennel license.
+          {t(locale, 'contest.legal')}
         </p>
       </aside>
     </>

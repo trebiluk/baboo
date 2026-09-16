@@ -2,6 +2,9 @@ import { openDB, type IDBPDatabase } from 'idb';
 import type { ProjectDocument, RoofStyleId } from '../types';
 import { isGuiThemeId } from '../data/themes';
 import { isSkillLevel, readSkillPref } from '../data/skill';
+import { asShowFurniture3d, asSite, asSky, asTint } from '../data/scene3d';
+import { asLocale } from '../data/i18n';
+import { asDollProj, asYawDeg } from './iso';
 import { APP_VERSION } from '../version';
 import { blankProject } from '../data/templates';
 import { defaultTinyHomeTypology } from '../data/typology';
@@ -110,6 +113,17 @@ function normalizeDoc(data: ProjectDocument): ProjectDocument {
         skillLevel: isSkillLevel(data.settings?.skillLevel)
           ? data.settings.skillLevel
           : readSkillPref(),
+        skyPreset: asSky(data.settings?.skyPreset),
+        siteFinish: asSite(data.settings?.siteFinish),
+        wallTintId: asTint(data.settings?.wallTintId),
+        showFurniture3d: asShowFurniture3d(data.settings?.showFurniture3d),
+        dollProj: asDollProj(data.settings?.dollProj),
+        dollYaw: asYawDeg(data.settings?.dollYaw),
+        dollTop: data.settings?.dollTop === true,
+        locale: asLocale(data.settings?.locale),
+        udlFat: data.settings?.udlFat === true,
+        udlType: data.settings?.udlType === true,
+        ellEnglish: data.settings?.ellEnglish !== false,
       };
       const typology =
         data.settings?.typology

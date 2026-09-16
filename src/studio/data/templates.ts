@@ -375,6 +375,17 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
       textureId: null,
       textureLabel: '',
       imageBlobRef: null,
+      skyPreset: 'day',
+      siteFinish: 'grass',
+      wallTintId: 'sand',
+      showFurniture3d: true,
+      dollProj: 'iso',
+      dollYaw: 0,
+      dollTop: false,
+      locale: 'en',
+      udlFat: false,
+      udlType: false,
+      ellEnglish: true,
       ...(styleId === 'tiny-home'
         ? { typology: defaultTinyHomeTypology('trailer') }
         : {}),

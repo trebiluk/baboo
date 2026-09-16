@@ -13,7 +13,7 @@ export function FurnitureSidebar() {
   const viewMode = useProjectStore((s) => s.viewMode);
   const skillLevel = useProjectStore((s) => s.doc.settings.skillLevel) ?? DEFAULT_SKILL_LEVEL;
 
-  if (viewMode !== 'plan' || !catalogOpen || tool === 'room' || !isToolUnlocked('furniture', skillLevel)) return null;
+  if ((viewMode !== 'plan' && viewMode !== 'dollhouse') || !catalogOpen || tool === 'room' || !isToolUnlocked('furniture', skillLevel)) return null;
 
   const cats = [...new Set(FURNITURE_CATALOG.map((c) => c.category))];
   const sizeLabel = (w: number, h: number) =>

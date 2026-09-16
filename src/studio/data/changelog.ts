@@ -11,6 +11,78 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '1.1.7',
+    date: '2026-09-16',
+    bullets: [
+      'Dollhouse turns: Front, Right, Rear, Left — same house, new face',
+      'Drawing views to teach: Isometric, Oblique (cabinet), Elevation, Orthographic + Top (a plan)',
+      'Axis gizmo shows which lines are true size. Paper walls in elevation like a real sheet',
+    ],
+  },
+  {
+    version: '1.1.6',
+    date: '2026-09-13',
+    bullets: [
+      'Full 3D: drag to orbit the house, scroll to zoom, Shift-drag to pan. Still view-only',
+      'Materials and Lighting are on — grass/shingles, sun, shade, dusk window glow',
+      'Walkthrough: eye-height look inside. Same plan as 2D. Edit stays in Plan or Dollhouse',
+    ],
+  },
+  {
+    version: '1.1.5',
+    date: '2026-09-13',
+    bullets: [
+      'Architect sheet: title block, north arrow, and a 0–5–10 scale bar on the plan',
+      'Overall width and depth ticks sit outside the envelope once walls close',
+      'Teach → Read this plan: envelope, entry, daylight, named rooms, size, kitchen work triangle (classroom, not a stamp)',
+    ],
+  },
+  {
+    version: '1.1.4',
+    date: '2026-09-13',
+    bullets: [
+      'Teach English words (grades 5–8 ELL): Wall, Door, Sketch sit in English on the tools; home language sits under',
+      'Teach → Vocab shows Say: Wall plus a simple English meaning. Tap-to-match practice, no timer',
+      'Settings → Help for everyone: turn the English-first teaching on or off',
+    ],
+  },
+  {
+    version: '1.1.3',
+    date: '2026-09-13',
+    bullets: [
+      'Vocab pack: Ukrainian, Russian, Tigrigna, Cubano, and Farsi — Settings chips, Teach list, tools and tips',
+      'Every language keeps the English CAD word in parentheses (Стіна (Wall) · دیوار (Wall))',
+      'Farsi text reads right-to-left in drawers and tips. The plan grid stays left-to-right',
+    ],
+  },
+  {
+    version: '1.1.2',
+    date: '2026-09-13',
+    bullets: [
+      'Language: Settings → English or Español. Spanish keeps the English CAD word in parentheses (muro (Wall))',
+      'Help for everyone: bigger 52px taps, bigger type on tips and Teach, slower toasts',
+      'Empty-plan wall tip, bilingual coach, tools, Contest titles, and vocab for ELL + special-ed',
+    ],
+  },
+  {
+    version: '1.1.1',
+    date: '2026-09-13',
+    bullets: [
+      'Solid 3D: Day sky + grass yard by default. Doors and windows cut through the walls. Furniture shows as boxes',
+      'Settings → 3D look: Sky (Day / Soft dusk / Overcast), Yard (Grass / Gravel / Pad), wall colors, Show furniture in 3D',
+      'Blocky theme: chunky cubes, grass and dirt — Minecraft-inspired look for chrome, tools, Dollhouse, and 3D',
+      'Keeps Dollhouse (roof-off wallpaper) and the side edit panel from 1.0.39. 3D stays view-only',
+    ],
+  },
+  {
+    version: '1.0.39',
+    date: '2026-09-13',
+    bullets: [
+      'Edit panel docks on the side — collapse it to a chip when you need the grid',
+      'Dollhouse: roof-off isometric view. Tap a wall to paper it in 2D',
+    ],
+  },
+  {
     version: '1.0.38',
     date: '2026-09-13',
     bullets: [

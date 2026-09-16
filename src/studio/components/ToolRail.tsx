@@ -13,6 +13,7 @@ import {
 import { PLANT_CATALOG } from '../data/landscape';
 import { Icon, type IconName } from '../icons';
 import { usePhoneChrome } from '../hooks/usePhoneChrome';
+import { t as tx, ellToolParts } from '../data/i18n';
 
 const PLANT_ICON: Record<PlantKind, IconName> = {
   tree: 'tree',
@@ -36,6 +37,23 @@ const TOOLS: { id: Tool; label: string; tip: string; icon: IconName }[] = [
 
 /** Always one tap away — the den gets drawn with these. */
 const QUICK = new Set<Tool>(['select', 'sketch', 'wall', 'door']);
+const DOLLHOUSE_TOOLS = new Set<Tool>(['select', 'furniture', 'plant', 'pan']);
+const QUICK_DOLL = new Set<Tool>(['select', 'furniture']);
+
+function ToolWord({ k }: { k: string }) {
+  const locale = useProjectStore((s) => s.doc.settings.locale);
+  const ell = useProjectStore((s) => s.doc.settings.ellEnglish !== false);
+  const parts = ellToolParts(locale, k);
+  if (!ell || !parts.home) {
+    return <span className="tool-rail-label">{tx(locale, k)}</span>;
+  }
+  return (
+    <span className="tool-rail-label ell-tool">
+      <span className="ell-tool-en" lang="en">{parts.en}</span>
+      <span className="ell-tool-l1">{parts.home}</span>
+    </span>
+  );
+}
 
 export function ToolRail() {
   const tool = useProjectStore((s) => s.tool);
@@ -49,6 +67,7 @@ export function ToolRail() {
   const minimizeTools = useProjectStore((s) => s.minimizeTools);
   const chromeEpoch = useProjectStore((s) => s.chromeEpoch);
   const skillLevel = useProjectStore((s) => s.doc.settings.skillLevel) ?? DEFAULT_SKILL_LEVEL;
+  const locale = useProjectStore((s) => s.doc.settings.locale);
   const wallKind = useProjectStore((s) => s.wallKind);
   const setWallKind = useProjectStore((s) => s.setWallKind);
   const wallMode = useProjectStore((s) => s.wallMode);
@@ -68,6 +87,7 @@ export function ToolRail() {
   const helpOpen = useProjectStore((s) => s.helpOpen);
   const customizeOpen = useProjectStore((s) => s.customizeOpen);
   const isPlan = viewMode === 'plan';
+  const isDollhouse = viewMode === 'dollhouse';
   const phone = usePhoneChrome();
   const sheetOpen = accessOpen || teachingOpen || contestOpen || helpOpen || customizeOpen;
   const [hover, setHover] = useState(false);
@@ -87,14 +107,15 @@ export function ToolRail() {
     return () => clearTimeout(t);
   }, [chromeEpoch]);
 
-  if (!isPlan) return null;
+  if (!isPlan && !isDollhouse) return null;
 
   const allowed = toolsForLevel(skillLevel);
-  const visible = TOOLS.filter((t) => allowed.includes(t.id));
-  const later = TOOLS.filter((t) => upcomingTools(skillLevel).includes(t.id));
+  const visible = TOOLS.filter((t) => allowed.includes(t.id) && (!isDollhouse || DOLLHOUSE_TOOLS.has(t.id)));
+  const later = isDollhouse ? [] : TOOLS.filter((t) => upcomingTools(skillLevel).includes(t.id));
   const expert = skillRank(skillLevel) >= 3;
-  const showList = allowed.includes('furniture') || allowed.includes('room');
+  const showList = allowed.includes('furniture') || (!isDollhouse && allowed.includes('room'));
   const drawing = wallDraft != null || dimDraft != null;
+  const quickSet = isDollhouse ? QUICK_DOLL : QUICK;
   const expanded = !sheetOpen && (
     toolsPinned
     || catalogOpen
@@ -119,13 +140,13 @@ export function ToolRail() {
       setToolsPinned(true);
       return;
     }
-    if (phone && QUICK.has(id) && !toolsPinned) return;
+    if (phone && quickSet.has(id) && !toolsPinned) return;
     setToolsPinned(true);
   };
 
   const lockedTip = (id: Tool) => {
     const need = skillInfo(levelRequiredFor(id)).label;
-    return `Unlocks at ${need} — Settings to change help`;
+    return tx(locale, 'toast.locked', { level: tx(locale, `skill.${levelRequiredFor(id)}`) || need });
   };
 
   return (
@@ -141,7 +162,7 @@ export function ToolRail() {
       }}
     >
       {visible.map((t) => {
-        const quick = QUICK.has(t.id);
+        const quick = quickSet.has(t.id);
         const extra = !quick && t.id === tool;
         return (
         <button
@@ -155,11 +176,11 @@ export function ToolRail() {
           aria-hidden={!(expanded || quick || extra)}
         >
           <Icon name={t.icon} />
-          <span className="tool-rail-label">{t.label}</span>
+          <ToolWord k={`tool.${t.id}`} />
         </button>
         );
       })}
-      {hasSketch && (
+      {hasSketch && isPlan && (
         <button
           type="button"
           className="tool-rail-btn tool-rail-trace-chip aw-pressable"
@@ -169,10 +190,10 @@ export function ToolRail() {
           aria-hidden={false}
         >
           <Icon name="wall" />
-          <span className="tool-rail-label">Trace</span>
+          <ToolWord k="tool.trace" />
         </button>
       )}
-      {(tool === 'wall' || wallMode === 'clip') && (
+      {isPlan && (tool === 'wall' || wallMode === 'clip') && (
         <button
           type="button"
           className={`tool-rail-btn tool-rail-extra aw-pressable ${wallMode === 'clip' ? 'active' : ''}`}
@@ -183,10 +204,10 @@ export function ToolRail() {
           aria-pressed={wallMode === 'clip'}
         >
           <Icon name="clip" />
-          <span className="tool-rail-label">Clip</span>
+          <ToolWord k="tool.clip" />
         </button>
       )}
-      {expert && tool === 'wall' && (
+      {isPlan && expert && tool === 'wall' && (
         <button
           type="button"
           className={`tool-rail-btn aw-pressable ${wallKind === 'interior' ? 'active' : ''}`}
@@ -222,7 +243,7 @@ export function ToolRail() {
           aria-hidden={!expanded}
         >
           <Icon name="copy" />
-          <span className="tool-rail-label">Copy</span>
+          <ToolWord k="tool.copy" />
         </button>
       )}
       {expert && selected?.kind === 'furniture' && (
@@ -235,7 +256,7 @@ export function ToolRail() {
           aria-hidden={!expanded}
         >
           <Icon name="rotate" />
-          <span className="tool-rail-label">Rot</span>
+          <ToolWord k="tool.rot" />
         </button>
       )}
       {showList && (
@@ -249,7 +270,7 @@ export function ToolRail() {
           aria-hidden={!expanded}
         >
           <Icon name="list" />
-          <span className="tool-rail-label">{catalogOpen ? 'Hide' : 'List'}</span>
+          <ToolWord k={catalogOpen ? 'tool.hide' : 'tool.list'} />
         </button>
       )}
       {later.length > 0 && (
@@ -271,7 +292,7 @@ export function ToolRail() {
               aria-hidden={!expanded}
             >
               <Icon name={t.icon} />
-              <span className="tool-rail-label">{t.label}</span>
+              <ToolWord k={`tool.${t.id}`} />
             </button>
           ))}
         </>
@@ -286,7 +307,7 @@ export function ToolRail() {
         >
           <span className="tool-rail-kicker">Tools</span>
           <Icon name="more" />
-          <span className="tool-rail-label">More</span>
+          <ToolWord k="tool.more" />
         </button>
       )}
       <button
@@ -298,7 +319,7 @@ export function ToolRail() {
         aria-hidden={!expanded}
       >
         <Icon name="min" />
-        <span className="tool-rail-label">Min</span>
+        <ToolWord k="tool.min" />
       </button>
     </nav>
   );

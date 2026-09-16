@@ -1,4 +1,6 @@
 import { SKILL_LEVELS, type SkillLevel } from '../data/skill';
+import { t } from '../data/i18n';
+import { useProjectStore } from '../store/useProjectStore';
 
 export function SkillPicker({
   value,
@@ -9,12 +11,11 @@ export function SkillPicker({
   onChange: (level: SkillLevel) => void;
   legend?: string;
 }) {
+  const locale = useProjectStore((s) => s.doc.settings.locale);
   return (
     <fieldset className="skill-picker">
       <legend>{legend}</legend>
-      <p className="muted skill-picker-lead">
-        Lower levels get extra help. Higher levels unlock more tools. You can change this any time.
-      </p>
+      <p className="muted skill-picker-lead">{t(locale, 'skill.lead')}</p>
       <div className="skill-grid" role="radiogroup" aria-label={legend}>
         {SKILL_LEVELS.map((s) => (
           <button
@@ -26,8 +27,8 @@ export function SkillPicker({
             onClick={() => onChange(s.id)}
             title={s.help}
           >
-            <strong>{s.label}</strong>
-            <span>{s.blurb}</span>
+            <strong>{t(locale, `skill.${s.id}`)}</strong>
+            <span>{t(locale, `skill.${s.id}.blurb`)}</span>
           </button>
         ))}
       </div>

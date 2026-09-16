@@ -7,8 +7,10 @@ import { formatLength, nearestWall, pointOnWall, screenToWorld, wallAngle, wallE
 import { centroid, findEnclosedFace, formatArea, polygonArea, polyPoints, roomPolygon } from '../lib/rooms';
 import { chamferPreview, nearestChamferable } from '../lib/chamfer';
 import { ADA, circleFitsInPoly } from '../lib/access';
+import { kitchenTriangle } from '../lib/architect';
+import { exteriorBounds } from '../lib/roof';
 import { roomType } from '../data/rooms';
-import type { FurnitureItem, Opening, Wall, Node, Room, DimItem, NoteItem, LandscapeItem } from '../types';
+import type { FurnitureItem, Opening, Wall, Node, Room, DimItem, NoteItem, LandscapeItem, Locale } from '../types';
 import {
   loadImportPattern,
   patternForPack,
@@ -18,7 +20,7 @@ import {
 import { FURNITURE_CATALOG } from '../data/furniture';
 import { DEFAULT_GUI_THEME } from '../data/themes';
 import { DEFAULT_SKILL_LEVEL, skillRank } from '../data/skill';
-import { ObjectMenu, selectedAnchor } from './ObjectMenu';
+import { t } from '../data/i18n';
 
 const FURN_BY_ID = new Map(FURNITURE_CATALOG.map((c) => [c.id, c]));
 
@@ -36,6 +38,7 @@ export function PlanCanvas() {
   const dimDraft = useProjectStore((s) => s.dimDraft);
   const wallMode = useProjectStore((s) => s.wallMode);
   const accessOpen = useProjectStore((s) => s.accessOpen);
+  const teachingOpen = useProjectStore((s) => s.teachingOpen);
   const showNodeIds = useDebugStore((s) => s.showNodeIds);
   const showHitboxes = useDebugStore((s) => s.showHitboxes);
   const selectedRoomKind = useProjectStore((s) => s.selectedRoomKind);
@@ -422,14 +425,6 @@ export function PlanCanvas() {
     return findEnclosedFace(floor.nodes, floor.walls, hover);
   }, [tool, hover, floor.nodes, floor.walls]);
 
-  const anchor = selectedAnchor(selected, floor);
-  const menuPos = anchor ? {
-    left: Math.min(size.w - 24, Math.max(24, panX + anchor.x * zoom)),
-    top: panY + anchor.y * zoom,
-  } : null;
-  const showMenu = !!selected && !!menuPos && !wallDraft && !dimDraft && tool === 'select';
-  const menuFlip = !!(menuPos && menuPos.top > size.h - 168);
-
   const useOrtho = settings.ortho !== false;
   const wallPreview = wallDraft && hover
     ? snapWallEnd(wallDraft, hover, {
@@ -455,7 +450,7 @@ export function PlanCanvas() {
     : null;
 
   const skillLevel = settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
-  const showWallCta = skillRank(skillLevel) === 2 && floor.walls.length === 0 && !wallCtaDismissed && !wallDraft;
+  const showWallCta = skillRank(skillLevel) <= 2 && floor.walls.length === 0 && !wallCtaDismissed && !wallDraft;
   const objectCount =
     floor.nodes.length +
     floor.walls.length +
@@ -679,6 +674,13 @@ export function PlanCanvas() {
             />
           ))}
 
+          {showDims && (() => {
+            const box = exteriorBounds(floor.nodes, floor.walls);
+            return box ? (
+              <OverallDims bounds={box} zoom={zoom} units={units} dimFg={planColors.dimFg} />
+            ) : null;
+          })()}
+
           {accessOpen && (floor.rooms ?? []).filter((r) => r.kind === 'bath').map((r) => {
             const poly = roomPolygon(r, floor.nodes, floor.walls);
             if (!poly) return null;
@@ -697,6 +699,38 @@ export function PlanCanvas() {
               />
             );
           })}
+
+          {(teachingOpen || accessOpen) && (() => {
+            const tri = kitchenTriangle(floor.furniture);
+            if (!tri) return null;
+            return (
+              <Group listening={false} perfectDrawEnabled={false}>
+                <Line
+                  points={[tri.sink.x, tri.sink.y, tri.stove.x, tri.stove.y, tri.fridge.x, tri.fridge.y, tri.sink.x, tri.sink.y]}
+                  stroke="#CA8A04"
+                  strokeWidth={2 / zoom}
+                  dash={[0.35, 0.2]}
+                />
+                {([
+                  [tri.sink, 'S'],
+                  [tri.stove, 'T'],
+                  [tri.fridge, 'F'],
+                ] as const).map(([p, label]) => (
+                  <Group key={label} x={p.x} y={p.y}>
+                    <Circle radius={0.35} fill="#CA8A04" opacity={0.9} />
+                    <Text
+                      text={label}
+                      x={-0.22}
+                      y={-0.22}
+                      fontSize={0.42}
+                      fill="#111"
+                      fontStyle="bold"
+                    />
+                  </Group>
+                ))}
+              </Group>
+            );
+          })()}
 
           {showHitboxes && floor.walls.map((w) => {
             const e = wallEnds(w, floor.nodes);
@@ -832,52 +866,47 @@ export function PlanCanvas() {
       {showWallCta && (
         <div className="wall-cta" role="status">
           <div className="wall-cta-body">
-            <strong>Let’s put a wall on the grid</strong>
-            <span className="wall-cta-sub">Two clicks: start, then the other end. Then a door.</span>
+            <strong>{t(settings.locale, 'cta.wall.title')}</strong>
+            <span className="wall-cta-sub">{t(settings.locale, 'cta.wall.sub')}</span>
           </div>
           <button
             type="button"
             className="wall-cta-x aw-pressable"
-            aria-label="Dismiss tip"
+            aria-label={t(settings.locale, 'cta.dismiss')}
             onClick={dismissWallCta}
           >
             ×
           </button>
         </div>
       )}
-      {showMenu && menuPos && (
-        <ObjectMenu left={menuPos.left} top={menuPos.top} flip={menuFlip} />
-      )}
       {skillRank(skillLevel) < 3 && (
       <div className="canvas-hint">
         {tool === 'wall'
           ? (wallMode === 'clip'
-            ? (clipHover ? 'Click the corner to clip it at 45°' : 'Clip → click a sharp corner')
+            ? (clipHover ? t(settings.locale, 'hint.clip.hot') : t(settings.locale, 'hint.clip'))
             : (wallDraft
-            ? (skillRank(skillLevel) <= 1 ? 'Nice — now click where it ends' : 'Click where the wall ends')
-            : (skillRank(skillLevel) <= 1 ? 'Click a corner to start, then the other end' : 'Wall → click start → click end')))
+            ? t(settings.locale, skillRank(skillLevel) <= 1 ? 'hint.wall.end' : 'hint.wall.end.short')
+            : t(settings.locale, skillRank(skillLevel) <= 1 ? 'hint.wall.start' : 'hint.wall.start.short')))
           : tool === 'sketch'
             ? (liveStroke
-              ? 'Keep dragging — lift to finish the stroke'
-              : (skillRank(skillLevel) <= 1
-                ? 'Drag like a pencil. Then tap the sketch → Trace to make walls.'
-                : 'Drag to sketch · tap a stroke → Trace to walls'))
+              ? t(settings.locale, 'hint.sketch.drag')
+              : t(settings.locale, skillRank(skillLevel) <= 1 ? 'hint.sketch' : 'hint.sketch.short'))
           : tool === 'door' || tool === 'window'
-            ? (skillRank(skillLevel) <= 1 ? 'Click right on a wall. Then the little menu can change it.' : 'Click on a wall — or tap an existing door to edit')
+            ? t(settings.locale, skillRank(skillLevel) <= 1 ? 'hint.door' : 'hint.door.short')
             : tool === 'furniture'
-              ? 'Click to place · or drag from the side list'
+              ? t(settings.locale, 'hint.furn')
               : tool === 'room'
-                ? 'Pick a type, then click inside walls that close'
+                ? t(settings.locale, 'hint.room')
               : tool === 'dim'
-                ? (dimDraft ? 'Click the other end of the size' : 'Size → click start, then the other end')
+                ? t(settings.locale, dimDraft ? 'hint.dim.end' : 'hint.dim')
               : tool === 'note'
-                ? 'Click the plan, then type in the note box'
+                ? t(settings.locale, 'hint.note')
               : tool === 'plant'
-                ? 'Tree, bed, or path — click to plant it'
+                ? t(settings.locale, 'hint.plant')
               : tool === 'pan'
-                ? 'Drag to look around · pinch to zoom'
-                : (skillRank(skillLevel) <= 1 ? 'Drag empty grid to look around. Tap a wall to move it.' : 'Drag the grid to look around · tap to select')}
-        {settings.snap ? ' · Snap ON' : ' · Snap OFF'}
+                ? t(settings.locale, 'hint.pan')
+                : t(settings.locale, skillRank(skillLevel) <= 1 ? 'hint.select' : 'hint.select.short')}
+        {settings.snap ? ` · ${t(settings.locale, 'hint.snapOn')}` : ` · ${t(settings.locale, 'hint.snapOff')}`}
         {settings.ortho !== false ? ' · 90°+45°' : ''}
         {' · '}{zoomLabel}
         {units === 'm' ? ' · m' : ' · ft'}
@@ -885,10 +914,17 @@ export function PlanCanvas() {
       )}
       {skillRank(skillLevel) >= 3 && (
         <div className="canvas-hint canvas-hint-quiet">
-          {settings.snap ? 'Snap ON' : 'Snap OFF'} · {zoomLabel}{units === 'm' ? ' · m' : ' · ft'}
+          {settings.snap ? t(settings.locale, 'hint.snapOn') : t(settings.locale, 'hint.snapOff')} · {zoomLabel}{units === 'm' ? ' · m' : ' · ft'}
         </div>
       )}
-      <PlanCompass zoom={zoom} units={units} />
+      <PlanCompass zoom={zoom} units={units} locale={settings.locale} />
+      <PlanSheet
+        title={doc.meta.title}
+        units={units}
+        gridSize={gridSize}
+        locale={settings.locale}
+        updatedAt={doc.meta.updatedAt}
+      />
       <PlanLoadChip
         objectCount={objectCount}
         furniture={floor.furniture.length}
@@ -1085,23 +1121,90 @@ function PlantMark({
   );
 }
 
-function PlanCompass({ zoom, units }: { zoom: number; units: 'ft' | 'm' }) {
+function PlanCompass({ zoom, units, locale }: { zoom: number; units: 'ft' | 'm'; locale: Locale }) {
   const barFt = zoom >= 20 ? 10 : zoom >= 12 ? 20 : 40;
   const px = barFt * zoom;
+  const half = barFt / 2;
   const label = units === 'm'
     ? `${Math.round(barFt * 0.3048 * 10) / 10} m`
     : `${barFt} ft`;
+  const halfLabel = units === 'm'
+    ? `${Math.round(half * 0.3048 * 10) / 10}`
+    : `${half}`;
   return (
     <div className="plan-compass" aria-hidden="true">
       <div className="plan-north">
         <span className="plan-north-arrow">▲</span>
-        <span>N</span>
+        <span>{t(locale, 'sheet.north')}</span>
       </div>
       <div className="plan-scale">
-        <span className="plan-scale-bar" style={{ width: Math.max(36, Math.min(140, px)) }} />
-        <span>{label}</span>
+        <span
+          className="plan-scale-track"
+          style={{ width: Math.max(48, Math.min(160, px)) }}
+        >
+          <i /><i /><i />
+        </span>
+        <span className="plan-scale-ticks">0 · {halfLabel} · {label}</span>
       </div>
     </div>
+  );
+}
+
+function PlanSheet({
+  title, units, gridSize, locale, updatedAt,
+}: {
+  title: string;
+  units: 'ft' | 'm';
+  gridSize: number;
+  locale: Locale;
+  updatedAt: string;
+}) {
+  const square = units === 'm'
+    ? `${Math.round(gridSize * 0.3048 * 100) / 100} m`
+    : gridSize === 1 ? "1'-0\"" : formatLength(gridSize, 'ft');
+  let date = '';
+  try {
+    date = new Date(updatedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  } catch {
+    date = '';
+  }
+  return (
+    <div className="plan-sheet" aria-hidden="true">
+      <strong className="plan-sheet-title">{title || 'Untitled Plan'}</strong>
+      <span>{t(locale, 'sheet.scale')} · {t(locale, 'sheet.grid', { n: square })}</span>
+      {date ? <span>{date}</span> : null}
+    </div>
+  );
+}
+
+function OverallDims({
+  bounds, zoom, units, dimFg,
+}: {
+  bounds: { minX: number; minY: number; maxX: number; maxY: number; w: number; h: number };
+  zoom: number;
+  units: 'ft' | 'm';
+  dimFg: string;
+}) {
+  const pad = 1.8;
+  return (
+    <Group listening={false} perfectDrawEnabled={false}>
+      <DimMark
+        dim={{ id: 'overall-x', ax: bounds.minX, ay: bounds.maxY + pad, bx: bounds.maxX, by: bounds.maxY + pad }}
+        selected={false}
+        accent={dimFg}
+        zoom={zoom}
+        units={units}
+        dimFg={dimFg}
+      />
+      <DimMark
+        dim={{ id: 'overall-y', ax: bounds.minX - pad, ay: bounds.minY, bx: bounds.minX - pad, by: bounds.maxY }}
+        selected={false}
+        accent={dimFg}
+        zoom={zoom}
+        units={units}
+        dimFg={dimFg}
+      />
+    </Group>
   );
 }
 

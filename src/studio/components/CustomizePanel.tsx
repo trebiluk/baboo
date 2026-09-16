@@ -2,11 +2,21 @@ import { useRef, useState } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
 import { ROOF_STYLE_OPTIONS, roofStyleName } from '../lib/roof';
 import { TEXTURE_PACKS, textureName } from '../data/textures';
-import type { GuiThemeId, RoofStyleId, TypologyShell } from '../types';
+import type { GuiThemeId, Locale, RoofStyleId, SiteFinish, SkyPreset, TypologyShell, WallTintId } from '../types';
 import { DEFAULT_SKILL_LEVEL, skillRank } from '../data/skill';
 import { SkillPicker } from './SkillPicker';
 import { THEME_OPTIONS } from '../data/themes';
-import { GalleryCardPreview } from './GalleryCardPreview';
+import { LOCALE_OPTIONS, asLocale, t } from '../data/i18n';
+import {
+  SKY_OPTIONS,
+  SITE_OPTIONS,
+  WALL_TINT,
+  WALL_TINT_OPTIONS,
+  asShowFurniture3d,
+  asSite,
+  asSky,
+  asTint,
+} from '../data/scene3d';
 
 export function CustomizePanel() {
   const open = useProjectStore((s) => s.customizeOpen);
@@ -21,7 +31,6 @@ export function CustomizePanel() {
   const setTypologyShell = useProjectStore((s) => s.setTypologyShell);
   const setInventoryPresent = useProjectStore((s) => s.setInventoryPresent);
   const fileRef = useRef<HTMLInputElement>(null);
-  const [showGallery, setShowGallery] = useState(false);
   const [importBusy, setImportBusy] = useState(false);
   const skillLevel = settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
   const setSkillLevel = useProjectStore((s) => s.setSkillLevel);
@@ -51,7 +60,7 @@ export function CustomizePanel() {
       <button
         type="button"
         className="teaching-backdrop"
-        aria-label="Dismiss settings"
+        aria-label={t(settings.locale, 'chrome.close')}
         onClick={toggle}
       />
       <aside
@@ -62,10 +71,10 @@ export function CustomizePanel() {
         <div className="drawer-head">
           <div className="drawer-head-title">
             <span className="sheet-handle" aria-hidden="true" />
-            <h2 id="customize-title">Settings</h2>
+            <h2 id="customize-title">{t(settings.locale, 'chrome.settings')}</h2>
           </div>
           <button type="button" className="ghost-btn secondary-btn aw-pressable" onClick={toggle}>
-            Close
+            {t(settings.locale, 'chrome.close')}
           </button>
         </div>
 
@@ -115,15 +124,70 @@ export function CustomizePanel() {
               setSettings({ guiTheme: e.target.value as GuiThemeId });
             }}
           >
-            {THEME_OPTIONS.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name} — {t.blurb}
+            {THEME_OPTIONS.map((opt) => (
+              <option key={opt.id} value={opt.id}>
+                {opt.name} — {opt.blurb}
               </option>
             ))}
           </select>
         </label>
 
-        <SkillPicker value={skillLevel} onChange={setSkillLevel} legend="Skill level" />
+        <section className="aw-scene3d" aria-labelledby="lang-title">
+          <h3 id="lang-title">{t(settings.locale, 'lang.title')}</h3>
+          <p className="muted dense-lead">{t(settings.locale, 'lang.lead')}</p>
+          <div className="aw-shell-toggle aw-lang-toggle" role="group" aria-label={t(settings.locale, 'lang.title')}>
+            {LOCALE_OPTIONS.map((opt) => {
+              const on = asLocale(settings.locale) === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  lang={opt.htmlLang}
+                  dir={opt.dir}
+                  title={opt.blurb}
+                  className={`aw-shell-chip aw-pressable${on ? ' active' : ''}`}
+                  aria-pressed={on}
+                  onClick={() => setSettings({ locale: opt.id as Locale })}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="aw-scene3d" aria-labelledby="udl-title">
+          <h3 id="udl-title">{t(settings.locale, 'udl.title')}</h3>
+          <p className="muted dense-lead">{t(settings.locale, 'udl.lead')}</p>
+          <label className="field check">
+            <input
+              type="checkbox"
+              checked={!!settings.udlFat}
+              onChange={(e) => setSettings({ udlFat: e.target.checked })}
+            />
+            <span>{t(settings.locale, 'udl.fat')}</span>
+          </label>
+          <label className="field check">
+            <input
+              type="checkbox"
+              checked={!!settings.udlType}
+              onChange={(e) => setSettings({ udlType: e.target.checked })}
+            />
+            <span>{t(settings.locale, 'udl.type')}</span>
+          </label>
+          <label className="field check">
+            <input
+              type="checkbox"
+              checked={settings.ellEnglish !== false}
+              onChange={(e) => setSettings({ ellEnglish: e.target.checked })}
+            />
+            <span>{t(settings.locale, 'udl.english')}</span>
+          </label>
+          <p className="muted dense-lead">{t(settings.locale, 'udl.english.lead')}</p>
+          <p className="muted dense-lead">{t(settings.locale, 'udl.contrast')}</p>
+        </section>
+
+        <SkillPicker value={skillLevel} onChange={setSkillLevel} legend={t(settings.locale, 'skill.legend')} />
 
         {skillRank(skillLevel) >= 3 && (
           <section className="skill-layers" aria-label="Plan layers">
@@ -330,17 +394,78 @@ export function CustomizePanel() {
           />
         </label>
 
-        <div className="aw-gallery-preview-block">
-          <button
-            type="button"
-            className="ghost-btn aw-pressable"
-            aria-expanded={showGallery}
-            onClick={() => setShowGallery((v) => !v)}
-          >
-            {showGallery ? 'Hide gallery preview' : 'Gallery preview'}
-          </button>
-          {showGallery ? <GalleryCardPreview compact /> : null}
-        </div>
+        <section className="aw-scene3d" aria-labelledby="scene3d-title">
+          <h3 id="scene3d-title">{t(settings.locale, 'scene.title')}</h3>
+          <p className="muted dense-lead">{t(settings.locale, 'scene.lead')}</p>
+          <div className="field field--dense">
+            <span>{t(settings.locale, 'scene.sky')}</span>
+            <div className="aw-shell-toggle" role="group" aria-label={t(settings.locale, 'scene.sky')}>
+              {SKY_OPTIONS.map((opt) => {
+                const on = asSky(settings.skyPreset) === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    className={`aw-shell-chip aw-pressable${on ? ' active' : ''}`}
+                    aria-pressed={on}
+                    onClick={() => setSettings({ skyPreset: opt.id as SkyPreset })}
+                  >
+                    {t(settings.locale, `scene.sky.${opt.id}`)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="field field--dense">
+            <span>{t(settings.locale, 'scene.yard')}</span>
+            <div className="aw-shell-toggle" role="group" aria-label={t(settings.locale, 'scene.yard')}>
+              {SITE_OPTIONS.map((opt) => {
+                const on = asSite(settings.siteFinish) === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    className={`aw-shell-chip aw-pressable${on ? ' active' : ''}`}
+                    aria-pressed={on}
+                    onClick={() => setSettings({ siteFinish: opt.id as SiteFinish })}
+                  >
+                    {t(settings.locale, `scene.site.${opt.id}`)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="field field--dense">
+            <span>{t(settings.locale, 'scene.wall')}</span>
+            <div className="aw-tint-grid" role="group" aria-label={t(settings.locale, 'scene.wall')}>
+              {WALL_TINT_OPTIONS.map((opt) => {
+                const on = asTint(settings.wallTintId) === opt.id;
+                const sw = WALL_TINT[opt.id];
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    className={`aw-tint-chip aw-pressable${on ? ' active' : ''}`}
+                    aria-pressed={on}
+                    title={t(settings.locale, `scene.tint.${opt.id}`)}
+                    onClick={() => setSettings({ wallTintId: opt.id as WallTintId })}
+                  >
+                    <span className="aw-tint-chip__swatch" style={{ background: sw.fill }} aria-hidden="true" />
+                    <span>{t(settings.locale, `scene.tint.${opt.id}`)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <label className="field check field--dense">
+            <input
+              type="checkbox"
+              checked={asShowFurniture3d(settings.showFurniture3d)}
+              onChange={(e) => setSettings({ showFurniture3d: e.target.checked })}
+            />
+            <span>{t(settings.locale, 'scene.furn')}</span>
+          </label>
+        </section>
 
         <p className="muted">Few settings on purpose. Grid stays visible; snap is easy to toggle.</p>
       </aside>

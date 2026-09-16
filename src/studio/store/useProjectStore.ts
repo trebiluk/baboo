@@ -18,6 +18,7 @@ import {
 import { chamferCorner, nearestChamferable } from '../lib/chamfer';
 import { findEnclosedFace, formatArea, hitRoom, polygonArea } from '../lib/rooms';
 import { DEFAULT_ROOM_KIND, roomType } from '../data/rooms';
+import { t, readLocalePref, readUdlFatPref, readUdlTypePref, readEllEnglishPref, writeLocalePref, writeUdlFatPref, writeUdlTypePref, writeEllEnglishPref } from '../data/i18n';
 import { generateRoof, roofStyleName } from '../lib/roof';
 import { textureName } from '../data/textures';
 import {
@@ -36,7 +37,7 @@ import { exportProjectFile, importProjectFile, loadProject, saveProject } from '
 import { exportGalleryCardFile, type GalleryCardOptions } from '../lib/galleryExport';
 import { noteAutosaveSuccess } from './useDebugStore';
 import {
-  DEFAULT_SKILL_LEVEL, isToolUnlocked, levelRequiredFor, skillInfo,
+  DEFAULT_SKILL_LEVEL, isToolUnlocked, levelRequiredFor,
   skillRank, toastMs, readSkillPref, writeSkillPref,
 } from '../data/skill';
 import type { SkillLevel } from '../types';
@@ -71,6 +72,7 @@ interface Store {
   toolsPinned: boolean;
   panelsPinned: boolean;
   chromeEpoch: number;
+  fitNonce: number;
   newProjectOpen: boolean;
   debugOpen: boolean;
   driveWizardOpen: boolean;
@@ -143,6 +145,7 @@ interface Store {
   exportGalleryCard: (opts?: GalleryCardOptions) => void;
   importJson: (file: File) => Promise<void>;
   clearSelection: () => void;
+  setSelected: (sel: Sel) => void;
   deleteSelected: () => void;
   beginWall: (p: Point) => void;
   finishWall: (p: Point, ortho?: boolean) => void;
@@ -150,7 +153,7 @@ interface Store {
   cancelWallDraft: () => void;
   placeOpening: (type: 'door' | 'window', p: Point) => void;
   patchOpening: (id: string, patch: Partial<Pick<Opening, 'width' | 'swing' | 'symbolKind' | 't'>>) => void;
-  patchWall: (id: string, patch: Partial<Pick<Wall, 'kind'>>) => void;
+  patchWall: (id: string, patch: Partial<Pick<Wall, 'kind' | 'finishId'>>) => void;
   patchRoom: (id: string, patch: Partial<Pick<Room, 'name' | 'kind'>>) => void;
   placeFurniture: (p: Point) => void;
   seedCrowd: (count: number) => void;
@@ -205,6 +208,7 @@ export const useProjectStore = create<Store>((set, get) => ({
   toolsPinned: false,
   panelsPinned: false,
   chromeEpoch: 0,
+  fitNonce: 0,
   // Drawers overlay the plan — stay closed so the grid is the first view
   teachingOpen: false,
   accessOpen: false,
@@ -262,7 +266,17 @@ export const useProjectStore = create<Store>((set, get) => ({
       set({
         newProjectOpen: true,
         saveStatus: 'saved',
-        doc: { ...doc, settings: { ...doc.settings, skillLevel: skill } },
+        doc: {
+          ...doc,
+          settings: {
+            ...doc.settings,
+            skillLevel: skill,
+            locale: readLocalePref(),
+            udlFat: readUdlFatPref(),
+            udlType: readUdlTypePref(),
+            ellEnglish: readEllEnglishPref(),
+          },
+        },
         toolsPinned: skill === 'novice',
       });
     }
@@ -271,9 +285,9 @@ export const useProjectStore = create<Store>((set, get) => ({
   setTool: (tool) => {
     const skill = get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
     if (!isToolUnlocked(tool, skill)) {
-      const need = skillInfo(levelRequiredFor(tool)).label;
+      const loc = get().doc.settings.locale;
       get().showToast(
-        `${({ dim: 'Size', note: 'Note', plant: 'Plant', sketch: 'Sketch' } as Record<string, string>)[tool] ?? (tool[0].toUpperCase() + tool.slice(1))} unlocks at ${need}. Change level in Settings.`,
+        t(loc, 'toast.locked', { level: t(loc, `skill.${levelRequiredFor(tool)}`) }),
         toastMs(skill, 3200),
       );
       return;
@@ -298,13 +312,18 @@ export const useProjectStore = create<Store>((set, get) => ({
       toolsPinned: skillLevel === 'novice' ? true : get().toolsPinned,
     });
     get().markDirty();
-    get().showToast(`I’ll help as ${skillInfo(skillLevel).label}`, toastMs(skillLevel, 2200));
+    get().showToast(t(get().doc.settings.locale, 'toast.helpAs', { level: t(get().doc.settings.locale, `skill.${skillLevel}`) }), toastMs(skillLevel, 2200));
   },
   setWallKind: (wallKind) => set({ wallKind, wallMode: 'draw' }),
   setWallMode: (wallMode) => set({ wallMode, wallDraft: null, tool: 'wall' }),
   setPlantKind: (selectedPlantKind) => set({ selectedPlantKind, tool: 'plant' }),
   setViewport: (w, h) => set({ viewport: { w, h } }),
   fitPlan: () => {
+    const mode = get().viewMode;
+    if (mode === 'dollhouse') {
+      set({ fitNonce: get().fitNonce + 1 });
+      return;
+    }
     const f = get().floor();
     const pts: Point[] = f.nodes.map((n) => ({ x: n.x, y: n.y }));
     for (const item of f.furniture) pts.push({ x: item.x, y: item.y });
@@ -320,7 +339,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     }
     const { w, h } = get().viewport;
     if (!pts.length || w < 40 || h < 40) {
-      set({ panX: 80, panY: 80, zoom: 24 });
+      set({ panX: 80, panY: 80, zoom: 24, viewMode: 'plan', fitNonce: get().fitNonce + 1 });
       return;
     }
     let minX = pts[0].x, maxX = pts[0].x, minY = pts[0].y, maxY = pts[0].y;
@@ -341,6 +360,7 @@ export const useProjectStore = create<Store>((set, get) => ({
       panX: w / 2 - cx * zoom,
       panY: h / 2 - cy * zoom,
       viewMode: 'plan',
+      fitNonce: get().fitNonce + 1,
     });
   },
   setFloorLayer: (key, on) => {
@@ -363,6 +383,10 @@ export const useProjectStore = create<Store>((set, get) => ({
     const meta = partial.units
       ? { ...doc.meta, units: partial.units }
       : doc.meta;
+    if (partial.locale != null) writeLocalePref(partial.locale);
+    if (partial.udlFat != null) writeUdlFatPref(!!partial.udlFat);
+    if (partial.udlType != null) writeUdlTypePref(!!partial.udlType);
+    if (partial.ellEnglish != null) writeEllEnglishPref(!!partial.ellEnglish);
     set({ doc: { ...doc, settings, meta } });
     get().markDirty();
   },
@@ -551,11 +575,12 @@ export const useProjectStore = create<Store>((set, get) => ({
     }),
   showToast: (toast, ms = 2400) => {
     if (toastTimer) clearTimeout(toastTimer);
+    const hold = get().doc.settings.udlType ? Math.max(ms + 1400, 4200) : ms;
     set({ toast });
     toastTimer = setTimeout(() => {
       toastTimer = null;
       set({ toast: null });
-    }, ms);
+    }, hold);
   },
 
   pushHistory: () => {
@@ -612,9 +637,15 @@ export const useProjectStore = create<Store>((set, get) => ({
   },
 
   newFromTemplate: (styleId) => {
-    const skillLevel = get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
+    const cur = get().doc.settings;
+    const skillLevel = cur.skillLevel ?? DEFAULT_SKILL_LEVEL;
     const doc = buildTemplateProject(styleId);
     doc.settings.skillLevel = skillLevel;
+    doc.settings.locale = cur.locale;
+    doc.settings.udlFat = cur.udlFat;
+    doc.settings.udlType = cur.udlType;
+    doc.settings.ellEnglish = cur.ellEnglish;
+    doc.settings.guiTheme = cur.guiTheme;
     set({
       doc,
       past: [],
@@ -631,18 +662,18 @@ export const useProjectStore = create<Store>((set, get) => ({
     get().markDirty();
     get().showToast(
       styleId === 'dog-house'
-        ? 'Baboo’s contest — sketch a snug den, then ask her to judge'
-        : `${doc.meta.title} is ready — go draw`,
+        ? t(doc.settings.locale, 'toast.contestStart')
+        : t(doc.settings.locale, 'toast.ready', { title: doc.meta.title }),
     );
     setTimeout(() => get().fitPlan(), 80);
   },
   exportJson: () => {
     exportProjectFile(get().doc);
-    get().showToast('Saved for class');
+    get().showToast(t(get().doc.settings.locale, 'toast.saved'));
   },
   exportGalleryCard: (opts) => {
     exportGalleryCardFile(get().doc, opts);
-    get().showToast('Class card ready — no last name');
+    get().showToast(t(get().doc.settings.locale, 'toast.card'));
   },
   importJson: async (file) => {
     try {
@@ -658,13 +689,14 @@ export const useProjectStore = create<Store>((set, get) => ({
       };
       set({ doc, past: [], future: [], selected: null, newProjectOpen: false });
       get().markDirty();
-      get().showToast('Project imported');
+      get().showToast(t(get().doc.settings.locale, 'toast.imported'));
     } catch {
-      get().showToast('Import failed');
+      get().showToast(t(get().doc.settings.locale, 'toast.importFail'));
     }
   },
 
   clearSelection: () => set({ selected: null }),
+  setSelected: (selected) => set({ selected }),
   deleteSelected: () => {
     const { selected, doc } = get();
     if (!selected) return;
@@ -754,7 +786,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     const floor = get().floor();
     const node = nearestChamferable(floor.nodes, floor.walls, p, 1.8);
     if (!node) {
-      get().showToast('Click a sharp corner where two walls meet', 2800);
+      get().showToast(t(get().doc.settings.locale, 'toast.clipHint'), 2800);
       return;
     }
     const size = Math.max(1, get().doc.settings.gridSize || 1) * 2;
@@ -787,7 +819,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     }
     const hit = nearestWall(floor.walls, floor.nodes, p, 1.5);
     if (!hit) {
-      get().showToast('Almost — click right on a wall', toastMs(get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL, 3200));
+      get().showToast(t(get().doc.settings.locale, 'toast.missWall'), toastMs(get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL, 3200));
       return;
     }
     get().pushHistory();
@@ -810,9 +842,9 @@ export const useProjectStore = create<Store>((set, get) => ({
     get().showToast(
       type === 'door'
         ? (get().doc.settings.styleId === 'dog-house'
-          ? 'Door is in — tap it, pick 12" or 18", then slide it off-center'
-          : 'Door is in — change swing or size in the menu')
-        : 'Window is in — drag to slide it',
+          ? t(get().doc.settings.locale, 'toast.doorDog')
+          : t(get().doc.settings.locale, 'toast.doorIn'))
+        : t(get().doc.settings.locale, 'toast.windowIn'),
       toastMs(get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL, 2800),
     );
   },
@@ -900,7 +932,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     {
       const skill = get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
       if (skillRank(skill) < 3) {
-        get().showToast('Click it to scoot it around', toastMs(skill, 2800));
+        get().showToast(t(get().doc.settings.locale, 'toast.furnMove'), toastMs(skill, 2800));
       }
     }
   },
@@ -1022,7 +1054,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     });
     get().markDirty();
     const skill = get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
-    if (skillRank(skill) < 3) get().showToast('Size label stuck. Delete removes it.', toastMs(skill, 2400));
+    if (skillRank(skill) < 3) get().showToast(t(get().doc.settings.locale, 'toast.dimIn'), toastMs(skill, 2400));
   },
 
   placeNote: (p) => {
@@ -1037,7 +1069,7 @@ export const useProjectStore = create<Store>((set, get) => ({
       tool: 'select',
     });
     get().markDirty();
-    get().showToast('Type in the note box', 2200);
+    get().showToast(t(get().doc.settings.locale, 'toast.noteType'), 2200);
   },
 
   renameNote: (id, text) => {
@@ -1094,7 +1126,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     get().markDirty();
     const skill = get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
     if (skillRank(skill) <= 1) {
-      get().showToast('Sketch is in. Keep drawing, or Trace to make walls.', toastMs(skill, 3200));
+      get().showToast(t(get().doc.settings.locale, 'toast.sketchIn'), toastMs(skill, 3200));
     }
   },
 
@@ -1106,7 +1138,7 @@ export const useProjectStore = create<Store>((set, get) => ({
       ?? sketches[sketches.length - 1]?.id
       ?? null;
     if (!sketchId) {
-      get().showToast('Sketch first, then Trace', 2400);
+      get().showToast(t(get().doc.settings.locale, 'toast.sketchFirst'), 2400);
       return;
     }
     const sketch = (get().floor().sketches ?? []).find((s) => s.id === sketchId);
@@ -1345,12 +1377,12 @@ export const useProjectStore = create<Store>((set, get) => ({
   duplicateSelected: () => {
     const skill = get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
     if (skillRank(skill) < 3) {
-      get().showToast('Duplicate unlocks at Expert. Change level in Settings.', toastMs(skill, 2800));
+      get().showToast(t(get().doc.settings.locale, 'toast.locked', { level: t(get().doc.settings.locale, 'skill.expert') }), toastMs(skill, 2800));
       return;
     }
     const { selected, doc } = get();
     if (!selected) {
-      get().showToast('Select something first, then Duplicate', 2200);
+      get().showToast(t(get().doc.settings.locale, 'toast.dupNeed'), 2200);
       return;
     }
     get().pushHistory();
@@ -1363,7 +1395,7 @@ export const useProjectStore = create<Store>((set, get) => ({
         selected: { kind: 'furniture', id: copy.id },
       });
       get().markDirty();
-      get().showToast('Duplicated', 1400);
+      get().showToast(t(get().doc.settings.locale, 'toast.dup'), 1400);
       return;
     }
     if (selected.kind === 'room') {
@@ -1375,7 +1407,7 @@ export const useProjectStore = create<Store>((set, get) => ({
         selected: { kind: 'room', id: copy.id },
       });
       get().markDirty();
-      get().showToast('Duplicated', 1400);
+      get().showToast(t(get().doc.settings.locale, 'toast.dup'), 1400);
       return;
     }
     if (selected.kind === 'opening') {
@@ -1387,7 +1419,7 @@ export const useProjectStore = create<Store>((set, get) => ({
         selected: { kind: 'opening', id: copy.id },
       });
       get().markDirty();
-      get().showToast('Duplicated', 1400);
+      get().showToast(t(get().doc.settings.locale, 'toast.dup'), 1400);
     }
   },
   rotateSelected: (dir) => {

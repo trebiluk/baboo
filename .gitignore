@@ -15,3 +15,6 @@ attachments
 .project_id
 .node_modules.lock
 startup.sh
+
+AGENTS.md
+AGENTS.project.md
