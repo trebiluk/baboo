@@ -105,6 +105,23 @@ export interface NoteItem {
 
 export type PlantKind = 'tree' | 'bed' | 'path';
 
+/** Indoor floor finish. */
+export type FloorFinishId =
+  | 'oak'
+  | 'walnut'
+  | 'maple'
+  | 'herringbone'
+  | 'tile'
+  | 'hex'
+  | 'carpet'
+  | 'denim'
+  | 'lino'
+  | 'concrete'
+  | 'checker'
+  | 'slate'
+  | 'terracotta'
+  | 'brick';
+
 export interface LandscapeItem {
   id: string;
   kind: PlantKind;
@@ -142,6 +159,8 @@ export interface Room {
   name: string;
   x: number;
   y: number;
+  /** Room floor finish. null/omit = house default. */
+  floorFinishId?: FloorFinishId | null;
 }
 
 export interface Floor {
@@ -240,6 +259,10 @@ export interface ProjectSettings {
   siteFinish: SiteFinish;
   /** Wall tint in Solid 3D. */
   wallTintId: WallTintId;
+  /** House-wide floor finish. Rooms may override. Default oak. */
+  floorFinishId: FloorFinishId;
+  /** Plank / tile grain. 0 = along X, 90 = along Y. */
+  floorGrain: 0 | 90;
   /** Furniture boxes in Solid 3D (view-only). Default on. */
   showFurniture3d: boolean;
   /** Dollhouse drawing system. Default isometric. */

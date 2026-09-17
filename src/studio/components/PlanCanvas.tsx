@@ -17,12 +17,12 @@ import {
   patternWorldScale,
   textureStrokeFallback,
 } from '../lib/texturePattern';
-import { FURNITURE_CATALOG } from '../data/furniture';
+import { FurnitureSymbol } from './FurnitureSymbol';
+import { asFloorFinish, asFloorGrain, floorFinish, floorTileCanvas } from '../data/flooring';
 import { DEFAULT_GUI_THEME } from '../data/themes';
 import { DEFAULT_SKILL_LEVEL, skillRank } from '../data/skill';
+import { furnitureLod } from '../lib/perf';
 import { t } from '../data/i18n';
-
-const FURN_BY_ID = new Map(FURNITURE_CATALOG.map((c) => [c.id, c]));
 
 export function PlanCanvas() {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -460,7 +460,9 @@ export function PlanCanvas() {
     (floor.dimensions ?? []).length +
     (floor.notes ?? []).length +
     (floor.sketches ?? []).length;
-  const packed = floor.furniture.length >= 120 || objectCount >= 400;
+  const packed = floor.furniture.length >= 80 || objectCount >= 280;
+  const furnLod = furnitureLod({ count: floor.furniture.length, zoom });
+  const simpleFurn = furnLod === 'simple' || packed;
   const showFurnLabels = !packed && zoom >= 16;
   const showDims = floor.layers.dims && !packed;
 
@@ -539,6 +541,9 @@ export function PlanCanvas() {
               selected={selected?.kind === 'room' && selected.id === r.id}
               zoom={zoom}
               lightPlan={lightPlan}
+              houseFloor={asFloorFinish(settings.floorFinishId)}
+              floorGrain={asFloorGrain(settings.floorGrain)}
+              simple={simpleFurn}
             />
           ))}
           {tool === 'room' && hoverFace && (
@@ -624,6 +629,8 @@ export function PlanCanvas() {
               furnStroke={planColors.furnStroke}
               showLabel={showFurnLabels}
               zoom={zoom}
+              lightPlan={lightPlan}
+              simple={simpleFurn}
             />
           ))}
 
@@ -936,7 +943,7 @@ export function PlanCanvas() {
 }
 
 const FurnitureMark = memo(function FurnitureMark({
-  item, selected, accent, furnStroke, showLabel, zoom,
+  item, selected, accent, furnStroke, showLabel, zoom, lightPlan, simple,
 }: {
   item: FurnitureItem;
   selected: boolean;
@@ -944,8 +951,9 @@ const FurnitureMark = memo(function FurnitureMark({
   furnStroke: string;
   showLabel: boolean;
   zoom: number;
+  lightPlan: boolean;
+  simple?: boolean;
 }) {
-  const cat = FURN_BY_ID.get(item.catalogId);
   return (
     <Group
       x={item.x}
@@ -954,28 +962,24 @@ const FurnitureMark = memo(function FurnitureMark({
       listening={false}
       perfectDrawEnabled={false}
     >
-      <Rect
-        x={-item.w / 2}
-        y={-item.h / 2}
-        width={item.w}
-        height={item.h}
-        fill={cat?.color ?? '#445'}
-        opacity={0.85}
-        stroke={selected ? accent : furnStroke}
-        strokeWidth={(selected ? 2.5 : 1) / zoom}
-        cornerRadius={0.08}
-        listening={false}
-        perfectDrawEnabled={false}
+      <FurnitureSymbol
+        item={item}
+        selected={selected}
+        accent={accent}
+        stroke={furnStroke}
+        zoom={zoom}
+        light={lightPlan}
+        simple={simple}
       />
       {showLabel ? (
         <Text
           text={item.label}
           x={-item.w / 2}
-          y={-0.2}
+          y={item.h / 2 + 0.08}
           width={item.w}
           align="center"
-          fontSize={Math.max(0.45, Math.min(0.7, item.w / 6))}
-          fill="#e8eef8"
+          fontSize={Math.max(0.4, Math.min(0.62, item.w / 6))}
+          fill={lightPlan ? '#1a1a1a' : '#e8eef8'}
           listening={false}
           perfectDrawEnabled={false}
         />
@@ -1084,7 +1088,8 @@ function PlantMark({
     return (
       <Group x={item.x} y={item.y} listening={false} perfectDrawEnabled={false}>
         <Circle radius={r} fill="#4C9A5C" opacity={0.55} stroke={stroke} strokeWidth={(selected ? 2 : 1) / zoom} />
-        <Circle radius={r * 0.45} fill="#2F6B3A" />
+        <Circle radius={r * 0.62} fill="#3D7A4A" opacity={0.7} />
+        <Circle radius={r * 0.22} fill="#6B5344" />
       </Group>
     );
   }
@@ -1566,22 +1571,36 @@ function RoofPlanShapes({ roof, zoom, lightPlan = false }: { roof: import('../ty
 }
 
 function RoomFill({
-  room, poly, selected, zoom, lightPlan,
+  room, poly, selected, zoom, lightPlan, houseFloor, floorGrain, simple,
 }: {
   room: Room;
   poly: { x: number; y: number }[] | null;
   selected: boolean;
   zoom: number;
   lightPlan: boolean;
+  houseFloor: ReturnType<typeof asFloorFinish>;
+  floorGrain: ReturnType<typeof asFloorGrain>;
+  simple?: boolean;
 }) {
   if (!poly) return null;
   const cat = roomType(room.kind);
+  const finishId = room.kind === 'outdoor'
+    ? null
+    : (room.floorFinishId ?? houseFloor);
+  const tile = !simple && finishId ? floorTileCanvas(finishId, floorGrain) : null;
+  const fill = finishId ? floorFinish(finishId).color : cat.color;
+  const scale = 2 / 64;
   return (
     <Line
       points={polyPoints(poly)}
       closed
-      fill={cat.color}
-      opacity={selected ? (lightPlan ? 0.42 : 0.38) : (lightPlan ? 0.28 : 0.22)}
+      fill={fill}
+      fillPatternImage={tile ? tile as CanvasImageSource as HTMLImageElement : undefined}
+      fillPatternRepeat="repeat"
+      fillPriority={tile ? 'pattern' : 'color'}
+      fillPatternScaleX={scale}
+      fillPatternScaleY={scale}
+      opacity={selected ? (lightPlan ? 0.92 : 0.88) : (lightPlan ? 0.78 : 0.72)}
       stroke={selected ? '#6E72F5' : 'transparent'}
       strokeWidth={2 / zoom}
       listening={false}

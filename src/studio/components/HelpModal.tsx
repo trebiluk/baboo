@@ -45,6 +45,7 @@ export function HelpModal() {
           <li>{t(locale, 'help.plant')}</li>
           <li>{t(locale, 'help.doll')}</li>
           <li>{t(locale, 'help.view3d')}</li>
+          <li>{t(locale, 'help.chrome')}</li>
           <li>{t(locale, 'help.skill')}</li>
           <li>{t(locale, 'help.lang')}</li>
           <li>{t(locale, 'help.udl')}</li>

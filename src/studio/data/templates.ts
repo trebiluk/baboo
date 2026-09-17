@@ -218,7 +218,13 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
     ];
     floor.furniture = [
       furn('sofa', 12, 9, 7, 3, 'Sofa'),
+      furn('coffee-table', 12, 13, 4, 2, 'Coffee Table'),
       furn('bed-queen', 38, 9, 5, 6.5, 'Bed'),
+      furn('nightstand', 34.5, 6.5, 1.5, 1.5, 'Nightstand'),
+      furn('stove', 24, 4, 2.5, 2.5, 'Stove'),
+      furn('fridge', 21, 4, 3, 2.5, 'Fridge'),
+      furn('toilet', 32, 4, 1.5, 2.5, 'Toilet'),
+      furn('bathtub', 29, 4.5, 5, 2.5, 'Tub'),
       furn('washer', 28, 14, 2.5, 2.5, 'Washer'),
       furn('closet', 42, 4, 4, 2, 'Closet'),
     ];
@@ -379,6 +385,8 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
       siteFinish: 'grass',
       wallTintId: 'sand',
       showFurniture3d: true,
+      floorFinishId: 'oak',
+      floorGrain: 0,
       dollProj: 'iso',
       dollYaw: 0,
       dollTop: false,

@@ -5,6 +5,7 @@ import { ROOM_CATALOG, roomType } from '../data/rooms';
 import { formatArea, polygonArea, roomPolygon } from '../lib/rooms';
 import { Icon } from '../icons';
 import { TEXTURE_PACKS } from '../data/textures';
+import { FLOOR_FINISHES, asFloorFinish } from '../data/flooring';
 
 const DOOR_WIDTHS = [
   { v: 1, label: '12"' },
@@ -43,6 +44,7 @@ export function ObjectMenu() {
   const selected = useProjectStore((s) => s.selected);
   const floor = useProjectStore((s) => s.doc.floors[0]);
   const units = useProjectStore((s) => s.doc.settings.units) || 'ft';
+  const houseFloor = useProjectStore((s) => asFloorFinish(s.doc.settings.floorFinishId));
   const styleId = useProjectStore((s) => s.doc.settings.styleId);
   const patchOpening = useProjectStore((s) => s.patchOpening);
   const patchWall = useProjectStore((s) => s.patchWall);
@@ -265,6 +267,51 @@ export function ObjectMenu() {
               {poly ? formatArea(polygonArea(poly), units) : 'Open — close walls to measure'}
               {' · '}{roomType(r.kind).blurb}
             </p>
+            {r.kind !== 'outdoor' ? (
+              <>
+                <p className="object-menu-meta">Flooring</p>
+                <div className="object-menu-row object-tex-row">
+                  <button
+                    type="button"
+                    className={`object-chip aw-pressable${r.floorFinishId == null ? ' active' : ''}`}
+                    onClick={() => patchRoom(r.id, { floorFinishId: null })}
+                  >
+                    House
+                  </button>
+                  {FLOOR_FINISHES.map((p) => {
+                    const current = r.floorFinishId ?? houseFloor;
+                    const on = r.floorFinishId != null && current === p.id;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        className={`object-chip tex-swatch aw-pressable${on ? ' active' : ''}`}
+                        style={{ background: p.previewCss }}
+                        title={p.name}
+                        onClick={() => patchRoom(r.id, { floorFinishId: p.id })}
+                      >
+                        {p.name}
+                      </button>
+                    );
+                  })}
+                </div>
+                {r.floorFinishId ? (
+                  <button
+                    type="button"
+                    className="object-chip aw-pressable"
+                    onClick={() => {
+                      for (const other of floor.rooms ?? []) {
+                        if (other.kind === r.kind && other.kind !== 'outdoor') {
+                          patchRoom(other.id, { floorFinishId: r.floorFinishId });
+                        }
+                      }
+                    }}
+                  >
+                    Same floor in every {roomType(r.kind).name.toLowerCase()}
+                  </button>
+                ) : null}
+              </>
+            ) : null}
             <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
           </>
         );

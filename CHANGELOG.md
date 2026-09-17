@@ -3,6 +3,20 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 1.3.1 — 2026-09-16
+- Tools, catalogs, Settings, Teach, and the edit panel dock to the sides and collapse — the grid stays open
+- Busy houses stay snappy: extra furniture detail drops while you spin 3D or zoom the plan out
+
+## 1.3.0 — 2026-09-16
+- Furniture is modeled, not boxed: round tables, burner rings, toilet bowls, tubs, drums, legs
+- Flooring: walnut, herringbone, slate, terracotta. Rotate the grain. 3D shows the pattern
+- Catalog shows the object. Tap a room for its own floor, or House to follow the default
+
+## 1.2.0 — 2026-09-16
+- Furniture reads as the thing: beds with pillows, sofas with arms, stove burners, toilet and tub
+- Flooring: oak, maple, tile, hex, carpet, linoleum, concrete, checker — house default plus per-room
+- Same shapes in Plan, Dollhouse, and 3D. Tap a named room to change its floor
+
 ## 1.1.7 — 2026-09-16
 - Dollhouse turns: Front, Right, Rear, Left — same house, new face
 - Drawing views to teach: Isometric, Oblique (cabinet), Elevation, Orthographic + Top (a plan)

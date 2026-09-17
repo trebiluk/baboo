@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
 import { ROOF_STYLE_OPTIONS, roofStyleName } from '../lib/roof';
 import { TEXTURE_PACKS, textureName } from '../data/textures';
+import { FLOOR_FINISHES, asFloorFinish, asFloorGrain } from '../data/flooring';
 import type { GuiThemeId, Locale, RoofStyleId, SiteFinish, SkyPreset, TypologyShell, WallTintId } from '../types';
 import { DEFAULT_SKILL_LEVEL, skillRank } from '../data/skill';
 import { SkillPicker } from './SkillPicker';
@@ -36,6 +37,7 @@ export function CustomizePanel() {
   const setSkillLevel = useProjectStore((s) => s.setSkillLevel);
   const floor = useProjectStore((s) => s.doc.floors[0]);
   const setFloorLayer = useProjectStore((s) => s.setFloorLayer);
+  const patchRoom = useProjectStore((s) => s.patchRoom);
 
   if (!open) return null;
 
@@ -383,6 +385,65 @@ export function CustomizePanel() {
                 : ' (import — blob missing, re-import)')
               : null}
           </p>
+        </section>
+
+        <section className="aw-materials" aria-labelledby="floor-title">
+          <h3 id="floor-title">{t(settings.locale, 'floor.title')}</h3>
+          <p className="muted dense-lead">{t(settings.locale, 'floor.lead')}</p>
+          <div className="aw-tex-grid" role="listbox" aria-label={t(settings.locale, 'floor.title')}>
+            {FLOOR_FINISHES.map((pack) => {
+              const selected = asFloorFinish(settings.floorFinishId) === pack.id;
+              return (
+                <button
+                  key={pack.id}
+                  type="button"
+                  role="option"
+                  aria-selected={selected}
+                  className={`aw-tex-chip aw-pressable${selected ? ' active' : ''}`}
+                  title={pack.blurb}
+                  onClick={() => setSettings({ floorFinishId: pack.id })}
+                >
+                  <span
+                    className="aw-tex-chip__swatch"
+                    style={{ background: pack.previewCss }}
+                    aria-hidden="true"
+                  />
+                  <span className="aw-tex-chip__label">{t(settings.locale, `floor.${pack.id}`)}</span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="muted dense-lead">{t(settings.locale, 'floor.grain')}</p>
+          <div className="aw-shell-toggle" role="group" aria-label={t(settings.locale, 'floor.grain')}>
+            <button
+              type="button"
+              className={`aw-shell-chip aw-pressable${asFloorGrain(settings.floorGrain) === 0 ? ' active' : ''}`}
+              aria-pressed={asFloorGrain(settings.floorGrain) === 0}
+              onClick={() => setSettings({ floorGrain: 0 })}
+            >
+              {t(settings.locale, 'floor.grain.across')}
+            </button>
+            <button
+              type="button"
+              className={`aw-shell-chip aw-pressable${asFloorGrain(settings.floorGrain) === 90 ? ' active' : ''}`}
+              aria-pressed={asFloorGrain(settings.floorGrain) === 90}
+              onClick={() => setSettings({ floorGrain: 90 })}
+            >
+              {t(settings.locale, 'floor.grain.along')}
+            </button>
+          </div>
+          <button
+            type="button"
+            className="ghost-btn aw-pressable aw-tex-clear"
+            style={{ marginTop: 8 }}
+            onClick={() => {
+              for (const r of floor.rooms ?? []) {
+                if (r.kind !== 'outdoor') patchRoom(r.id, { floorFinishId: null });
+              }
+            }}
+          >
+            {t(settings.locale, 'floor.applyAll')}
+          </button>
         </section>
 
         <label className="field">

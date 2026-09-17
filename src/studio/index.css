@@ -490,18 +490,19 @@ button {
 }
 .side-panel {
   z-index:var(--aw-z-catalogs);
-  left:calc(var(--aw-float-inset) + var(--aw-rail-left) + 8px);
-  top:var(--aw-float-inset);
-  bottom:var(--aw-float-inset);
-  background:var(--aw-surface);
-  border:1px solid var(--aw-border);
-  width:min(248px, 100% - 84px);
+  left:var(--aw-rail-left);
+  top:0;
+  bottom:0;
+  background:var(--aw-elevated);
+  border:none;
+  border-right:1px solid var(--aw-border);
+  width:min(248px, calc(100% - var(--aw-rail-left) - var(--aw-rail-right)));
   animation:aw-dock-in-left var(--aw-motion-fast) var(--aw-ease-out);
-  border-radius:14px;
+  border-radius:0;
   padding:12px;
   position:absolute;
   overflow:auto;
-  box-shadow:8px 0 24px #0000002e
+  box-shadow:none
 }
 .side-panel h2 {
   margin:0 0 6px;
@@ -524,22 +525,24 @@ button {
 }
 .tool-rail {
   z-index:calc(var(--aw-z-catalogs) + 2);
-  left:var(--aw-float-inset);
-  top:var(--aw-float-inset);
+  left:0;
+  top:0;
+  bottom:0;
   width:var(--aw-rail-left);
-  background:color-mix(in srgb, var(--aw-elevated) 94%, transparent);
-  border:1px solid var(--aw-border);
-  height:auto;
-  max-height:calc(100% - 24px);
+  background:var(--aw-elevated);
+  border:none;
+  border-right:1px solid var(--aw-border);
+  height:100%;
+  max-height:none;
   transition:box-shadow var(--aw-motion-quick) var(--aw-ease-out);
-  border-radius:14px;
+  border-radius:0;
   flex-direction:column;
   gap:4px;
-  padding:6px;
+  padding:6px 4px;
   display:flex;
   position:absolute;
   overflow:auto;
-  box-shadow:0 10px 28px #0a0a0a29
+  box-shadow:none
 }
 .tool-rail.is-min {
   padding:4px
@@ -606,21 +609,23 @@ button {
 }
 .dock-rail {
   z-index:calc(var(--aw-z-drawers) + 2);
-  right:var(--aw-float-inset);
-  top:var(--aw-float-inset);
+  right:0;
+  top:0;
+  bottom:0;
   width:var(--aw-rail-right);
-  background:color-mix(in srgb, var(--aw-elevated) 94%, transparent);
-  border:1px solid var(--aw-border);
-  border-radius:14px;
+  background:var(--aw-elevated);
+  border:none;
+  border-left:1px solid var(--aw-border);
+  border-radius:0;
   flex-direction:column;
   gap:4px;
-  height:auto;
-  max-height:calc(100% - 24px);
+  height:100%;
+  max-height:none;
   padding:6px 2px;
   display:flex;
   position:absolute;
   overflow:auto;
-  box-shadow:0 10px 28px #0a0a0a29
+  box-shadow:none
 }
 .dock-rail-btn {
   min-width:40px;
@@ -694,7 +699,7 @@ button {
   background:var(--aw-elevated);
   border-radius:8px;
   grid-template-rows:auto auto;
-  grid-template-columns:16px 1fr;
+  grid-template-columns:44px 1fr;
   gap:2px 8px;
   padding:8px;
   display:grid
@@ -709,6 +714,16 @@ button {
 .catalog-card.active {
   border-color:var(--aw-royal);
   background:color-mix(in srgb, var(--aw-royal) 28%, var(--aw-elevated))
+}
+.furn-glyph {
+  width:44px;
+  height:44px;
+  grid-row:span 2;
+  align-self:center;
+  display:block;
+  border-radius:6px;
+  border:1px solid var(--aw-border);
+  background:#f3eee4
 }
 .swatch {
   border-radius:4px;
@@ -743,7 +758,7 @@ button {
   line-height:1.35;
   position:absolute;
   bottom:12px;
-  left:12px
+  left:calc(var(--aw-rail-left) + 8px)
 }
 .plan-load-chip {
   z-index:var(--aw-z-overlays);
@@ -929,8 +944,8 @@ button {
 }
 .coach-card {
   z-index:var(--aw-z-overlays);
-  left:calc(var(--aw-float-inset) + var(--aw-rail-left) + 12px);
-  right:calc(var(--aw-float-inset) + var(--aw-rail-right) + 12px);
+  left:calc(var(--aw-rail-left) + 12px);
+  right:calc(var(--aw-rail-right) + 12px);
   background:var(--aw-elevated);
   border:1px solid color-mix(in srgb, var(--aw-royal) 45%, var(--aw-border));
   width:auto;
@@ -1007,18 +1022,19 @@ button {
 }
 .drawer {
   z-index:var(--aw-z-drawers);
-  top:var(--aw-float-inset);
-  right:calc(var(--aw-float-inset) + var(--aw-rail-right) + 8px);
-  bottom:var(--aw-float-inset);
-  width:min(var(--aw-dock-width), calc(100% - 72px));
-  background:var(--aw-surface);
-  border:1px solid var(--aw-border);
+  top:0;
+  right:var(--aw-rail-right);
+  bottom:0;
+  width:min(var(--aw-dock-width), calc(100% - var(--aw-rail-left) - var(--aw-rail-right)));
+  background:var(--aw-elevated);
+  border:none;
+  border-left:1px solid var(--aw-border);
   animation:aw-dock-in-right var(--aw-motion-fast) var(--aw-ease-out);
-  border-radius:14px;
+  border-radius:0;
   padding:12px;
   position:absolute;
   overflow:auto;
-  box-shadow:-8px 0 24px #0000002e
+  box-shadow:none
 }
 .drawer-head {
   justify-content:space-between;
@@ -2624,13 +2640,13 @@ html.aw-teaching-open, body.aw-teaching-open {
     display:flex!important
   }
   .coach-card {
-    left:calc(var(--aw-float-inset) + var(--aw-rail-left) + 8px);
-    right:calc(var(--aw-float-inset) + var(--aw-rail-right) + 8px);
+    left:calc(var(--aw-rail-left) + 8px);
+    right:calc(var(--aw-rail-right) + 8px);
     bottom:max(12px, env(safe-area-inset-bottom, 0px));
     width:auto;
     max-width:none;
     top:auto;
-    inset:auto calc(var(--aw-float-inset) + var(--aw-rail-right) + 8px) max(12px, env(safe-area-inset-bottom, 0px)) calc(var(--aw-float-inset) + var(--aw-rail-left) + 8px);
+    inset:auto calc(var(--aw-rail-right) + 8px) max(12px, env(safe-area-inset-bottom, 0px)) calc(var(--aw-rail-left) + 8px);
     margin-inline:0;
     transform:none
   }
@@ -2638,8 +2654,8 @@ html.aw-teaching-open, body.aw-teaching-open {
     display:none
   }
   .canvas-hint {
-    left:calc(var(--aw-float-inset) + var(--aw-rail-left) + 8px);
-    right:calc(var(--aw-float-inset) + var(--aw-rail-right) + 8px);
+    left:calc(var(--aw-rail-left) + 8px);
+    right:calc(var(--aw-rail-right) + 8px);
     max-width:none;
     bottom:max(10px, env(safe-area-inset-bottom, 0px));
     padding:8px 10px;
@@ -2708,15 +2724,17 @@ html.aw-teaching-open, body.aw-teaching-open {
     display:flex!important
   }
   .side-panel {
-    top:var(--aw-float-inset);
-    bottom:var(--aw-float-inset);
-    left:calc(var(--aw-float-inset) + var(--aw-rail-left) + 8px);
-    border:1px solid var(--aw-border);
-    border-radius:14px;
-    width:min(248px, 100% - 84px);
-    max-height:none;
-    position:absolute;
-    box-shadow:8px 0 24px #0000002e
+    left: var(--aw-rail-left);
+    top: 0;
+    bottom: 0;
+    border: none;
+    border-right: 1px solid var(--aw-border);
+    border-radius: 0;
+    width: min(248px, calc(100% - var(--aw-rail-left) - var(--aw-rail-right)));
+    max-height: none;
+    position: absolute;
+    box-shadow: none;
+    background: var(--aw-elevated);
   }
   .drawer, .teaching-drawer, .help-drawer, .customize-drawer, .debug-drawer, .contest-drawer, .access-drawer {
     border-left:none;
@@ -2837,7 +2855,7 @@ html.aw-teaching-open, body.aw-teaching-open {
 }
 @media (height <= 500px) {
   .tool-rail-btn { min-height: 44px; padding: 4px 2px; }
-  .tool-rail { max-height: calc(100% - 8px); }
+  .tool-rail { max-height: none; }
 }
 
 /* Floating version — kids on phones. Header chip hides; this one sits on the grid. */
@@ -3019,14 +3037,17 @@ html.aw-teaching-open, body.aw-teaching-open {
 /* 1.0.39 inspect dock + dollhouse */
 .inspect-dock {
   z-index: var(--aw-z-floating);
-  right: calc(var(--aw-float-inset) + var(--aw-rail-right) + 8px);
-  top: var(--aw-float-inset);
-  width: min(232px, calc(100% - 120px));
-  max-height: calc(100% - 24px);
-  background: color-mix(in srgb, var(--aw-elevated) 96%, transparent);
-  border: 1px solid var(--aw-border);
-  border-radius: 14px;
-  box-shadow: 0 10px 28px #0a0a0a29;
+  right: var(--aw-rail-right);
+  top: 0;
+  bottom: 0;
+  width: min(232px, calc(100% - var(--aw-rail-left) - var(--aw-rail-right)));
+  max-height: none;
+  height: 100%;
+  background: var(--aw-elevated);
+  border: none;
+  border-left: 1px solid var(--aw-border);
+  border-radius: 0;
+  box-shadow: none;
   pointer-events: auto;
   display: flex;
   flex-direction: column;
@@ -3034,7 +3055,11 @@ html.aw-teaching-open, body.aw-teaching-open {
   overflow: auto;
 }
 .inspect-dock.is-min {
+  top: 8px;
+  right: calc(var(--aw-rail-right) + 8px);
+  bottom: auto;
   width: auto;
+  height: auto;
   max-height: none;
   background: transparent;
   border: none;
@@ -3090,13 +3115,13 @@ html.aw-teaching-open, body.aw-teaching-open {
   z-index: var(--aw-z-overlays);
   pointer-events: auto;
   position: absolute;
-  top: 10px;
-  left: 12px;
-  right: 12px;
+  top: 8px;
+  left: calc(var(--aw-rail-left) + 8px);
+  right: calc(var(--aw-rail-right) + 8px);
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-width: min(720px, calc(100% - 24px));
+  max-width: none;
 }
 .doll-proj-row {
   display: flex;
@@ -3392,4 +3417,10 @@ html[data-locale="uk"] .drawer,
 html[data-locale="ru"] .drawer {
   font-family: "Noto Sans Ethiopic", "Noto Sans Arabic", "Noto Sans", Archivo, Segoe UI, sans-serif;
 }
+
+/* Hide the edit panel while a right-side drawer is open so they do not stack. */
+.app-shell:has(.drawer) .inspect-dock:not(.is-min) {
+  display: none;
+}
+
 

@@ -88,16 +88,49 @@ describe('mass3d', () => {
     assert.ok(faces.some((f) => f.kind === 'shadow'));
   });
 
+  it('simple lod skips the house shadow', () => {
+    const faces = buildMass(boxFloor(12, 10), { ...opts, lighting: true, lod: 'simple' as const });
+    assert.equal(faces.some((f) => f.kind === 'shadow'), false);
+  });
+
   it('day sun points up-ish', () => {
     const s = sunDir('day');
     assert.ok(s.z > 0.4);
   });
 
-  it('projectFaces returns painter-sorted paths', () => {
+  it('furniture uses modeled parts, not one box', () => {
     const floor = boxFloor(12, 10);
-    const cam = defaultCam(floor, false);
-    const painted = projectFaces(buildMass(floor, opts), cam, 800, 400, opts);
-    assert.ok(painted.length > 4);
-    assert.ok(painted[0].kind === 'yard' || painted[0].d.startsWith('M'));
+    floor.furniture = [{
+      id: 'f1', catalogId: 'toilet', x: 4, y: 4, w: 1.5, h: 2.5, rot: 0, zIndex: 1, label: 'Toilet',
+    }];
+    const faces = buildMass(floor, opts);
+    const furn = faces.filter((f) => f.kind === 'furn');
+    assert.ok(furn.length >= 8, `furn faces ${furn.length}`);
+  });
+
+  it('simple lod drops extra furniture faces', () => {
+    const floor = boxFloor(20, 16);
+    floor.furniture = Array.from({ length: 8 }, (_, i) => ({
+      id: `f${i}`, catalogId: 'sofa', x: 4 + i * 2, y: 6, w: 7, h: 3, rot: 0, zIndex: 1, label: 'Sofa',
+    }));
+    const full = buildMass(floor, { ...opts, lod: 'full' as const }).filter((f) => f.kind === 'furn');
+    const simple = buildMass(floor, { ...opts, lod: 'simple' as const }).filter((f) => f.kind === 'furn');
+    assert.ok(simple.length < full.length, `simple ${simple.length} vs full ${full.length}`);
+    assert.ok(simple.length >= 8);
+  });
+
+  it('house floor uses the house finish pattern', () => {
+    const faces = buildMass(boxFloor(12, 10), { ...opts, floorId: 'walnut' });
+    const fl = faces.filter((f) => f.kind === 'floor');
+    assert.ok(fl.length >= 1);
+    assert.ok(fl.some((f) => f.pattern === 'walnut'));
+  });
+
+  it('room floor carries a pattern id', () => {
+    const floor = boxFloor(12, 10);
+    floor.rooms = [{ id: 'r1', kind: 'kitchen', name: 'Kitchen', x: 6, y: 5, floorFinishId: 'tile' }];
+    const faces = buildMass(floor, { ...opts, floorId: 'oak' });
+    const fl = faces.filter((f) => f.kind === 'floor' && f.pattern === 'tile');
+    assert.ok(fl.length >= 1);
   });
 });

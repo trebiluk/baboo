@@ -3,6 +3,7 @@ import type { ProjectDocument, RoofStyleId } from '../types';
 import { isGuiThemeId } from '../data/themes';
 import { isSkillLevel, readSkillPref } from '../data/skill';
 import { asShowFurniture3d, asSite, asSky, asTint } from '../data/scene3d';
+import { asFloorFinish, asFloorGrain } from '../data/flooring';
 import { asLocale } from '../data/i18n';
 import { asDollProj, asYawDeg } from './iso';
 import { APP_VERSION } from '../version';
@@ -116,6 +117,8 @@ function normalizeDoc(data: ProjectDocument): ProjectDocument {
         skyPreset: asSky(data.settings?.skyPreset),
         siteFinish: asSite(data.settings?.siteFinish),
         wallTintId: asTint(data.settings?.wallTintId),
+        floorFinishId: asFloorFinish(data.settings?.floorFinishId),
+        floorGrain: asFloorGrain(data.settings?.floorGrain),
         showFurniture3d: asShowFurniture3d(data.settings?.showFurniture3d),
         dollProj: asDollProj(data.settings?.dollProj),
         dollYaw: asYawDeg(data.settings?.dollYaw),

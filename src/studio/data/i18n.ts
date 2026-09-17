@@ -1081,6 +1081,49 @@ export const STR: Record<string, Gloss> = {
     fa: 'کنتراست بالا می‌خواهی؟ پوسته → Projector. مکعب می‌خواهی؟ پوسته → Blocky.',
   }),
 
+  'floor.title': g('Flooring', {
+    es: 'Piso (Flooring)', cu: 'Piso (Flooring)', uk: 'Підлога (Flooring)', ru: 'Пол (Flooring)', ti: 'ወለል (Flooring)', fa: 'کف (Flooring)',
+  }),
+  'floor.lead': g('House default. Tap a named room to pick a different floor for that room.', {
+    es: 'Piso de la casa. Toca un cuarto con nombre para otro piso en ese cuarto.',
+    cu: 'Piso de la casa. Toca un cuarto con nombre para otro piso en ese cuarto.',
+    uk: 'Підлога всього дому. Торкнись названої кімнати, щоб змінити її підлогу.',
+    ru: 'Пол всего дома. Нажми названную комнату, чтобы сменить её пол.',
+    ti: 'ናይ ገዛ ወለል. ንኻልእ ወለል ናይቲ ክፍሊ ስም ዘለዎ ክፍሊ ጠውቕ.',
+    fa: 'کف پیش‌فرض خانه. روی اتاق نام‌دار بزن تا کف همان اتاق عوض شود.',
+  }),
+  'floor.oak': g('Oak', { es: 'Roble', cu: 'Roble', uk: 'Дуб', ru: 'Дуб', ti: 'ኦክ', fa: 'بلوط' }),
+  'floor.walnut': g('Walnut', { es: 'Nogal', cu: 'Nogal', uk: 'Горіх', ru: 'Орех', ti: 'ዋልነት', fa: 'گردو' }),
+  'floor.maple': g('Maple', { es: 'Arce', cu: 'Arce', uk: 'Клен', ru: 'Клён', ti: 'መፕል', fa: 'افرا' }),
+  'floor.herringbone': g('Herringbone', { es: 'Espiga', cu: 'Espiga', uk: 'Ялинка', ru: 'Ёлочка', ti: 'ሽጉጥ', fa: 'جناغی' }),
+  'floor.tile': g('Tile', { es: 'Loseta', cu: 'Loseta', uk: 'Кахель', ru: 'Кафель', ti: 'ታይል', fa: 'کاشی' }),
+  'floor.hex': g('Hex tile', { es: 'Hexágono', cu: 'Hexágono', uk: 'Шестикутник', ru: 'Шестигранник', ti: 'ሽዱሽተ ኩርናዕ', fa: 'کاشی شش‌گوش' }),
+  'floor.carpet': g('Carpet', { es: 'Alfombra', cu: 'Alfombra', uk: 'Килим', ru: 'Ковёр', ti: 'ምንጻፍ', fa: 'موکت' }),
+  'floor.denim': g('Blue carpet', { es: 'Alfombra azul', cu: 'Alfombra azul', uk: 'Синій килим', ru: 'Синий ковёр', ti: 'ሰማያዊ ምንጻፍ', fa: 'موکت آبی' }),
+  'floor.lino': g('Linoleum', { es: 'Linóleo', cu: 'Linóleo', uk: 'Лінолеум', ru: 'Линолеум', ti: 'ሊኖሌየም', fa: 'لینولئوم' }),
+  'floor.concrete': g('Concrete', { es: 'Concreto', cu: 'Concreto', uk: 'Бетон', ru: 'Бетон', ti: 'ኮንክሪት', fa: 'بتن' }),
+  'floor.checker': g('Checker', { es: 'Ajedrez', cu: 'Ajedrez', uk: 'Шахи', ru: 'Шашка', ti: 'ደረት', fa: 'شطرنجی' }),
+  'floor.slate': g('Slate', { es: 'Pizarra', cu: 'Pizarra', uk: 'Сланець', ru: 'Сланец', ti: 'ስሌት', fa: 'سنگ لوح' }),
+  'floor.terracotta': g('Terracotta', { es: 'Terracota', cu: 'Terracota', uk: 'Теракота', ru: 'Терракота', ti: 'ቴራኮታ', fa: 'سفال' }),
+  'floor.brick': g('Brick paver', { es: 'Ladrillo', cu: 'Ladrillo', uk: 'Цегла', ru: 'Кирпич', ti: 'ሕጡብ', fa: 'آجر' }),
+  'floor.grain': g('Plank direction', {
+    es: 'Dirección de las tablas', cu: 'Dirección de las tablas', uk: 'Напрям дощок', ru: 'Направление досок', ti: 'ኣንፈት ሳንቃ', fa: 'جهت تخته',
+  }),
+  'floor.grain.across': g('Across', {
+    es: 'A lo ancho', cu: 'A lo ancho', uk: 'Впоперек', ru: 'Поперёк', ti: 'ኣግድም', fa: 'عرضی',
+  }),
+  'floor.grain.along': g('Along', {
+    es: 'A lo largo', cu: 'A lo largo', uk: 'Вздовж', ru: 'Вдоль', ti: 'ንነውሒ', fa: 'طولی',
+  }),
+  'floor.applyAll': g('Use this floor in every room', {
+    es: 'Usar este piso en todos los cuartos',
+    cu: 'Usar este piso en todos los cuartos',
+    uk: 'Ця підлога в кожній кімнаті',
+    ru: 'Этот пол в каждой комнате',
+    ti: 'እዚ ወለል ኣብ ኩሉ ክፍሊ',
+    fa: 'همین کف در همه اتاق‌ها',
+  }),
+
   'scene.title': g('3D look', {
     es: 'Vista 3D', cu: 'Vista 3D', uk: 'Вигляд 3D', ru: 'Вид 3D', ti: 'ትርኢት 3D', fa: 'نمای سه‌بعدی',
   }),
@@ -1376,6 +1419,14 @@ export const STR: Record<string, Gloss> = {
     ru: 'Правка только в 2D — Вид 3D только для просмотра. Вращение, материалы, свет и проход читают тот же план. Править стены в Плане 2D или Кукольном доме.',
     ti: 'ኣርትዖት 2D ጥራይ — ትርኢት 3D ምርኣይ ጥራይ እዩ. ምዝዋር፣ ንዋት፣ ብርሃንን ምጉዓዝን ነቲ ሓደ ትልሚ የንብቡ. መናድቕ ኣብ ትልሚ 2D ወይ ገዛ ዕሸል ኣርም.',
     fa: 'ویرایش فقط ۲بعدی — نمای سه‌بعدی فقط نگاه است. چرخش، مصالح، نور و گشت همان پلان را می‌خوانند. دیوارها را در پلان ۲بعدی یا خانه عروسکی ویرایش کن.',
+  }),
+  'help.chrome': g('Tools sit on the left edge and tuck with Hide. Teach, Settings, Help sit on the right. The grid stays open.', {
+    es: 'Las herramientas van al borde izquierdo y se recogen con Ocultar. Enseñar, Ajustes y Ayuda van a la derecha. La cuadrícula sigue abierta.',
+    cu: 'Las herramientas van al borde izquierdo y se recogen con Ocultar. Enseñar, Ajustes y Ayuda van a la derecha. La cuadrícula sigue abierta.',
+    uk: 'Інструменти на лівому краї — сховай їх. Навчати, Налаштування, Допомога справа. Сітка лишається відкритою.',
+    ru: 'Инструменты на левом краю — спрячь их. Учить, Настройки, Справка справа. Сетка остаётся открытой.',
+    ti: 'መሳርሒታት ኣብ ጸጋም ወሰን ይቕመጡ፣ ብሓብእ ይኽውሉ. ኣምህር፣ ቅጥዕታት፣ ሓገዝ ኣብ የማን. መርበብ ክፉት ይጸንሕ.',
+    fa: 'ابزار روی لبهٔ چپ می‌نشیند و با پنهان جمع می‌شود. آموزش، تنظیمات، راهنما سمت راست. شبکه باز می‌ماند.',
   }),
   'help.skill': g('Skill level — New plan or Settings. Novice and Beginner get extra help. Grey tools unlock at the next skill.', {
     es: 'Nivel de ayuda — Plano nuevo o Ajustes. Novato y Principiante reciben más ayuda. Las herramientas grises se abren en el siguiente nivel.',

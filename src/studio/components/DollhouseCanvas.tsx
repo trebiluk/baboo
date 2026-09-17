@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Stage, Layer, Line, Rect, Text, Circle } from 'react-konva';
+import { Stage, Layer, Line, Rect, Text, Circle, Group } from 'react-konva';
 import type Konva from 'konva';
 import { useProjectStore } from '../store/useProjectStore';
 import { wallEnds } from '../lib/geometry';
@@ -17,6 +17,10 @@ import {
   type YawDeg,
 } from '../lib/iso';
 import { packTileCanvas, textureStrokeFallback } from '../lib/texturePattern';
+import { furnitureParts, partWorldCorners, partWorldRing } from '../lib/furnShape';
+import { FURN_CAP, furnitureLod } from '../lib/perf';
+import { asFloorFinish, asFloorGrain, floorFinish, floorTileCanvas } from '../data/flooring';
+import { roomPolygon } from '../lib/rooms';
 import { DEFAULT_GUI_THEME } from '../data/themes';
 import { t } from '../data/i18n';
 import type { Wall } from '../types';
@@ -54,6 +58,7 @@ export function DollhouseCanvas() {
   const fitNonce = useProjectStore((s) => s.fitNonce);
   const light = (settings.guiTheme ?? DEFAULT_GUI_THEME) !== 'ink';
   const blocky = settings.guiTheme === 'blocky';
+  const furnLod = furnitureLod({ count: floor.furniture.length, zoom: zoom * 16 });
   const spec: ProjSpec = {
     kind: (settings.dollProj ?? 'iso') as DollProj,
     yaw: (settings.dollYaw ?? 0) as YawDeg,
@@ -315,7 +320,7 @@ export function DollhouseCanvas() {
           setPan({ x: mx - (mx - pan.x) * k, y: my - (my - pan.y) * k });
         }}
       >
-        <Layer>
+        <Layer perfectDrawEnabled={false}>
           <Rect
             name="doll-bg"
             x={-4000}
@@ -329,11 +334,39 @@ export function DollhouseCanvas() {
               name="doll-floor"
               points={floorPoly}
               closed
-              fill={light ? (blocky ? '#7cb342' : '#cfd8c8') : '#3d4a38'}
-            stroke={blocky ? '#1a1208' : (light ? '#9aa890' : '#6d7a62')}
-            strokeWidth={(blocky ? 3 : 1.5) / zoom}
+              fill={floorFinish(asFloorFinish(settings.floorFinishId)).color}
+              fillPatternImage={furnLod === 'full' ? floorTileCanvas(asFloorFinish(settings.floorFinishId), asFloorGrain(settings.floorGrain)) as CanvasImageSource as HTMLImageElement : undefined}
+              fillPatternRepeat="repeat"
+              fillPriority={furnLod === 'full' ? 'pattern' : 'color'}
+              fillPatternScaleX={0.04}
+              fillPatternScaleY={0.04}
+              stroke={blocky ? '#1a1208' : (light ? '#9aa890' : '#6d7a62')}
+              strokeWidth={(blocky ? 3 : 1.5) / zoom}
             />
           )}
+          {(floor.rooms ?? []).map((r) => {
+            if (r.kind === 'outdoor') return null;
+            const poly = roomPolygon(r, floor.nodes, floor.walls);
+            if (!poly || poly.length < 3) return null;
+            const fid = r.floorFinishId ?? asFloorFinish(settings.floorFinishId);
+            if (!fid) return null;
+            const pts = projectPoints(poly.map((p) => ({ x: p.x, y: p.y, z: 0.04 })), spec);
+            const grain = asFloorGrain(settings.floorGrain);
+            return (
+              <Line
+                key={`df-${r.id}`}
+                points={pts}
+                closed
+                fill={floorFinish(fid).color}
+                fillPatternImage={furnLod === 'full' ? floorTileCanvas(fid, grain) as CanvasImageSource as HTMLImageElement : undefined}
+                fillPatternRepeat="repeat"
+                fillPriority={furnLod === 'full' ? 'pattern' : 'color'}
+                fillPatternScaleX={0.04}
+                fillPatternScaleY={0.04}
+                listening={false}
+              />
+            );
+          })}
           {lidPoly.length >= 6 && !spec.top && (
             <Line
               points={lidPoly}
@@ -408,24 +441,43 @@ export function DollhouseCanvas() {
               />
             );
           })}
-          {floor.furniture.map((f) => {
-            const z = 2.4;
+          {floor.furniture.slice(0, FURN_CAP[furnLod]).map((f) => {
             const sel = selected?.kind === 'furniture' && selected.id === f.id;
-            const top = projectPoints([
-              { x: f.x, y: f.y, z },
-              { x: f.x + f.w, y: f.y, z },
-              { x: f.x + f.w, y: f.y + f.h, z },
-              { x: f.x, y: f.y + f.h, z },
-            ], spec);
+            const lod = furnLod;
+            const faces: { pts: number[]; fill: string; depth: number }[] = [];
+            const parts = furnitureParts(f, lod);
+            for (const part of parts) {
+              const ring = lod === 'simple' ? partWorldCorners(f, part) : partWorldRing(f, part);
+              if (ring.length < 3) continue;
+              const cx = ring.reduce((s, p) => s + p.x, 0) / ring.length;
+              const cy = ring.reduce((s, p) => s + p.y, 0) / ring.length;
+              faces.push({
+                pts: projectPoints(ring.map((c) => ({ x: c.x, y: c.y, z: part.z1 })), spec),
+                fill: sel ? '#c5c7ff' : part.fill,
+                depth: painterDepth(cx, cy, spec) + part.z1 * 0.04,
+              });
+              if (lod === 'simple' || part.z1 - part.z0 < 0.1) continue;
+              for (let i = 0; i < ring.length; i++) {
+                const j = (i + 1) % ring.length;
+                const a = ring[i];
+                const b = ring[j];
+                faces.push({
+                  pts: projectPoints([
+                    { x: a.x, y: a.y, z: part.z0 },
+                    { x: b.x, y: b.y, z: part.z0 },
+                    { x: b.x, y: b.y, z: part.z1 },
+                    { x: a.x, y: a.y, z: part.z1 },
+                  ], spec),
+                  fill: sel ? '#c5c7ff' : part.fill,
+                  depth: painterDepth((a.x + b.x) / 2, (a.y + b.y) / 2, spec) + (part.z0 + part.z1) * 0.02,
+                });
+              }
+            }
+            faces.sort((a, b) => a.depth - b.depth);
             return (
-              <Line
+              <Group
                 key={f.id}
                 name="doll-furn"
-                points={top}
-                closed
-                fill={sel ? '#c5c7ff' : (light ? '#c4b8a0' : '#6a5e4e')}
-                stroke={sel ? '#6e72f5' : (blocky ? '#1a1208' : '#3f3f46')}
-                strokeWidth={(sel ? 2 : (blocky ? 2 : 1)) / zoom}
                 onClick={(evt) => {
                   evt.cancelBubble = true;
                   setSelected({ kind: 'furniture', id: f.id });
@@ -434,7 +486,18 @@ export function DollhouseCanvas() {
                   evt.cancelBubble = true;
                   setSelected({ kind: 'furniture', id: f.id });
                 }}
-              />
+              >
+                {faces.map((face, i) => (
+                  <Line
+                    key={i}
+                    points={face.pts}
+                    closed
+                    fill={face.fill}
+                    stroke={sel ? '#6e72f5' : (blocky ? '#1a1208' : '#3f3f46')}
+                    strokeWidth={(sel ? 2 : (blocky ? 2 : 1)) / zoom}
+                  />
+                ))}
+              </Group>
             );
           })}
           {(floor.landscape ?? []).filter((L) => L.kind === 'tree').map((L) => {

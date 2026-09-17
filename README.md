@@ -4,7 +4,7 @@ Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 
 **© 2026 Richard Kulibert Jr.**
 
-**Version 1.1.7** — Dollhouse drawing views (isometric, oblique, elevation, orthographic). Full look-only 3D. ELL vocab. Architect sheet.
+**Version 1.3.1** — Side-attached collapsible toolbars. Busy houses stay snappy.
 
 Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the side rail. Plans save on the device as `.archworks.json`.
 
@@ -35,13 +35,12 @@ npm run pack:share
 - **Class folder** is a copy-to-the-share pack — Chrome, no login
 - No Google login inside the app
 
-## What’s in 1.1.7
+## What’s in 1.3.1
 
-- Dollhouse turns Front / Right / Rear / Left
-- Drawing views: Isometric, Oblique (cabinet), Elevation, Orthographic + Top (a plan)
-- 3D orbit, materials, lighting, walkthrough — still view-only
-- Teach English CAD words for grades 5–8 ELL (7 languages)
-- Architect sheet: title block, north, scale, kitchen triangle
+- Tools, catalogs, Settings, and Teach dock to the sides and collapse — the grid stays open
+- Extra furniture detail drops while you spin 3D or zoom the plan out, so a packed house stays snappy
+- Furniture is modeled, not boxed: round tables, burner rings, toilet bowls, tubs, drums, legs
+- Flooring: walnut, herringbone, slate, terracotta, plus oak/maple/tile. Rotate the grain. Per-room or house default
 
 See [CHANGELOG.md](CHANGELOG.md) for the rest.
 

@@ -1,6 +1,7 @@
 import { FURNITURE_CATALOG } from '../data/furniture';
 import { useProjectStore } from '../store/useProjectStore';
 import { DEFAULT_SKILL_LEVEL, isToolUnlocked } from '../data/skill';
+import { FurnitureGlyph } from './FurnitureSymbol';
 
 export function FurnitureSidebar() {
   const tool = useProjectStore((s) => s.tool);
@@ -60,7 +61,7 @@ export function FurnitureSidebar() {
                   setTool('furniture');
                 }}
               >
-                <span className="swatch" style={{ background: item.color }} />
+                <FurnitureGlyph catalogId={item.id} />
                 <span>{item.name}</span>
                 <small>{sizeLabel(item.w, item.h)}</small>
               </button>

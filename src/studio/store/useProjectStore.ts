@@ -18,6 +18,7 @@ import {
 import { chamferCorner, nearestChamferable } from '../lib/chamfer';
 import { findEnclosedFace, formatArea, hitRoom, polygonArea } from '../lib/rooms';
 import { DEFAULT_ROOM_KIND, roomType } from '../data/rooms';
+import { defaultFloorForKind } from '../data/flooring';
 import { t, readLocalePref, readUdlFatPref, readUdlTypePref, readEllEnglishPref, writeLocalePref, writeUdlFatPref, writeUdlTypePref, writeEllEnglishPref } from '../data/i18n';
 import { generateRoof, roofStyleName } from '../lib/roof';
 import { textureName } from '../data/textures';
@@ -154,7 +155,7 @@ interface Store {
   placeOpening: (type: 'door' | 'window', p: Point) => void;
   patchOpening: (id: string, patch: Partial<Pick<Opening, 'width' | 'swing' | 'symbolKind' | 't'>>) => void;
   patchWall: (id: string, patch: Partial<Pick<Wall, 'kind' | 'finishId'>>) => void;
-  patchRoom: (id: string, patch: Partial<Pick<Room, 'name' | 'kind'>>) => void;
+  patchRoom: (id: string, patch: Partial<Pick<Room, 'name' | 'kind' | 'floorFinishId'>>) => void;
   placeFurniture: (p: Point) => void;
   seedCrowd: (count: number) => void;
   placeRoom: (p: Point) => void;
@@ -897,6 +898,9 @@ export const useProjectStore = create<Store>((set, get) => ({
           if (patch.kind && (!patch.name || !patch.name.trim()) && r.name === roomType(r.kind).name) {
             next.name = roomType(patch.kind).name;
           }
+          if (patch.kind && r.floorFinishId === defaultFloorForKind(r.kind)) {
+            next.floorFinishId = defaultFloorForKind(patch.kind);
+          }
           if (typeof next.name === 'string') next.name = next.name.trim().slice(0, 28) || r.name;
           return next;
         }),
@@ -1000,6 +1004,7 @@ export const useProjectStore = create<Store>((set, get) => ({
       name: cat.name,
       x: pt.x,
       y: pt.y,
+      floorFinishId: defaultFloorForKind(kind),
     };
     const area = formatArea(polygonArea(poly), s.units);
     set({

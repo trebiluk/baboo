@@ -2,10 +2,11 @@
 import type { Floor, FurnitureItem, LandscapeItem, Opening, Point, RoofGeometry, Wall } from '../types';
 import type { SiteFinish, SkyPreset, WallTintId } from '../data/scene3d';
 import { SITE_PALETTE, WALL_TINT, hexAlpha } from '../data/scene3d';
-import { FURNITURE_CATALOG } from '../data/furniture';
 import { exteriorBounds } from './roof';
-
-const FURN_BY_ID = new Map(FURNITURE_CATALOG.map((c) => [c.id, c]));
+import { furnitureParts, partWorldCorners, partWorldRing } from './furnShape';
+import { floorFinish, asFloorFinish, type FloorFinishId, type FloorGrain } from '../data/flooring';
+import { roomPolygon } from './rooms';
+import { FACE_BUDGET, FURN_CAP, PLANT_CAP, type FurnLod } from './perf';
 
 export const WALL_H = 9;
 export const EYE_Z = 5.5;
@@ -21,7 +22,7 @@ export type Cam3 = {
 };
 
 export type FaceKind =
-  | 'yard' | 'slab' | 'path' | 'wall' | 'glass' | 'door'
+  | 'yard' | 'slab' | 'floor' | 'path' | 'wall' | 'glass' | 'door'
   | 'furn' | 'roof' | 'tree' | 'shadow' | 'bed';
 
 export type MassFace = {
@@ -29,6 +30,7 @@ export type MassFace = {
   fill: string;
   stroke: string;
   kind: FaceKind;
+  pattern?: FloorFinishId;
 };
 
 export type MassOpts = {
@@ -39,6 +41,9 @@ export type MassOpts = {
   materials: boolean;
   lighting: boolean;
   blocky: boolean;
+  floorId?: FloorFinishId;
+  floorGrain?: FloorGrain;
+  lod?: FurnLod;
 };
 
 export const ROOF_MAT: Record<string, { fill: string; shade: string; edge: string }> = {
@@ -50,14 +55,6 @@ export const ROOF_MAT: Record<string, { fill: string; shade: string; edge: strin
   mansard: { fill: '#3E4450', shade: '#2A3038', edge: '#6A7380' },
   grass: { fill: '#4A7A48', shade: '#356038', edge: '#7AAB72' },
   conical: { fill: '#C4A574', shade: '#A88858', edge: '#E0C8A0' },
-};
-
-const FURN_H: Record<string, number> = {
-  'bed-twin': 2.2, 'bed-queen': 2.2, nightstand: 2, dresser: 3.2, closet: 7,
-  'storage-shelf': 5, sofa: 2.6, chair: 2.8, 'coffee-table': 1.4,
-  'dining-table': 2.5, 'dining-chair': 3, fridge: 6, stove: 3, sink: 3,
-  toilet: 1.6, bathtub: 1.8, desk: 2.5, 'water-heater': 4.5,
-  'mech-closet': 7, washer: 3.2, dryer: 3.2,
 };
 
 export function v3(x: number, y: number, z: number): Vec3 {
@@ -231,6 +228,36 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
     'slab',
   ));
 
+  const houseFloor = asFloorFinish(opts.floorId);
+  if (b) {
+    faces.push({
+      pts: [
+        v3(minX, minY, 0.06),
+        v3(maxX, minY, 0.06),
+        v3(maxX, maxY, 0.06),
+        v3(minX, maxY, 0.06),
+      ],
+      fill: floorFinish(houseFloor).color,
+      stroke: opts.blocky ? '#1a1208' : floorFinish(houseFloor).color,
+      kind: 'floor',
+      pattern: opts.blocky ? undefined : houseFloor,
+    });
+  }
+  for (const room of floor.rooms ?? []) {
+    if (room.kind === 'outdoor') continue;
+    const poly = roomPolygon(room, floor.nodes, floor.walls);
+    if (!poly || poly.length < 3) continue;
+    const fid = room.floorFinishId ?? houseFloor;
+    if (!fid) continue;
+    faces.push({
+      pts: poly.map((pt) => v3(pt.x, pt.y, 0.07)),
+      fill: floorFinish(fid).color,
+      stroke: opts.blocky ? '#1a1208' : floorFinish(fid).color,
+      kind: 'floor',
+      pattern: opts.blocky ? undefined : fid,
+    });
+  }
+
   const walkW = 3.2;
   faces.push(quad(
     v3(cx - walkW / 2, maxY - 0.4, 0.05),
@@ -316,16 +343,28 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
   if (floor.roof) faces.push(...roofFaces(floor.roof, opts.blocky));
 
   if (opts.showFurn) {
-    for (const item of (floor.furniture ?? []).slice(0, 48)) {
-      faces.push(...furnBox(item, opts.blocky));
+    const lod = opts.lod ?? 'full';
+    const cap = FURN_CAP[lod];
+    const budget = FACE_BUDGET[lod];
+    for (const item of (floor.furniture ?? []).slice(0, cap)) {
+      faces.push(...furnBox(item, opts.blocky, lod));
+      if (faces.length > budget) break;
     }
   }
 
-  for (const plant of floor.landscape ?? []) {
-    faces.push(...plantFaces(plant, opts.site, opts.blocky));
+  {
+    const lod = opts.lod ?? 'full';
+    const budget = FACE_BUDGET[lod];
+    const plantCap = PLANT_CAP[lod];
+    if (faces.length < budget) {
+      for (const plant of (floor.landscape ?? []).slice(0, plantCap)) {
+        faces.push(...plantFaces(plant, opts.site, opts.blocky, lod));
+        if (faces.length > budget) break;
+      }
+    }
   }
 
-  if (opts.lighting && opts.sky !== 'overcast' && b) {
+  if (opts.lighting && opts.lod !== 'simple' && opts.sky !== 'overcast' && b) {
     const sun = sunDir(opts.sky);
     const corners = [
       v3(minX, minY, WALL_H * 0.5),
@@ -461,32 +500,50 @@ function roofFaces(roof: RoofGeometry, blocky: boolean): MassFace[] {
   return out;
 }
 
-function furnBox(item: FurnitureItem, blocky: boolean): MassFace[] {
-  const color = FURN_BY_ID.get(item.catalogId)?.color ?? '#6a7080';
-  const z1 = FURN_H[item.catalogId] ?? Math.min(4.2, 1.2 + Math.min(item.w, item.h) * 0.4);
-  const hw = (item.w || 2) / 2;
-  const hh = (item.h || 2) / 2;
-  const ca = Math.cos(item.rot || 0);
-  const sa = Math.sin(item.rot || 0);
-  const corner = (lx: number, ly: number, z: number): Vec3 => ({
-    x: item.x + lx * ca - ly * sa,
-    y: item.y + lx * sa + ly * ca,
-    z,
-  });
-  const fill = color;
-  const stroke = blocky ? '#1a1208' : hexAlpha(color, 1);
-  return [
-    quad(corner(-hw, -hh, z1), corner(hw, -hh, z1), corner(hw, hh, z1), corner(-hw, hh, z1), fill, stroke, 'furn'),
-    quad(corner(hw, -hh, 0), corner(hw, hh, 0), corner(hw, hh, z1), corner(hw, -hh, z1), fill, stroke, 'furn'),
-    quad(corner(-hw, hh, 0), corner(hw, hh, 0), corner(hw, hh, z1), corner(-hw, hh, z1), fill, stroke, 'furn'),
-  ];
+function furnBox(item: FurnitureItem, blocky: boolean, lod: FurnLod = 'full'): MassFace[] {
+  const stroke = blocky ? '#1a1208' : '#3f3f46';
+  const out: MassFace[] = [];
+  for (const part of furnitureParts(item, lod)) {
+    const ring = lod === 'simple' ? partWorldCorners(item, part) : partWorldRing(item, part);
+    if (ring.length < 3) continue;
+    const z0 = part.z0;
+    const z1 = part.z1;
+    const T = ring.map((c) => v3(c.x, c.y, z1));
+    const B = ring.map((c) => v3(c.x, c.y, z0));
+    out.push({ pts: T, fill: part.fill, stroke, kind: 'furn' });
+    if (z1 - z0 < 0.1) continue;
+    if (lod === 'simple' && ring.length >= 4) {
+      out.push(quad(B[1], B[2], T[2], T[1], part.fill, stroke, 'furn'));
+      out.push(quad(B[2], B[3], T[3], T[2], part.fill, stroke, 'furn'));
+      continue;
+    }
+    const n = ring.length;
+    for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n;
+      out.push(quad(B[i], B[j], T[j], T[i], part.fill, stroke, 'furn'));
+    }
+  }
+  return out;
 }
 
-function plantFaces(item: LandscapeItem, site: SiteFinish, blocky: boolean): MassFace[] {
+function plantFaces(item: LandscapeItem, site: SiteFinish, blocky: boolean, lod: FurnLod = 'full'): MassFace[] {
   const stroke = blocky ? '#1a1208' : '#2F5D3A';
   if (item.kind === 'tree') {
     const r = Math.max(item.w, item.h) / 2;
     const trunk = 0.35;
+    if (lod === 'simple') {
+      return boxFaces(
+        item.x - r * 0.65,
+        item.y - r * 0.65,
+        item.x + r * 0.65,
+        item.y + r * 0.65,
+        0,
+        3.2 + r,
+        '#3D7A4A',
+        stroke,
+        'tree',
+      );
+    }
     const out = boxFaces(item.x - trunk, item.y - trunk, item.x + trunk, item.y + trunk, 0, 3.2, '#6B5344', stroke, 'tree');
     const peak = v3(item.x, item.y, 3.2 + r * 1.1);
     const ring = 8;
@@ -534,6 +591,7 @@ export function projectFaces(faces: MassFace[], cam: Cam3, w: number, h: number,
   stroke: string;
   sw: number;
   kind: FaceKind;
+  pattern?: FloorFinishId;
 }[] {
   const sun = sunDir(opts.sky);
   const painted = faces.map((f) => {
@@ -549,12 +607,25 @@ export function projectFaces(faces: MassFace[], cam: Cam3, w: number, h: number,
         ? hexAlpha(f.fill, opts.sky === 'dusk' ? 0.85 : 0.55)
         : shade(f.fill, n, sun, opts);
     const sw = f.kind === 'shadow' ? 0 : opts.blocky ? 1.8 : f.kind === 'roof' ? 1.2 : 0.9;
-    return { d, fill, stroke: f.stroke === 'none' ? 'none' : f.stroke, sw, kind: f.kind, depth, z: c.z, ndot: dot(n, camBasis(cam).forward) };
-  }).filter(Boolean) as { d: string; fill: string; stroke: string; sw: number; kind: FaceKind; depth: number; z: number; ndot: number }[];
+    return {
+      d,
+      fill,
+      stroke: f.stroke === 'none' ? 'none' : f.stroke,
+      sw,
+      kind: f.kind,
+      pattern: f.pattern,
+      depth,
+      z: c.z,
+      ndot: dot(n, camBasis(cam).forward),
+    };
+  }).filter(Boolean) as {
+    d: string; fill: string; stroke: string; sw: number; kind: FaceKind;
+    pattern?: FloorFinishId; depth: number; z: number; ndot: number;
+  }[];
 
   painted.sort((a, b) => {
     const order: Record<FaceKind, number> = {
-      yard: 0, shadow: 1, path: 2, bed: 2, slab: 3, wall: 4, door: 5, glass: 5,
+      yard: 0, shadow: 1, path: 2, bed: 2, slab: 3, floor: 3.5, wall: 4, door: 5, glass: 5,
       furn: 6, tree: 6, roof: 7,
     };
     const oa = order[a.kind] - order[b.kind];
