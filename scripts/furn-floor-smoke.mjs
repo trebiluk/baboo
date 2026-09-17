@@ -25,7 +25,7 @@ const ranch = page.locator('.template-card').filter({ hasText: /Ranch/ }).first(
 if (await ranch.count()) { await ranch.click(); await page.waitForTimeout(900); pass('ranch'); }
 
 const ver = await page.locator('.ver-chip').first().innerText().catch(() => '');
-if ((ver || '').includes('1.3.1')) pass('version 1.3.1');
+if ((ver || '').includes('1.3.5')) pass('version 1.3.5');
 else log.push('NOTE version ' + JSON.stringify(ver));
 
 await page.screenshot({ path: '/workspace/screenshots/furn-plan.png' });

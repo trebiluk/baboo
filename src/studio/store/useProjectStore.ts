@@ -13,7 +13,8 @@ import {
   dist, findOrCreateNode, hitFurniture, hitOpening, hitWall, nearestWall,
   snapPoint, uid, hitDimension, hitNote, hitLandscape, hitSketch,
   snapWallEnd, splitWallsAtNode, wallLength, wallAngle,
-  simplifyPolyline, polylineLength, polylinePoints,
+  simplifyPolyline, polylineLength, fitWallsFromStroke,
+  nodesAfterWallEnd, nodesAfterWallLength, wallEnds,
 } from '../lib/geometry';
 import { chamferCorner, nearestChamferable } from '../lib/chamfer';
 import { findEnclosedFace, formatArea, hitRoom, polygonArea } from '../lib/rooms';
@@ -154,7 +155,11 @@ interface Store {
   cancelWallDraft: () => void;
   placeOpening: (type: 'door' | 'window', p: Point) => void;
   patchOpening: (id: string, patch: Partial<Pick<Opening, 'width' | 'swing' | 'symbolKind' | 't'>>) => void;
-  patchWall: (id: string, patch: Partial<Pick<Wall, 'kind' | 'finishId'>>) => void;
+  patchWall: (id: string, patch: Partial<Pick<Wall, 'kind' | 'finishId' | 'thickness'>>) => void;
+  patchFurniture: (id: string, patch: Partial<Pick<FurnitureItem, 'color' | 'x' | 'y' | 'w' | 'h' | 'rot'>>) => void;
+  patchLandscape: (id: string, patch: Partial<Pick<LandscapeItem, 'x' | 'y' | 'w' | 'h'>>) => void;
+  moveWallEnd: (wallId: string, end: 'a' | 'b', p: Point, forceOrtho?: boolean) => void;
+  setWallLength: (wallId: string, length: number) => void;
   patchRoom: (id: string, patch: Partial<Pick<Room, 'name' | 'kind' | 'floorFinishId'>>) => void;
   placeFurniture: (p: Point) => void;
   seedCrowd: (count: number) => void;
@@ -878,9 +883,85 @@ export const useProjectStore = create<Store>((set, get) => ({
           walls: f.walls.map((w) => (w.id === id ? {
             ...w,
             ...patch,
-            thickness: patch.kind === 'interior' ? 0.35 : patch.kind === 'exterior' ? 0.5 : w.thickness,
+            thickness: patch.thickness
+              ?? (patch.kind === 'interior' ? 0.35 : patch.kind === 'exterior' ? 0.5 : w.thickness),
           } : w)),
         };
+        return refreshRoof(next, get().doc.settings.roofStyleId ?? null);
+      }),
+    });
+    get().markDirty();
+  },
+
+  patchFurniture: (id, patch) => {
+    get().pushHistory();
+    set({
+      doc: withFloor(get().doc, (f) => ({
+        ...f,
+        furniture: f.furniture.map((item) => {
+          if (item.id !== id) return item;
+          const next = { ...item, ...patch };
+          if (next.w != null) next.w = Math.max(0.4, next.w);
+          if (next.h != null) next.h = Math.max(0.4, next.h);
+          return next;
+        }),
+      })),
+    });
+    get().markDirty();
+  },
+
+  patchLandscape: (id, patch) => {
+    get().pushHistory();
+    set({
+      doc: withFloor(get().doc, (f) => ({
+        ...f,
+        landscape: (f.landscape ?? []).map((item) => {
+          if (item.id !== id) return item;
+          const next = { ...item, ...patch };
+          if (next.w != null) next.w = Math.max(0.4, next.w);
+          if (next.h != null) next.h = Math.max(0.4, next.h);
+          return next;
+        }),
+      })),
+    });
+    get().markDirty();
+  },
+
+  moveWallEnd: (wallId, end, p, forceOrtho) => {
+    const { doc } = get();
+    const wall = get().floor().walls.find((w) => w.id === wallId);
+    if (!wall) return;
+    const e = wallEnds(wall, get().floor().nodes);
+    if (!e) return;
+    const from = end === 'a' ? e.b : e.a;
+    const s = doc.settings;
+    const to = snapWallEnd(from, p, {
+      ortho: s.ortho !== false,
+      forceOrtho: !!forceOrtho,
+      snap: s.snap,
+      gridSize: s.gridSize,
+    });
+    if (Math.hypot(to.x - from.x, to.y - from.y) < 0.25) return;
+    if (!moving) {
+      get().pushHistory();
+      moving = true;
+    }
+    set({
+      doc: withFloor(get().doc, (f) => ({
+        ...f,
+        nodes: nodesAfterWallEnd(f.nodes, wall, end, to),
+      })),
+    });
+  },
+
+  setWallLength: (wallId, length) => {
+    const wall = get().floor().walls.find((w) => w.id === wallId);
+    if (!wall) return;
+    const len = Math.max(0.5, length);
+    get().pushHistory();
+    set({
+      doc: withFloor(get().doc, (f) => {
+        const next = { ...f, nodes: nodesAfterWallLength(f.nodes, wall, len) };
         return refreshRoof(next, get().doc.settings.roofStyleId ?? null);
       }),
     });
@@ -1148,13 +1229,16 @@ export const useProjectStore = create<Store>((set, get) => ({
     }
     const sketch = (get().floor().sketches ?? []).find((s) => s.id === sketchId);
     if (!sketch) return;
-    const simple = simplifyPolyline(sketch.points, 0.85);
-    const pts = polylinePoints(simple);
-    if (pts.length < 2) {
-      get().showToast('Sketch is too short to trace — draw bigger');
+    const s = get().doc.settings;
+    const verts = fitWallsFromStroke(sketch.points, {
+      gridSize: s.gridSize,
+      snap: s.snap,
+      ortho: s.ortho !== false,
+    });
+    if (verts.length < 2) {
+      get().showToast(t(s.locale, 'toast.traceNeed'), 3200);
       return;
     }
-    const s = get().doc.settings;
     const merge = s.snap ? s.gridSize * 0.4 : 0.35;
     const kind = get().wallKind;
     const thick = kind === 'interior' ? 0.35 : 0.5;
@@ -1165,15 +1249,10 @@ export const useProjectStore = create<Store>((set, get) => ({
         let nodes = [...f.nodes];
         let walls = [...f.walls];
         let openings = [...f.openings];
-        let prev = snapPoint(pts[0], s.gridSize, s.snap);
-        for (let i = 1; i < pts.length; i++) {
-          const endPt = snapWallEnd(prev, pts[i], {
-            ortho: s.ortho !== false,
-            forceOrtho: false,
-            snap: s.snap,
-            gridSize: s.gridSize,
-          });
-          if (Math.hypot(endPt.x - prev.x, endPt.y - prev.y) < 0.75) continue;
+        for (let i = 1; i < verts.length; i++) {
+          const prev = verts[i - 1];
+          const endPt = verts[i];
+          if (Math.hypot(endPt.x - prev.x, endPt.y - prev.y) < 0.95) continue;
           const aRes = findOrCreateNode(nodes, prev, merge);
           nodes = aRes.nodes;
           const bRes = findOrCreateNode(nodes, endPt, merge);
@@ -1182,17 +1261,13 @@ export const useProjectStore = create<Store>((set, get) => ({
           const dup = walls.some(
             (w) => (w.a === aRes.id && w.b === bRes.id) || (w.a === bRes.id && w.b === aRes.id),
           );
-          if (dup) {
-            prev = endPt;
-            continue;
-          }
+          if (dup) continue;
           ({ walls, openings } = splitWallsAtNode(walls, openings, nodes, aRes.id, merge));
           ({ walls, openings } = splitWallsAtNode(walls, openings, nodes, bRes.id, merge));
           walls.push({
             id: uid('w'), a: aRes.id, b: bRes.id, kind, thickness: thick,
           });
           added += 1;
-          prev = endPt;
         }
         if (added === 0) return f;
         return refreshRoof({ ...f, nodes, walls, openings }, get().doc.settings.roofStyleId ?? null);
@@ -1202,12 +1277,12 @@ export const useProjectStore = create<Store>((set, get) => ({
     });
     get().markDirty();
     if (added === 0) {
-      get().showToast('Sketch is too wiggly — draw bigger, then Trace', 3200);
+      get().showToast(t(get().doc.settings.locale, 'toast.traceNeed'), 3200);
     } else {
       get().showToast(
         added === 1
-          ? 'Traced 1 wall — sketch stays as an underlay'
-          : `Traced ${added} walls — sketch stays as an underlay`,
+          ? t(get().doc.settings.locale, 'toast.traceOne')
+          : t(get().doc.settings.locale, 'toast.traceMany', { n: String(added) }),
         toastMs(get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL, 2800),
       );
     }

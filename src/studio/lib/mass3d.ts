@@ -5,8 +5,9 @@ import { SITE_PALETTE, WALL_TINT, hexAlpha } from '../data/scene3d';
 import { exteriorBounds } from './roof';
 import { furnitureParts, partWorldCorners, partWorldRing } from './furnShape';
 import { floorFinish, asFloorFinish, type FloorFinishId, type FloorGrain } from '../data/flooring';
-import { roomPolygon } from './rooms';
+import { listInteriorFaces, listInteriorFloors, roomPolygon } from './rooms';
 import { FACE_BUDGET, FURN_CAP, PLANT_CAP, type FurnLod } from './perf';
+import { wallFootprint, wallSidesAt } from './wallJoin';
 
 export const WALL_H = 9;
 export const EYE_Z = 5.5;
@@ -218,18 +219,41 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
     site.edge,
     'yard',
   ));
-  faces.push(quad(
-    v3(minX - 1.5, minY - 1.5, 0.04),
-    v3(maxX + 1.5, minY - 1.5, 0.04),
-    v3(maxX + 1.5, maxY + 1.5, 0.04),
-    v3(minX - 1.5, maxY + 1.5, 0.04),
-    site.deep,
-    site.edge,
-    'slab',
-  ));
+  const loops = listInteriorFaces(floor.nodes, floor.walls);
+  if (loops.length) {
+    for (const loop of loops) {
+      faces.push({
+        pts: loop.poly.map((pt) => v3(pt.x, pt.y, 0.04)),
+        fill: site.deep,
+        stroke: site.edge,
+        kind: 'slab',
+      });
+    }
+  } else {
+    faces.push(quad(
+      v3(minX - 1.5, minY - 1.5, 0.04),
+      v3(maxX + 1.5, minY - 1.5, 0.04),
+      v3(maxX + 1.5, maxY + 1.5, 0.04),
+      v3(minX - 1.5, maxY + 1.5, 0.04),
+      site.deep,
+      site.edge,
+      'slab',
+    ));
+  }
 
   const houseFloor = asFloorFinish(opts.floorId);
-  if (b) {
+  const interiorFloors = listInteriorFloors(floor.nodes, floor.walls, floor.rooms, houseFloor);
+  if (interiorFloors.length) {
+    for (const rf of interiorFloors) {
+      faces.push({
+        pts: rf.poly.map((pt) => v3(pt.x, pt.y, 0.07)),
+        fill: floorFinish(rf.finish).color,
+        stroke: opts.blocky ? '#1a1208' : floorFinish(rf.finish).color,
+        kind: 'floor',
+        pattern: opts.blocky ? undefined : rf.finish,
+      });
+    }
+  } else if (b) {
     faces.push({
       pts: [
         v3(minX, minY, 0.06),
@@ -242,20 +266,20 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
       kind: 'floor',
       pattern: opts.blocky ? undefined : houseFloor,
     });
-  }
-  for (const room of floor.rooms ?? []) {
-    if (room.kind === 'outdoor') continue;
-    const poly = roomPolygon(room, floor.nodes, floor.walls);
-    if (!poly || poly.length < 3) continue;
-    const fid = room.floorFinishId ?? houseFloor;
-    if (!fid) continue;
-    faces.push({
-      pts: poly.map((pt) => v3(pt.x, pt.y, 0.07)),
-      fill: floorFinish(fid).color,
-      stroke: opts.blocky ? '#1a1208' : floorFinish(fid).color,
-      kind: 'floor',
-      pattern: opts.blocky ? undefined : fid,
-    });
+    for (const room of floor.rooms ?? []) {
+      if (room.kind === 'outdoor') continue;
+      const poly = roomPolygon(room, floor.nodes, floor.walls);
+      if (!poly || poly.length < 3) continue;
+      const fid = room.floorFinishId ?? houseFloor;
+      if (!fid) continue;
+      faces.push({
+        pts: poly.map((pt) => v3(pt.x, pt.y, 0.07)),
+        fill: floorFinish(fid).color,
+        stroke: opts.blocky ? '#1a1208' : floorFinish(fid).color,
+        kind: 'floor',
+        pattern: opts.blocky ? undefined : fid,
+      });
+    }
   }
 
   const walkW = 3.2;
@@ -292,6 +316,7 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
     const fill = wall.kind === 'exterior' ? tint.fill : tint.fillShade;
     const h = wall.kind === 'interior' ? WALL_H - 0.4 : WALL_H;
     const ops = (byWall.get(wall.id) ?? []).slice().sort((p, q) => p.t - q.t);
+    const foot = wallFootprint(wall, floor.nodes, floor.walls);
 
     type Span = { t0: number; t1: number; z0: number; z1: number };
     const spans: Span[] = [];
@@ -324,14 +349,16 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
     if (cursor < 0.995) spans.push({ t0: cursor, t1: 1, z0: 0, z1: h });
 
     for (const s of spans) {
-      const p00 = along(a, ux, uy, nx, ny, len, s.t0, hw, s.z0);
-      const p10 = along(a, ux, uy, nx, ny, len, s.t1, hw, s.z0);
-      const p11 = along(a, ux, uy, nx, ny, len, s.t1, hw, s.z1);
-      const p01 = along(a, ux, uy, nx, ny, len, s.t0, hw, s.z1);
-      const n00 = along(a, ux, uy, nx, ny, len, s.t0, -hw, s.z0);
-      const n10 = along(a, ux, uy, nx, ny, len, s.t1, -hw, s.z0);
-      const n11 = along(a, ux, uy, nx, ny, len, s.t1, -hw, s.z1);
-      const n01 = along(a, ux, uy, nx, ny, len, s.t0, -hw, s.z1);
+      const side0 = foot ? wallSidesAt(foot, s.t0) : null;
+      const side1 = foot ? wallSidesAt(foot, s.t1) : null;
+      const p00 = side0 ? v3(side0.left.x, side0.left.y, s.z0) : along(a, ux, uy, nx, ny, len, s.t0, hw, s.z0);
+      const p10 = side1 ? v3(side1.left.x, side1.left.y, s.z0) : along(a, ux, uy, nx, ny, len, s.t1, hw, s.z0);
+      const p11 = side1 ? v3(side1.left.x, side1.left.y, s.z1) : along(a, ux, uy, nx, ny, len, s.t1, hw, s.z1);
+      const p01 = side0 ? v3(side0.left.x, side0.left.y, s.z1) : along(a, ux, uy, nx, ny, len, s.t0, hw, s.z1);
+      const n00 = side0 ? v3(side0.right.x, side0.right.y, s.z0) : along(a, ux, uy, nx, ny, len, s.t0, -hw, s.z0);
+      const n10 = side1 ? v3(side1.right.x, side1.right.y, s.z0) : along(a, ux, uy, nx, ny, len, s.t1, -hw, s.z0);
+      const n11 = side1 ? v3(side1.right.x, side1.right.y, s.z1) : along(a, ux, uy, nx, ny, len, s.t1, -hw, s.z1);
+      const n01 = side0 ? v3(side0.right.x, side0.right.y, s.z1) : along(a, ux, uy, nx, ny, len, s.t0, -hw, s.z1);
       faces.push(quad(p00, p10, p11, p01, fill, stroke, 'wall'));
       faces.push(quad(n10, n00, n01, n11, fill, stroke, 'wall'));
       if (s.z1 >= h - 0.05) {

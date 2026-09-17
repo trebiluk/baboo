@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
-import { formatLength, wallLength } from '../lib/geometry';
+import { formatLength, parseFeet, wallLength, dist } from '../lib/geometry';
 import { ROOM_CATALOG, roomType } from '../data/rooms';
 import { formatArea, polygonArea, roomPolygon } from '../lib/rooms';
 import { Icon } from '../icons';
 import { TEXTURE_PACKS } from '../data/textures';
 import { FLOOR_FINISHES, asFloorFinish } from '../data/flooring';
+import { FURN_PAINTS, samePaint } from '../data/furnPaint';
 
 const DOOR_WIDTHS = [
   { v: 1, label: '12"' },
@@ -24,6 +25,72 @@ const WIN_WIDTHS = [
 
 function near(a: number, b: number) {
   return Math.abs(a - b) < 0.04;
+}
+
+function FeetField({
+  label, feet, units, onCommit, allowZero = false,
+}: {
+  label: string;
+  feet: number;
+  units: 'ft' | 'm';
+  onCommit: (n: number) => void;
+  allowZero?: boolean;
+}) {
+  const shown = formatLength(feet, units);
+  const [text, setText] = useState(shown);
+  useEffect(() => { setText(shown); }, [shown]);
+  const commit = () => {
+    const n = parseFeet(text, units);
+    if (n == null || (!allowZero && Math.abs(n) < 0.05)) {
+      setText(shown);
+      return;
+    }
+    onCommit(n);
+  };
+  return (
+    <label className="object-menu-field">
+      <span>{label}</span>
+      <input
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => { if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur(); }}
+        aria-label={label}
+      />
+    </label>
+  );
+}
+
+function DegField({
+  label, rad, onCommit,
+}: {
+  label: string;
+  rad: number;
+  onCommit: (rad: number) => void;
+}) {
+  const deg = Math.round((((rad * 180) / Math.PI) % 360 + 360) % 360);
+  const [text, setText] = useState(String(deg));
+  useEffect(() => { setText(String(deg)); }, [deg]);
+  const commit = () => {
+    const n = parseFloat(text);
+    if (!Number.isFinite(n)) {
+      setText(String(deg));
+      return;
+    }
+    onCommit((n * Math.PI) / 180);
+  };
+  return (
+    <label className="object-menu-field">
+      <span>{label}</span>
+      <input
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => { if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur(); }}
+        aria-label={label}
+      />
+    </label>
+  );
 }
 
 function DockHead({ title, onCollapse, onClose }: { title: string; onCollapse: () => void; onClose: () => void }) {
@@ -48,6 +115,9 @@ export function ObjectMenu() {
   const styleId = useProjectStore((s) => s.doc.settings.styleId);
   const patchOpening = useProjectStore((s) => s.patchOpening);
   const patchWall = useProjectStore((s) => s.patchWall);
+  const patchFurniture = useProjectStore((s) => s.patchFurniture);
+  const patchLandscape = useProjectStore((s) => s.patchLandscape);
+  const setWallLength = useProjectStore((s) => s.setWallLength);
   const patchRoom = useProjectStore((s) => s.patchRoom);
   const renameRoom = useProjectStore((s) => s.renameRoom);
   const renameNote = useProjectStore((s) => s.renameNote);
@@ -165,6 +235,9 @@ export function ObjectMenu() {
               </button>
               <span className="object-menu-meta">{formatLength(Math.min(o.width, len), units)} wide</span>
             </div>
+            <div className="object-menu-grid">
+              <FeetField label="Width" feet={o.width} units={units} onCommit={(n) => patchOpening(o.id, { width: n })} />
+            </div>
             <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
           </>
         );
@@ -173,6 +246,7 @@ export function ObjectMenu() {
       {selected.kind === 'wall' && (() => {
         const w = floor.walls.find((x) => x.id === selected.id);
         if (!w) return null;
+        const thickIn = Math.round((w.thickness || 0.5) * 12);
         return (
           <>
             <DockHead title="Wall" onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
@@ -191,7 +265,33 @@ export function ObjectMenu() {
               >
                 Inside
               </button>
-              <span className="object-menu-meta">{formatLength(wallLength(w, floor.nodes), units)}</span>
+            </div>
+            <div className="object-menu-grid">
+              <FeetField
+                label="Length"
+                feet={wallLength(w, floor.nodes)}
+                units={units}
+                onCommit={(n) => setWallLength(w.id, n)}
+              />
+              <FeetField
+                label="Thick"
+                feet={w.thickness || 0.5}
+                units={units}
+                onCommit={(n) => patchWall(w.id, { thickness: n })}
+              />
+            </div>
+            <div className="object-menu-row" role="group" aria-label="Thickness">
+              {[4, 6, 8].map((inch) => (
+                <button
+                  key={inch}
+                  type="button"
+                  className={`object-chip aw-pressable${thickIn === inch ? ' active' : ''}`}
+                  onClick={() => patchWall(w.id, { thickness: inch / 12 })}
+                >
+                  {inch}"
+                </button>
+              ))}
+              <span className="object-menu-meta">Drag the squares on the ends to stretch</span>
             </div>
             <p className="object-menu-meta">Wallpaper</p>
             <div className="object-menu-row" role="group" aria-label="Wallpaper">
@@ -222,9 +322,36 @@ export function ObjectMenu() {
         return (
           <>
             <DockHead title={f.label} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
+            <div className="object-menu-grid">
+              <FeetField label="X" feet={f.x} units={units} allowZero onCommit={(n) => patchFurniture(f.id, { x: n })} />
+              <FeetField label="Y" feet={f.y} units={units} allowZero onCommit={(n) => patchFurniture(f.id, { y: n })} />
+              <FeetField label="Width" feet={f.w} units={units} onCommit={(n) => patchFurniture(f.id, { w: n })} />
+              <FeetField label="Depth" feet={f.h} units={units} onCommit={(n) => patchFurniture(f.id, { h: n })} />
+            </div>
+            <div className="object-menu-grid">
+              <DegField label="Angle °" rad={f.rot || 0} onCommit={(n) => patchFurniture(f.id, { rot: n })} />
+            </div>
             <div className="object-menu-row">
               <button type="button" className="object-chip aw-pressable" onClick={() => rotateSelected(1)}><Icon name="rotate" /> Rotate</button>
               <button type="button" className="object-chip aw-pressable" onClick={duplicateSelected}><Icon name="copy" /> Copy</button>
+            </div>
+            <p className="object-menu-meta">Paint</p>
+            <div className="object-menu-row object-tex-row" role="group" aria-label="Paint">
+              {FURN_PAINTS.map((p) => {
+                const on = samePaint(f.color, p.hex);
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={`object-chip tex-swatch aw-pressable${on ? ' active' : ''}`}
+                    style={{ background: p.hex ?? 'linear-gradient(135deg,#C4A074,#8B6914)' }}
+                    title={p.label}
+                    onClick={() => patchFurniture(f.id, { color: p.hex })}
+                  >
+                    {p.label}
+                  </button>
+                );
+              })}
             </div>
             <p className="object-menu-meta">Drag to move</p>
             <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
@@ -238,6 +365,12 @@ export function ObjectMenu() {
         return (
           <>
             <DockHead title={f.label} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
+            <div className="object-menu-grid">
+              <FeetField label="X" feet={f.x} units={units} allowZero onCommit={(n) => patchLandscape(f.id, { x: n })} />
+              <FeetField label="Y" feet={f.y} units={units} allowZero onCommit={(n) => patchLandscape(f.id, { y: n })} />
+              <FeetField label="Width" feet={f.w} units={units} onCommit={(n) => patchLandscape(f.id, { w: n })} />
+              <FeetField label="Depth" feet={f.h} units={units} onCommit={(n) => patchLandscape(f.id, { h: n })} />
+            </div>
             <p className="object-menu-meta">Drag to move</p>
             <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
           </>
@@ -332,13 +465,17 @@ export function ObjectMenu() {
         );
       })()}
 
-      {selected.kind === 'dim' && (
-        <>
-          <DockHead title="Size" onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
-          <p className="object-menu-meta">Drag to move the label</p>
-          <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
-        </>
-      )}
+      {selected.kind === 'dim' && (() => {
+        const d = (floor.dimensions ?? []).find((x) => x.id === selected.id);
+        const len = d ? dist({ x: d.ax, y: d.ay }, { x: d.bx, y: d.by }) : 0;
+        return (
+          <>
+            <DockHead title="Size" onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
+            <p className="object-menu-meta">{formatLength(len, units)} · drag to move the label</p>
+            <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
+          </>
+        );
+      })()}
 
       {selected.kind === 'sketch' && (
         <>

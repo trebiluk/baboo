@@ -84,6 +84,8 @@ export interface FurnitureItem {
   rot: number;
   zIndex: number;
   label: string;
+  /** Optional paint hex. Natural catalog colors when omitted. */
+  color?: string | null;
 }
 
 /** Two-click size string that stays on the plan. */
@@ -120,7 +122,9 @@ export type FloorFinishId =
   | 'checker'
   | 'slate'
   | 'terracotta'
-  | 'brick';
+  | 'brick'
+  | 'cork'
+  | 'marble';
 
 export interface LandscapeItem {
   id: string;
@@ -212,9 +216,11 @@ export type GuiThemeId = 'stark' | 'ink' | 'projector' | 'blocky';
 /** Solid 3D sky look. */
 export type SkyPreset = 'day' | 'dusk' | 'overcast';
 /** Yard under the house in Solid 3D. */
-export type SiteFinish = 'grass' | 'gravel' | 'pad';
+export type SiteFinish = 'grass' | 'gravel' | 'pad' | 'dirt' | 'sand' | 'deck' | 'mulch';
 /** Wall tint in Solid 3D. */
-export type WallTintId = 'sand' | 'white' | 'clay' | 'slate' | 'sage' | 'sky';
+export type WallTintId =
+  | 'sand' | 'white' | 'clay' | 'slate' | 'sage' | 'sky'
+  | 'cream' | 'blush' | 'navy' | 'charcoal' | 'butter' | 'mint' | 'terra';
 
 /** Classroom UI language. Cubano is Cuban Spanish, distinct from Español. */
 export type Locale = 'en' | 'es' | 'cu' | 'uk' | 'ru' | 'ti' | 'fa';

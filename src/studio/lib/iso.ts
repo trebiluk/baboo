@@ -133,6 +133,51 @@ export function painterDepth(x: number, y: number, spec: ProjSpec): number {
   return p.y;
 }
 
+/** Larger = closer to the camera (draw later). Iso uses x+y; cabinet/elevation use the front (−Y). */
+export function cameraDepth(x: number, y: number, spec: ProjSpec): number {
+  const p = rotateYaw(x, y, spec.yaw);
+  if (spec.kind === 'iso') return p.x + p.y;
+  if (spec.kind === 'ortho' && spec.top) return 0;
+  return -p.y;
+}
+
+export function isCloserToCamera(
+  x: number,
+  y: number,
+  thanX: number,
+  thanY: number,
+  spec: ProjSpec,
+  eps = 0,
+): boolean {
+  return cameraDepth(x, y, spec) > cameraDepth(thanX, thanY, spec) + eps;
+}
+
+/** Drop the near walls in a 3/4 view so furniture is not painted on top of them. */
+export function shouldCutawayWall(
+  midX: number,
+  midY: number,
+  originX: number,
+  originY: number,
+  spec: ProjSpec,
+): boolean {
+  if (spec.top) return false;
+  if (spec.kind !== 'iso' && spec.kind !== 'oblique') return false;
+  return isCloserToCamera(midX, midY, originX, originY, spec, 0.2);
+}
+
+/** Keep the side of a box that faces the camera; skip the far side so parts do not stack. */
+export function isCameraFacingSide(
+  ax: number,
+  ay: number,
+  bx: number,
+  by: number,
+  cx: number,
+  cy: number,
+  spec: ProjSpec,
+): boolean {
+  return isCloserToCamera((ax + bx) / 2, (ay + by) / 2, cx, cy, spec, -0.02);
+}
+
 /** Backward-compatible isometric, yaw 0. */
 export function iso(x: number, y: number, z = 0): { x: number; y: number } {
   return project(x, y, z, { kind: 'iso', yaw: 0 });

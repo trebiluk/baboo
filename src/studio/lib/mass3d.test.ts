@@ -133,4 +133,50 @@ describe('mass3d', () => {
     const fl = faces.filter((f) => f.kind === 'floor' && f.pattern === 'tile');
     assert.ok(fl.length >= 1);
   });
+
+  it('L-shaped house floor stays inside the rooms, not the bounding box', () => {
+    const nodes: Node[] = [
+      { id: 'a', x: 0, y: 0 },
+      { id: 'b', x: 20, y: 0 },
+      { id: 'c', x: 20, y: 8 },
+      { id: 'd', x: 8, y: 8 },
+      { id: 'e', x: 8, y: 16 },
+      { id: 'f', x: 0, y: 16 },
+    ];
+    const walls: Wall[] = [
+      { id: 'w1', a: 'a', b: 'b', kind: 'exterior', thickness: 0.5 },
+      { id: 'w2', a: 'b', b: 'c', kind: 'exterior', thickness: 0.5 },
+      { id: 'w3', a: 'c', b: 'd', kind: 'exterior', thickness: 0.5 },
+      { id: 'w4', a: 'd', b: 'e', kind: 'exterior', thickness: 0.5 },
+      { id: 'w5', a: 'e', b: 'f', kind: 'exterior', thickness: 0.5 },
+      { id: 'w6', a: 'f', b: 'a', kind: 'exterior', thickness: 0.5 },
+    ];
+    const floor = boxFloor(20, 16);
+    floor.nodes = nodes;
+    floor.walls = walls;
+    const faces = buildMass(floor, { ...opts, floorId: 'oak' });
+    const fl = faces.filter((f) => f.kind === 'floor');
+    assert.ok(fl.length >= 1);
+    const xs = fl.flatMap((f) => f.pts.map((p) => p.x));
+    const ys = fl.flatMap((f) => f.pts.map((p) => p.y));
+    assert.ok(Math.max(...xs) < 19.9, `floor reaches x=${Math.max(...xs)}`);
+    assert.ok(Math.max(...ys) < 15.9, `floor reaches y=${Math.max(...ys)}`);
+    // missing L corner is not covered
+    const coversHole = fl.some((f) => f.pts.every((p) => p.x >= 8 && p.y >= 8) && f.pts.length >= 4 && f.pts.some((p) => p.x > 12 && p.y > 12));
+    assert.equal(coversHole, false);
+    const holePtInside = fl.some((f) => {
+      const poly = f.pts;
+      const p = { x: 14, y: 12 };
+      let inside = false;
+      for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+        const a = poly[i];
+        const b = poly[j];
+        const hit = (a.y > p.y) !== (b.y > p.y)
+          && p.x < ((b.x - a.x) * (p.y - a.y)) / (b.y - a.y || 1e-12) + a.x;
+        if (hit) inside = !inside;
+      }
+      return inside;
+    });
+    assert.equal(holePtInside, false, 'bounding-box hole should not have a floor');
+  });
 });

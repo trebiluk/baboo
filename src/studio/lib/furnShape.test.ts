@@ -53,4 +53,15 @@ describe('furniture parts', () => {
     const ring = partWorldRing(item('water-heater', 2, 2), cyl!);
     assert.ok(ring.length >= 8);
   });
+
+  it('paint recolors a sofa and leaves a toilet porcelain', () => {
+    const sofa = item('sofa', 7, 3);
+    sofa.color = '#3D4F6F';
+    const painted = furnitureParts(sofa);
+    assert.ok(painted.some((p) => p.fill.toLowerCase() === '#3d4f6f' || p.fill.toLowerCase().startsWith('#3')));
+    const toilet = item('toilet', 1.5, 2.5);
+    toilet.color = '#3D4F6F';
+    const bowl = furnitureParts(toilet);
+    assert.ok(bowl.some((p) => p.fill === '#E8EEF2' || p.fill === '#EEF2F6'));
+  });
 });

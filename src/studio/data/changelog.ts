@@ -11,6 +11,38 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '1.3.5',
+    date: '2026-09-17',
+    bullets: [
+      'Selected walls show squares on the ends — drag them to stretch, drag the middle to slide',
+      'The right panel edits size, paint, and place for whatever you tap',
+    ],
+  },
+  {
+    version: '1.3.4',
+    date: '2026-09-17',
+    bullets: [
+      'Dollhouse 3/4 view opens the near walls so beds and toilets stay inside the room',
+      'Furniture shows only the sides you should see — no stacked bowls or through-the-wall frames',
+    ],
+  },
+  {
+    version: '1.3.3',
+    date: '2026-09-17',
+    bullets: [
+      'Closed rooms meet clean at the corners — walls no longer blob or stack',
+      '3D shows the real floor inside each room, not a rectangle around the house',
+      'More paints, wallpapers, yard looks, and furniture colors in Settings and the edit panel',
+    ],
+  },
+  {
+    version: '1.3.2',
+    date: '2026-09-17',
+    bullets: [
+      'Trace reads a wiggly pencil outline as straight walls — a wandering house still hard-lines',
+    ],
+  },
+  {
     version: '1.3.1',
     date: '2026-09-16',
     bullets: [

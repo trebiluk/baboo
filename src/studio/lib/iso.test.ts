@@ -12,6 +12,9 @@ import {
   project,
   unproject,
   yawToFace,
+  shouldCutawayWall,
+  isCameraFacingSide,
+  cameraDepth,
 } from './iso.ts';
 
 describe('isometric dollhouse', () => {
@@ -100,5 +103,45 @@ describe('dollhouse projections', () => {
     const back = unproject(p.x, p.y, spec);
     assert.ok(Math.abs(back.x - 8) < 1e-6);
     assert.ok(Math.abs(back.y - 3) < 1e-6);
+  });
+});
+
+describe('dollhouse cutaway', () => {
+  const iso0 = { kind: 'iso' as const, yaw: 0 as const };
+  const iso180 = { kind: 'iso' as const, yaw: 180 as const };
+
+  it('opens the two near walls of a square on isometric front', () => {
+    const c = 5;
+    assert.equal(shouldCutawayWall(10, 5, c, c, iso0), true); // +X near
+    assert.equal(shouldCutawayWall(5, 10, c, c, iso0), true); // +Y near
+    assert.equal(shouldCutawayWall(0, 5, c, c, iso0), false); // −X far
+    assert.equal(shouldCutawayWall(5, 0, c, c, iso0), false); // −Y far
+  });
+
+  it('swaps which walls open when you turn the house 180°', () => {
+    const c = 5;
+    assert.equal(shouldCutawayWall(0, 5, c, c, iso180), true);
+    assert.equal(shouldCutawayWall(5, 0, c, c, iso180), true);
+    assert.equal(shouldCutawayWall(10, 5, c, c, iso180), false);
+    assert.equal(shouldCutawayWall(5, 10, c, c, iso180), false);
+  });
+
+  it('never cuts elevation or a top view — those faces stay true', () => {
+    assert.equal(shouldCutawayWall(10, 5, 5, 5, { kind: 'elevation', yaw: 0 }), false);
+    assert.equal(shouldCutawayWall(10, 5, 5, 5, { kind: 'ortho', yaw: 0, top: true }), false);
+  });
+
+  it('keeps the camera-facing side of a box and drops the far side', () => {
+    const spec = iso0;
+    const cx = 4;
+    const cy = 4;
+    assert.equal(isCameraFacingSide(6, 2, 6, 6, cx, cy, spec), true); // +X
+    assert.equal(isCameraFacingSide(2, 6, 6, 6, cx, cy, spec), true); // +Y
+    assert.equal(isCameraFacingSide(2, 2, 2, 6, cx, cy, spec), false); // −X
+    assert.equal(isCameraFacingSide(2, 2, 6, 2, cx, cy, spec), false); // −Y
+  });
+
+  it('cameraDepth is larger for the near corner in isometric', () => {
+    assert.ok(cameraDepth(10, 10, iso0) > cameraDepth(0, 0, iso0));
   });
 });

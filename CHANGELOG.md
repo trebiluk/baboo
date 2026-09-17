@@ -3,6 +3,22 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 1.3.5 — 2026-09-17
+- Selected walls show squares on the ends — drag them to stretch, drag the middle to slide
+- The right panel edits size, paint, and place for whatever you tap
+
+## 1.3.4 — 2026-09-17
+- Dollhouse 3/4 view opens the near walls so beds and toilets stay inside the room
+- Furniture shows only the sides you should see — no stacked bowls or through-the-wall frames
+
+## 1.3.3 — 2026-09-17
+- Closed rooms meet clean at the corners — walls no longer blob or stack
+- 3D shows the real floor inside each room, not a rectangle around the house
+- More paints, wallpapers, yard looks, and furniture colors in Settings and the edit panel
+
+## 1.3.2 — 2026-09-17
+- Trace reads a wiggly pencil outline as straight walls — a wandering house still hard-lines
+
 ## 1.3.1 — 2026-09-16
 - Tools, catalogs, Settings, Teach, and the edit panel dock to the sides and collapse — the grid stays open
 - Busy houses stay snappy: extra furniture detail drops while you spin 3D or zoom the plan out

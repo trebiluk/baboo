@@ -17,15 +17,26 @@ export const SITE_OPTIONS: { id: SiteFinish; label: string }[] = [
   { id: 'grass', label: 'Grass' },
   { id: 'gravel', label: 'Gravel' },
   { id: 'pad', label: 'Pad' },
+  { id: 'dirt', label: 'Dirt' },
+  { id: 'sand', label: 'Sand' },
+  { id: 'deck', label: 'Deck' },
+  { id: 'mulch', label: 'Mulch' },
 ];
 
 export const WALL_TINT_OPTIONS: { id: WallTintId; label: string }[] = [
   { id: 'sand', label: 'Sand' },
   { id: 'white', label: 'White' },
+  { id: 'cream', label: 'Cream' },
+  { id: 'butter', label: 'Butter' },
+  { id: 'blush', label: 'Blush' },
   { id: 'clay', label: 'Clay' },
-  { id: 'slate', label: 'Slate' },
+  { id: 'terra', label: 'Terra' },
   { id: 'sage', label: 'Sage' },
+  { id: 'mint', label: 'Mint' },
   { id: 'sky', label: 'Sky' },
+  { id: 'navy', label: 'Navy' },
+  { id: 'slate', label: 'Slate' },
+  { id: 'charcoal', label: 'Charcoal' },
 ];
 
 export const SKY_PALETTE: Record<SkyPreset, {
@@ -50,6 +61,10 @@ export const SITE_PALETTE: Record<SiteFinish, { ground: string; deep: string; ed
   grass: { ground: '#5F6F52', deep: '#4A5642', edge: '#6D7A62' },
   gravel: { ground: '#8A8680', deep: '#6E6A64', edge: '#A09B94' },
   pad: { ground: '#9CA3AF', deep: '#787F8B', edge: '#B0B6C0' },
+  dirt: { ground: '#6B5344', deep: '#534032', edge: '#8A6A54' },
+  sand: { ground: '#D4C4A0', deep: '#B8A878', edge: '#E0D4B4' },
+  deck: { ground: '#8B6914', deep: '#6B4E10', edge: '#C4A074' },
+  mulch: { ground: '#5C4030', deep: '#3E2A20', edge: '#8A6248' },
 };
 
 export const WALL_TINT: Record<WallTintId, { fill: string; edge: string; fillShade: string }> = {
@@ -59,16 +74,25 @@ export const WALL_TINT: Record<WallTintId, { fill: string; edge: string; fillSha
   slate: { fill: '#64748B', edge: '#334155', fillShade: '#52627A' },
   sage: { fill: '#8A9A7B', edge: '#5C6B50', fillShade: '#7A8A6B' },
   sky: { fill: '#B6C8DC', edge: '#6B849E', fillShade: '#A4B8CE' },
+  cream: { fill: '#F5EDE0', edge: '#C4B49A', fillShade: '#E8DCC8' },
+  blush: { fill: '#E8C4C4', edge: '#B88888', fillShade: '#D8B0B0' },
+  navy: { fill: '#3D4F6F', edge: '#243248', fillShade: '#33445E' },
+  charcoal: { fill: '#3A3F46', edge: '#1F2328', fillShade: '#2E333A' },
+  butter: { fill: '#F0E4A8', edge: '#C4B46A', fillShade: '#E4D690' },
+  mint: { fill: '#B8D4C8', edge: '#7AA090', fillShade: '#A4C4B6' },
+  terra: { fill: '#C47850', edge: '#8A4E32', fillShade: '#B06844' },
 };
 
 export function isSkyPreset(v: unknown): v is SkyPreset {
   return v === 'day' || v === 'dusk' || v === 'overcast';
 }
 export function isSiteFinish(v: unknown): v is SiteFinish {
-  return v === 'grass' || v === 'gravel' || v === 'pad';
+  return v === 'grass' || v === 'gravel' || v === 'pad'
+    || v === 'dirt' || v === 'sand' || v === 'deck' || v === 'mulch';
 }
 export function isWallTintId(v: unknown): v is WallTintId {
-  return v === 'white' || v === 'sand' || v === 'clay' || v === 'slate' || v === 'sage' || v === 'sky';
+  return v === 'white' || v === 'sand' || v === 'clay' || v === 'slate' || v === 'sage' || v === 'sky'
+    || v === 'cream' || v === 'blush' || v === 'navy' || v === 'charcoal' || v === 'butter' || v === 'mint' || v === 'terra';
 }
 
 export function asSky(v: unknown): SkyPreset {

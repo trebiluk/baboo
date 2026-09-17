@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Stage, Layer, Line, Rect, Text, Circle, Group } from 'react-konva';
+import { Stage, Layer, Line, Rect, Text, Circle } from 'react-konva';
 import type Konva from 'konva';
 import { useProjectStore } from '../store/useProjectStore';
 import { wallEnds } from '../lib/geometry';
@@ -7,11 +7,13 @@ import {
   project,
   unproject,
   projectPoints,
-  painterDepth,
+  cameraDepth,
   nextYaw,
   yawToFace,
   DOLL_PROJS,
   WALL_H,
+  shouldCutawayWall,
+  isCameraFacingSide,
   type DollProj,
   type ProjSpec,
   type YawDeg,
@@ -20,16 +22,20 @@ import { packTileCanvas, textureStrokeFallback } from '../lib/texturePattern';
 import { furnitureParts, partWorldCorners, partWorldRing } from '../lib/furnShape';
 import { FURN_CAP, furnitureLod } from '../lib/perf';
 import { asFloorFinish, asFloorGrain, floorFinish, floorTileCanvas } from '../data/flooring';
-import { roomPolygon } from '../lib/rooms';
+import { listInteriorFloors, roomPolygon } from '../lib/rooms';
 import { DEFAULT_GUI_THEME } from '../data/themes';
 import { t } from '../data/i18n';
-import type { Wall } from '../types';
 
-type WallFace = {
-  wall: Wall;
+type SceneFace = {
+  key: string;
+  pts: number[];
+  fill?: string;
+  pattern?: HTMLCanvasElement;
+  stroke: string;
+  sw: number;
   depth: number;
-  points: number[];
-  texId: string | null;
+  name?: string;
+  pick?: () => void;
 };
 
 export function DollhouseCanvas() {
@@ -134,33 +140,158 @@ export function DollhouseCanvas() {
     return projectPoints(floor.nodes.map((n) => ({ x: n.x, y: n.y, z: 0 })), spec);
   }, [floor.roof, floor.nodes, spec.kind, spec.yaw, spec.top]);
 
+  const interiorFloors = useMemo(() => {
+    const house = asFloorFinish(settings.floorFinishId);
+    return listInteriorFloors(floor.nodes, floor.walls, floor.rooms, house).map((rf) => ({
+      ...rf,
+      pts: projectPoints(rf.poly.map((p) => ({ x: p.x, y: p.y, z: 0.04 })), spec),
+    }));
+  }, [floor.nodes, floor.walls, floor.rooms, settings.floorFinishId, spec.kind, spec.yaw, spec.top]);
+
   const lidPoly = useMemo(() => {
     const outline = floor.roof?.outline;
     if (outline && outline.length >= 3) return projectPoints(outline.map((p) => ({ x: p.x, y: p.y, z: WALL_H })), spec);
     return [];
   }, [floor.roof, spec.kind, spec.yaw, spec.top]);
 
-  const wallFaces = useMemo(() => {
-    const faces: WallFace[] = [];
+  const sceneFaces = useMemo(() => {
+    const originPts = floor.roof?.outline && floor.roof.outline.length >= 3
+      ? floor.roof.outline
+      : floor.nodes;
+    let ox = 0;
+    let oy = 0;
+    if (originPts.length) {
+      for (const p of originPts) {
+        ox += p.x;
+        oy += p.y;
+      }
+      ox /= originPts.length;
+      oy /= originPts.length;
+    }
+
+    const faces: SceneFace[] = [];
+    const cutAway = new Set<string>();
+    const ink = blocky ? '#1a1208' : (light ? '#2a2a32' : '#c5d0ea');
+    const furnInk = blocky ? '#1a1208' : '#3f3f46';
+    const swWall = (sel: boolean) => (sel ? 3 : (blocky ? 2.5 : 1.25)) / zoom;
+    const swFurn = (sel: boolean) => (sel ? 2 : (blocky ? 2 : 1)) / zoom;
+
     for (const w of floor.walls) {
       const e = wallEnds(w, floor.nodes);
       if (!e) continue;
+      const mx = (e.a.x + e.b.x) / 2;
+      const my = (e.a.y + e.b.y) / 2;
+      if (shouldCutawayWall(mx, my, ox, oy, spec)) {
+        cutAway.add(w.id);
+        continue;
+      }
       const texId = w.finishId || houseTex;
+      const useTex = texId && texId !== 'pack:plain' ? texId : null;
+      const sel = selected?.kind === 'wall' && selected.id === w.id;
+      const fill = textureStrokeFallback(useTex) ?? (w.kind === 'exterior'
+        ? (light ? '#d8dce8' : '#3a4560')
+        : (light ? '#ece4d4' : '#4a4034'));
+      const tile = useTex ? tiles.get(useTex) : undefined;
       faces.push({
-        wall: w,
-        depth: painterDepth((e.a.x + e.b.x) / 2, (e.a.y + e.b.y) / 2, spec),
-        points: projectPoints([
+        key: `w-${w.id}`,
+        pts: projectPoints([
           { x: e.a.x, y: e.a.y, z: 0 },
           { x: e.b.x, y: e.b.y, z: 0 },
           { x: e.b.x, y: e.b.y, z: WALL_H },
           { x: e.a.x, y: e.a.y, z: WALL_H },
         ], spec),
-        texId: texId && texId !== 'pack:plain' ? texId : null,
+        fill,
+        pattern: tile,
+        stroke: sel ? '#6e72f5' : ink,
+        sw: swWall(sel),
+        depth: cameraDepth(mx, my, spec),
+        pick: () => setSelected({ kind: 'wall', id: w.id }),
       });
     }
+
+    for (const o of floor.openings) {
+      const wall = floor.walls.find((w) => w.id === o.wallId);
+      if (!wall || cutAway.has(wall.id)) continue;
+      const e = wallEnds(wall, floor.nodes);
+      if (!e) continue;
+      const dx = e.b.x - e.a.x;
+      const dy = e.b.y - e.a.y;
+      const len = Math.max(0.01, Math.hypot(dx, dy));
+      const t0 = o.t - o.width / (2 * len);
+      const t1 = o.t + o.width / (2 * len);
+      const z0 = o.type === 'door' ? 0 : 3;
+      const z1 = o.type === 'door' ? 7 : 6.5;
+      const a = { x: e.a.x + dx * t0, y: e.a.y + dy * t0 };
+      const b = { x: e.a.x + dx * t1, y: e.a.y + dy * t1 };
+      const sel = selected?.kind === 'opening' && selected.id === o.id;
+      faces.push({
+        key: `o-${o.id}`,
+        pts: projectPoints([
+          { x: a.x, y: a.y, z: z0 },
+          { x: b.x, y: b.y, z: z0 },
+          { x: b.x, y: b.y, z: z1 },
+          { x: a.x, y: a.y, z: z1 },
+        ], spec),
+        fill: o.type === 'door' ? (light ? '#8b5a2b' : '#6b4220') : (light ? '#b9d7ee' : '#3d6a88'),
+        stroke: sel ? '#6e72f5' : '#1a1a1a',
+        sw: (sel ? 2.5 : 1) / zoom,
+        depth: cameraDepth((a.x + b.x) / 2, (a.y + b.y) / 2, spec) + 0.08,
+        pick: () => setSelected({ kind: 'opening', id: o.id }),
+      });
+    }
+
+    const lod = furnLod;
+    for (const f of floor.furniture.slice(0, FURN_CAP[lod])) {
+      const sel = selected?.kind === 'furniture' && selected.id === f.id;
+      const parts = furnitureParts(f, lod);
+      let fi = 0;
+      const pick = () => setSelected({ kind: 'furniture', id: f.id });
+      for (const part of parts) {
+        const ring = lod === 'simple' ? partWorldCorners(f, part) : partWorldRing(f, part);
+        if (ring.length < 3) continue;
+        const cx = ring.reduce((s, p) => s + p.x, 0) / ring.length;
+        const cy = ring.reduce((s, p) => s + p.y, 0) / ring.length;
+        faces.push({
+          key: `f-${f.id}-${fi++}`,
+          pts: projectPoints(ring.map((c) => ({ x: c.x, y: c.y, z: part.z1 })), spec),
+          fill: sel ? '#c5c7ff' : part.fill,
+          stroke: sel ? '#6e72f5' : furnInk,
+          sw: swFurn(sel),
+          depth: cameraDepth(cx, cy, spec) + part.z1 * 0.04,
+          name: 'doll-furn',
+          pick,
+        });
+        if (lod === 'simple' || part.z1 - part.z0 < 0.1) continue;
+        for (let i = 0; i < ring.length; i++) {
+          const j = (i + 1) % ring.length;
+          const a = ring[i];
+          const b = ring[j];
+          if (!isCameraFacingSide(a.x, a.y, b.x, b.y, cx, cy, spec)) continue;
+          faces.push({
+            key: `f-${f.id}-${fi++}`,
+            pts: projectPoints([
+              { x: a.x, y: a.y, z: part.z0 },
+              { x: b.x, y: b.y, z: part.z0 },
+              { x: b.x, y: b.y, z: part.z1 },
+              { x: a.x, y: a.y, z: part.z1 },
+            ], spec),
+            fill: sel ? '#c5c7ff' : part.fill,
+            stroke: sel ? '#6e72f5' : furnInk,
+            sw: swFurn(sel),
+            depth: cameraDepth((a.x + b.x) / 2, (a.y + b.y) / 2, spec) + (part.z0 + part.z1) * 0.02,
+            name: 'doll-furn',
+            pick,
+          });
+        }
+      }
+    }
+
     faces.sort((a, b) => a.depth - b.depth);
     return faces;
-  }, [floor.walls, floor.nodes, houseTex, spec.kind, spec.yaw, spec.top]);
+  }, [
+    floor.walls, floor.nodes, floor.openings, floor.furniture, floor.roof,
+    houseTex, tiles, spec.kind, spec.yaw, spec.top, selected, light, blocky, zoom, furnLod, setSelected,
+  ]);
 
   const screenToWorld = (sx: number, sy: number) => {
     const ix = (sx - pan.x) / zoom;
@@ -289,11 +420,6 @@ export function DollhouseCanvas() {
     last.current = null;
   };
 
-  const pickWall = (id: string) => (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
-    e.cancelBubble = true;
-    setSelected({ kind: 'wall', id });
-  };
-
   return (
     <div ref={wrapRef} className="plan-canvas dollhouse-canvas" style={{ touchAction: 'none' }}>
       <Stage
@@ -329,7 +455,24 @@ export function DollhouseCanvas() {
             height={8000}
             fill={light ? '#e8edf2' : '#121820'}
           />
-          {floorPoly.length >= 6 && (
+          {interiorFloors.length
+            ? interiorFloors.map((rf, i) => (
+              <Line
+                key={`if-${i}`}
+                name="doll-floor"
+                points={rf.pts}
+                closed
+                fill={floorFinish(rf.finish).color}
+                fillPatternImage={furnLod === 'full' ? floorTileCanvas(rf.finish, asFloorGrain(settings.floorGrain)) as CanvasImageSource as HTMLImageElement : undefined}
+                fillPatternRepeat="repeat"
+                fillPriority={furnLod === 'full' ? 'pattern' : 'color'}
+                fillPatternScaleX={0.04}
+                fillPatternScaleY={0.04}
+                stroke={blocky ? '#1a1208' : (light ? '#9aa890' : '#6d7a62')}
+                strokeWidth={(blocky ? 3 : 1.5) / zoom}
+              />
+            ))
+            : floorPoly.length >= 6 && (
             <Line
               name="doll-floor"
               points={floorPoly}
@@ -344,7 +487,7 @@ export function DollhouseCanvas() {
               strokeWidth={(blocky ? 3 : 1.5) / zoom}
             />
           )}
-          {(floor.rooms ?? []).map((r) => {
+          {!interiorFloors.length && (floor.rooms ?? []).map((r) => {
             if (r.kind === 'outdoor') return null;
             const poly = roomPolygon(r, floor.nodes, floor.walls);
             if (!poly || poly.length < 3) return null;
@@ -378,126 +521,33 @@ export function DollhouseCanvas() {
               listening={false}
             />
           )}
-          {wallFaces.map((face) => {
-            const sel = selected?.kind === 'wall' && selected.id === face.wall.id;
-            const fill = textureStrokeFallback(face.texId) ?? (face.wall.kind === 'exterior'
-              ? (light ? '#d8dce8' : '#3a4560')
-              : (light ? '#ece4d4' : '#4a4034'));
-            const tile = face.texId ? tiles.get(face.texId) : undefined;
+          {sceneFaces.map((face) => {
+            const tile = face.pattern;
             return (
               <Line
-                key={face.wall.id}
-                points={face.points}
+                key={face.key}
+                name={face.name}
+                points={face.pts}
                 closed
-                fill={fill}
+                fill={face.fill}
                 fillPatternImage={tile as CanvasImageSource as HTMLImageElement}
                 fillPatternRepeat="repeat"
                 fillPriority={tile ? 'pattern' : 'color'}
                 fillPatternScaleX={tile ? 0.22 : 1}
                 fillPatternScaleY={tile ? 0.22 : 1}
-                stroke={sel ? '#6e72f5' : (blocky ? '#1a1208' : (light ? '#2a2a32' : '#c5d0ea'))}
-                strokeWidth={(sel ? 3 : (blocky ? 2.5 : 1.25)) / zoom}
-                onClick={pickWall(face.wall.id)}
-                onTap={pickWall(face.wall.id)}
-              />
-            );
-          })}
-          {floor.openings.map((o) => {
-            const wall = floor.walls.find((w) => w.id === o.wallId);
-            if (!wall) return null;
-            const e = wallEnds(wall, floor.nodes);
-            if (!e) return null;
-            const dx = e.b.x - e.a.x;
-            const dy = e.b.y - e.a.y;
-            const len = Math.max(0.01, Math.hypot(dx, dy));
-            const t0 = o.t - o.width / (2 * len);
-            const t1 = o.t + o.width / (2 * len);
-            const z0 = o.type === 'door' ? 0 : 3;
-            const z1 = o.type === 'door' ? 7 : 6.5;
-            const a = { x: e.a.x + dx * t0, y: e.a.y + dy * t0 };
-            const b = { x: e.a.x + dx * t1, y: e.a.y + dy * t1 };
-            const sel = selected?.kind === 'opening' && selected.id === o.id;
-            return (
-              <Line
-                key={o.id}
-                points={projectPoints([
-                  { x: a.x, y: a.y, z: z0 },
-                  { x: b.x, y: b.y, z: z0 },
-                  { x: b.x, y: b.y, z: z1 },
-                  { x: a.x, y: a.y, z: z1 },
-                ], spec)}
-                closed
-                fill={o.type === 'door' ? (light ? '#8b5a2b' : '#6b4220') : (light ? '#b9d7ee' : '#3d6a88')}
-                stroke={sel ? '#6e72f5' : '#1a1a1a'}
-                strokeWidth={(sel ? 2.5 : 1) / zoom}
+                stroke={face.stroke}
+                strokeWidth={face.sw}
                 onClick={(evt) => {
+                  if (!face.pick) return;
                   evt.cancelBubble = true;
-                  setSelected({ kind: 'opening', id: o.id });
+                  face.pick();
                 }}
                 onTap={(evt) => {
+                  if (!face.pick) return;
                   evt.cancelBubble = true;
-                  setSelected({ kind: 'opening', id: o.id });
+                  face.pick();
                 }}
               />
-            );
-          })}
-          {floor.furniture.slice(0, FURN_CAP[furnLod]).map((f) => {
-            const sel = selected?.kind === 'furniture' && selected.id === f.id;
-            const lod = furnLod;
-            const faces: { pts: number[]; fill: string; depth: number }[] = [];
-            const parts = furnitureParts(f, lod);
-            for (const part of parts) {
-              const ring = lod === 'simple' ? partWorldCorners(f, part) : partWorldRing(f, part);
-              if (ring.length < 3) continue;
-              const cx = ring.reduce((s, p) => s + p.x, 0) / ring.length;
-              const cy = ring.reduce((s, p) => s + p.y, 0) / ring.length;
-              faces.push({
-                pts: projectPoints(ring.map((c) => ({ x: c.x, y: c.y, z: part.z1 })), spec),
-                fill: sel ? '#c5c7ff' : part.fill,
-                depth: painterDepth(cx, cy, spec) + part.z1 * 0.04,
-              });
-              if (lod === 'simple' || part.z1 - part.z0 < 0.1) continue;
-              for (let i = 0; i < ring.length; i++) {
-                const j = (i + 1) % ring.length;
-                const a = ring[i];
-                const b = ring[j];
-                faces.push({
-                  pts: projectPoints([
-                    { x: a.x, y: a.y, z: part.z0 },
-                    { x: b.x, y: b.y, z: part.z0 },
-                    { x: b.x, y: b.y, z: part.z1 },
-                    { x: a.x, y: a.y, z: part.z1 },
-                  ], spec),
-                  fill: sel ? '#c5c7ff' : part.fill,
-                  depth: painterDepth((a.x + b.x) / 2, (a.y + b.y) / 2, spec) + (part.z0 + part.z1) * 0.02,
-                });
-              }
-            }
-            faces.sort((a, b) => a.depth - b.depth);
-            return (
-              <Group
-                key={f.id}
-                name="doll-furn"
-                onClick={(evt) => {
-                  evt.cancelBubble = true;
-                  setSelected({ kind: 'furniture', id: f.id });
-                }}
-                onTap={(evt) => {
-                  evt.cancelBubble = true;
-                  setSelected({ kind: 'furniture', id: f.id });
-                }}
-              >
-                {faces.map((face, i) => (
-                  <Line
-                    key={i}
-                    points={face.pts}
-                    closed
-                    fill={face.fill}
-                    stroke={sel ? '#6e72f5' : (blocky ? '#1a1208' : '#3f3f46')}
-                    strokeWidth={(sel ? 2 : (blocky ? 2 : 1)) / zoom}
-                  />
-                ))}
-              </Group>
             );
           })}
           {(floor.landscape ?? []).filter((L) => L.kind === 'tree').map((L) => {

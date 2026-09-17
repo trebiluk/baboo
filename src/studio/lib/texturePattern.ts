@@ -139,6 +139,107 @@ export function packTileCanvas(textureId: string): HTMLCanvasElement | null {
       drawPaw(48, 48, 0.7);
       break;
     }
+    case 'pack:linen': {
+      ctx.fillStyle = '#EDE6D6';
+      ctx.fillRect(0, 0, S, S);
+      ctx.strokeStyle = '#D8CEBA';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < S; x += 4) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, S); ctx.stroke();
+      }
+      ctx.strokeStyle = '#E0D6C4';
+      for (let y = 0; y < S; y += 4) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(S, y); ctx.stroke();
+      }
+      break;
+    }
+    case 'pack:wainscot': {
+      ctx.fillStyle = '#F4F0E8';
+      ctx.fillRect(0, 0, S, S);
+      ctx.fillStyle = '#E8DCC8';
+      ctx.fillRect(0, S * 0.55, S, S * 0.45);
+      ctx.fillStyle = '#C4B49A';
+      ctx.fillRect(0, S * 0.52, S, 3);
+      ctx.strokeStyle = '#C4B49A';
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(6, S * 0.58, S - 12, S * 0.34);
+      break;
+    }
+    case 'pack:subway': {
+      ctx.fillStyle = '#C8D0D8';
+      ctx.fillRect(0, 0, S, S);
+      const tw = 20;
+      const th = 10;
+      for (let row = 0; row < 8; row++) {
+        const y = row * th;
+        const off = row % 2 ? tw / 2 : 0;
+        for (let x = -tw; x < S; x += tw) {
+          ctx.fillStyle = '#F4F6F8';
+          ctx.fillRect(x + off + 1, y + 1, tw - 2, th - 2);
+        }
+      }
+      break;
+    }
+    case 'pack:plaster': {
+      ctx.fillStyle = '#E8D8C0';
+      ctx.fillRect(0, 0, S, S);
+      ctx.fillStyle = '#F0E4D0';
+      for (let i = 0; i < 24; i++) {
+        ctx.beginPath();
+        ctx.arc((i * 13) % S, (i * 17) % S, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      break;
+    }
+    case 'pack:wood-panel': {
+      ctx.fillStyle = '#C4A074';
+      ctx.fillRect(0, 0, S, S);
+      const plank = 16;
+      for (let x = 0; x < S; x += plank) {
+        ctx.fillStyle = x % (plank * 2) ? '#D4B888' : '#B89058';
+        ctx.fillRect(x, 0, plank - 2, S);
+        ctx.strokeStyle = '#8B6914';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(x + plank - 1, 0);
+        ctx.lineTo(x + plank - 1, S);
+        ctx.stroke();
+      }
+      break;
+    }
+    case 'pack:grasscloth': {
+      ctx.fillStyle = '#D4C4A0';
+      ctx.fillRect(0, 0, S, S);
+      for (let y = 0; y < S; y += 3) {
+        ctx.strokeStyle = y % 6 ? '#C4B490' : '#E0D4B4';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(S, y + (y % 2 ? 1 : -1));
+        ctx.stroke();
+      }
+      break;
+    }
+    case 'pack:stripe': {
+      ctx.fillStyle = '#D6E4F0';
+      ctx.fillRect(0, 0, S, S);
+      ctx.fillStyle = '#B6C8DC';
+      for (let x = 8; x < S; x += 16) ctx.fillRect(x, 0, 8, S);
+      break;
+    }
+    case 'pack:dots': {
+      ctx.fillStyle = '#F5EDE0';
+      ctx.fillRect(0, 0, S, S);
+      ctx.fillStyle = '#C4A074';
+      for (let y = 8; y < S; y += 16) {
+        for (let x = 8; x < S; x += 16) {
+          ctx.beginPath();
+          ctx.arc(x, y, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      break;
+    }
     default:
       ctx.fillStyle = '#6366f1';
       ctx.fillRect(0, 0, S, S);
@@ -207,6 +308,22 @@ export function textureStrokeFallback(textureId: string | null | undefined): str
       return '#22d3ee';
     case 'pack:paw':
       return '#e85820';
+    case 'pack:linen':
+      return '#D8CEBA';
+    case 'pack:wainscot':
+      return '#C4B49A';
+    case 'pack:subway':
+      return '#C8D0D8';
+    case 'pack:plaster':
+      return '#E8D8C0';
+    case 'pack:wood-panel':
+      return '#8B6914';
+    case 'pack:grasscloth':
+      return '#C4B490';
+    case 'pack:stripe':
+      return '#B6C8DC';
+    case 'pack:dots':
+      return '#C4A074';
     case 'import:local':
       return '#6366f1';
     default:

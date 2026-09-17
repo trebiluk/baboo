@@ -2449,6 +2449,11 @@ html.aw-teaching-open, body.aw-teaching-open {
   outline:2px solid var(--aw-royal);
   outline-offset:1px
 }
+.object-menu-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px
+}
 .object-del {
   border:1px solid var(--aw-border);
   min-height:32px;

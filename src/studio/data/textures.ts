@@ -11,6 +11,14 @@ export type TexturePackId =
   | 'pack:brick-joke'
   | 'pack:starry'
   | 'pack:paw'
+  | 'pack:linen'
+  | 'pack:wainscot'
+  | 'pack:subway'
+  | 'pack:plaster'
+  | 'pack:wood-panel'
+  | 'pack:grasscloth'
+  | 'pack:stripe'
+  | 'pack:dots'
   | 'import:local';
 
 export type TextureDef = {
@@ -78,6 +86,54 @@ export const TEXTURE_PACKS: TextureDef[] = [
       'radial-gradient(circle at 58% 28%, #e85820 0 2.5px, transparent 3.5px),' +
       'radial-gradient(circle at 52% 22%, #e85820 0 2px, transparent 3px),' +
       'linear-gradient(135deg, #0b1a40, #132a5c)',
+  },
+  {
+    id: 'pack:linen',
+    name: 'Linen',
+    blurb: 'Soft woven cream — calm classroom walls.',
+    previewCss: 'repeating-linear-gradient(90deg,#EDE6D6 0 3px,#E0D6C4 3px 4px),repeating-linear-gradient(0deg,#EDE6D6 0 3px,#D8CEBA 3px 4px)',
+  },
+  {
+    id: 'pack:wainscot',
+    name: 'Wainscot',
+    blurb: 'Painted panels with a chair rail.',
+    previewCss: 'linear-gradient(180deg,#F4F0E8 0 55%,#C4B49A 55% 58%,#E8DCC8 58%)',
+  },
+  {
+    id: 'pack:subway',
+    name: 'Subway tile',
+    blurb: 'White kitchen tiles with thin grout.',
+    previewCss: 'repeating-linear-gradient(0deg,#F4F6F8 0 10px,#C8D0D8 10px 12px),repeating-linear-gradient(90deg,#F4F6F8 0 18px,#C8D0D8 18px 20px)',
+  },
+  {
+    id: 'pack:plaster',
+    name: 'Plaster',
+    blurb: 'Warm limewash speckle.',
+    previewCss: 'radial-gradient(circle at 30% 40%,#F0E4D0 0 6px,transparent 7px),#E8D8C0',
+  },
+  {
+    id: 'pack:wood-panel',
+    name: 'Wood panel',
+    blurb: 'Vertical grain boards.',
+    previewCss: 'repeating-linear-gradient(90deg,#C4A074 0 10px,#8B6914 10px 12px,#D4B888 12px 22px)',
+  },
+  {
+    id: 'pack:grasscloth',
+    name: 'Grasscloth',
+    blurb: 'Horizontal fiber weave.',
+    previewCss: 'repeating-linear-gradient(0deg,#D4C4A0 0 3px,#C4B490 3px 4px,#E0D4B4 4px 7px)',
+  },
+  {
+    id: 'pack:stripe',
+    name: 'Stripe',
+    blurb: 'Soft blue vertical stripes.',
+    previewCss: 'repeating-linear-gradient(90deg,#D6E4F0 0 8px,#B6C8DC 8px 16px)',
+  },
+  {
+    id: 'pack:dots',
+    name: 'Dots',
+    blurb: 'Quiet polka on cream.',
+    previewCss: 'radial-gradient(circle at 8px 8px,#C4A074 0 2px,transparent 3px),#F5EDE0',
   },
 ];
 

@@ -1,5 +1,6 @@
-import type { Node, Point, Room, Wall } from '../types';
+import type { FloorFinishId, Node, Point, Room, Wall } from '../types';
 import { dist } from './geometry';
+import { insetPoly, loopHalfWidth } from './wallJoin';
 
 export type Face = { poly: Point[]; area: number };
 
@@ -195,3 +196,28 @@ export function polyPoints(poly: Point[]): number[] {
   for (const p of poly) pts.push(p.x, p.y);
   return pts;
 }
+
+/** Closed-room floors, inset to the inner wall face. Outdoor rooms are skipped. */
+export function listInteriorFloors(
+  nodes: Node[],
+  walls: Wall[],
+  rooms: Room[] | undefined,
+  houseFinish: FloorFinishId,
+): { poly: Point[]; finish: FloorFinishId }[] {
+  const faces = listInteriorFaces(nodes, walls);
+  const out: { poly: Point[]; finish: FloorFinishId }[] = [];
+  for (const f of faces) {
+    const room = (rooms ?? []).find((r) => pointInPoly({ x: r.x, y: r.y }, f.poly));
+    if (room?.kind === 'outdoor') continue;
+    const hw = loopHalfWidth(f.poly, nodes, walls);
+    const inset = insetPoly(f.poly, Math.max(0.08, hw * 0.92));
+    if (inset.length < 3) continue;
+    const area = Math.abs(signedArea(inset));
+    if (area < 2) continue;
+    const finish = (room?.floorFinishId ?? houseFinish) as FloorFinishId;
+    if (!finish) continue;
+    out.push({ poly: inset, finish });
+  }
+  return out;
+}
+

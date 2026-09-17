@@ -36,6 +36,38 @@ const WATER = '#7EB3D4';
 const CHROME = '#D0D8E0';
 const KNOB = '#D4C4A0';
 
+const PAINTABLE = new Set([WOOD, WOOD_LT, WOOD_DK, LINEN, BLANKET, UPH, UPH_DK, UPH_LT, PILLOW]);
+
+function hexRgb(hex: string): [number, number, number] {
+  const n = hex.replace('#', '');
+  const full = n.length === 3 ? n.split('').map((c) => c + c).join('') : n;
+  return [parseInt(full.slice(0, 2), 16), parseInt(full.slice(2, 4), 16), parseInt(full.slice(4, 6), 16)];
+}
+function rgbHex(r: number, g: number, b: number): string {
+  const h = (n: number) => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, '0');
+  return `#${h(r)}${h(g)}${h(b)}`;
+}
+function shadeHex(hex: string, k: number): string {
+  const [r, g, b] = hexRgb(hex);
+  if (k >= 1) {
+    const t = Math.min(1, k - 1);
+    return rgbHex(r + (255 - r) * t, g + (255 - g) * t, b + (255 - b) * t);
+  }
+  return rgbHex(r * k, g * k, b * k);
+}
+
+function paintFurnParts(parts: FurnPart[], color?: string | null): FurnPart[] {
+  if (!color) return parts;
+  const any = parts.some((p) => PAINTABLE.has(p.fill));
+  if (!any) return parts;
+  return parts.map((p) => {
+    if (!PAINTABLE.has(p.fill)) return p;
+    if (p.fill === WOOD_DK || p.fill === UPH_DK || p.fill === BLANKET) return { ...p, fill: shadeHex(color, 0.72) };
+    if (p.fill === WOOD_LT || p.fill === UPH_LT || p.fill === LINEN || p.fill === PILLOW) return { ...p, fill: shadeHex(color, 1.22) };
+    return { ...p, fill: color };
+  });
+}
+
 function box(lx: number, ly: number, lw: number, lh: number, z0: number, z1: number, fill: string): FurnPart {
   return { lx, ly, lw, lh, z0, z1, fill, shape: 'box' };
 }
@@ -60,7 +92,11 @@ function legs(w: number, h: number, inset: number, thick: number, z1: number, fi
 }
 
 export function furnitureParts(item: FurnitureItem, lod: FurnLod = 'full'): FurnPart[] {
-  if (lod === 'simple') return furnitureSilhouette(item);
+  const raw = lod === 'simple' ? furnitureSilhouette(item) : furniturePartsFull(item);
+  return paintFurnParts(raw, item.color);
+}
+
+function furniturePartsFull(item: FurnitureItem): FurnPart[] {
   const w = Math.max(0.4, item.w || 2);
   const h = Math.max(0.4, item.h || 2);
   const id = item.catalogId;

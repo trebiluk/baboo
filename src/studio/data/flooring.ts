@@ -14,7 +14,9 @@ export type FloorFinishId =
   | 'checker'
   | 'slate'
   | 'terracotta'
-  | 'brick';
+  | 'brick'
+  | 'cork'
+  | 'marble';
 
 export type FloorGrain = 0 | 90;
 
@@ -42,6 +44,8 @@ export const FLOOR_FINISHES: FloorFinish[] = [
   { id: 'slate', name: 'Slate', blurb: 'Blue-gray stone — entry or bath.', color: '#6A7480', previewCss: 'repeating-linear-gradient(0deg,#6A7480 0 10px,#4A5460 10px 12px,#8A94A0 12px 22px)' },
   { id: 'terracotta', name: 'Terracotta', blurb: 'Warm clay tiles.', color: '#C47850', previewCss: 'repeating-linear-gradient(0deg,#C47850 0 14px,#A05838 14px 16px),repeating-linear-gradient(90deg,#C47850 0 14px,#A05838 14px 16px)' },
   { id: 'brick', name: 'Brick paver', blurb: 'Entry or porch pavers.', color: '#B07058', previewCss: 'repeating-linear-gradient(0deg,#B07058 0 8px,#8A5040 8px 10px)' },
+  { id: 'cork', name: 'Cork', blurb: 'Warm speckled sheets — classroom quiet.', color: '#C4A068', previewCss: 'radial-gradient(circle at 20% 30%,#D4B078 0 3px,transparent 4px),radial-gradient(circle at 70% 60%,#A88848 0 2px,transparent 3px),#C4A068' },
+  { id: 'marble', name: 'Marble', blurb: 'Soft veined stone — entry or bath.', color: '#E8E4DC', previewCss: 'linear-gradient(120deg,#F4F0E8 0 40%,#D0CCC4 42%,#F4F0E8 50%,#C8C4BC 70%,#E8E4DC 100%)' },
 ];
 
 const BY_ID = new Map(FLOOR_FINISHES.map((f) => [f.id, f]));
@@ -282,6 +286,39 @@ function paintFloor(ctx: CanvasRenderingContext2D, id: FloorFinishId, S: number)
           ctx.fillRect(x + off + 1, y + 1, 30, rowH - 2);
         }
       }
+      break;
+    }
+    case 'cork': {
+      ctx.fillStyle = '#C4A068';
+      ctx.fillRect(0, 0, S, S);
+      const dots = ['#D4B078', '#A88848', '#E0C490', '#8A6A38'];
+      for (let i = 0; i < 90; i++) {
+        ctx.fillStyle = dots[i % dots.length];
+        ctx.beginPath();
+        ctx.arc((i * 11) % S, (i * 19) % S, 1.6 + (i % 3) * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      break;
+    }
+    case 'marble': {
+      ctx.fillStyle = '#E8E4DC';
+      ctx.fillRect(0, 0, S, S);
+      ctx.strokeStyle = '#C8C4BC';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(2, 10);
+      ctx.bezierCurveTo(18, 4, 28, 22, 60, 14);
+      ctx.moveTo(4, 40);
+      ctx.bezierCurveTo(22, 28, 36, 52, 62, 44);
+      ctx.moveTo(0, 56);
+      ctx.bezierCurveTo(16, 48, 40, 62, 64, 54);
+      ctx.stroke();
+      ctx.strokeStyle = '#D8D4CC';
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(8, 20);
+      ctx.bezierCurveTo(24, 16, 40, 30, 58, 22);
+      ctx.stroke();
       break;
     }
   }

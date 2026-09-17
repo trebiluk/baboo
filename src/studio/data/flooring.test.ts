@@ -10,8 +10,10 @@ describe('flooring', () => {
     assert.equal(isFloorFinish('herringbone'), true);
     assert.equal(isFloorFinish('slate'), true);
     assert.equal(isFloorFinish('terracotta'), true);
+    assert.equal(isFloorFinish('cork'), true);
+    assert.equal(isFloorFinish('marble'), true);
     assert.equal(asFloorFinish('nope'), 'oak');
-    assert.equal(FLOOR_FINISHES.length >= 14, true);
+    assert.equal(FLOOR_FINISHES.length >= 16, true);
   });
 
   it('grain is 0 or 90', () => {

@@ -417,6 +417,26 @@ function FloorSvgPattern({ id, grain }: { id: FloorFinishId; grain: 0 | 90 }) {
       </pattern>
     );
   }
+  if (id === 'cork') {
+    return (
+      <pattern {...common}>
+        <rect width="32" height="32" fill="#C4A068" />
+        <circle cx="8" cy="10" r="2.2" fill="#D4B078" />
+        <circle cx="20" cy="8" r="1.6" fill="#A88848" />
+        <circle cx="14" cy="22" r="2" fill="#E0C490" />
+        <circle cx="26" cy="20" r="1.4" fill="#8A6A38" />
+      </pattern>
+    );
+  }
+  if (id === 'marble') {
+    return (
+      <pattern {...common}>
+        <rect width="32" height="32" fill="#E8E4DC" />
+        <path d="M2 8 C12 4 18 16 30 10" stroke="#C8C4BC" strokeWidth="1.2" fill="none" />
+        <path d="M0 22 C10 16 20 28 32 24" stroke="#D8D4CC" strokeWidth="1" fill="none" />
+      </pattern>
+    );
+  }
   return (
     <pattern {...common}>
       <rect width="32" height="32" fill="#A8B0B8" />

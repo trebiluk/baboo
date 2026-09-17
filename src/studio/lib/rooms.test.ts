@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { Node, Wall } from '../types.ts';
-import { findEnclosedFace, listInteriorFaces, polygonArea } from './rooms.ts';
+import { findEnclosedFace, listInteriorFaces, listInteriorFloors, polygonArea } from './rooms.ts';
 
 function rect(w: number, h: number): { nodes: Node[]; walls: Wall[] } {
   const nodes: Node[] = [
@@ -74,4 +74,19 @@ test('hexagon with two 45° corners is one room', () => {
   const poly = findEnclosedFace(nodes, walls, { x: 6, y: 5 });
   assert.ok(poly);
   assert.equal(poly!.length, 6);
+});
+
+test('interior floors inset a closed room and skip outdoor', () => {
+  const { nodes, walls } = rect(12, 10);
+  const floors = listInteriorFloors(nodes, walls, [
+    { id: 'r1', kind: 'kitchen', name: 'Kitchen', x: 6, y: 5, floorFinishId: 'tile' },
+  ], 'oak');
+  assert.equal(floors.length, 1);
+  assert.equal(floors[0].finish, 'tile');
+  const xs = floors[0].poly.map((p) => p.x);
+  assert.ok(Math.min(...xs) > 0.15);
+  const outdoor = listInteriorFloors(nodes, walls, [
+    { id: 'r1', kind: 'outdoor', name: 'Yard', x: 6, y: 5 },
+  ], 'oak');
+  assert.equal(outdoor.length, 0);
 });

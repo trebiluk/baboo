@@ -318,8 +318,16 @@ export const STR: Record<string, Gloss> = {
     cu: 'Arrastra la cuadrícula vacía. Toca una pared para moverla.',
     uk: 'Тягни порожню сітку, щоб дивитись. Торкнись стіни, щоб посунути.',
     ru: 'Тяни пустую сетку, чтобы смотреть. Нажми стену, чтобы сдвинуть.',
-    ti: 'ነቲ ባዶ መርበብ ስሓብ። ነቲ መንደቕ ንምንቅስቓስ ጠውቕ።',
-    fa: 'شبکهٔ خالی را بکش تا نگاه کنی. دیوار را بزن تا جابه‌جا شود.',
+    ti: 'ነቲ ባዶ መስመር ስሓብ. ንመንደቕ ንምንቅስቓስ ንካእቶ።',
+    fa: 'شبکه خالی را بکش. برای جابه‌جا کردن، دیوار را بزن.',
+  }),
+  'hint.select.wall': g('Squares on the ends stretch the wall. Drag the middle to slide it. Sizes are on the right.', {
+    es: 'Los cuadros en los extremos estiran el muro. El centro lo desliza. Las medidas están a la derecha.',
+    cu: 'Los cuadros en los extremos estiran la pared. El centro la desliza. Las medidas están a la derecha.',
+    uk: 'Квадрати на кінцях тягнуть стіну. Середина зсуває. Розміри справа.',
+    ru: 'Квадраты на концах тянут стену. Середина сдвигает. Размеры справа.',
+    ti: 'ኣብ ጫፍ ዘለዉ ትርብዑ ንመንደቕ ይስሕቡ. ማእከል የንቀሳቕሶ። መጠን ኣብ የማን እዩ።',
+    fa: 'مربع‌های دو سر دیوار را می‌کشند. وسط آن را جابه‌جا می‌کند. اندازه‌ها سمت راست است.',
   }),
   'hint.select.short': g('Drag the grid to look around · tap to select', {
     es: 'Arrastra la cuadrícula · toca para elegir',
@@ -397,7 +405,7 @@ export const STR: Record<string, Gloss> = {
   'doll.turn.right': g('Turn right', {
     es: 'Girar a la derecha', cu: 'Girar a la derecha', uk: 'Повернути праворуч', ru: 'Повернуть вправо', ti: 'ናብ የማን ኣዘውር', fa: 'بچرخان به راست',
   }),
-  'doll.lesson.iso': g('Isometric: all three axes. Turn the house — height stays true. This is a 3/4 view, not a photo.', {
+  'doll.lesson.iso': g('Isometric: all three axes. Turn the house — height stays true. Near walls open so beds stay in the room.', {
     es: 'Isométrica: tres ejes. Gira la casa — la altura queda verdadera. Es una vista 3/4, no una foto.',
     cu: 'Isométrica: tres ejes. Gira la casa — la altura queda verdadera. Es una vista 3/4, no una foto.',
     uk: 'Ізометрія: три осі. Поверни будинок — висота правдива. Це вид 3/4, не фото.',
@@ -493,6 +501,30 @@ export const STR: Record<string, Gloss> = {
     ru: 'Сначала эскиз, потом Обвести',
     ti: 'መጀመርታ ስእሊ፣ ድሕሪኡ ቀጥታ',
     fa: 'اول طرح، بعد خط‌کشی',
+  }),
+  'toast.traceNeed': g('Draw the outline a bit bigger, then Trace', {
+    es: 'Dibuja el contorno un poco más grande, luego Traza',
+    cu: 'Dibuja el contorno un poco más grande, luego Traza',
+    uk: 'Намалюй контур трохи більшим, потім Обведи',
+    ru: 'Нарисуй контур чуть больше, потом Обведи',
+    ti: 'ነቲ ዝርዝር ቁሩብ ዓቢ ስኣል፣ ድሕሪኡ ቀጥታ ግበር',
+    fa: 'دور خط را کمی بزرگ‌تر بکش، بعد خط‌کشی کن',
+  }),
+  'toast.traceOne': g('Traced 1 wall — sketch stays as an underlay', {
+    es: 'Se trazó 1 muro — el boceto queda debajo',
+    cu: 'Se trazó 1 pared — el boceto queda debajo',
+    uk: 'Обведено 1 стіну — ескіз лишається підкладкою',
+    ru: 'Обведена 1 стена — эскиз остаётся подложкой',
+    ti: '1 መንደቕ ተቀጥታ — ስእሊ ኣብ ታሕቲ ይቕመጥ',
+    fa: '۱ دیوار خط‌کشی شد — طرح زیر آن می‌ماند',
+  }),
+  'toast.traceMany': g('Traced {n} walls — sketch stays as an underlay', {
+    es: 'Se trazaron {n} muros — el boceto queda debajo',
+    cu: 'Se trazaron {n} paredes — el boceto queda debajo',
+    uk: 'Обведено {n} стін — ескіз лишається підкладкою',
+    ru: 'Обведено {n} стен — эскиз остаётся подложкой',
+    ti: '{n} መናድቕ ተቀጥታ — ስእሊ ኣብ ታሕቲ ይቕመጥ',
+    fa: '{n} دیوار خط‌کشی شد — طرح زیر آن می‌ماند',
   }),
   'toast.clipHint': g('Click a sharp corner where two walls meet', {
     es: 'Clic en una esquina aguda donde se juntan dos muros',
@@ -1106,6 +1138,8 @@ export const STR: Record<string, Gloss> = {
   'floor.slate': g('Slate', { es: 'Pizarra', cu: 'Pizarra', uk: 'Сланець', ru: 'Сланец', ti: 'ስሌት', fa: 'سنگ لوح' }),
   'floor.terracotta': g('Terracotta', { es: 'Terracota', cu: 'Terracota', uk: 'Теракота', ru: 'Терракота', ti: 'ቴራኮታ', fa: 'سفال' }),
   'floor.brick': g('Brick paver', { es: 'Ladrillo', cu: 'Ladrillo', uk: 'Цегла', ru: 'Кирпич', ti: 'ሕጡብ', fa: 'آجر' }),
+  'floor.cork': g('Cork', { es: 'Corcho', cu: 'Corcho', uk: 'Корок', ru: 'Пробка', ti: 'ኮርክ', fa: 'چوب‌پنبه' }),
+  'floor.marble': g('Marble', { es: 'Mármol', cu: 'Mármol', uk: 'Мармур', ru: 'Мрамор', ti: 'ማርብል', fa: 'مرمر' }),
   'floor.grain': g('Plank direction', {
     es: 'Dirección de las tablas', cu: 'Dirección de las tablas', uk: 'Напрям дощок', ru: 'Направление досок', ti: 'ኣንፈት ሳንቃ', fa: 'جهت تخته',
   }),
@@ -1479,6 +1513,18 @@ export const STR: Record<string, Gloss> = {
   'scene.site.pad': g('Pad', {
     es: 'Losa', cu: 'Losa', uk: 'Плита', ru: 'Плита', ti: 'ዕንጨይቲ', fa: 'کف‌سازی',
   }),
+  'scene.site.dirt': g('Dirt', {
+    es: 'Tierra', cu: 'Tierra', uk: 'Ґрунт', ru: 'Земля', ti: 'ሓመድ', fa: 'خاک',
+  }),
+  'scene.site.sand': g('Sand', {
+    es: 'Arena', cu: 'Arena', uk: 'Пісок', ru: 'Песок', ti: 'ሑጻ', fa: 'شن',
+  }),
+  'scene.site.deck': g('Deck', {
+    es: 'Terraza', cu: 'Terraza', uk: 'Настил', ru: 'Настил', ti: 'ዳስ', fa: 'عرشه',
+  }),
+  'scene.site.mulch': g('Mulch', {
+    es: 'Mantillo', cu: 'Mantillo', uk: 'Мульча', ru: 'Мульча', ti: 'ሓመድ ቆጽሊ', fa: 'مالچ',
+  }),
   'scene.tint.sand': g('Sand', {
     es: 'Arena', cu: 'Arena', uk: 'Пісок', ru: 'Песок', ti: 'ሑጻ', fa: 'شن‌رنگ',
   }),
@@ -1496,6 +1542,27 @@ export const STR: Record<string, Gloss> = {
   }),
   'scene.tint.sky': g('Sky', {
     es: 'Cielo', cu: 'Cielo', uk: 'Небо', ru: 'Небо', ti: 'ሰማይ', fa: 'آسمان',
+  }),
+  'scene.tint.cream': g('Cream', {
+    es: 'Crema', cu: 'Crema', uk: 'Крем', ru: 'Крем', ti: 'ክሪም', fa: 'کرم',
+  }),
+  'scene.tint.blush': g('Blush', {
+    es: 'Rubor', cu: 'Rubor', uk: 'Руж', ru: 'Румяна', ti: 'ሮዝ', fa: 'صورتی',
+  }),
+  'scene.tint.navy': g('Navy', {
+    es: 'Marino', cu: 'Marino', uk: 'Морський', ru: 'Морской', ti: 'ባሕሪ', fa: 'سرمه‌ای',
+  }),
+  'scene.tint.charcoal': g('Charcoal', {
+    es: 'Carbón', cu: 'Carbón', uk: 'Вугілля', ru: 'Уголь', ti: 'ከሰል', fa: 'ذغالی',
+  }),
+  'scene.tint.butter': g('Butter', {
+    es: 'Mantequilla', cu: 'Mantequilla', uk: 'Масло', ru: 'Масло', ti: 'ቅቤ', fa: 'کره',
+  }),
+  'scene.tint.mint': g('Mint', {
+    es: 'Menta', cu: 'Menta', uk: 'М’ята', ru: 'Мята', ti: 'ናና', fa: 'نعنا',
+  }),
+  'scene.tint.terra': g('Terra', {
+    es: 'Terra', cu: 'Terra', uk: 'Тера', ru: 'Терра', ti: 'መሬት', fa: 'خاکی',
   }),
 
   'toast.ready': g('{title} is ready — go draw', {

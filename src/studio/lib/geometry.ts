@@ -116,6 +116,31 @@ export function formatLength(n: number, units: 'ft' | 'm' = 'ft'): string {
   return formatFeet(n);
 }
 
+/** Parse a typed size. `12`, `12'6"`, `8"`, `3.5`, `2.4 m`. Returns plan-feet. */
+export function parseFeet(raw: string, units: 'ft' | 'm' = 'ft'): number | null {
+  const s = raw.trim().toLowerCase().replace(/,/g, '');
+  if (!s) return null;
+  const looksMetric = (units === 'm' && !s.includes("'") && !s.includes('"'))
+    || /m\s*$/.test(s);
+  if (looksMetric) {
+    const n = parseFloat(s.replace(/[m\s]/g, ''));
+    return Number.isFinite(n) ? n / 0.3048 : null;
+  }
+  const inchesOnly = s.match(/^(-?\d+(?:\.\d+)?)\s*"$/);
+  if (inchesOnly) return parseFloat(inchesOnly[1]) / 12;
+  if (s.includes("'") || s.includes('ft') || s.includes('"')) {
+    const fi = s.match(/^(-?\d+)\s*(?:'|ft)?\s*-?\s*(\d+(?:\.\d+)?)?\s*(?:"|in)?$/);
+    if (fi) {
+      const ft = parseInt(fi[1], 10);
+      const inch = fi[2] ? parseFloat(fi[2]) : 0;
+      if (!Number.isFinite(ft) || !Number.isFinite(inch)) return null;
+      return ft + inch / 12;
+    }
+  }
+  const n = parseFloat(s);
+  return Number.isFinite(n) ? n : null;
+}
+
 export function screenToWorld(
   sx: number, sy: number, panX: number, panY: number, zoom: number, ox: number, oy: number,
 ): Point {
@@ -214,6 +239,47 @@ export function hitOpening(openings: Opening[], walls: Wall[], nodes: Node[], p:
 export function hitWall(walls: Wall[], nodes: Node[], p: Point, thr = 0.45): string | null {
   const n = nearestWall(walls, nodes, p, thr);
   return n ? n.wall.id : null;
+}
+
+export type WallGrip = 'a' | 'b' | 'mid';
+
+export function wallGripPoints(wall: Wall, nodes: Node[]): { a: Point; b: Point; mid: Point } | null {
+  const e = wallEnds(wall, nodes);
+  if (!e) return null;
+  return { a: e.a, b: e.b, mid: { x: (e.a.x + e.b.x) / 2, y: (e.a.y + e.b.y) / 2 } };
+}
+
+/** Squares at the ends beat the middle when both are close. */
+export function hitWallGrip(wall: Wall, nodes: Node[], p: Point, thr: number): WallGrip | null {
+  const g = wallGripPoints(wall, nodes);
+  if (!g) return null;
+  const da = dist(p, g.a);
+  const db = dist(p, g.b);
+  const dm = dist(p, g.mid);
+  if (da <= thr && da <= db && da <= dm + 1e-6) return 'a';
+  if (db <= thr && db <= da && db <= dm + 1e-6) return 'b';
+  if (dm <= thr * 0.85) return 'mid';
+  return null;
+}
+
+/** Move one end of a wall (shared corners move with it). */
+export function nodesAfterWallEnd(nodes: Node[], wall: Wall, end: 'a' | 'b', to: Point): Node[] {
+  const id = end === 'a' ? wall.a : wall.b;
+  return nodes.map((n) => (n.id === id ? { ...n, x: to.x, y: to.y } : n));
+}
+
+/** Keep end A, slide B along the wall to a new length. */
+export function nodesAfterWallLength(nodes: Node[], wall: Wall, length: number): Node[] {
+  const e = wallEnds(wall, nodes);
+  if (!e || length < 0.25) return nodes;
+  const cur = dist(e.a, e.b);
+  if (cur < 1e-6) return nodes;
+  const k = length / cur;
+  return nodes.map((n) => (n.id === wall.b ? {
+    ...n,
+    x: e.a.x + (e.b.x - e.a.x) * k,
+    y: e.a.y + (e.b.y - e.a.y) * k,
+  } : n));
 }
 
 /** Find or create node near point (for wall drawing). */
@@ -337,3 +403,141 @@ export function hitSketch(items: SketchStroke[], p: Point, thr = 0.5): string | 
   return null;
 }
 
+export type FitWallsOpts = {
+  gridSize: number;
+  snap: boolean;
+  ortho: boolean;
+  /** Max wobble off a candidate wall, in feet. */
+  band?: number;
+  minLen?: number;
+};
+
+function strokeSpan(pts: Point[]): number {
+  if (pts.length === 0) return 0;
+  let minX = pts[0].x;
+  let minY = pts[0].y;
+  let maxX = pts[0].x;
+  let maxY = pts[0].y;
+  for (const p of pts) {
+    if (p.x < minX) minX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y > maxY) maxY = p.y;
+  }
+  return Math.hypot(maxX - minX, maxY - minY);
+}
+
+function collapseClose(pts: Point[], min: number): Point[] {
+  if (pts.length === 0) return pts;
+  const out: Point[] = [pts[0]];
+  for (let i = 1; i < pts.length; i++) {
+    if (dist(out[out.length - 1], pts[i]) >= min) out.push(pts[i]);
+  }
+  return out;
+}
+
+function mergeCollinear(pts: Point[], eps = 0.4): Point[] {
+  if (pts.length < 3) return pts.slice();
+  const out: Point[] = [pts[0]];
+  for (let i = 1; i < pts.length - 1; i++) {
+    const a = out[out.length - 1];
+    const b = pts[i];
+    const c = pts[i + 1];
+    const hit = projectOnSegment(a, c, b);
+    const dot = (b.x - a.x) * (c.x - b.x) + (b.y - a.y) * (c.y - b.y);
+    if (hit.d <= eps && dot > 0) continue;
+    out.push(b);
+  }
+  out.push(pts[pts.length - 1]);
+  return out;
+}
+
+function maxDev(pts: Point[], a: number, b: number, from: Point, to: Point): number {
+  let maxD = 0;
+  for (let k = a; k <= b; k++) {
+    const d = projectOnSegment(from, to, pts[k]).d;
+    if (d > maxD) maxD = d;
+  }
+  return maxD;
+}
+
+/**
+ * Turn a wiggly pencil stroke into grid-snapped wall corners (0/45/90 when ortho).
+ * Classroom sketches wander a few feet — we keep the long runs, not the wobble.
+ */
+export function fitWallsFromStroke(flat: number[], opts: FitWallsOpts): Point[] {
+  const raw = polylinePoints(flat);
+  if (raw.length < 2) return [];
+  const span = strokeSpan(raw);
+  if (span < 1.75) return [];
+
+  const band = opts.band ?? Math.min(6, Math.max(2.8, span * 0.09));
+  const minLen = opts.minLen ?? Math.max(1.25, opts.gridSize * 0.9);
+  const light = polylinePoints(simplifyPolyline(flat, Math.min(0.55, band * 0.18)));
+  const pts = collapseClose(light.length >= 2 ? light : raw, Math.min(0.35, minLen * 0.25));
+  if (pts.length < 2) return [];
+
+  const snapEnd = (from: Point, to: Point): Point => {
+    if (opts.ortho) {
+      return snapWallEnd(from, to, {
+        ortho: true,
+        forceOrtho: false,
+        snap: opts.snap,
+        gridSize: opts.gridSize,
+      });
+    }
+    return snapPoint(to, opts.gridSize, opts.snap);
+  };
+
+  const verts: Point[] = [snapPoint(pts[0], opts.gridSize, opts.snap)];
+  let i = 0;
+  let guard = 0;
+  while (i < pts.length - 1 && guard++ < pts.length + 12) {
+    const from = verts[verts.length - 1];
+    let bestJ = -1;
+    let bestEnd: Point | null = null;
+    for (let j = i + 1; j < pts.length; j++) {
+      const end = snapEnd(from, pts[j]);
+      const len = dist(from, end);
+      if (len < minLen) continue;
+      if (maxDev(pts, i, j, from, end) > band) {
+        if (bestJ >= 0) break;
+        continue;
+      }
+      bestJ = j;
+      bestEnd = end;
+    }
+    if (bestJ < 0 || !bestEnd) {
+      i += 1;
+      continue;
+    }
+    verts.push(bestEnd);
+    i = Math.max(i + 1, bestJ);
+  }
+
+  let out = mergeCollinear(collapseClose(verts, minLen * 0.55));
+  if (out.length < 2 && span >= 4) {
+    const coarse = polylinePoints(simplifyPolyline(flat, Math.min(5, Math.max(2.2, span * 0.08))));
+    out = [snapPoint(coarse[0], opts.gridSize, opts.snap)];
+    for (let k = 1; k < coarse.length; k++) {
+      const end = snapEnd(out[out.length - 1], coarse[k]);
+      if (dist(out[out.length - 1], end) >= minLen) out.push(end);
+    }
+    out = mergeCollinear(out);
+  }
+
+  if (out.length >= 3) {
+    const closeAt = Math.max(band * 1.35, 3.5);
+    if (dist(out[0], out[out.length - 1]) <= closeAt) {
+      out[out.length - 1] = { x: out[0].x, y: out[0].y };
+    }
+  }
+  if (out.length >= 2 && dist(out[0], out[out.length - 1]) < 0.2) {
+    const uniq = collapseClose(out, minLen * 0.5);
+    if (uniq.length >= 2) {
+      if (dist(uniq[0], uniq[uniq.length - 1]) >= minLen * 0.5) uniq.push({ x: uniq[0].x, y: uniq[0].y });
+      return uniq;
+    }
+  }
+  return out;
+}

@@ -3,8 +3,9 @@ import { Stage, Layer, Line, Rect, Text, Arc, Group, Circle, Shape } from 'react
 import Konva from 'konva';
 import { useProjectStore } from '../store/useProjectStore';
 import { useDebugStore } from '../store/useDebugStore';
-import { formatLength, nearestWall, pointOnWall, screenToWorld, wallAngle, wallEnds, wallLength, dist, snapWallEnd, isDiagonal } from '../lib/geometry';
+import { formatLength, nearestWall, pointOnWall, screenToWorld, wallAngle, wallEnds, wallLength, dist, snapWallEnd, isDiagonal, hitWallGrip, wallGripPoints } from '../lib/geometry';
 import { centroid, findEnclosedFace, formatArea, polygonArea, polyPoints, roomPolygon } from '../lib/rooms';
+import { wallFootprintFlat } from '../lib/wallJoin';
 import { chamferPreview, nearestChamferable } from '../lib/chamfer';
 import { ADA, circleFitsInPoly } from '../lib/access';
 import { kitchenTriangle } from '../lib/architect';
@@ -65,6 +66,7 @@ export function PlanCanvas() {
     pan: { x: number; y: number };
     mid: { x: number; y: number };
   } | null>(null);
+  const gripDrag = useRef<{ wallId: string; end: 'a' | 'b' } | null>(null);
   const debugOpen = useProjectStore((s) => s.debugOpen);
 
   useEffect(() => {
@@ -236,8 +238,26 @@ export function PlanCanvas() {
     const isCoarse = e.evt.pointerType === 'touch' || e.evt.pointerType === 'pen';
     const hit = store.hitAt(world);
     const sel = store.selected;
+    const floorNow = store.floor();
+    const gripThr = Math.max(0.55, 16 / liveZoom.current);
+    const wallForGrip = hit?.kind === 'wall'
+      ? floorNow.walls.find((w) => w.id === hit.id)
+      : sel?.kind === 'wall'
+        ? floorNow.walls.find((w) => w.id === sel.id)
+        : undefined;
+    if (tool === 'select' && wallForGrip) {
+      const g = hitWallGrip(wallForGrip, floorNow.nodes, world, gripThr);
+      if (g === 'a' || g === 'b') {
+        store.setSelected({ kind: 'wall', id: wallForGrip.id });
+        gripDrag.current = { wallId: wallForGrip.id, end: g };
+        setDragging(true);
+        lastRef.current = world;
+        pendingTap.current = null;
+        return;
+      }
+    }
     const same = !!(hit && sel && hit.kind === sel.kind && hit.id === sel.id);
-    const movable = same && (hit?.kind === 'furniture' || hit?.kind === 'landscape' || hit?.kind === 'note' || hit?.kind === 'dim' || hit?.kind === 'opening' || hit?.kind === 'sketch');
+    const movable = same && (hit?.kind === 'furniture' || hit?.kind === 'landscape' || hit?.kind === 'note' || hit?.kind === 'dim' || hit?.kind === 'opening' || hit?.kind === 'sketch' || hit?.kind === 'wall');
 
     if (isCoarse) {
       if (movable) {
@@ -318,8 +338,18 @@ export function PlanCanvas() {
       }
       return;
     }
-    if (tool === 'wall' || tool === 'door' || tool === 'window' || tool === 'room' || tool === 'dim') {
+    if (tool === 'select' || tool === 'wall' || tool === 'door' || tool === 'window' || tool === 'room' || tool === 'dim') {
       setHover(world);
+    }
+
+    if (gripDrag.current) {
+      useProjectStore.getState().moveWallEnd(
+        gripDrag.current.wallId,
+        gripDrag.current.end,
+        world,
+        e.evt.shiftKey,
+      );
+      return;
     }
 
     if (dragging && lastRef.current && tool === 'select') {
@@ -362,6 +392,7 @@ export function PlanCanvas() {
     }
     if (dragging) {
       setDragging(false);
+      gripDrag.current = null;
       useProjectStore.getState().endMove();
     }
     lastRef.current = null;
@@ -449,6 +480,15 @@ export function PlanCanvas() {
     ? chamferPreview(floor.nodes, floor.walls, clipHover.id, Math.max(1, settings.gridSize || 1) * 2)
     : null;
 
+  const selectedWall = selected?.kind === 'wall'
+    ? floor.walls.find((w) => w.id === selected.id) ?? null
+    : null;
+  const gripThr = Math.max(0.55, 16 / zoom);
+  const hoverGrip = selectedWall && hover
+    ? hitWallGrip(selectedWall, floor.nodes, hover, gripThr)
+    : null;
+  const selectedGrips = selectedWall ? wallGripPoints(selectedWall, floor.nodes) : null;
+
   const skillLevel = settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
   const showWallCta = skillRank(skillLevel) <= 2 && floor.walls.length === 0 && !wallCtaDismissed && !wallDraft;
   const objectCount =
@@ -484,7 +524,7 @@ export function PlanCanvas() {
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
-      style={{ touchAction: 'none' }}
+      style={{ touchAction: 'none', cursor: hoverGrip ? (dragging ? 'grabbing' : 'grab') : undefined }}
     >
       <Stage
         width={size.w}
@@ -589,6 +629,7 @@ export function PlanCanvas() {
             <WallShape
               key={w.id}
               wall={w}
+              walls={floor.walls}
               nodes={floor.nodes}
               selected={selected?.kind === 'wall' && selected.id === w.id}
               accent={accent}
@@ -602,6 +643,14 @@ export function PlanCanvas() {
               dimFg={planColors.dimFg}
             />
           ))}
+          {selectedGrips && (
+            <WallGrips
+              grips={selectedGrips}
+              hover={hoverGrip}
+              accent={accent}
+              zoom={zoom}
+            />
+          )}
 
           {(settings.showRoof !== false) && (floor.layers.roof !== false) && floor.roof && (
             <RoofPlanShapes roof={floor.roof} zoom={zoom} lightPlan={lightPlan} />
@@ -912,7 +961,9 @@ export function PlanCanvas() {
                 ? t(settings.locale, 'hint.plant')
               : tool === 'pan'
                 ? t(settings.locale, 'hint.pan')
-                : t(settings.locale, skillRank(skillLevel) <= 1 ? 'hint.select' : 'hint.select.short')}
+                : t(settings.locale, selected?.kind === 'wall'
+                  ? 'hint.select.wall'
+                  : skillRank(skillLevel) <= 1 ? 'hint.select' : 'hint.select.short')}
         {settings.snap ? ` · ${t(settings.locale, 'hint.snapOn')}` : ` · ${t(settings.locale, 'hint.snapOff')}`}
         {settings.ortho !== false ? ' · 90°+45°' : ''}
         {' · '}{zoomLabel}
@@ -1263,11 +1314,51 @@ function PlanLoadChip({
   );
 }
 
+function WallGrips({
+  grips, hover, accent, zoom,
+}: {
+  grips: { a: { x: number; y: number }; b: { x: number; y: number }; mid: { x: number; y: number } };
+  hover: 'a' | 'b' | 'mid' | null;
+  accent: string;
+  zoom: number;
+}) {
+  const end = 10 / zoom;
+  const mid = 8 / zoom;
+  const sw = 1.6 / zoom;
+  const square = (
+    p: { x: number; y: number },
+    size: number,
+    hot: boolean,
+    diamond = false,
+  ) => (
+    <Rect
+      x={p.x}
+      y={p.y}
+      width={size}
+      height={size}
+      offsetX={size / 2}
+      offsetY={size / 2}
+      rotation={diamond ? 45 : 0}
+      fill={hot ? accent : '#fff'}
+      stroke={accent}
+      strokeWidth={sw}
+      listening={false}
+    />
+  );
+  return (
+    <Group listening={false} perfectDrawEnabled={false}>
+      {square(grips.mid, mid, hover === 'mid', true)}
+      {square(grips.a, end, hover === 'a')}
+      {square(grips.b, end, hover === 'b')}
+    </Group>
+  );
+}
+
 function WallShape({
-  wall, nodes, selected, accent, zoom, showDim, units, textureId, texturePattern,
+  wall, walls, nodes, selected, accent, zoom, showDim, units, textureId, texturePattern,
   wallExt, wallInt, dimFg,
 }: {
-  wall: Wall; nodes: Node[]; selected: boolean; accent: string; zoom: number; showDim: boolean; units: 'ft' | 'm';
+  wall: Wall; walls: Wall[]; nodes: Node[]; selected: boolean; accent: string; zoom: number; showDim: boolean; units: 'ft' | 'm';
   textureId: string | null;
   texturePattern: HTMLImageElement | HTMLCanvasElement | null;
   wallExt: string;
@@ -1285,50 +1376,40 @@ function WallShape({
   const textured = Boolean(textureId && textureId !== 'pack:plain');
   const fallback = textureStrokeFallback(textureId);
   const scale = patternWorldScale(textureId);
+  const foot = wallFootprintFlat(wall, nodes, walls);
+  const fill = textured ? (texturePattern ? paint : (fallback ?? paint)) : paint;
+  const usePattern = Boolean(textured && texturePattern);
 
   return (
     <Group listening={false} perfectDrawEnabled={false}>
-      {textured && texturePattern && len > 0.05 ? (
-        <Group x={e.a.x} y={e.a.y} rotation={(ang * 180) / Math.PI} listening={false}>
-          <Rect
-            x={0}
-            y={-thick / 2}
-            width={len}
-            height={thick}
-            fillPatternImage={texturePattern as CanvasImageSource as HTMLImageElement}
-            fillPatternRepeat="repeat"
-            fillPatternScaleX={scale}
-            fillPatternScaleY={scale}
-            opacity={wall.kind === 'exterior' ? 0.95 : 0.72}
-          />
-          <Rect
-            x={0}
-            y={-thick / 2}
-            width={len}
-            height={thick}
-            stroke={selected ? accent : (fallback ?? paint)}
-            strokeWidth={1.25 / zoom}
-            fillEnabled={false}
-          />
-        </Group>
-      ) : textured && fallback ? (
+      {foot ? (
         <Line
-          points={[e.a.x, e.a.y, e.b.x, e.b.y]}
-          stroke={selected ? accent : fallback}
-          strokeWidth={thick}
-          lineCap="square"
-          dash={[0.35, 0.18]}
+          points={foot}
+          closed
+          fill={fill}
+          fillPriority={usePattern ? 'pattern' : 'color'}
+          fillPatternImage={usePattern ? texturePattern as CanvasImageSource as HTMLImageElement : undefined}
+          fillPatternRepeat="repeat"
+          fillPatternScaleX={scale}
+          fillPatternScaleY={scale}
+          fillPatternRotation={(ang * 180) / Math.PI}
+          opacity={wall.kind === 'exterior' ? 0.98 : 0.88}
+          stroke={selected ? accent : 'transparent'}
+          strokeWidth={selected ? 2 / zoom : 0}
+          lineJoin="miter"
+          miterLimit={8}
           listening={false}
         />
-      ) : null}
-      <Line
-        points={[e.a.x, e.a.y, e.b.x, e.b.y]}
-        stroke={textured ? (texturePattern ? 'transparent' : (fallback ?? paint)) : paint}
-        strokeWidth={thick}
-        lineCap="square"
-        hitStrokeWidth={Math.max(thick, 0.6)}
-        opacity={textured && (texturePattern || fallback) ? 0 : 1}
-      />
+      ) : (
+        <Line
+          points={[e.a.x, e.a.y, e.b.x, e.b.y]}
+          stroke={fill}
+          strokeWidth={thick}
+          lineCap="butt"
+          lineJoin="miter"
+          listening={false}
+        />
+      )}
       {showDim && len > 0.8 && (
         <Text
           x={mx}
