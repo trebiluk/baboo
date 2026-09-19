@@ -4,7 +4,7 @@ Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 
 **© 2026 Richard Kulibert Jr.**
 
-**Version 2.0.0** — P0 inclusion: fat taps, tip language, high contrast on Stark.
+**Version 2.1.0** — Drafting precision: snap to walls, exact length and angle, arrow-key nudge.
 
 Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the side rail. Plans save on the device as `.archworks.json`.
 
@@ -34,6 +34,12 @@ npm run pack:share
 - **Save file** downloads `.archworks.json` for Classroom
 - **Class folder** is a copy-to-the-share pack — Chrome, no login
 - No Google login inside the app
+
+## What’s in 2.1.0
+
+- Walls land on what you already drew — corner, middle, crossing, square-off, along-wall — each with its own marker shape and word
+- Type an exact Length and Angle while a wall is in progress, or tap the boxes
+- Arrow keys nudge the selection; measurements always read right side up
 
 ## What’s in 2.0.0
 

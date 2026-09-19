@@ -335,7 +335,9 @@ button {
 }
 .chrome-left {
   flex:1;
-  min-width:0
+  min-width:0;
+  /* The right-hand controls own their space; nothing here may paint over them. */
+  overflow:hidden
 }
 .chrome-right {
   flex-shrink:0
@@ -344,7 +346,9 @@ button {
   align-items:center;
   gap:6px;
   font-weight:700;
-  display:flex
+  display:flex;
+  flex:0 1 auto;
+  min-width:0
 }
 .brand-mark {
   color:var(--aw-paw)
@@ -359,7 +363,10 @@ button {
 }
 .brand-name {
   letter-spacing:.02em;
-  font-weight:800
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis
 }
 .brand-mark {
   display:none
@@ -381,7 +388,8 @@ button {
   background:var(--aw-elevated);
   border:1px solid var(--aw-border);
   border-radius:8px;
-  min-width:100px;
+  flex:1 1 120px;
+  min-width:64px;
   max-width:160px;
   padding:4px 8px
 }
@@ -395,7 +403,27 @@ button {
   color:var(--aw-muted);
   border-radius:999px;
   padding:4px 8px;
-  font-size:12px
+  font-size:12px;
+  white-space:nowrap;
+  flex-shrink:0
+}
+.chrome-left .skill-chrome-chip,
+.chrome-left .ver-chip,
+.brand-logo {
+  flex-shrink:0
+}
+/*
+ * Past this width the right-hand controls leave the title strip too little
+ * room for the version pill and the attribution line. Both appear elsewhere —
+ * the floating version chip, and the dedication card under Help - About — so
+ * dropping them here costs nothing and keeps the name and title readable.
+ */
+@media (width < 1540px) {
+  .chrome-left .ver-chip-header,
+  .chrome-left .copyright-chrome,
+  .chrome-left .brand-name {
+    display:none
+  }
 }
 .save-saved {
   color:var(--aw-ok)
@@ -3109,15 +3137,34 @@ html.aw-teaching-open, body.aw-teaching-open {
 .object-chip.tex-swatch {
   min-width: 64px;
   min-height: 36px;
-  color: #fff;
-  text-shadow: 0 1px 2px #0009;
   background-size: cover;
   justify-content: center;
+  /* Half these swatches are pale; a solid band is the only way the name reads. */
+  align-items: flex-end;
+  padding: 0;
+  overflow: hidden;
+}
+.tex-swatch-label {
+  display: block;
+  width: 100%;
+  padding: 3px 6px;
+  background: #0b1220e6;
+  color: #fff;
+  text-shadow: none;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
 }
 .object-chip.tex-swatch.active {
-  color: #fff;
   box-shadow: 0 0 0 2px var(--aw-royal);
   border-color: var(--aw-royal);
+}
+.object-chip.tex-swatch.active .tex-swatch-label {
+  background: var(--aw-royal);
+}
+html[data-udl-contrast] .tex-swatch-label {
+  background: #000;
 }
 .dollhouse-canvas {
   background: #e8edf2;
@@ -3569,3 +3616,80 @@ html[data-gui-theme=stark] .canvas-hint {
 }
 
 
+
+/* 2.1 — Exact entry while drawing (length + angle, tap or type) */
+.dyn-input {
+  z-index: var(--aw-z-overlays);
+  position: absolute;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 10px;
+  background: var(--aw-elevated);
+  border: 1px solid color-mix(in srgb, var(--aw-cyan) 55%, var(--aw-border));
+  box-shadow: 0 6px 18px #0a0a0a29;
+  pointer-events: auto;
+}
+.dyn-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dyn-field > span {
+  color: var(--aw-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.dyn-field > input {
+  width: 74px;
+  min-height: 36px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--aw-border);
+  background: var(--aw-bg);
+  color: var(--aw-fg);
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.dyn-field-ang > input {
+  width: 58px;
+}
+.dyn-field > input:focus-visible,
+.dyn-go:focus-visible {
+  outline: 3px solid var(--aw-cyan);
+  outline-offset: 1px;
+}
+.dyn-go {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--aw-cyan) 55%, var(--aw-border));
+  background: var(--aw-bg);
+  color: var(--aw-fg);
+  font-size: 13px;
+  font-weight: 700;
+}
+.canvas-readout {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+html[data-udl-fat] .dyn-field > input,
+html[data-udl-fat] .dyn-go {
+  min-height: 44px;
+  font-size: 15px;
+}
+html[data-udl-type] .dyn-field > input,
+html[data-udl-type] .dyn-go {
+  font-size: 1.1em;
+}
+html[data-udl-contrast] .dyn-input {
+  border-color: #000;
+}
+html[data-udl-contrast] .dyn-field > span,
+html[data-udl-contrast] .dyn-field > input,
+html[data-udl-contrast] .dyn-go {
+  color: #000;
+}

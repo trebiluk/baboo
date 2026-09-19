@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { dist, fitWallsFromStroke, hitSketch, polylineLength, simplifyPolyline, parseFeet, hitWallGrip, nodesAfterWallLength, nodesAfterWallEnd } from './geometry.ts';
+import { dist, fitWallsFromStroke, hitSketch, polylineLength, readableAngle, simplifyPolyline, parseFeet, hitWallGrip, nodesAfterWallLength, nodesAfterWallEnd } from './geometry.ts';
 import type { Wall, Node } from '../types.ts';
 
 describe('sketch geometry', () => {
@@ -151,5 +151,34 @@ describe('wall grips and typed sizes', () => {
     assert.equal(parseFeet('8"'), 8 / 12);
     assert.ok(Math.abs((parseFeet('3.048 m') ?? 0) - 10) < 0.01);
     assert.equal(parseFeet('nope'), null);
+  });
+});
+
+describe('readableAngle', () => {
+  it('leaves a left-to-right label alone', () => {
+    assert.deepEqual(readableAngle(0), { deg: 0, flipped: false });
+    assert.deepEqual(readableAngle(30), { deg: 30, flipped: false });
+  });
+
+  it('turns an upside-down label around', () => {
+    assert.deepEqual(readableAngle(180), { deg: 0, flipped: true });
+    assert.deepEqual(readableAngle(135), { deg: -45, flipped: true });
+    assert.deepEqual(readableAngle(-135), { deg: 45, flipped: true });
+  });
+
+  it('reads both verticals bottom to top', () => {
+    assert.deepEqual(readableAngle(90), { deg: -90, flipped: true });
+    assert.deepEqual(readableAngle(-90), { deg: -90, flipped: false });
+  });
+
+  it('always lands in [-90, 90)', () => {
+    for (let d = -720; d <= 720; d += 7) {
+      const r = readableAngle(d);
+      assert.ok(r.deg >= -90 && r.deg < 90, `${d} -> ${r.deg}`);
+    }
+  });
+
+  it('shrugs off a bad number', () => {
+    assert.deepEqual(readableAngle(Number.NaN), { deg: 0, flipped: false });
   });
 });
