@@ -3,7 +3,7 @@ import { Stage, Layer, Line, Rect, Text, Arc, Group, Circle, Shape } from 'react
 import Konva from 'konva';
 import { useProjectStore } from '../store/useProjectStore';
 import { useDebugStore } from '../store/useDebugStore';
-import { formatLength, nearestWall, parseFeet, pointOnWall, screenToWorld, wallAngle, wallEnds, wallLength, dist, hitWallGrip, wallGripPoints } from '../lib/geometry';
+import { formatLength, nearestWall, parseFeet, pointOnWall, readableAngle, screenToWorld, wallAngle, wallEnds, wallLength, dist, hitWallGrip, wallGripPoints } from '../lib/geometry';
 import {
   headingDeg,
   polarPoint,
@@ -970,6 +970,7 @@ export function PlanCanvas() {
               fg={planColors.dimFg}
               bg={planColors.dimBg}
               label={t(tips, `osnap.${drawAim.osnap.kind}`)}
+              big={settings.udlType === true}
             />
           )}
         </Layer>
@@ -1073,7 +1074,7 @@ export function PlanCanvas() {
  * relying on colour, and the word spells it out for anyone still learning.
  */
 const SnapMark = memo(function SnapMark({
-  kind, at, zoom, accent, fg, bg, label,
+  kind, at, zoom, accent, fg, bg, label, big,
 }: {
   kind: OsnapKind;
   at: { x: number; y: number };
@@ -1082,10 +1083,11 @@ const SnapMark = memo(function SnapMark({
   fg: string;
   bg: string;
   label: string;
+  big: boolean;
 }) {
-  const r = 7 / zoom;
-  const font = 11 / zoom;
-  const pad = 3 / zoom;
+  const r = (big ? 11 : 8) / zoom;
+  const font = (big ? 14 : 12) / zoom;
+  const pad = 4 / zoom;
   const boxW = label.length * font * 0.6 + pad * 2;
   const boxH = font * 1.55;
   const boxX = at.x + r * 1.5;
@@ -1121,7 +1123,7 @@ const SnapMark = memo(function SnapMark({
             ctx.closePath();
           }
           ctx.strokeStyle = accent;
-          ctx.lineWidth = 2 / zoom;
+          ctx.lineWidth = (big ? 3 : 2.5) / zoom;
           ctx.stroke();
         }}
       />
@@ -1131,7 +1133,9 @@ const SnapMark = memo(function SnapMark({
         width={boxW}
         height={boxH}
         fill={bg}
-        cornerRadius={2 / zoom}
+        stroke={accent}
+        strokeWidth={1 / zoom}
+        cornerRadius={3 / zoom}
         listening={false}
       />
       <Text
@@ -1139,6 +1143,7 @@ const SnapMark = memo(function SnapMark({
         y={boxY + font * 0.26}
         text={label}
         fontSize={font}
+        fontStyle="bold"
         fill={fg}
         listening={false}
       />
@@ -1700,19 +1705,24 @@ function WallShape({
           listening={false}
         />
       )}
-      {showDim && len > 0.8 && (
-        <Text
-          x={mx}
-          y={my}
-          text={formatLength(len, units)}
-          offsetX={18 / zoom}
-          offsetY={18 / zoom}
-          fontSize={11 / zoom}
-          fill={dimFg}
-          rotation={(ang * 180) / Math.PI}
-          listening={false}
-        />
-      )}
+      {showDim && len > 0.8 && (() => {
+        /* Mirroring the offset with the flip keeps the label outside the room. */
+        const read = readableAngle((ang * 180) / Math.PI);
+        const off = (read.flipped ? -18 : 18) / zoom;
+        return (
+          <Text
+            x={mx}
+            y={my}
+            text={formatLength(len, units)}
+            offsetX={off}
+            offsetY={off}
+            fontSize={11 / zoom}
+            fill={dimFg}
+            rotation={read.deg}
+            listening={false}
+          />
+        );
+      })()}
     </Group>
   );
 }
