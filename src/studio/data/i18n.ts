@@ -1452,6 +1452,42 @@ export const STR: Record<string, Gloss> = {
   'hint.snapOff': g('Snap OFF', {
     es: 'Imán OFF', cu: 'Imán OFF', uk: 'Прив’язка ВИМК', ru: 'Привязка ВЫКЛ', ti: 'ምልጣፍ OFF', fa: 'چسبیدن خاموش',
   }),
+  'hint.osnapOn': g('Wall snap', {
+    es: 'Imán a muros', cu: 'Imán a paredes', uk: 'Прилипання до стін', ru: 'Привязка к стенам',
+    ti: 'ናብ መንደቕ ምልጣፍ', fa: 'چسبیدن به دیوار',
+  }),
+  'osnap.endpoint': g('Corner', {
+    es: 'Esquina', cu: 'Esquina', uk: 'Кут', ru: 'Угол', ti: 'ኩርናዕ', fa: 'گوشه',
+  }),
+  'osnap.midpoint': g('Middle', {
+    es: 'Centro', cu: 'Centro', uk: 'Середина', ru: 'Середина', ti: 'ማእከል', fa: 'وسط',
+  }),
+  'osnap.cross': g('Crossing', {
+    es: 'Cruce', cu: 'Cruce', uk: 'Перетин', ru: 'Пересечение', ti: 'መስቀላዊ', fa: 'تقاطع',
+  }),
+  'osnap.perp': g('Square', {
+    es: 'Escuadra', cu: 'Escuadra', uk: 'Прямий кут', ru: 'Прямой угол', ti: 'ቀጥ ዝበለ', fa: 'قائمه',
+  }),
+  'osnap.onwall': g('On wall', {
+    es: 'En el muro', cu: 'En la pared', uk: 'На стіні', ru: 'На стене', ti: 'ኣብ መንደቕ', fa: 'روی دیوار',
+  }),
+  'dyn.len': g('Length', {
+    es: 'Largo', cu: 'Largo', uk: 'Довжина', ru: 'Длина', ti: 'ንውሓት', fa: 'طول',
+  }),
+  'dyn.ang': g('Angle', {
+    es: 'Ángulo', cu: 'Ángulo', uk: 'Кут', ru: 'Угол', ti: 'መኣዝን', fa: 'زاویه',
+  }),
+  'dyn.go': g('Set', {
+    es: 'Fijar', cu: 'Fijar', uk: 'Задати', ru: 'Задать', ti: 'ኣቐምጥ', fa: 'ثبت',
+  }),
+  'set.osnap': g('Snap to walls (corner, middle, crossing)', {
+    es: 'Imán a muros (esquina, centro, cruce)',
+    cu: 'Imán a paredes (esquina, centro, cruce)',
+    uk: 'Прилипання до стін (кут, середина, перетин)',
+    ru: 'Привязка к стенам (угол, середина, пересечение)',
+    ti: 'ናብ መንደቕ ምልጣፍ (ኩርናዕ፣ ማእከል፣ መስቀላዊ)',
+    fa: 'چسبیدن به دیوار (گوشه، وسط، تقاطع)',
+  }),
 
   'help.title': g('Help · About', {
     es: 'Ayuda · Acerca de', cu: 'Ayuda · Acerca de', uk: 'Допомога · Про застосунок', ru: 'Помощь · О программе', ti: 'ሓገዝ · ብዛዕባ', fa: 'راهنما · درباره',

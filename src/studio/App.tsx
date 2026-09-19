@@ -40,6 +40,7 @@ export default function App() {
   const minimizeTools = useProjectStore((s) => s.minimizeTools);
   const duplicateSelected = useProjectStore((s) => s.duplicateSelected);
   const rotateSelected = useProjectStore((s) => s.rotateSelected);
+  const nudgeSelected = useProjectStore((s) => s.nudgeSelected);
   const fitPlan = useProjectStore((s) => s.fitPlan);
 
   useEffect(() => {
@@ -120,6 +121,15 @@ export default function App() {
         duplicateSelected();
       } else if (e.altKey || e.metaKey || e.ctrlKey) {
         return;
+      } else if (e.key.startsWith('Arrow')) {
+        if (!useProjectStore.getState().selected) return;
+        e.preventDefault();
+        const grid = useProjectStore.getState().doc.settings.gridSize || 1;
+        /* Shift is the fine nudge — one inch at the classroom default. */
+        const step = e.shiftKey ? Math.max(1 / 12, grid / 4) : grid;
+        const dx = e.key === 'ArrowRight' ? step : e.key === 'ArrowLeft' ? -step : 0;
+        const dy = e.key === 'ArrowDown' ? step : e.key === 'ArrowUp' ? -step : 0;
+        if (dx || dy) nudgeSelected(dx, dy);
       } else if (e.key.toLowerCase() === 'v') setTool('select');
       else if (e.key.toLowerCase() === 's') { if (viewMode === 'plan') setTool('sketch'); }
       else if (e.key.toLowerCase() === 'w') { if (viewMode === 'plan') setTool('wall'); }
@@ -137,7 +147,7 @@ export default function App() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [deleteSelected, undo, redo, cancelWallDraft, setTool, closeOverlays, minimizeTools, duplicateSelected, rotateSelected, fitPlan, viewMode]);
+  }, [deleteSelected, undo, redo, cancelWallDraft, setTool, closeOverlays, minimizeTools, duplicateSelected, rotateSelected, nudgeSelected, fitPlan, viewMode]);
 
   return (
     <div

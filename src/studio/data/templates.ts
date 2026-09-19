@@ -368,6 +368,7 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
       gridSize: 1,
       snap: true,
       ortho: true,
+      osnap: true,
       units: 'ft',
       accent: '#6E72F5',
       guiTheme: 'stark',

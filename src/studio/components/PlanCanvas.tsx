@@ -1,9 +1,18 @@
-import { useCallback, useEffect, useMemo, useRef, useState, memo, type DragEvent, type RefObject } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, memo, type DragEvent, type KeyboardEvent as ReactKeyEvent, type RefObject } from 'react';
 import { Stage, Layer, Line, Rect, Text, Arc, Group, Circle, Shape } from 'react-konva';
 import Konva from 'konva';
 import { useProjectStore } from '../store/useProjectStore';
 import { useDebugStore } from '../store/useDebugStore';
-import { formatLength, nearestWall, pointOnWall, screenToWorld, wallAngle, wallEnds, wallLength, dist, snapWallEnd, isDiagonal, hitWallGrip, wallGripPoints } from '../lib/geometry';
+import { formatLength, nearestWall, parseFeet, pointOnWall, screenToWorld, wallAngle, wallEnds, wallLength, dist, hitWallGrip, wallGripPoints } from '../lib/geometry';
+import {
+  headingDeg,
+  polarPoint,
+  resolveDrawPoint,
+  wallSegs,
+  type AlignGuide,
+  type OsnapKind,
+  type Resolved,
+} from '../lib/osnap';
 import { centroid, findEnclosedFace, formatArea, polygonArea, polyPoints, roomPolygon } from '../lib/rooms';
 import { wallFootprintFlat } from '../lib/wallJoin';
 import { chamferPreview, nearestChamferable } from '../lib/chamfer';
@@ -170,6 +179,33 @@ export function PlanCanvas() {
     }
   };
 
+  /* Object snap pull radius, in screen pixels — feels the same at any zoom. */
+  const PULL_PX = 16;
+  const useOrtho = settings.ortho !== false;
+  const useOsnap = settings.osnap !== false;
+  const segs = useMemo(() => wallSegs(floor.walls, floor.nodes), [floor.walls, floor.nodes]);
+  const anchors = useMemo(
+    () => floor.nodes.map((n) => ({ x: n.x, y: n.y })),
+    [floor.nodes],
+  );
+
+  /** One place decides where a click lands, for both the ghost and the commit. */
+  const resolveAt = (
+    cursor: { x: number; y: number },
+    from: { x: number; y: number } | null,
+    forceOrtho: boolean,
+  ): Resolved => resolveDrawPoint(cursor, {
+    segs,
+    nodes: anchors,
+    tol: PULL_PX / liveZoom.current,
+    osnap: useOsnap,
+    from,
+    ortho: useOrtho,
+    forceOrtho,
+    snap: !!settings.snap,
+    gridSize: settings.gridSize || 1,
+  });
+
   const onPointerDown = (e: Konva.KonvaEventObject<PointerEvent>) => {
     const stage = e.target.getStage();
     if (!stage) return;
@@ -220,13 +256,13 @@ export function PlanCanvas() {
         store.chamferAt(world);
         return;
       }
-      if (!store.wallDraft) store.beginWall(world);
-      else store.finishWall(world, shift);
+      if (!store.wallDraft) store.beginWall(resolveAt(world, null, shift).p, true);
+      else store.finishWall(resolveAt(world, store.wallDraft, shift).p, shift, true);
       return;
     }
     if (tool === 'dim') {
-      if (!store.dimDraft) store.beginDim(world);
-      else store.finishDim(world, shift);
+      if (!store.dimDraft) store.beginDim(resolveAt(world, null, shift).p, true);
+      else store.finishDim(resolveAt(world, store.dimDraft, shift).p, shift, true);
       return;
     }
     if (tool === 'note') { store.placeNote(world); return; }
@@ -251,6 +287,14 @@ export function PlanCanvas() {
       if (g === 'a' || g === 'b') {
         store.setSelected({ kind: 'wall', id: wallForGrip.id });
         gripDrag.current = { wallId: wallForGrip.id, end: g };
+        setDragging(true);
+        lastRef.current = world;
+        pendingTap.current = null;
+        return;
+      }
+      if (g === 'mid') {
+        /* The middle handle slides the whole wall; the ends stretch it. */
+        store.setSelected({ kind: 'wall', id: wallForGrip.id });
         setDragging(true);
         lastRef.current = world;
         pendingTap.current = null;
@@ -457,23 +501,13 @@ export function PlanCanvas() {
     return findEnclosedFace(floor.nodes, floor.walls, hover);
   }, [tool, hover, floor.nodes, floor.walls]);
 
-  const useOrtho = settings.ortho !== false;
-  const wallPreview = wallDraft && hover
-    ? snapWallEnd(wallDraft, hover, {
-      ortho: useOrtho,
-      forceOrtho: shiftHeld,
-      snap: !!settings.snap,
-      gridSize: settings.gridSize || 1,
-    })
+  /* Ghost and marker both read the same resolve the click will use. */
+  const aim: Resolved | null = hover && (tool === 'wall' || tool === 'dim')
+    ? resolveAt(hover, tool === 'wall' ? wallDraft : dimDraft, shiftHeld)
     : null;
-  const dimPreview = dimDraft && hover
-    ? snapWallEnd(dimDraft, hover, {
-      ortho: useOrtho,
-      forceOrtho: shiftHeld,
-      snap: !!settings.snap,
-      gridSize: settings.gridSize || 1,
-    })
-    : null;
+  const drawAim = tool === 'wall' && wallMode === 'clip' ? null : aim;
+  const wallPreview = wallDraft && drawAim ? drawAim.p : null;
+  const dimPreview = dimDraft && drawAim ? drawAim.p : null;
   const clipHover = tool === 'wall' && wallMode === 'clip' && hover
     ? nearestChamferable(floor.nodes, floor.walls, hover, 1.8)
     : null;
@@ -880,7 +914,7 @@ export function PlanCanvas() {
             <Text
               x={(wallDraft.x + wallPreview.x) / 2}
               y={(wallDraft.y + wallPreview.y) / 2 - 0.7}
-              text={`${formatLength(dist(wallDraft, wallPreview), units)}${isDiagonal(wallDraft, wallPreview) ? ' · 45°' : ''}`}
+              text={`${formatLength(dist(wallDraft, wallPreview), units)} · ${Math.round(headingDeg(wallDraft, wallPreview))}°`}
               fontSize={Math.max(10, 12) / zoom}
               fill={planColors.dimFg}
               listening={false}
@@ -918,8 +952,41 @@ export function PlanCanvas() {
               dimFg={planColors.dimFg}
             />
           )}
+          {drawAim?.guides.map((g) => (
+            <AlignGuideMark
+              key={`${g.axis}-${g.at}`}
+              guide={g}
+              to={drawAim.p}
+              zoom={zoom}
+              accent={accent}
+            />
+          ))}
+          {drawAim?.osnap && (
+            <SnapMark
+              kind={drawAim.osnap.kind}
+              at={drawAim.osnap.p}
+              zoom={zoom}
+              accent={accent}
+              fg={planColors.dimFg}
+              bg={planColors.dimBg}
+              label={t(tips, `osnap.${drawAim.osnap.kind}`)}
+            />
+          )}
         </Layer>
       </Stage>
+      {tool === 'wall' && wallMode !== 'clip' && wallDraft && (
+        <DynInput
+          from={wallDraft}
+          to={wallPreview ?? wallDraft}
+          zoom={zoom}
+          panX={panX}
+          panY={panY}
+          units={units}
+          tips={tips}
+          onCommit={(p) => useProjectStore.getState().finishWall(p, false, true)}
+          onCancel={() => useProjectStore.getState().cancelWallDraft()}
+        />
+      )}
       {showWallCta && (
         <div className="wall-cta" role="status">
           <div className="wall-cta-body">
@@ -966,6 +1033,7 @@ export function PlanCanvas() {
                   ? 'hint.select.wall'
                   : skillRank(skillLevel) <= 1 ? 'hint.select' : 'hint.select.short')}
         {settings.snap ? ` · ${t(tips, 'hint.snapOn')}` : ` · ${t(tips, 'hint.snapOff')}`}
+        {useOsnap ? ` · ${t(tips, 'hint.osnapOn')}` : ''}
         {settings.ortho !== false ? ' · 90°+45°' : ''}
         {' · '}{zoomLabel}
         {units === 'm' ? ' · m' : ' · ft'}
@@ -973,7 +1041,13 @@ export function PlanCanvas() {
       )}
       {skillRank(skillLevel) >= 3 && (
         <div className="canvas-hint canvas-hint-quiet">
-          {settings.snap ? t(tips, 'hint.snapOn') : t(tips, 'hint.snapOff')} · {zoomLabel}{units === 'm' ? ' · m' : ' · ft'}
+          {settings.snap ? t(tips, 'hint.snapOn') : t(tips, 'hint.snapOff')}
+          {useOsnap ? ` · ${t(tips, 'hint.osnapOn')}` : ''} · {zoomLabel}{units === 'm' ? ' · m' : ' · ft'}
+          {hover && (
+            <span className="canvas-readout">
+              {` · x ${formatLength(hover.x, units)}  y ${formatLength(hover.y, units)}`}
+            </span>
+          )}
         </div>
       )}
       <PlanCompass zoom={zoom} units={units} locale={tips} />
@@ -990,6 +1064,221 @@ export function PlanCanvas() {
         measure={debugOpen}
         layerRef={layerRef}
       />
+    </div>
+  );
+}
+
+/**
+ * The snap badge. Each kind gets its own outline so the snap reads without
+ * relying on colour, and the word spells it out for anyone still learning.
+ */
+const SnapMark = memo(function SnapMark({
+  kind, at, zoom, accent, fg, bg, label,
+}: {
+  kind: OsnapKind;
+  at: { x: number; y: number };
+  zoom: number;
+  accent: string;
+  fg: string;
+  bg: string;
+  label: string;
+}) {
+  const r = 7 / zoom;
+  const font = 11 / zoom;
+  const pad = 3 / zoom;
+  const boxW = label.length * font * 0.6 + pad * 2;
+  const boxH = font * 1.55;
+  const boxX = at.x + r * 1.5;
+  const boxY = at.y - r - boxH;
+  return (
+    <Group listening={false}>
+      <Shape
+        listening={false}
+        sceneFunc={(ctx) => {
+          ctx.beginPath();
+          if (kind === 'endpoint') {
+            ctx.rect(at.x - r, at.y - r, r * 2, r * 2);
+          } else if (kind === 'midpoint') {
+            ctx.moveTo(at.x, at.y - r);
+            ctx.lineTo(at.x + r, at.y + r);
+            ctx.lineTo(at.x - r, at.y + r);
+            ctx.closePath();
+          } else if (kind === 'cross') {
+            ctx.moveTo(at.x - r, at.y - r);
+            ctx.lineTo(at.x + r, at.y + r);
+            ctx.moveTo(at.x + r, at.y - r);
+            ctx.lineTo(at.x - r, at.y + r);
+          } else if (kind === 'perp') {
+            ctx.moveTo(at.x - r, at.y + r);
+            ctx.lineTo(at.x + r, at.y + r);
+            ctx.moveTo(at.x, at.y - r);
+            ctx.lineTo(at.x, at.y + r);
+          } else {
+            ctx.moveTo(at.x, at.y - r);
+            ctx.lineTo(at.x + r, at.y);
+            ctx.lineTo(at.x, at.y + r);
+            ctx.lineTo(at.x - r, at.y);
+            ctx.closePath();
+          }
+          ctx.strokeStyle = accent;
+          ctx.lineWidth = 2 / zoom;
+          ctx.stroke();
+        }}
+      />
+      <Rect
+        x={boxX}
+        y={boxY}
+        width={boxW}
+        height={boxH}
+        fill={bg}
+        cornerRadius={2 / zoom}
+        listening={false}
+      />
+      <Text
+        x={boxX + pad}
+        y={boxY + font * 0.26}
+        text={label}
+        fontSize={font}
+        fill={fg}
+        listening={false}
+      />
+    </Group>
+  );
+});
+
+/** Dashed line back to the corner the cursor is lining up with. */
+const AlignGuideMark = memo(function AlignGuideMark({
+  guide, to, zoom, accent,
+}: {
+  guide: AlignGuide;
+  to: { x: number; y: number };
+  zoom: number;
+  accent: string;
+}) {
+  const pts = guide.axis === 'x'
+    ? [guide.anchor.x, guide.anchor.y, guide.at, to.y]
+    : [guide.anchor.x, guide.anchor.y, to.x, guide.at];
+  return (
+    <Group listening={false}>
+      <Line
+        points={pts}
+        stroke={accent}
+        strokeWidth={1 / zoom}
+        dash={[0.5, 0.35]}
+        opacity={0.75}
+        listening={false}
+      />
+      <Circle
+        x={guide.anchor.x}
+        y={guide.anchor.y}
+        radius={3 / zoom}
+        stroke={accent}
+        strokeWidth={1.5 / zoom}
+        listening={false}
+      />
+    </Group>
+  );
+});
+
+/**
+ * Exact entry while a wall is in progress. The boxes track the cursor until you
+ * type in one, then they hold what you typed — the way a drafting program does.
+ * They are real inputs, so a tap works as well as a keystroke.
+ */
+function DynInput({
+  from, to, zoom, panX, panY, units, tips, onCommit, onCancel,
+}: {
+  from: { x: number; y: number };
+  to: { x: number; y: number };
+  zoom: number;
+  panX: number;
+  panY: number;
+  units: 'ft' | 'm';
+  tips: Locale;
+  onCommit: (p: { x: number; y: number }) => void;
+  onCancel: () => void;
+}) {
+  const lenRef = useRef<HTMLInputElement>(null);
+  const [len, setLen] = useState<string | null>(null);
+  const [ang, setAng] = useState<string | null>(null);
+  const liveLen = dist(from, to);
+  const liveAng = headingDeg(from, to);
+
+  useEffect(() => {
+    setLen(null);
+    setAng(null);
+  }, [from.x, from.y]);
+
+  useEffect(() => {
+    const onKey = (ev: KeyboardEvent) => {
+      const tag = (ev.target as HTMLElement | null)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (!/^[0-9]$/.test(ev.key)) return;
+      /* Beat the app-wide shortcuts: `0` would otherwise zoom to fit. */
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      setLen(ev.key);
+      lenRef.current?.focus();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  const commit = () => {
+    const length = len == null ? liveLen : parseFeet(len, units);
+    const typedAng = ang == null ? liveAng : Number(ang);
+    if (length == null || !Number.isFinite(length) || length < 0.5) return;
+    const deg = Number.isFinite(typedAng) ? typedAng : liveAng;
+    onCommit(polarPoint(from, length, deg));
+  };
+
+  const onFieldKey = (ev: ReactKeyEvent<HTMLInputElement>) => {
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      commit();
+    } else if (ev.key === 'Escape') {
+      ev.preventDefault();
+      onCancel();
+    }
+  };
+
+  const lenText = len ?? (units === 'm'
+    ? (liveLen * 0.3048).toFixed(2)
+    : (Math.round(liveLen * 12) / 12).toFixed(2).replace(/\.?0+$/, ''));
+
+  return (
+    <div
+      className="dyn-input"
+      style={{ left: to.x * zoom + panX + 16, top: to.y * zoom + panY + 16 }}
+    >
+      <label className="dyn-field">
+        <span>{t(tips, 'dyn.len')}</span>
+        <input
+          ref={lenRef}
+          type="text"
+          inputMode="decimal"
+          value={lenText}
+          aria-label={t(tips, 'dyn.len')}
+          onChange={(ev) => setLen(ev.target.value)}
+          onFocus={(ev) => ev.target.select()}
+          onKeyDown={onFieldKey}
+        />
+      </label>
+      <label className="dyn-field dyn-field-ang">
+        <span>{t(tips, 'dyn.ang')}</span>
+        <input
+          type="text"
+          inputMode="decimal"
+          value={ang ?? String(Math.round(liveAng))}
+          aria-label={t(tips, 'dyn.ang')}
+          onChange={(ev) => setAng(ev.target.value)}
+          onFocus={(ev) => ev.target.select()}
+          onKeyDown={onFieldKey}
+        />
+      </label>
+      <button type="button" className="dyn-go aw-pressable" onClick={commit}>
+        {t(tips, 'dyn.go')}
+      </button>
     </div>
   );
 }

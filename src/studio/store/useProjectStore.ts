@@ -175,8 +175,9 @@ interface Store {
   clearSelection: () => void;
   setSelected: (sel: Sel) => void;
   deleteSelected: () => void;
-  beginWall: (p: Point) => void;
-  finishWall: (p: Point, ortho?: boolean) => void;
+  /** `exact` means the canvas already resolved an object snap — do not re-snap. */
+  beginWall: (p: Point, exact?: boolean) => void;
+  finishWall: (p: Point, ortho?: boolean, exact?: boolean) => void;
   chamferAt: (p: Point) => void;
   cancelWallDraft: () => void;
   placeOpening: (type: 'door' | 'window', p: Point) => void;
@@ -191,8 +192,8 @@ interface Store {
   seedCrowd: (count: number) => void;
   placeRoom: (p: Point) => void;
   renameRoom: (id: string, name: string) => void;
-  beginDim: (p: Point) => void;
-  finishDim: (p: Point, ortho?: boolean) => void;
+  beginDim: (p: Point, exact?: boolean) => void;
+  finishDim: (p: Point, ortho?: boolean, exact?: boolean) => void;
   placeNote: (p: Point) => void;
   renameNote: (id: string, text: string) => void;
   placePlant: (p: Point) => void;
@@ -202,6 +203,8 @@ interface Store {
   hitAt: (p: Point) => { kind: 'furniture' | 'landscape' | 'note' | 'dim' | 'opening' | 'wall' | 'sketch' | 'room'; id: string } | null;
   moveSelected: (dx: number, dy: number) => void;
   endMove: () => void;
+  /** Arrow-key move. Exact, so it is never pulled back onto the grid. */
+  nudgeSelected: (dx: number, dy: number) => void;
   debugJson: () => string;
 }
 
@@ -240,6 +243,8 @@ function refreshRoof(f: Floor, roofStyleId: RoofStyleId | null): Floor {
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
 let moving = false;
+/** A burst of arrow-key nudges should undo as one move, not one per tap. */
+let nudgeTimer: ReturnType<typeof setTimeout> | null = null;
 
 export const useProjectStore = create<Store>((set, get) => ({
   doc: blankProject(),
@@ -856,15 +861,15 @@ export const useProjectStore = create<Store>((set, get) => ({
     get().markDirty();
   },
 
-  beginWall: (p) => {
+  beginWall: (p, exact) => {
     if (capReached(get().floor(), 'walls')) {
       get().showCapToast('walls');
       return;
     }
     const s = get().doc.settings;
-    set({ wallDraft: snapPoint(p, s.gridSize, s.snap), dimDraft: null });
+    set({ wallDraft: exact ? p : snapPoint(p, s.gridSize, s.snap), dimDraft: null });
   },
-  finishWall: (p, forceOrtho) => {
+  finishWall: (p, forceOrtho, exact) => {
     const { wallDraft, doc } = get();
     if (!wallDraft) return;
     if (capReached(get().floor(), 'walls')) {
@@ -873,7 +878,7 @@ export const useProjectStore = create<Store>((set, get) => ({
       return;
     }
     const s = doc.settings;
-    const endPt = snapWallEnd(wallDraft, p, {
+    const endPt = exact ? p : snapWallEnd(wallDraft, p, {
       ortho: s.ortho !== false,
       forceOrtho: !!forceOrtho,
       snap: s.snap,
@@ -1246,15 +1251,15 @@ export const useProjectStore = create<Store>((set, get) => ({
     get().markDirty();
   },
 
-  beginDim: (p) => {
+  beginDim: (p, exact) => {
     const s = get().doc.settings;
-    set({ dimDraft: snapPoint(p, s.gridSize, s.snap), wallDraft: null });
+    set({ dimDraft: exact ? p : snapPoint(p, s.gridSize, s.snap), wallDraft: null });
   },
-  finishDim: (p, forceOrtho) => {
+  finishDim: (p, forceOrtho, exact) => {
     const { dimDraft, doc } = get();
     if (!dimDraft) return;
     const s = doc.settings;
-    const endPt = snapWallEnd(dimDraft, p, {
+    const endPt = exact ? p : snapWallEnd(dimDraft, p, {
       ortho: s.ortho !== false,
       forceOrtho: !!forceOrtho,
       snap: s.snap,
@@ -1600,6 +1605,21 @@ export const useProjectStore = create<Store>((set, get) => ({
       }
       get().markDirty();
     }
+  },
+  nudgeSelected: (dx, dy) => {
+    const selected = get().selected;
+    if (!selected) return;
+    get().moveSelected(dx, dy);
+    const s = get().doc.settings;
+    if (selected.kind === 'wall' && s.roofStyleId) {
+      set({ doc: withFloor(get().doc, (f) => refreshRoof(f, s.roofStyleId)) });
+    }
+    if (nudgeTimer) clearTimeout(nudgeTimer);
+    nudgeTimer = setTimeout(() => {
+      nudgeTimer = null;
+      moving = false;
+      get().markDirty();
+    }, 600);
   },
 
   duplicateSelected: () => {
