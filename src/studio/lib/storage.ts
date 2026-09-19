@@ -5,6 +5,7 @@ import { isSkillLevel, readSkillPref } from '../data/skill';
 import { asShowFurniture3d, asSite, asSky, asTint } from '../data/scene3d';
 import { asFloorFinish, asFloorGrain } from '../data/flooring';
 import { asLocale } from '../data/i18n';
+import { mergeChunk, type DirtyChunk } from './tiles';
 import { asDollProj, asYawDeg } from './iso';
 import { APP_VERSION } from '../version';
 import { blankProject } from '../data/templates';
@@ -13,15 +14,18 @@ import { generateRoof, roofDefaultForStyle, roofStyleName } from './roof';
 
 const DB_NAME = 'archworks';
 const STORE = 'projects';
+const CHUNK_STORE = 'dirtyChunks';
 const KEY = 'current';
+const DB_VERSION = 2;
 
 let dbPromise: Promise<IDBPDatabase> | null = null;
 
 function getDb() {
   if (!dbPromise) {
-    dbPromise = openDB(DB_NAME, 1, {
+    dbPromise = openDB(DB_NAME, DB_VERSION, {
       upgrade(db) {
         if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
+        if (!db.objectStoreNames.contains(CHUNK_STORE)) db.createObjectStore(CHUNK_STORE);
       },
     });
   }
@@ -124,8 +128,12 @@ function normalizeDoc(data: ProjectDocument): ProjectDocument {
         dollYaw: asYawDeg(data.settings?.dollYaw),
         dollTop: data.settings?.dollTop === true,
         locale: asLocale(data.settings?.locale),
+        tipsLocale: asLocale(
+          (data.settings as { tipsLocale?: unknown })?.tipsLocale ?? data.settings?.locale,
+        ),
         udlFat: data.settings?.udlFat === true,
         udlType: data.settings?.udlType === true,
+        udlContrast: data.settings?.udlContrast === true,
         ellEnglish: data.settings?.ellEnglish !== false,
       };
       const typology =
@@ -150,7 +158,14 @@ export async function loadProject(): Promise<ProjectDocument | null> {
         setTimeout(() => resolve(null), 2500);
       }),
     ]);
-    return raw ? normalizeDoc(raw) : null;
+    if (!raw) return null;
+    const leftovers = await loadDirtyChunks();
+    const doc = normalizeDoc(raw);
+    if (!leftovers.length) return doc;
+    return {
+      ...doc,
+      floors: doc.floors.map((f) => leftovers.filter((c) => c.floorId === f.id).reduce(mergeChunk, f)),
+    };
   } catch {
     return null;
   }
@@ -163,6 +178,37 @@ export async function saveProject(doc: ProjectDocument): Promise<void> {
     meta: { ...doc.meta, version: APP_VERSION, updatedAt: new Date().toISOString() },
   };
   await db.put(STORE, payload, KEY);
+  await clearDirtyChunks();
+}
+
+export async function saveDirtyChunks(chunks: DirtyChunk[]): Promise<void> {
+  if (!chunks.length) return;
+  const db = await getDb();
+  const tx = db.transaction(CHUNK_STORE, 'readwrite');
+  for (const chunk of chunks) {
+    await tx.store.put(chunk, chunk.key);
+  }
+  await tx.done;
+}
+
+export async function loadDirtyChunks(): Promise<DirtyChunk[]> {
+  try {
+    const db = await getDb();
+    if (!db.objectStoreNames.contains(CHUNK_STORE)) return [];
+    return ((await db.getAll(CHUNK_STORE)) as DirtyChunk[]) ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function clearDirtyChunks(): Promise<void> {
+  try {
+    const db = await getDb();
+    if (!db.objectStoreNames.contains(CHUNK_STORE)) return;
+    await db.clear(CHUNK_STORE);
+  } catch {
+    /* ignore */
+  }
 }
 
 export function exportProjectFile(doc: ProjectDocument): void {

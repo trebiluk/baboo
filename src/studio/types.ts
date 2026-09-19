@@ -279,10 +279,17 @@ export interface ProjectSettings {
   dollTop: boolean;
   /** Classroom language. Default English. */
   locale: Locale;
-  /** Special-ed: 52px tap targets + always-on labels. */
+  /**
+   * Chrome / tip / toast language pack (EN+ES+CU+UK+RU+TI+FA).
+   * Teaching / Matteson spine stays English with an optional gloss line.
+   */
+  tipsLocale: Locale;
+  /** Classroom: 52px tap targets + always-on labels. */
   udlFat: boolean;
-  /** Special-ed: larger type on coach, toast, Teach, hints. */
+  /** Classroom: larger type on coach, toast, Teach, hints. */
   udlType: boolean;
+  /** Classroom: Stark high-contrast overlay. Does not switch to Dream. */
+  udlContrast: boolean;
   /** ELL grades 5–8: show English CAD words first so kids learn them. Default on. */
   ellEnglish: boolean;
   /** Tiny Home typology + inventory checklist (omit for regular houses). */

@@ -3,6 +3,14 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.0.0 — 2026-09-19 — P0 inclusion / tools-ease UDL defaults
+- Same Help for every student: bigger type, high contrast, and tip language sit at the top of Help and Settings
+- High contrast stays on Stark white + blue — darker words, thicker lines, stronger focus rings
+- Tip language pack (EN · ES · Cubano · UK · RU · TI · FA) via one `tipsLocale` setting. Teach / Matteson words stay English with a gloss line
+- Fat taps (≥44px), icon above the label, Undo always on the bar
+- Every place or miss shows a calm visual toast (Done / Try again / Full) — works with the sound off
+- Cap toast before a stamp: rooms 12 · walls 40 · objects 60. Autosave writes dirty awake tiles only
+
 ## 1.3.5 — 2026-09-17
 - Selected walls show squares on the ends — drag them to stretch, drag the middle to slide
 - The right panel edits size, paint, and place for whatever you tap

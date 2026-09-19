@@ -1,9 +1,15 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { LOCALES, STR, asLocale, ellToolParts, homePhrase, isLocale, t, tt } from './i18n.ts';
+import { LOCALES, STR, asLocale, ellToolParts, homePhrase, isLocale, t, tipLoc, tt } from './i18n.ts';
 import { VOCAB, VOCAB_PACKS, ellPracticeEntries, ellVocabCard, vocabGloss } from './teaching.ts';
 
 describe('i18n', () => {
+  it('tipLoc prefers tipsLocale over locale', () => {
+    assert.equal(tipLoc({ tipsLocale: 'es', locale: 'en' }), 'es');
+    assert.equal(tipLoc({ locale: 'uk' }), 'uk');
+    assert.equal(tipLoc({}), 'en');
+  });
+
   it('asLocale falls back to en', () => {
     assert.equal(asLocale('es'), 'es');
     assert.equal(asLocale('en'), 'en');

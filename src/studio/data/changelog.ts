@@ -11,6 +11,15 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.0.0',
+    date: '2026-09-19',
+    bullets: [
+      'P0 inclusion / tools-ease: same Help for every student — bigger type, high contrast, and tip language at the top',
+      'High contrast stays on Stark white + blue. Teach / Matteson words stay English; tips use tipsLocale',
+      'Fat taps, icon-above-label, Undo always visible, visual success/miss toasts, cap toast, dirty-tile autosave',
+    ],
+  },
+  {
     version: '1.3.5',
     date: '2026-09-17',
     bullets: [

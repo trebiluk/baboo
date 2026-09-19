@@ -5,7 +5,7 @@ import { useProjectStore } from '../store/useProjectStore';
 import { exteriorFloorAreaSqFt, roofStyleName } from '../lib/roof';
 import { FURNITURE_CATALOG } from '../data/furniture';
 import { DEFAULT_SKILL_LEVEL, NOVICE_UNIT_STEPS, skillRank } from '../data/skill';
-import { t, localeOption, asLocale } from '../data/i18n';
+import { t, localeOption, asLocale, tipLoc } from '../data/i18n';
 import type { Locale, Floor, StyleId } from '../types';
 import { runArchitectCheck, type ArchCheck, type ArchHit } from '../lib/architect';
 
@@ -24,7 +24,8 @@ export function TeachingDrawer() {
   const catalogIds = new Set(floor.furniture.map((f) => f.catalogId));
   const hasUtility = (ids: string[]) => ids.some((id) => catalogIds.has(id));
   const skillLevel = doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
-  const locale = doc.settings.locale;
+  const locale = tipLoc(doc.settings);
+  const tipsName = localeOption(locale).label;
   const ellEnglish = doc.settings.ellEnglish !== false;
   const rank = skillRank(skillLevel);
   const unit = styleId === 'dog-house' ? DOG_HOUSE_UNIT : UNIT_1;
@@ -90,6 +91,9 @@ export function TeachingDrawer() {
 
         <div className="teaching-drawer-body">
           <p className="muted teach-hello">{t(locale, 'teach.hello')}</p>
+          {asLocale(locale) !== 'en' ? (
+            <p className="muted dense-lead" lang="en">{t(locale, 'teach.spine', { lang: tipsName })}</p>
+          ) : null}
           <section>
             <h3>{t(locale, 'teach.read.title')}</h3>
             <p className="muted dense-lead">{t(locale, 'teach.read.lead')}</p>

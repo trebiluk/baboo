@@ -2490,8 +2490,14 @@ html.aw-teaching-open, body.aw-teaching-open {
 .tool-btn {
   justify-content:center;
   align-items:center;
-  gap:6px;
+  gap:4px;
+  flex-direction:column;
   display:inline-flex
+}
+.tool-btn-label {
+  font-size:11px;
+  font-weight:700;
+  line-height:1.1
 }
 .tool-btn .tool-icon {
   width:18px;
@@ -3426,6 +3432,140 @@ html[data-locale="ru"] .drawer {
 /* Hide the edit panel while a right-side drawer is open so they do not stack. */
 .app-shell:has(.drawer) .inspect-dock:not(.is-min) {
   display: none;
+}
+
+/* 2.0.0-P0 — inclusion chrome (Stark stays default; no Dream purple) */
+.chrome-undo {
+  display: inline-flex !important;
+}
+.tool-rail-btn.active,
+.tool-btn.active {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 800;
+}
+.tool-rail-btn.active .tool-check {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 11px;
+}
+.tool-rail-btn {
+  position: relative;
+}
+.tool-rail-btn.is-capped,
+.tool-btn.is-capped {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+.help-include {
+  border: 1px solid var(--aw-border);
+  background: var(--aw-surface);
+  border-radius: 12px;
+  margin: 0 0 14px;
+  padding: 12px;
+}
+.help-include h3 {
+  margin: 0 0 6px;
+}
+.help-include-toggles,
+.help-include .aw-lang-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+.help-lang-label {
+  margin: 10px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+.toast {
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+  cursor: pointer;
+  text-align: start;
+}
+.toast-mark {
+  flex: none;
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--aw-border);
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  display: inline-flex;
+}
+.toast-copy {
+  flex-direction: column;
+  gap: 2px;
+  display: flex;
+}
+.toast-body {
+  color: var(--aw-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.toast-ok .toast-mark {
+  border-color: var(--aw-ok);
+  color: var(--aw-ok);
+}
+.toast-miss .toast-mark {
+  border-color: var(--aw-due);
+  color: var(--aw-due);
+}
+.toast-cap {
+  border-color: var(--aw-fg);
+  box-shadow: 0 8px 22px #0a0a0a29;
+}
+.toast-cap .toast-mark {
+  border-color: var(--aw-fg);
+  color: var(--aw-fg);
+}
+
+html[data-udl-contrast] {
+  --aw-fg: #000;
+  --aw-muted: #161616;
+  --aw-subtle: #2a2a2a;
+  --aw-border: #111;
+  --aw-plan-line: #000;
+  --aw-plan-dim: #161616;
+  --aw-plan-wall-ext: #000;
+  --aw-plan-wall-int: #222;
+  --aw-cyan: #1d4ed8;
+  --aw-accent: #1d4ed8;
+  --aw-royal: #1d4ed8;
+  --aw-indigo: #1e3a8a;
+  --aw-violet: #1d4ed8;
+  --aw-purple: #93c5fd;
+  --aw-deep: #172554;
+}
+html[data-udl-contrast] .tool-btn:focus-visible,
+html[data-udl-contrast] .ghost-btn:focus-visible,
+html[data-udl-contrast] .primary-btn:focus-visible,
+html[data-udl-contrast] .tool-rail-btn:focus-visible,
+html[data-udl-contrast] .aw-shell-chip:focus-visible,
+html[data-udl-contrast] .catalog-card:focus-visible {
+  outline: 3px solid #000;
+  outline-offset: 2px;
+}
+html[data-udl-contrast] .canvas-hint,
+html[data-udl-contrast] .wall-cta,
+html[data-udl-contrast] .toast,
+html[data-udl-contrast] .help-list,
+html[data-udl-contrast] .teach-hello {
+  color: #000;
+}
+html[data-gui-theme=stark] body,
+html[data-gui-theme=stark] .help-list,
+html[data-gui-theme=stark] .teach-hello,
+html[data-gui-theme=stark] .canvas-hint {
+  color: var(--aw-fg);
 }
 
 

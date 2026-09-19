@@ -8,7 +8,8 @@ import { ClassShareModal } from './ClassShareModal';
 import { COPYRIGHT_LINE } from './HelpModal';
 import { VersionChip } from './VersionChip';
 import { usePhoneChrome } from '../hooks/usePhoneChrome';
-import { t, asLocale } from '../data/i18n';
+import { t, tipLoc } from '../data/i18n';
+import { capReached } from '../lib/caps';
 
 const TOOLS: { id: Tool; label: string; tip?: string; icon: IconName }[] = [
   { id: 'select', label: 'Select', tip: 'Click something to move it', icon: 'select' },
@@ -94,7 +95,9 @@ export function Chrome() {
   }, []);
 
   const skillLevel = useProjectStore((s) => s.doc.settings.skillLevel) ?? DEFAULT_SKILL_LEVEL;
-  const locale = asLocale(useProjectStore((s) => s.doc.settings.locale));
+  const locale = tipLoc(useProjectStore((s) => s.doc.settings));
+  const floor = useProjectStore((s) => s.doc.floors[0]);
+  const showCapToast = useProjectStore((s) => s.showCapToast);
   const statusLabel =
     saveStatus === 'saved' ? t(locale, 'chrome.saved') :
     saveStatus === 'saving' ? t(locale, 'chrome.saving') :
@@ -157,25 +160,39 @@ export function Chrome() {
       </div>
 
       <div className="tool-bar chrome-tools" role="toolbar" aria-label="Primary tools">
-        {visibleTools.map((item) => (
+        {visibleTools.map((item) => {
+          const capped = (item.id === 'wall' && capReached(floor, 'walls'))
+            || (item.id === 'room' && capReached(floor, 'rooms'))
+            || ((item.id === 'furniture' || item.id === 'plant') && capReached(floor, 'objects'));
+          return (
           <button
             key={item.id}
             type="button"
-            className={`tool-btn aw-pressable ${tool === item.id ? 'active' : ''}`}
-            onClick={() => setTool(item.id)}
+            className={`tool-btn aw-pressable ${tool === item.id ? 'active' : ''}${capped ? ' is-capped' : ''}`}
+            onClick={() => {
+              if (capped) {
+                if (item.id === 'wall') showCapToast('walls');
+                else if (item.id === 'room') showCapToast('rooms');
+                else showCapToast('objects');
+                return;
+              }
+              setTool(item.id);
+            }}
             title={item.tip}
             aria-pressed={tool === item.id}
+            aria-disabled={capped}
             disabled={!canEdit && item.id !== 'select'}
           >
             {tool === item.id ? <span className="tool-check" aria-hidden="true">✓ </span> : null}
             <Icon name={item.icon} />
-            {t(locale, `tool.${item.id}`)}
+            <span className="tool-btn-label">{t(locale, `tool.${item.id}`)}</span>
           </button>
-        ))}
+          );
+        })}
       </div>
 
       <div className="chrome-right">
-        <button type="button" className="ghost-btn aw-pressable chrome-ico" onClick={undo} title={t(locale, 'chrome.undo')} disabled={!canEdit}>
+        <button type="button" className="ghost-btn aw-pressable chrome-ico chrome-undo" onClick={undo} title={t(locale, 'chrome.undo')} aria-label={t(locale, 'chrome.undo')} disabled={!canEdit}>
           <Icon name="undo" /> <span className="chrome-label">{t(locale, 'chrome.undo')}</span>
         </button>
         <button type="button" className="ghost-btn aw-pressable chrome-ico chrome-wide" onClick={redo} title={t(locale, 'chrome.redo')} disabled={!canEdit}>

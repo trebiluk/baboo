@@ -12,6 +12,7 @@ import { kitchenTriangle } from '../lib/architect';
 import { exteriorBounds } from '../lib/roof';
 import { roomType } from '../data/rooms';
 import type { FurnitureItem, Opening, Wall, Node, Room, DimItem, NoteItem, LandscapeItem, Locale } from '../types';
+import { t, tipLoc } from '../data/i18n';
 import {
   loadImportPattern,
   patternForPack,
@@ -23,7 +24,6 @@ import { asFloorFinish, asFloorGrain, floorFinish, floorTileCanvas } from '../da
 import { DEFAULT_GUI_THEME } from '../data/themes';
 import { DEFAULT_SKILL_LEVEL, skillRank } from '../data/skill';
 import { furnitureLod } from '../lib/perf';
-import { t } from '../data/i18n';
 
 export function PlanCanvas() {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -111,6 +111,7 @@ export function PlanCanvas() {
   }, []);
 
   const settings = doc.settings;
+  const tips = tipLoc(settings);
   const accent = settings.accent || '#22D3EE';
   const units = settings.units || 'ft';
   const guiTheme = settings.guiTheme ?? DEFAULT_GUI_THEME;
@@ -922,13 +923,13 @@ export function PlanCanvas() {
       {showWallCta && (
         <div className="wall-cta" role="status">
           <div className="wall-cta-body">
-            <strong>{t(settings.locale, 'cta.wall.title')}</strong>
-            <span className="wall-cta-sub">{t(settings.locale, 'cta.wall.sub')}</span>
+            <strong>{t(tips, 'cta.wall.title')}</strong>
+            <span className="wall-cta-sub">{t(tips, 'cta.wall.sub')}</span>
           </div>
           <button
             type="button"
             className="wall-cta-x aw-pressable"
-            aria-label={t(settings.locale, 'cta.dismiss')}
+            aria-label={t(tips, 'cta.dismiss')}
             onClick={dismissWallCta}
           >
             ×
@@ -939,32 +940,32 @@ export function PlanCanvas() {
       <div className="canvas-hint">
         {tool === 'wall'
           ? (wallMode === 'clip'
-            ? (clipHover ? t(settings.locale, 'hint.clip.hot') : t(settings.locale, 'hint.clip'))
+            ? (clipHover ? t(tips, 'hint.clip.hot') : t(tips, 'hint.clip'))
             : (wallDraft
-            ? t(settings.locale, skillRank(skillLevel) <= 1 ? 'hint.wall.end' : 'hint.wall.end.short')
-            : t(settings.locale, skillRank(skillLevel) <= 1 ? 'hint.wall.start' : 'hint.wall.start.short')))
+            ? t(tips, skillRank(skillLevel) <= 1 ? 'hint.wall.end' : 'hint.wall.end.short')
+            : t(tips, skillRank(skillLevel) <= 1 ? 'hint.wall.start' : 'hint.wall.start.short')))
           : tool === 'sketch'
             ? (liveStroke
-              ? t(settings.locale, 'hint.sketch.drag')
-              : t(settings.locale, skillRank(skillLevel) <= 1 ? 'hint.sketch' : 'hint.sketch.short'))
+              ? t(tips, 'hint.sketch.drag')
+              : t(tips, skillRank(skillLevel) <= 1 ? 'hint.sketch' : 'hint.sketch.short'))
           : tool === 'door' || tool === 'window'
-            ? t(settings.locale, skillRank(skillLevel) <= 1 ? 'hint.door' : 'hint.door.short')
+            ? t(tips, skillRank(skillLevel) <= 1 ? 'hint.door' : 'hint.door.short')
             : tool === 'furniture'
-              ? t(settings.locale, 'hint.furn')
+              ? t(tips, 'hint.furn')
               : tool === 'room'
-                ? t(settings.locale, 'hint.room')
+                ? t(tips, 'hint.room')
               : tool === 'dim'
-                ? t(settings.locale, dimDraft ? 'hint.dim.end' : 'hint.dim')
+                ? t(tips, dimDraft ? 'hint.dim.end' : 'hint.dim')
               : tool === 'note'
-                ? t(settings.locale, 'hint.note')
+                ? t(tips, 'hint.note')
               : tool === 'plant'
-                ? t(settings.locale, 'hint.plant')
+                ? t(tips, 'hint.plant')
               : tool === 'pan'
-                ? t(settings.locale, 'hint.pan')
-                : t(settings.locale, selected?.kind === 'wall'
+                ? t(tips, 'hint.pan')
+                : t(tips, selected?.kind === 'wall'
                   ? 'hint.select.wall'
                   : skillRank(skillLevel) <= 1 ? 'hint.select' : 'hint.select.short')}
-        {settings.snap ? ` · ${t(settings.locale, 'hint.snapOn')}` : ` · ${t(settings.locale, 'hint.snapOff')}`}
+        {settings.snap ? ` · ${t(tips, 'hint.snapOn')}` : ` · ${t(tips, 'hint.snapOff')}`}
         {settings.ortho !== false ? ' · 90°+45°' : ''}
         {' · '}{zoomLabel}
         {units === 'm' ? ' · m' : ' · ft'}
@@ -972,15 +973,15 @@ export function PlanCanvas() {
       )}
       {skillRank(skillLevel) >= 3 && (
         <div className="canvas-hint canvas-hint-quiet">
-          {settings.snap ? t(settings.locale, 'hint.snapOn') : t(settings.locale, 'hint.snapOff')} · {zoomLabel}{units === 'm' ? ' · m' : ' · ft'}
+          {settings.snap ? t(tips, 'hint.snapOn') : t(tips, 'hint.snapOff')} · {zoomLabel}{units === 'm' ? ' · m' : ' · ft'}
         </div>
       )}
-      <PlanCompass zoom={zoom} units={units} locale={settings.locale} />
+      <PlanCompass zoom={zoom} units={units} locale={tips} />
       <PlanSheet
         title={doc.meta.title}
         units={units}
         gridSize={gridSize}
-        locale={settings.locale}
+        locale={tips}
         updatedAt={doc.meta.updatedAt}
       />
       <PlanLoadChip
