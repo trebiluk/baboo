@@ -18,8 +18,15 @@ export function HelpModal() {
   const settings = useProjectStore((s) => s.doc.settings);
   const setSettings = useProjectStore((s) => s.setSettings);
   const locale = tipLoc(settings);
+  const showTips = useProjectStore((s) => s.showTips);
+  const setShowTips = useProjectStore((s) => s.setShowTips);
+  const taAssist = useProjectStore((s) => s.taAssist);
+  const setTaAssist = useProjectStore((s) => s.setTaAssist);
   const [showGallery, setShowGallery] = useState(false);
+  // With an aide driving, the long list folds away until someone asks for it.
+  const [showList, setShowList] = useState(false);
   if (!open) return null;
+  const listOpen = !taAssist || showList;
   return (
     <>
       <button
@@ -66,7 +73,25 @@ export function HelpModal() {
             >
               {t(locale, 'udl.fat')}
             </button>
+            <button
+              type="button"
+              className={`aw-shell-chip aw-pressable${showTips ? ' active' : ''}`}
+              aria-pressed={showTips}
+              onClick={() => setShowTips(!showTips)}
+            >
+              {t(locale, 'tip.show')}
+            </button>
+            <button
+              type="button"
+              className={`aw-shell-chip aw-pressable${taAssist ? ' active' : ''}`}
+              aria-pressed={taAssist}
+              onClick={() => setTaAssist(!taAssist)}
+            >
+              {t(locale, 'tip.ta')}
+            </button>
           </div>
+          <p className="muted dense-lead">{t(locale, 'tip.show.lead')}</p>
+          <p className="muted dense-lead">{t(locale, 'tip.ta.lead')}</p>
           <p className="muted dense-lead">{t(locale, 'udl.contrast')}</p>
           <h4 className="help-lang-label">{t(locale, 'lang.tips')}</h4>
           <div className="aw-shell-toggle aw-lang-toggle" role="group" aria-label={t(locale, 'lang.tips')}>
@@ -90,6 +115,17 @@ export function HelpModal() {
           </div>
         </section>
 
+        {taAssist ? (
+          <button
+            type="button"
+            className="ghost-btn aw-pressable help-more-btn"
+            aria-expanded={showList}
+            onClick={() => setShowList((v) => !v)}
+          >
+            {t(locale, 'tip.help.more')}
+          </button>
+        ) : null}
+        {listOpen ? (
         <ul className="help-list">
           <li>{t(locale, 'help.sketch')}</li>
           <li>{t(locale, 'help.wall')}</li>
@@ -107,6 +143,7 @@ export function HelpModal() {
           <li>{t(locale, 'help.udl')}</li>
           <li>{t(locale, 'help.read')}</li>
         </ul>
+        ) : null}
         <div className="aw-gallery-preview-block">
           <button
             type="button"

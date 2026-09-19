@@ -25,6 +25,11 @@ import {
   readUdlContrastPref, readEllEnglishPref, writeLocalePref, writeTipsLocalePref,
   writeUdlFatPref, writeUdlTypePref, writeUdlContrastPref, writeEllEnglishPref,
 } from '../data/i18n';
+import {
+  readShowTipsPref, writeShowTipsPref, readTipsDonePref, writeTipsDonePref,
+  readSavedFilePref, writeSavedFilePref, readTaAssistPref, writeTaAssistPref,
+} from '../data/tips';
+import type { TipId } from '../data/tips';
 import { generateRoof, roofStyleName } from '../lib/roof';
 import { textureName } from '../data/textures';
 import {
@@ -103,6 +108,12 @@ interface Store {
   driveWizardOpen: boolean;
   changelogOpen: boolean;
   demoMode: boolean;
+  /* Tip pack — one coach mark at a time, three wins then quiet. */
+  showTips: boolean;
+  tipsDone: TipId[];
+  savedFile: boolean;
+  tipPending: TipId | null;
+  taAssist: boolean;
   viewMode: ViewMode;
   panX: number;
   panY: number;
@@ -152,6 +163,10 @@ interface Store {
   minimizePanels: () => void;
   toggleCustomize: () => void;
   toggleHelp: () => void;
+  setShowTips: (on: boolean) => void;
+  markTipDone: (id: TipId) => void;
+  requestTip: (id: TipId) => void;
+  setTaAssist: (on: boolean) => void;
   toggleDebug: () => void;
   toggleChangelog: () => void;
   toggleDemo: () => void;
@@ -265,6 +280,11 @@ export const useProjectStore = create<Store>((set, get) => ({
   driveWizardOpen: false,
   changelogOpen: false,
   demoMode: false,
+  showTips: readShowTipsPref(),
+  tipsDone: readTipsDonePref(),
+  savedFile: readSavedFilePref(),
+  tipPending: null,
+  taAssist: readTaAssistPref(),
   viewMode: 'plan',
   panX: 40,
   panY: 40,
@@ -534,6 +554,7 @@ export const useProjectStore = create<Store>((set, get) => ({
   },
   setViewMode: (viewMode) => {
     set({ viewMode, doc: { ...get().doc, settings: { ...get().doc.settings, viewMode } } });
+    if (viewMode !== 'plan' && viewMode !== 'dollhouse') get().requestTip('tip-3d');
     get().markDirty();
   },
   setRenderTier: (renderTier) => {
@@ -552,13 +573,17 @@ export const useProjectStore = create<Store>((set, get) => ({
       saveTimer = setTimeout(() => { void get().autosave(); }, 400);
     }
   },
-  toggleTeaching: () => set((s) => ({
-    teachingOpen: !s.teachingOpen,
-    accessOpen: false,
-    contestOpen: false,
-    helpOpen: false,
-    customizeOpen: false,
-  })),
+  toggleTeaching: () => {
+    const opening = !get().teachingOpen;
+    set({
+      teachingOpen: opening,
+      accessOpen: false,
+      contestOpen: false,
+      helpOpen: false,
+      customizeOpen: false,
+    });
+    if (opening) get().requestTip('tip-teach');
+  },
   toggleAccess: () => set((s) => ({
     accessOpen: !s.accessOpen,
     contestOpen: false,
@@ -620,6 +645,27 @@ export const useProjectStore = create<Store>((set, get) => ({
     contestOpen: false,
     customizeOpen: false,
   })),
+  /** Turning tips back on restarts the three-win path — one class, one run. */
+  setShowTips: (on) => {
+    writeShowTipsPref(on);
+    if (on) writeTipsDonePref([]);
+    set({ showTips: on, tipsDone: on ? [] : get().tipsDone, tipPending: null });
+  },
+  markTipDone: (id) => {
+    const done = get().tipsDone.includes(id) ? get().tipsDone : [...get().tipsDone, id];
+    writeTipsDonePref(done);
+    set({ tipsDone: done, tipPending: get().tipPending === id ? null : get().tipPending });
+  },
+  /** A later tip the student just walked into. nextTip still holds it back
+      until the three wins are in, or a TA is driving. */
+  requestTip: (id) => {
+    if (get().tipsDone.includes(id)) return;
+    set({ tipPending: id });
+  },
+  setTaAssist: (on) => {
+    writeTaAssistPref(on);
+    set({ taAssist: on, teachingOpen: on ? false : get().teachingOpen });
+  },
   toggleDebug: () => set((s) => ({ debugOpen: !s.debugOpen })),
   toggleChangelog: () => set((s) => ({ changelogOpen: !s.changelogOpen })),
   toggleDemo: () => set((s) => ({ demoMode: !s.demoMode })),
@@ -781,6 +827,9 @@ export const useProjectStore = create<Store>((set, get) => ({
       toolsPinned: skillLevel === 'novice',
     });
     get().markDirty();
+    // The template drew a roof. Naming it is the student's job — but not today,
+    // so this waits behind the three wins.
+    get().requestTip('tip-roof');
     get().showToast(
       styleId === 'dog-house'
         ? t(doc.settings.locale, 'toast.contestStart')
@@ -791,10 +840,16 @@ export const useProjectStore = create<Store>((set, get) => ({
   exportJson: () => {
     void get().flushSave();
     exportProjectFile(get().doc);
+    // Third win. The file on the Chromebook is the turn-in.
+    if (!get().savedFile) {
+      writeSavedFilePref(true);
+      set({ savedFile: true });
+    }
     get().showToast(t(tip(get), 'toast.saved'), 2400, 'ok');
   },
   exportGalleryCard: (opts) => {
     exportGalleryCardFile(get().doc, opts);
+    get().requestTip('tip-class-card');
     get().showToast(t(get().doc.settings.locale, 'toast.card'));
   },
   importJson: async (file) => {

@@ -3,6 +3,7 @@ import { useProjectStore } from '../store/useProjectStore';
 import type { StyleId } from '../types';
 import { DEFAULT_SKILL_LEVEL } from '../data/skill';
 import { SkillPicker } from './SkillPicker';
+import { TemplateGlyph } from './TemplateGlyph';
 import { roofDefaultForStyle, roofStyleName } from '../lib/roof';
 import { t } from '../data/i18n';
 
@@ -43,6 +44,7 @@ export function NewProjectModal() {
                 className="template-card aw-pressable"
                 onClick={() => start(tpl.id as StyleId)}
               >
+                <TemplateGlyph styleId={tpl.id} />
                 <strong>
                   {tpl.name}
                   {tpl.badge ? <span className="template-badge">{tpl.badge}</span> : null}

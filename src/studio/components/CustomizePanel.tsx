@@ -31,6 +31,10 @@ export function CustomizePanel() {
   const importTextureFile = useProjectStore((s) => s.importTextureFile);
   const setTypologyShell = useProjectStore((s) => s.setTypologyShell);
   const setInventoryPresent = useProjectStore((s) => s.setInventoryPresent);
+  const showTips = useProjectStore((s) => s.showTips);
+  const setShowTips = useProjectStore((s) => s.setShowTips);
+  const taAssist = useProjectStore((s) => s.taAssist);
+  const setTaAssist = useProjectStore((s) => s.setTaAssist);
   const fileRef = useRef<HTMLInputElement>(null);
   const [importBusy, setImportBusy] = useState(false);
   const skillLevel = settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
@@ -195,6 +199,24 @@ export function CustomizePanel() {
             <span>{t(settings.locale, 'udl.english')}</span>
           </label>
           <p className="muted dense-lead">{t(settings.locale, 'udl.english.lead')}</p>
+          <label className="field check">
+            <input
+              type="checkbox"
+              checked={showTips}
+              onChange={(e) => setShowTips(e.target.checked)}
+            />
+            <span>{t(settings.locale, 'tip.show')}</span>
+          </label>
+          <p className="muted dense-lead">{t(settings.locale, 'tip.show.lead')}</p>
+          <label className="field check">
+            <input
+              type="checkbox"
+              checked={taAssist}
+              onChange={(e) => setTaAssist(e.target.checked)}
+            />
+            <span>{t(settings.locale, 'tip.ta')}</span>
+          </label>
+          <p className="muted dense-lead">{t(settings.locale, 'tip.ta.lead')}</p>
           <p className="muted dense-lead">{t(settings.locale, 'udl.contrast')}</p>
         </section>
 

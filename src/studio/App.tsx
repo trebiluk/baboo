@@ -52,6 +52,7 @@ export default function App() {
   const udlType = useProjectStore((s) => s.doc.settings.udlType);
   const udlContrast = useProjectStore((s) => s.doc.settings.udlContrast);
   const ellEnglish = useProjectStore((s) => s.doc.settings.ellEnglish !== false);
+  const taAssist = useProjectStore((s) => s.taAssist);
   const phoneChrome = usePhoneChrome();
 
   useEffect(() => {
@@ -61,11 +62,13 @@ export default function App() {
   useEffect(() => {
     applyDocumentLocale(tipsLocale);
     const root = document.documentElement;
-    root.toggleAttribute('data-udl-fat', !!udlFat);
+    // TA assist implies fat taps: an aide is guiding a hand to the target.
+    root.toggleAttribute('data-udl-fat', !!udlFat || taAssist);
     root.toggleAttribute('data-udl-type', !!udlType);
     root.toggleAttribute('data-udl-contrast', !!udlContrast);
     root.toggleAttribute('data-ell-english', !!ellEnglish && tipsLocale !== 'en');
-  }, [tipsLocale, udlFat, udlType, udlContrast, ellEnglish]);
+    root.toggleAttribute('data-ta-assist', taAssist);
+  }, [tipsLocale, udlFat, udlType, udlContrast, ellEnglish, taAssist]);
 
   useEffect(() => {
     const flush = () => {
@@ -155,7 +158,8 @@ export default function App() {
             ) : (
               <View3DStub />
             )}
-            {(viewMode === 'plan' || viewMode === 'dollhouse') && <CoachBanner />}
+            {/* Also in 3D — that is where "3D is look-only" has to land. */}
+            <CoachBanner />
             {demoMode && <div className="demo-watermark">DEMO</div>}
           </main>
           <ObjectMenu />

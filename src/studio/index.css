@@ -1003,6 +1003,39 @@ button {
 .coach-card-actions .ghost-btn {
   min-height:44px
 }
+/* TA whisper — the aide's line, under the student's tip. Shape and position
+   carry the difference, not colour alone. */
+.coach-whisper {
+  flex-direction:column;
+  gap:2px;
+  margin:2px 0 0;
+  padding:6px 9px;
+  border-left:3px solid color-mix(in srgb, var(--aw-royal) 50%, transparent);
+  border-radius:0 8px 8px 0;
+  background:color-mix(in srgb, var(--aw-royal) 8%, var(--aw-surface));
+  color:var(--aw-fg);
+  font-size:12px;
+  font-weight:500;
+  line-height:1.4;
+  display:flex
+}
+.coach-whisper-kicker {
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--aw-royal);
+  font-size:10px;
+  font-weight:700
+}
+.coach-ta-label {
+  color:var(--aw-subtle);
+  margin:2px 0 0;
+  font-size:11px;
+  font-weight:600
+}
+.help-more-btn {
+  min-height:44px;
+  align-self:flex-start
+}
 .canvas-hint-quiet {
   opacity:.72;
   font-weight:500
@@ -2964,9 +2997,18 @@ html.aw-teaching-open, body.aw-teaching-open {
   grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
   gap: 12px;
 }
+/* Picture first: the glyph reads before the name does. */
+.template-glyph {
+  display: block;
+  width: 72px;
+  height: 45px;
+  margin-bottom: 6px;
+  color: var(--aw-royal);
+  flex-shrink: 0;
+}
 .template-card {
   border-radius: 10px;
-  min-height: 128px;
+  min-height: 170px;
   padding: 14px;
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--aw-fg) 8%, transparent);
   border-color: transparent;
@@ -3348,6 +3390,13 @@ html[data-udl-fat] .chrome .chrome-more-btn {
   min-height: 52px;
   min-width: 52px;
 }
+html[data-udl-fat] .template-glyph {
+  width: 88px;
+  height: 55px;
+}
+html[data-udl-fat] .template-card {
+  min-height: 190px;
+}
 html[data-udl-fat] .tool-rail-label,
 html[data-udl-fat] .chrome-label,
 html[data-udl-fat] .dock-rail-label {
@@ -3362,6 +3411,7 @@ html[data-udl-type] .canvas-hint,
 html[data-udl-type] .toast,
 html[data-udl-type] .coach-card-body,
 html[data-udl-type] .coach-card-body p,
+html[data-udl-type] .coach-whisper,
 html[data-udl-type] .wall-cta-body,
 html[data-udl-type] .wall-cta-sub,
 html[data-udl-type] .teach-hello,
