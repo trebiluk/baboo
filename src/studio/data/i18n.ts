@@ -1064,13 +1064,13 @@ export const STR: Record<string, Gloss> = {
   'udl.title': g('Help for everyone', {
     es: 'Ayuda para todos', cu: 'Ayuda para todos', uk: 'Допомога для всіх', ru: 'Помощь для всех', ti: 'ሓገዝ ንኹሉ', fa: 'کمک برای همه',
   }),
-  'udl.lead': g('ELL grades 5–8 + special-ed: same tools, English words first, bigger hits, bigger type, slower tips.', {
-    es: 'ELL grados 5–8 + educación especial: mismas herramientas, inglés primero, toques más grandes, letra más grande, tips más lentos.',
-    cu: 'ELL grados 5–8 + educación especial: mismas herramientas, inglés primero, toques más grandes, letra más grande, consejos más lentos.',
-    uk: 'ELL 5–8 класи + особлива освіта: ті самі інструменти, англійська перша, більші натиски, більший шрифт, повільніші підказки.',
-    ru: 'ELL 5–8 классы + особая поддержка: те же инструменты, английский первый, больше кнопки, крупнее шрифт, медленнее подсказки.',
+  'udl.lead': g('Same tools for the whole class. English drawing words first, fat taps, bigger type, slower tips.', {
+    es: 'Las mismas herramientas para toda la clase. Palabras de dibujo en inglés primero, toques grandes, letra más grande, tips más lentos.',
+    cu: 'Las mismas herramientas para toda la clase. Palabras de dibujo en inglés primero, toques grandes, letra más grande, consejos más lentos.',
+    uk: 'Ті самі інструменти для всього класу. Англійські слова креслення перші, великі натиски, більший шрифт, повільніші підказки.',
+    ru: 'Те же инструменты для всего класса. Английские слова чертежа первые, большие нажатия, крупнее шрифт, медленнее подсказки.',
     ti: 'ELL ክፍሊ 5–8 + ፍሉይ ትምህርቲ፦ ተመሳሳሊ መሳርሒታት፣ እንግሊዝኛ ቅድሚት፣ ዓበይቲ ጠውቕታት፣ ዓቢ ፊደል፣ ዝሓውስ ምኽሪ.',
-    fa: 'زبان‌آموز کلاس ۵ تا ۸ + آموزش ویژه: همان ابزار، انگلیسی اول، ضربهٔ بزرگ‌تر، نوشتهٔ درشت‌تر، راهنمای آهسته‌تر.',
+    fa: 'همان ابزار برای همهٔ کلاس. واژهٔ انگلیسی نقشه اول، ضربهٔ درشت، نوشتهٔ بزرگ‌تر، راهنمای آهسته‌تر.',
   }),
   'udl.fat': g('Bigger buttons (52px taps)', {
     es: 'Botones más grandes (toques de 52px)',
@@ -1104,13 +1104,95 @@ export const STR: Record<string, Gloss> = {
     ti: 'Wall, Door, Sketch ብእንግሊዝኛ ኣብ መሳርሒታት ይጸንሓ. ቋንቋኻ ኣብ ታሕቲ እያ ምእንቲ ቃላት ስእሊ ክመሃሩ.',
     fa: 'Wall، Door، Sketch روی ابزار انگلیسی می‌مانند. زبان تو زیر آن‌هاست تا واژه‌های نقشه را یاد بگیرند.',
   }),
-  'udl.contrast': g('Need high contrast? Theme → Projector. Prefer cubes? Theme → Blocky.', {
-    es: '¿Alto contraste? Tema → Projector. ¿Cubos? Tema → Blocky.',
-    cu: '¿Alto contraste? Tema → Projector. ¿Cubos? Tema → Blocky.',
-    uk: 'Потрібен високий контраст? Тема → Projector. Кубики? Тема → Blocky.',
-    ru: 'Нужен высокий контраст? Тема → Projector. Кубики? Тема → Blocky.',
-    ti: 'ልዑል ንጽጽር? ቴማ → Projector. ኩቡታት? ቴማ → Blocky.',
-    fa: 'کنتراست بالا می‌خواهی؟ پوسته → Projector. مکعب می‌خواهی؟ پوسته → Blocky.',
+  'udl.contrast': g('High contrast stays on Stark white + blue. Darker words, thicker lines.', {
+    es: 'El alto contraste se queda en Stark blanco + azul. Letras más oscuras, líneas más gruesas.',
+    cu: 'El alto contraste se queda en Stark blanco + azul. Letras más oscuras, líneas más gruesas.',
+    uk: 'Високий контраст лишається на Stark білий + синій. Темніші слова, товстіші лінії.',
+    ru: 'Высокий контраст остаётся на Stark белый + синий. Темнее слова, толще линии.',
+    ti: 'High contrast — Stark.',
+    fa: 'کنتراست بالا روی Stark سفید + آبی می‌ماند. واژه‌های تیره‌تر، خط‌های ضخیم‌تر.',
+  }),
+  'udl.contrastOn': g('High contrast', {
+    es: 'Alto contraste', cu: 'Alto contraste', uk: 'Високий контраст', ru: 'Высокий контраст', ti: 'High contrast', fa: 'کنتراست بالا',
+  }),
+  'lang.tips': g('Tip language', {
+    es: 'Idioma de consejos', cu: 'Idioma de consejos', uk: 'Мова підказок', ru: 'Язык подсказок', ti: 'Tip language', fa: 'زبان راهنما',
+  }),
+  'teach.spine': g('Class words stay in English. Tips are in {lang}.', {
+    es: 'Las palabras de clase se quedan en inglés. Los consejos están en {lang}.',
+    cu: 'Las palabras de clase se quedan en inglés. Los consejos están en {lang}.',
+    uk: 'Класні слова лишаються англійською. Підказки — {lang}.',
+    ru: 'Классные слова остаются по-английски. Подсказки — {lang}.',
+    ti: 'Class words English. Tips: {lang}.',
+    fa: 'واژه‌های کلاس انگلیسی می‌مانند. راهنما به {lang} است.',
+  }),
+  'toast.wallIn': g('Wall is in — add a Door on a wall next', {
+    es: 'Muro listo — ahora pon una Puerta en un muro',
+    cu: 'Pared lista — ahora pon una Puerta en una pared',
+    uk: 'Стіна є — далі двері на стіні',
+    ru: 'Стена есть — дальше дверь на стене',
+    ti: 'Wall is in.',
+    fa: 'دیوار گذاشته شد — بعد یک در روی دیوار بگذار',
+  }),
+  'toast.wallShort': g('Make the wall a bit longer', {
+    es: 'Haz el muro un poco más largo',
+    cu: 'Haz la pared un poco más larga',
+    uk: 'Зроби стіну трохи довшою',
+    ru: 'Сделай стену чуть длиннее',
+    ti: 'Make the wall longer.',
+    fa: 'دیوار را کمی بلندتر کن',
+  }),
+  'toast.plantIn': g('Plant is in — drag to move it', {
+    es: 'Planta lista — arrástrala para moverla',
+    cu: 'Planta lista — arrástrala para moverla',
+    uk: 'Рослина на місці — тягни, щоб посунути',
+    ru: 'Растение на месте — тяни, чтобы сдвинуть',
+    ti: 'Plant is in.',
+    fa: 'گیاه گذاشته شد — بکش تا جابه‌جا شود',
+  }),
+  'toast.capRooms': g('Room limit · 12 max', {
+    es: 'Límite de cuartos · 12 máx',
+    cu: 'Límite de cuartos · 12 máx',
+    uk: 'Ліміт кімнат · макс. 12',
+    ru: 'Лимит комнат · макс. 12',
+    ti: 'Room limit · 12',
+    fa: 'حد اتاق · حداکثر ۱۲',
+  }),
+  'toast.capWalls': g('Wall limit · 40 max', {
+    es: 'Límite de muros · 40 máx',
+    cu: 'Límite de paredes · 40 máx',
+    uk: 'Ліміт стін · макс. 40',
+    ru: 'Лимит стен · макс. 40',
+    ti: 'Wall limit · 40',
+    fa: 'حد دیوار · حداکثر ۴۰',
+  }),
+  'toast.capObjects': g('Object limit · 60 max', {
+    es: 'Límite de objetos · 60 máx',
+    cu: 'Límite de objetos · 60 máx',
+    uk: 'Ліміт речей · макс. 60',
+    ru: 'Лимит вещей · макс. 60',
+    ti: 'Object limit · 60',
+    fa: 'حد وسیله · حداکثر ۶۰',
+  }),
+  'toast.capBody': g('Delete some to add more.', {
+    es: 'Borra algunos para añadir más.',
+    cu: 'Borra algunos para añadir más.',
+    uk: 'Видали дещо, щоб додати ще.',
+    ru: 'Удали часть, чтобы добавить ещё.',
+    ti: 'Delete some to add more.',
+    fa: 'چند تا را پاک کن تا جای جدید باز شود.',
+  }),
+  'toast.mark.ok': g('Done', {
+    es: 'Listo', cu: 'Listo', uk: 'Готово', ru: 'Готово', ti: 'Done', fa: 'انجام شد',
+  }),
+  'toast.mark.miss': g('Try again', {
+    es: 'Otra vez', cu: 'Otra vez', uk: 'Ще раз', ru: 'Ещё раз', ti: 'Try again', fa: 'دوباره',
+  }),
+  'toast.mark.cap': g('Full', {
+    es: 'Lleno', cu: 'Lleno', uk: 'Повно', ru: 'Полно', ti: 'Full', fa: 'پر',
+  }),
+  'toast.mark.info': g('Tip', {
+    es: 'Consejo', cu: 'Consejo', uk: 'Підказка', ru: 'Подсказка', ti: 'Tip', fa: 'راهنما',
   }),
 
   'floor.title': g('Flooring', {
@@ -1478,13 +1560,13 @@ export const STR: Record<string, Gloss> = {
     ti: 'ቋንቋ — ቅጥዕታት. ቋንቋ ገዛ ምረጽ. እንግሊዝኛ ቃላት ኣምህር ክፍሊ 5–8 Wall, Door, Sketch ክመሃሩ ትጸንሕ.',
     fa: 'زبان — تنظیمات. زبان خانه را برگزین. آموزش واژه‌های انگلیسی روشن می‌ماند تا کلاس ۵ تا ۸ واژهٔ Wall، Door، Sketch را یاد بگیرند.',
   }),
-  'help.udl': g('Help for everyone — Settings → Teach English words, bigger buttons, bigger type. Projector theme is high contrast.', {
-    es: 'Ayuda para todos — Ajustes → Enseñar palabras en inglés, botones más grandes, letra más grande. El tema Projector es alto contraste.',
-    cu: 'Ayuda para todos — Ajustes → Enseñar palabras en inglés, botones más grandes, letra más grande. El tema Projector es alto contraste.',
-    uk: 'Допомога для всіх — Налаштування → Вчити англійські слова, більші кнопки, більший шрифт. Тема Projector — високий контраст.',
-    ru: 'Помощь для всех — Настройки → Учить английские слова, больше кнопки, крупнее шрифт. Тема Projector — высокий контраст.',
+  'help.udl': g('Bigger type and high contrast sit at the top of this Help. Tip language is there too. Same Help for every student.', {
+    es: 'Letra grande y alto contraste están arriba en esta Ayuda. El idioma de consejos también. La misma Ayuda para cada estudiante.',
+    cu: 'Letra grande y alto contraste están arriba en esta Ayuda. El idioma de consejos también. La misma Ayuda para cada estudiante.',
+    uk: 'Більший шрифт і високий контраст — зверху цієї Допомоги. Мова підказок теж тут. Така сама Допомога для кожного.',
+    ru: 'Крупный шрифт и высокий контраст — вверху этой Помощи. Язык подсказок тоже здесь. Та же Помощь для каждого.',
     ti: 'ሓገዝ ንኹሉ — ቅጥዕታት → እንግሊዝኛ ቃላት ኣምህር፣ ዓበይቲ መልጎማት፣ ዓቢ ፊደል. ቴማ Projector ልዑል ንጽጽር እዩ.',
-    fa: 'کمک برای همه — تنظیمات → آموزش واژه‌های انگلیسی، دکمهٔ بزرگ‌تر، نوشتهٔ درشت‌تر. پوستهٔ Projector کنتراست بالاست.',
+    fa: 'نوشتهٔ درشت و کنتراست بالا بالای همین راهنماست. زبان راهنما هم اینجاست. همان راهنما برای هر دانش‌آموز.',
   }),
   'help.read': g('Read this plan — Teach. Envelope, door, window, room names, overall size, kitchen triangle. North and scale sit on the sheet.', {
     es: 'Lee este plano — Enseñar. Recinto, puerta, ventana, nombres, tamaño total, triángulo de cocina. Norte y escala están en la hoja.',
@@ -1903,9 +1985,15 @@ export function ellToolParts(
   return { en, home };
 }
 
+export function tipLoc(settings: { tipsLocale?: Locale | null; locale?: Locale | null } | null | undefined): Locale {
+  return asLocale(settings?.tipsLocale ?? settings?.locale);
+}
+
 const LOCALE_PREF = 'baboo-locale';
+const TIPS_LOCALE_PREF = 'baboo-tips-locale';
 const UDL_FAT_PREF = 'baboo-udl-fat';
 const UDL_TYPE_PREF = 'baboo-udl-type';
+const UDL_CONTRAST_PREF = 'baboo-udl-contrast';
 const ELL_EN_PREF = 'baboo-ell-english';
 
 export function readLocalePref(): Locale {
@@ -1918,6 +2006,18 @@ export function readLocalePref(): Locale {
 
 export function writeLocalePref(locale: Locale): void {
   try { localStorage.setItem(LOCALE_PREF, asLocale(locale)); } catch { /* ignore */ }
+}
+
+export function readTipsLocalePref(): Locale {
+  try {
+    return asLocale(localStorage.getItem(TIPS_LOCALE_PREF) ?? localStorage.getItem(LOCALE_PREF));
+  } catch {
+    return DEFAULT_LOCALE;
+  }
+}
+
+export function writeTipsLocalePref(locale: Locale): void {
+  try { localStorage.setItem(TIPS_LOCALE_PREF, asLocale(locale)); } catch { /* ignore */ }
 }
 
 export function readUdlFatPref(): boolean {
@@ -1934,6 +2034,14 @@ export function readUdlTypePref(): boolean {
 
 export function writeUdlTypePref(on: boolean): void {
   try { localStorage.setItem(UDL_TYPE_PREF, on ? '1' : '0'); } catch { /* ignore */ }
+}
+
+export function readUdlContrastPref(): boolean {
+  try { return localStorage.getItem(UDL_CONTRAST_PREF) === '1'; } catch { return false; }
+}
+
+export function writeUdlContrastPref(on: boolean): void {
+  try { localStorage.setItem(UDL_CONTRAST_PREF, on ? '1' : '0'); } catch { /* ignore */ }
 }
 
 /** Default on — grades 5–8 ELL should see English CAD words. */

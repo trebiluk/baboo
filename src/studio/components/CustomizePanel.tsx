@@ -7,7 +7,7 @@ import type { GuiThemeId, Locale, RoofStyleId, SiteFinish, SkyPreset, TypologySh
 import { DEFAULT_SKILL_LEVEL, skillRank } from '../data/skill';
 import { SkillPicker } from './SkillPicker';
 import { THEME_OPTIONS } from '../data/themes';
-import { LOCALE_OPTIONS, asLocale, t } from '../data/i18n';
+import { LOCALE_OPTIONS, asLocale, t, tipLoc } from '../data/i18n';
 import {
   SKY_OPTIONS,
   SITE_OPTIONS,
@@ -137,9 +137,10 @@ export function CustomizePanel() {
         <section className="aw-scene3d" aria-labelledby="lang-title">
           <h3 id="lang-title">{t(settings.locale, 'lang.title')}</h3>
           <p className="muted dense-lead">{t(settings.locale, 'lang.lead')}</p>
-          <div className="aw-shell-toggle aw-lang-toggle" role="group" aria-label={t(settings.locale, 'lang.title')}>
+          <h4 className="help-lang-label">{t(tipLoc(settings), 'lang.tips')}</h4>
+          <div className="aw-shell-toggle aw-lang-toggle" role="group" aria-label={t(tipLoc(settings), 'lang.tips')}>
             {LOCALE_OPTIONS.map((opt) => {
-              const on = asLocale(settings.locale) === opt.id;
+              const on = asLocale(settings.tipsLocale ?? settings.locale) === opt.id;
               return (
                 <button
                   key={opt.id}
@@ -149,7 +150,7 @@ export function CustomizePanel() {
                   title={opt.blurb}
                   className={`aw-shell-chip aw-pressable${on ? ' active' : ''}`}
                   aria-pressed={on}
-                  onClick={() => setSettings({ locale: opt.id as Locale })}
+                  onClick={() => setSettings({ tipsLocale: opt.id as Locale })}
                 >
                   {opt.label}
                 </button>
@@ -176,6 +177,14 @@ export function CustomizePanel() {
               onChange={(e) => setSettings({ udlType: e.target.checked })}
             />
             <span>{t(settings.locale, 'udl.type')}</span>
+          </label>
+          <label className="field check">
+            <input
+              type="checkbox"
+              checked={!!settings.udlContrast}
+              onChange={(e) => setSettings({ udlContrast: e.target.checked })}
+            />
+            <span>{t(settings.locale, 'udl.contrastOn')}</span>
           </label>
           <label className="field check">
             <input

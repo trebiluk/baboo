@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
 import { APP_VERSION } from '../version';
 import { GalleryCardPreview } from './GalleryCardPreview';
-import { t } from '../data/i18n';
+import { LOCALE_OPTIONS, asLocale, t, tipLoc } from '../data/i18n';
+import type { Locale } from '../types';
 
 /** Quiet dedication — DEDICATION.md · not a loud splash. */
 export const DEDICATION_LINE =
@@ -14,7 +15,9 @@ export const COPYRIGHT_LINE = '© 2026 Richard Kulibert Jr.';
 export function HelpModal() {
   const open = useProjectStore((s) => s.helpOpen);
   const toggle = useProjectStore((s) => s.toggleHelp);
-  const locale = useProjectStore((s) => s.doc.settings.locale);
+  const settings = useProjectStore((s) => s.doc.settings);
+  const setSettings = useProjectStore((s) => s.setSettings);
+  const locale = tipLoc(settings);
   const [showGallery, setShowGallery] = useState(false);
   if (!open) return null;
   return (
@@ -34,6 +37,59 @@ export function HelpModal() {
           <button type="button" className="ghost-btn secondary-btn aw-pressable" onClick={toggle}>{t(locale, 'chrome.close')}</button>
         </div>
         <p className="muted">Baboo {APP_VERSION} — {t(locale, 'help.lead')}</p>
+
+        <section className="help-include" aria-labelledby="udl-title">
+          <h3 id="udl-title">{t(locale, 'udl.title')}</h3>
+          <p className="muted dense-lead">{t(locale, 'udl.lead')}</p>
+          <div className="help-include-toggles" role="group" aria-label={t(locale, 'udl.title')}>
+            <button
+              type="button"
+              className={`aw-shell-chip aw-pressable${settings.udlType ? ' active' : ''}`}
+              aria-pressed={!!settings.udlType}
+              onClick={() => setSettings({ udlType: !settings.udlType })}
+            >
+              {t(locale, 'udl.type')}
+            </button>
+            <button
+              type="button"
+              className={`aw-shell-chip aw-pressable${settings.udlContrast ? ' active' : ''}`}
+              aria-pressed={!!settings.udlContrast}
+              onClick={() => setSettings({ udlContrast: !settings.udlContrast })}
+            >
+              {t(locale, 'udl.contrastOn')}
+            </button>
+            <button
+              type="button"
+              className={`aw-shell-chip aw-pressable${settings.udlFat ? ' active' : ''}`}
+              aria-pressed={!!settings.udlFat}
+              onClick={() => setSettings({ udlFat: !settings.udlFat })}
+            >
+              {t(locale, 'udl.fat')}
+            </button>
+          </div>
+          <p className="muted dense-lead">{t(locale, 'udl.contrast')}</p>
+          <h4 className="help-lang-label">{t(locale, 'lang.tips')}</h4>
+          <div className="aw-shell-toggle aw-lang-toggle" role="group" aria-label={t(locale, 'lang.tips')}>
+            {LOCALE_OPTIONS.map((opt) => {
+              const on = asLocale(settings.tipsLocale ?? settings.locale) === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  lang={opt.htmlLang}
+                  dir={opt.dir}
+                  title={opt.blurb}
+                  className={`aw-shell-chip aw-pressable${on ? ' active' : ''}`}
+                  aria-pressed={on}
+                  onClick={() => setSettings({ tipsLocale: opt.id as Locale })}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
         <ul className="help-list">
           <li>{t(locale, 'help.sketch')}</li>
           <li>{t(locale, 'help.wall')}</li>

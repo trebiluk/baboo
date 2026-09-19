@@ -25,7 +25,7 @@ import { ObjectMenu } from './components/ObjectMenu';
 import { usePhoneChrome } from './hooks/usePhoneChrome';
 import { useProjectStore } from './store/useProjectStore';
 import { applyGuiTheme, DEFAULT_GUI_THEME } from './data/themes';
-import { applyDocumentLocale, localeOption } from './data/i18n';
+import { applyDocumentLocale, localeOption, tipLoc } from './data/i18n';
 
 export default function App() {
   const init = useProjectStore((s) => s.init);
@@ -47,9 +47,10 @@ export default function App() {
   }, [init]);
 
   const guiTheme = useProjectStore((s) => s.doc.settings.guiTheme);
-  const locale = useProjectStore((s) => s.doc.settings.locale);
+  const tipsLocale = tipLoc(useProjectStore((s) => s.doc.settings));
   const udlFat = useProjectStore((s) => s.doc.settings.udlFat);
   const udlType = useProjectStore((s) => s.doc.settings.udlType);
+  const udlContrast = useProjectStore((s) => s.doc.settings.udlContrast);
   const ellEnglish = useProjectStore((s) => s.doc.settings.ellEnglish !== false);
   const phoneChrome = usePhoneChrome();
 
@@ -58,12 +59,26 @@ export default function App() {
   }, [guiTheme]);
 
   useEffect(() => {
-    applyDocumentLocale(locale);
+    applyDocumentLocale(tipsLocale);
     const root = document.documentElement;
     root.toggleAttribute('data-udl-fat', !!udlFat);
     root.toggleAttribute('data-udl-type', !!udlType);
-    root.toggleAttribute('data-ell-english', !!ellEnglish && locale !== 'en');
-  }, [locale, udlFat, udlType, ellEnglish]);
+    root.toggleAttribute('data-udl-contrast', !!udlContrast);
+    root.toggleAttribute('data-ell-english', !!ellEnglish && tipsLocale !== 'en');
+  }, [tipsLocale, udlFat, udlType, udlContrast, ellEnglish]);
+
+  useEffect(() => {
+    const flush = () => {
+      if (document.visibilityState === 'hidden') {
+        void useProjectStore.getState().flushSave();
+      }
+    };
+    document.addEventListener('visibilitychange', flush);
+    window.addEventListener('pagehide', () => { void useProjectStore.getState().flushSave(); });
+    return () => {
+      document.removeEventListener('visibilitychange', flush);
+    };
+  }, []);
 
   useEffect(() => {
     if (viewMode === 'plan') return;
@@ -127,7 +142,7 @@ export default function App() {
   return (
     <div
       className={`app-shell${phoneChrome ? ' is-phone' : ''}`}
-      lang={localeOption(locale).htmlLang}
+      lang={localeOption(tipsLocale).htmlLang}
     >
       <Chrome />
       <div className={`workspace${viewMode !== 'plan' && viewMode !== 'dollhouse' ? ' workspace-3d' : ''}`}>

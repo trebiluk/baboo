@@ -5,9 +5,10 @@ export type IdbStatus = 'ok' | 'unavailable' | 'error';
 export async function pingIndexedDb(): Promise<{ status: IdbStatus; detail?: string }> {
   try {
     if (typeof indexedDB === 'undefined') return { status: 'unavailable', detail: 'no indexedDB' };
-    const db = await openDB('archworks', 1, {
+    const db = await openDB('archworks', 2, {
       upgrade(db) {
         if (!db.objectStoreNames.contains('projects')) db.createObjectStore('projects');
+        if (!db.objectStoreNames.contains('dirtyChunks')) db.createObjectStore('dirtyChunks');
       },
     });
     await db.get('projects', 'current');

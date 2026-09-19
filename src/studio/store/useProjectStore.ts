@@ -20,7 +20,11 @@ import { chamferCorner, nearestChamferable } from '../lib/chamfer';
 import { findEnclosedFace, formatArea, hitRoom, polygonArea } from '../lib/rooms';
 import { DEFAULT_ROOM_KIND, roomType } from '../data/rooms';
 import { defaultFloorForKind } from '../data/flooring';
-import { t, readLocalePref, readUdlFatPref, readUdlTypePref, readEllEnglishPref, writeLocalePref, writeUdlFatPref, writeUdlTypePref, writeEllEnglishPref } from '../data/i18n';
+import {
+  t, tipLoc, readLocalePref, readTipsLocalePref, readUdlFatPref, readUdlTypePref,
+  readUdlContrastPref, readEllEnglishPref, writeLocalePref, writeTipsLocalePref,
+  writeUdlFatPref, writeUdlTypePref, writeUdlContrastPref, writeEllEnglishPref,
+} from '../data/i18n';
 import { generateRoof, roofStyleName } from '../lib/roof';
 import { textureName } from '../data/textures';
 import {
@@ -35,7 +39,9 @@ import {
   typologyTogglePresent,
   typologyWithShell,
 } from '../data/typology';
-import { exportProjectFile, importProjectFile, loadProject, saveProject } from '../lib/storage';
+import { exportProjectFile, importProjectFile, loadProject, saveDirtyChunks, saveProject } from '../lib/storage';
+import { capReached, remaining, type CapKind } from '../lib/caps';
+import { awakeTileKeys, extractChunk, tileKey, type TileKey } from '../lib/tiles';
 import { exportGalleryCardFile, type GalleryCardOptions } from '../lib/galleryExport';
 import { noteAutosaveSuccess } from './useDebugStore';
 import {
@@ -45,6 +51,23 @@ import {
 import type { SkillLevel } from '../types';
 
 const MAX_UNDO = 40;
+
+export type ToastTone = 'ok' | 'miss' | 'info' | 'cap';
+export type ToastPlate = {
+  tone: ToastTone;
+  title: string;
+  body?: string;
+  cap?: CapKind;
+};
+
+const CAP_TOAST: Record<CapKind, string> = {
+  rooms: 'toast.capRooms',
+  walls: 'toast.capWalls',
+  objects: 'toast.capObjects',
+};
+
+const dirtyTiles = new Set<TileKey>();
+let fullFlushNeeded = false;
 
 type Sel =
   | { kind: 'wall'; id: string }
@@ -91,7 +114,7 @@ interface Store {
   selectedPlantKind: PlantKind;
   viewport: { w: number; h: number };
   saveStatus: SaveStatus;
-  toast: string | null;
+  toast: ToastPlate | null;
   lastSaveAt: string | null;
   floor: () => Floor;
   init: () => Promise<void>;
@@ -136,12 +159,15 @@ interface Store {
   openDriveWizard: (open: boolean) => void;
   selectCatalog: (id: string | null) => void;
   selectRoomKind: (kind: RoomKind) => void;
-  showToast: (msg: string, ms?: number) => void;
+  showToast: (msg: string, ms?: number, tone?: ToastTone) => void;
+  showCapToast: (kind: CapKind) => void;
+  clearToast: () => void;
   pushHistory: () => void;
   undo: () => void;
   redo: () => void;
-  markDirty: () => void;
+  markDirty: (at?: Point) => void;
   autosave: () => Promise<void>;
+  flushSave: () => Promise<void>;
   newFromTemplate: (styleId: StyleId) => void;
   exportJson: () => void;
   exportGalleryCard: (opts?: GalleryCardOptions) => void;
@@ -191,6 +217,19 @@ function clampOpeningT(t: number, width: number, wallLen: number): number {
 
 function withFloor(doc: ProjectDocument, fn: (f: Floor) => Floor): ProjectDocument {
   return { ...doc, floors: doc.floors.map((f, i) => (i === 0 ? fn(f) : f)) };
+}
+
+function tip(get: () => Store): ReturnType<typeof tipLoc> {
+  return tipLoc(get().doc.settings);
+}
+
+function toneForToast(msg: string, fallback: ToastTone): ToastTone {
+  if (fallback !== 'info') return fallback;
+  const miss = /almost|closer|click inside|too tight|need|first|locked|fail|could not|make the wall/i;
+  const ok = /is in|placed|named|saved|ready|clipped|door is|window is|wall is|plant is|switched|done/i;
+  if (miss.test(msg)) return 'miss';
+  if (ok.test(msg)) return 'ok';
+  return 'info';
 }
 
 
@@ -278,8 +317,10 @@ export const useProjectStore = create<Store>((set, get) => ({
             ...doc.settings,
             skillLevel: skill,
             locale: readLocalePref(),
+            tipsLocale: readTipsLocalePref(),
             udlFat: readUdlFatPref(),
             udlType: readUdlTypePref(),
+            udlContrast: readUdlContrastPref(),
             ellEnglish: readEllEnglishPref(),
           },
         },
@@ -389,9 +430,20 @@ export const useProjectStore = create<Store>((set, get) => ({
     const meta = partial.units
       ? { ...doc.meta, units: partial.units }
       : doc.meta;
-    if (partial.locale != null) writeLocalePref(partial.locale);
+    if (partial.tipsLocale != null) {
+      settings.tipsLocale = partial.tipsLocale;
+      settings.locale = partial.locale ?? partial.tipsLocale;
+      writeTipsLocalePref(partial.tipsLocale);
+      writeLocalePref(settings.locale);
+    } else if (partial.locale != null) {
+      settings.locale = partial.locale;
+      settings.tipsLocale = partial.tipsLocale ?? partial.locale;
+      writeLocalePref(partial.locale);
+      writeTipsLocalePref(settings.tipsLocale);
+    }
     if (partial.udlFat != null) writeUdlFatPref(!!partial.udlFat);
     if (partial.udlType != null) writeUdlTypePref(!!partial.udlType);
+    if (partial.udlContrast != null) writeUdlContrastPref(!!partial.udlContrast);
     if (partial.ellEnglish != null) writeEllEnglishPref(!!partial.ellEnglish);
     set({ doc: { ...doc, settings, meta } });
     get().markDirty();
@@ -493,7 +545,13 @@ export const useProjectStore = create<Store>((set, get) => ({
     });
     get().markDirty();
   },
-  setPanZoom: (panX, panY, zoom) => set((s) => ({ panX, panY, zoom: zoom ?? s.zoom })),
+  setPanZoom: (panX, panY, zoom) => {
+    set((s) => ({ panX, panY, zoom: zoom ?? s.zoom }));
+    if (dirtyTiles.size) {
+      if (saveTimer) clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => { void get().autosave(); }, 400);
+    }
+  },
   toggleTeaching: () => set((s) => ({
     teachingOpen: !s.teachingOpen,
     accessOpen: false,
@@ -579,14 +637,35 @@ export const useProjectStore = create<Store>((set, get) => ({
       tool: 'room',
       catalogOpen: true,
     }),
-  showToast: (toast, ms = 2400) => {
+  showToast: (title, ms = 2400, tone = 'info') => {
     if (toastTimer) clearTimeout(toastTimer);
     const hold = get().doc.settings.udlType ? Math.max(ms + 1400, 4200) : ms;
-    set({ toast });
+    const plate: ToastPlate = { tone: toneForToast(title, tone), title };
+    set({ toast: plate });
     toastTimer = setTimeout(() => {
       toastTimer = null;
       set({ toast: null });
     }, hold);
+  },
+  showCapToast: (kind) => {
+    if (toastTimer) clearTimeout(toastTimer);
+    const loc = tip(get);
+    const plate: ToastPlate = {
+      tone: 'cap',
+      cap: kind,
+      title: t(loc, CAP_TOAST[kind]),
+      body: t(loc, 'toast.capBody'),
+    };
+    set({ toast: plate });
+    toastTimer = setTimeout(() => {
+      toastTimer = null;
+      set({ toast: null });
+    }, 2500);
+  },
+  clearToast: () => {
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = null;
+    set({ toast: null });
   },
 
   pushHistory: () => {
@@ -616,22 +695,56 @@ export const useProjectStore = create<Store>((set, get) => ({
     get().markDirty();
   },
 
-  markDirty: () => {
+  markDirty: (at) => {
     set({ saveStatus: 'unsaved' });
+    if (at) {
+      dirtyTiles.add(tileKey(get().floor().id, at.x, at.y));
+    } else {
+      fullFlushNeeded = true;
+    }
     if (saveTimer) clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => { void get().autosave(); }, 500);
+    saveTimer = setTimeout(() => { void get().autosave(); }, 400);
+  },
+  flushSave: async () => {
+    fullFlushNeeded = true;
+    if (saveTimer) {
+      clearTimeout(saveTimer);
+      saveTimer = null;
+    }
+    await get().autosave();
   },
   autosave: async () => {
-    set({ saveStatus: 'saving' });
+    const { doc, panX, panY, zoom, viewport } = get();
     try {
-      await saveProject(get().doc);
+      if (fullFlushNeeded) {
+        set({ saveStatus: 'saving' });
+        await saveProject(doc);
+        dirtyTiles.clear();
+        fullFlushNeeded = false;
+      } else if (dirtyTiles.size) {
+        const awake = new Set(awakeTileKeys({
+          floorId: doc.floors[0].id,
+          panX, panY, zoom,
+          w: viewport.w,
+          h: viewport.h,
+        }));
+        const writeKeys = [...dirtyTiles].filter((k) => awake.has(k));
+        if (!writeKeys.length) return;
+        set({ saveStatus: 'saving' });
+        const chunks = writeKeys
+          .map((key) => extractChunk(doc.floors[0], key))
+          .filter((c): c is NonNullable<typeof c> => c != null);
+        await saveDirtyChunks(chunks);
+        for (const key of writeKeys) dirtyTiles.delete(key);
+      } else {
+        return;
+      }
       const ts = new Date().toISOString();
       noteAutosaveSuccess();
-      const doc = get().doc;
       set({
         saveStatus: 'saved',
         lastSaveAt: ts,
-        doc: { ...doc, meta: { ...doc.meta, version: APP_VERSION, updatedAt: ts } },
+        doc: { ...get().doc, meta: { ...get().doc.meta, version: APP_VERSION, updatedAt: ts } },
       });
     } catch (e) {
       set({ saveStatus: 'error' });
@@ -648,8 +761,10 @@ export const useProjectStore = create<Store>((set, get) => ({
     const doc = buildTemplateProject(styleId);
     doc.settings.skillLevel = skillLevel;
     doc.settings.locale = cur.locale;
+    doc.settings.tipsLocale = cur.tipsLocale ?? cur.locale;
     doc.settings.udlFat = cur.udlFat;
     doc.settings.udlType = cur.udlType;
+    doc.settings.udlContrast = cur.udlContrast;
     doc.settings.ellEnglish = cur.ellEnglish;
     doc.settings.guiTheme = cur.guiTheme;
     set({
@@ -674,8 +789,9 @@ export const useProjectStore = create<Store>((set, get) => ({
     setTimeout(() => get().fitPlan(), 80);
   },
   exportJson: () => {
+    void get().flushSave();
     exportProjectFile(get().doc);
-    get().showToast(t(get().doc.settings.locale, 'toast.saved'));
+    get().showToast(t(tip(get), 'toast.saved'), 2400, 'ok');
   },
   exportGalleryCard: (opts) => {
     exportGalleryCardFile(get().doc, opts);
@@ -741,12 +857,21 @@ export const useProjectStore = create<Store>((set, get) => ({
   },
 
   beginWall: (p) => {
+    if (capReached(get().floor(), 'walls')) {
+      get().showCapToast('walls');
+      return;
+    }
     const s = get().doc.settings;
     set({ wallDraft: snapPoint(p, s.gridSize, s.snap), dimDraft: null });
   },
   finishWall: (p, forceOrtho) => {
     const { wallDraft, doc } = get();
     if (!wallDraft) return;
+    if (capReached(get().floor(), 'walls')) {
+      set({ wallDraft: null });
+      get().showCapToast('walls');
+      return;
+    }
     const s = doc.settings;
     const endPt = snapWallEnd(wallDraft, p, {
       ortho: s.ortho !== false,
@@ -756,6 +881,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     });
     if (Math.hypot(endPt.x - wallDraft.x, endPt.y - wallDraft.y) < 0.5) {
       set({ wallDraft: null });
+      get().showToast(t(tip(get), 'toast.wallShort'), 2800, 'miss');
       return;
     }
     get().pushHistory();
@@ -786,7 +912,8 @@ export const useProjectStore = create<Store>((set, get) => ({
       }),
       wallDraft: null,
     });
-    get().markDirty();
+    get().markDirty(endPt);
+    get().showToast(t(tip(get), 'toast.wallIn'), 2400, 'ok');
   },
   chamferAt: (p) => {
     const floor = get().floor();
@@ -825,7 +952,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     }
     const hit = nearestWall(floor.walls, floor.nodes, p, 1.5);
     if (!hit) {
-      get().showToast(t(get().doc.settings.locale, 'toast.missWall'), toastMs(get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL, 3200));
+      get().showToast(t(tip(get), 'toast.missWall'), toastMs(get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL, 3200), 'miss');
       return;
     }
     get().pushHistory();
@@ -844,14 +971,15 @@ export const useProjectStore = create<Store>((set, get) => ({
       selected: { kind: 'opening', id: opening.id },
       tool: 'select',
     });
-    get().markDirty();
+    get().markDirty(p);
     get().showToast(
       type === 'door'
         ? (get().doc.settings.styleId === 'dog-house'
-          ? t(get().doc.settings.locale, 'toast.doorDog')
-          : t(get().doc.settings.locale, 'toast.doorIn'))
-        : t(get().doc.settings.locale, 'toast.windowIn'),
+          ? t(tip(get), 'toast.doorDog')
+          : t(tip(get), 'toast.doorIn'))
+        : t(tip(get), 'toast.windowIn'),
       toastMs(get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL, 2800),
+      'ok',
     );
   },
 
@@ -991,6 +1119,10 @@ export const useProjectStore = create<Store>((set, get) => ({
   },
 
   placeFurniture: (p) => {
+    if (capReached(get().floor(), 'objects')) {
+      get().showCapToast('objects');
+      return;
+    }
     const { selectedCatalogId, doc } = get();
     const cat = FURNITURE_CATALOG.find((c) => c.id === selectedCatalogId) ?? FURNITURE_CATALOG[0];
     const s = doc.settings;
@@ -1013,17 +1145,20 @@ export const useProjectStore = create<Store>((set, get) => ({
       selected: { kind: 'furniture', id: item.id },
       tool: 'select',
     });
-    get().markDirty();
+    get().markDirty(pt);
     {
       const skill = get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
-      if (skillRank(skill) < 3) {
-        get().showToast(t(get().doc.settings.locale, 'toast.furnMove'), toastMs(skill, 2800));
-      }
+      get().showToast(t(tip(get), 'toast.furnMove'), toastMs(skill, 2800), 'ok');
     }
   },
 
   seedCrowd: (count) => {
-    const n = Math.max(1, Math.min(2000, Math.floor(count)));
+    const roomLeft = remaining(get().floor(), 'objects');
+    if (roomLeft <= 0) {
+      get().showCapToast('objects');
+      return;
+    }
+    const n = Math.max(1, Math.min(roomLeft, Math.floor(count)));
     get().pushHistory();
     const cols = Math.max(1, Math.ceil(Math.sqrt(n)));
     const gap = 4;
@@ -1058,6 +1193,10 @@ export const useProjectStore = create<Store>((set, get) => ({
   },
 
   placeRoom: (p) => {
+    if (capReached(get().floor(), 'rooms')) {
+      get().showCapToast('rooms');
+      return;
+    }
     const { selectedRoomKind, doc } = get();
     const kind = selectedRoomKind ?? DEFAULT_ROOM_KIND;
     const cat = roomType(kind);
@@ -1092,8 +1231,8 @@ export const useProjectStore = create<Store>((set, get) => ({
       doc: withFloor(doc, (f) => ({ ...f, rooms: [...(f.rooms ?? []), item] })),
       selected: { kind: 'room', id: item.id },
     });
-    get().markDirty();
-    get().showToast(`${cat.name} named · ${area}`, 2400);
+    get().markDirty(pt);
+    get().showToast(`${cat.name} named · ${area}`, 2400, 'ok');
   },
 
   renameRoom: (id, name) => {
@@ -1170,6 +1309,10 @@ export const useProjectStore = create<Store>((set, get) => ({
   },
 
   placePlant: (p) => {
+    if (capReached(get().floor(), 'objects')) {
+      get().showCapToast('objects');
+      return;
+    }
     const { selectedPlantKind, doc } = get();
     const cat = plantType(selectedPlantKind);
     const s = doc.settings;
@@ -1193,7 +1336,8 @@ export const useProjectStore = create<Store>((set, get) => ({
       })),
       selected: { kind: 'landscape', id: item.id },
     });
-    get().markDirty();
+    get().markDirty(pt);
+    get().showToast(t(tip(get), 'toast.plantIn'), 2400, 'ok');
   },
 
   addSketch: (points) => {
@@ -1236,7 +1380,11 @@ export const useProjectStore = create<Store>((set, get) => ({
       ortho: s.ortho !== false,
     });
     if (verts.length < 2) {
-      get().showToast(t(s.locale, 'toast.traceNeed'), 3200);
+      get().showToast(t(s.locale, 'toast.traceNeed'), 3200, 'miss');
+      return;
+    }
+    if (capReached(get().floor(), 'walls')) {
+      get().showCapToast('walls');
       return;
     }
     const merge = s.snap ? s.gridSize * 0.4 : 0.35;

@@ -13,7 +13,8 @@ import {
 import { PLANT_CATALOG } from '../data/landscape';
 import { Icon, type IconName } from '../icons';
 import { usePhoneChrome } from '../hooks/usePhoneChrome';
-import { t as tx, ellToolParts } from '../data/i18n';
+import { t as tx, ellToolParts, tipLoc } from '../data/i18n';
+import { capReached } from '../lib/caps';
 
 const PLANT_ICON: Record<PlantKind, IconName> = {
   tree: 'tree',
@@ -41,7 +42,7 @@ const DOLLHOUSE_TOOLS = new Set<Tool>(['select', 'furniture', 'plant', 'pan']);
 const QUICK_DOLL = new Set<Tool>(['select', 'furniture']);
 
 function ToolWord({ k }: { k: string }) {
-  const locale = useProjectStore((s) => s.doc.settings.locale);
+  const locale = tipLoc(useProjectStore((s) => s.doc.settings));
   const ell = useProjectStore((s) => s.doc.settings.ellEnglish !== false);
   const parts = ellToolParts(locale, k);
   if (!ell || !parts.home) {
@@ -67,7 +68,9 @@ export function ToolRail() {
   const minimizeTools = useProjectStore((s) => s.minimizeTools);
   const chromeEpoch = useProjectStore((s) => s.chromeEpoch);
   const skillLevel = useProjectStore((s) => s.doc.settings.skillLevel) ?? DEFAULT_SKILL_LEVEL;
-  const locale = useProjectStore((s) => s.doc.settings.locale);
+  const locale = tipLoc(useProjectStore((s) => s.doc.settings));
+  const floor = useProjectStore((s) => s.doc.floors[0]);
+  const showCapToast = useProjectStore((s) => s.showCapToast);
   const wallKind = useProjectStore((s) => s.wallKind);
   const setWallKind = useProjectStore((s) => s.setWallKind);
   const wallMode = useProjectStore((s) => s.wallMode);
@@ -135,6 +138,18 @@ export function ToolRail() {
   };
 
   const pick = (id: Tool) => {
+    if (id === 'wall' && capReached(floor, 'walls')) {
+      showCapToast('walls');
+      return;
+    }
+    if (id === 'room' && capReached(floor, 'rooms')) {
+      showCapToast('rooms');
+      return;
+    }
+    if ((id === 'furniture' || id === 'plant') && capReached(floor, 'objects')) {
+      showCapToast('objects');
+      return;
+    }
     setTool(id);
     if (id === 'furniture' || id === 'room') {
       setToolsPinned(true);
@@ -164,17 +179,22 @@ export function ToolRail() {
       {visible.map((t) => {
         const quick = quickSet.has(t.id);
         const extra = !quick && t.id === tool;
+        const capped = (t.id === 'wall' && capReached(floor, 'walls'))
+          || (t.id === 'room' && capReached(floor, 'rooms'))
+          || ((t.id === 'furniture' || t.id === 'plant') && capReached(floor, 'objects'));
         return (
         <button
           key={t.id}
           type="button"
-          className={`tool-rail-btn aw-pressable ${tool === t.id ? 'active is-current' : ''}${quick ? ' tool-rail-quick' : ''}${extra ? ' tool-rail-extra' : ''}`}
+          className={`tool-rail-btn aw-pressable ${tool === t.id ? 'active is-current' : ''}${quick ? ' tool-rail-quick' : ''}${extra ? ' tool-rail-extra' : ''}${capped ? ' is-capped' : ''}`}
           onClick={() => pick(t.id)}
           title={t.tip}
           aria-pressed={tool === t.id}
+          aria-disabled={capped}
           tabIndex={expanded || quick || extra ? 0 : -1}
           aria-hidden={!(expanded || quick || extra)}
         >
+          {tool === t.id ? <span className="tool-check" aria-hidden="true">✓</span> : null}
           <Icon name={t.icon} />
           <ToolWord k={`tool.${t.id}`} />
         </button>

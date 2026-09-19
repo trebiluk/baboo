@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { DEFAULT_SKILL_LEVEL, nextCoach, skillRank } from '../data/skill';
 import { BABOO_LOGO } from '../logo';
 import { useProjectStore } from '../store/useProjectStore';
-import { t, tt } from '../data/i18n';
+import { t, tt, tipLoc } from '../data/i18n';
 
 export function CoachBanner() {
   const floor = useProjectStore((s) => s.doc.floors[0]);
   const skillLevel = useProjectStore((s) => s.doc.settings.skillLevel) ?? DEFAULT_SKILL_LEVEL;
   const styleId = useProjectStore((s) => s.doc.settings.styleId);
-  const locale = useProjectStore((s) => s.doc.settings.locale);
+  const locale = tipLoc(useProjectStore((s) => s.doc.settings));
   const setTool = useProjectStore((s) => s.setTool);
   const setToolsPinned = useProjectStore((s) => s.setToolsPinned);
   const toggleTeaching = useProjectStore((s) => s.toggleTeaching);

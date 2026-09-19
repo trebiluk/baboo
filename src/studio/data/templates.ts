@@ -391,8 +391,10 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
       dollYaw: 0,
       dollTop: false,
       locale: 'en',
+      tipsLocale: 'en',
       udlFat: false,
       udlType: false,
+      udlContrast: false,
       ellEnglish: true,
       ...(styleId === 'tiny-home'
         ? { typology: defaultTinyHomeTypology('trailer') }
