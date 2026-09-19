@@ -4,7 +4,7 @@ Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 
 **© 2026 Richard Kulibert Jr.**
 
-**Version 2.0.1** — P0.1 Edge Pocket: left tools overlay, Teach/Help on the top row.
+**Version 2.1.0** — Drafting precision: snap to walls, exact length and angle, arrow-key nudge. Edge Pocket chrome from 2.0.1 stays.
 
 Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the top chip. Plans save on the device as `.archworks.json`.
 
@@ -35,12 +35,12 @@ npm run pack:share
 - **Class folder** is a copy-to-the-share pack — Chrome, no login
 - No Google login inside the app
 
-## What’s in 2.0.1
+## What’s in 2.1.0
 
-- Edge Pocket on the left: Select · Sketch · Wall · Door · More. Tap (or hover with a pointer) opens the flyout. Right-click / long-press empty canvas opens the same pocket
-- No right Teach ribbon. Save · Teach · Help sit on the top row. The plan fills remaining `100dvh`
-- Help and Settings still share the classroom bar: bigger type, high contrast (Stark white + blue), tip language
-- Teach / Matteson words stay English. Tips follow `tipsLocale`
+- Walls land on what you already drew — corner, middle, crossing, square-off, along-wall — each with its own marker shape and word
+- Type an exact Length and Angle while a wall is in progress, or tap the boxes
+- Arrow keys nudge the selection; measurements always read right side up
+- Edge Pocket chrome from 2.0.1 stays: left overlay tools, Teach/Help on the top row, no right Enseñar ribbon. Stark white + blue is still the classroom default
 
 See [CHANGELOG.md](CHANGELOG.md) for the rest.
 

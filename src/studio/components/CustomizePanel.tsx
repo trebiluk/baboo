@@ -107,6 +107,14 @@ export function CustomizePanel() {
           />
           <span>Straight walls (90° and 45° corners) <em>hold Shift for 90° only</em></span>
         </label>
+        <label className="field check">
+          <input
+            type="checkbox"
+            checked={settings.osnap !== false}
+            onChange={(e) => setSettings({ osnap: e.target.checked })}
+          />
+          <span>{t(settings.locale, 'set.osnap')} <em>lands exactly on what you already drew</em></span>
+        </label>
         <label className="field">
           <span>Units (dimension labels)</span>
           <select

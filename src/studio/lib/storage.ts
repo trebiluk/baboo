@@ -112,6 +112,7 @@ function normalizeDoc(data: ProjectDocument): ProjectDocument {
         textureLabel: data.settings?.textureLabel ?? '',
         imageBlobRef: data.settings?.imageBlobRef ?? null,
         ortho: data.settings?.ortho !== false,
+        osnap: (data.settings as { osnap?: unknown })?.osnap !== false,
         guiTheme: isGuiThemeId(data.settings?.guiTheme)
           ? data.settings.guiTheme
           : 'stark',

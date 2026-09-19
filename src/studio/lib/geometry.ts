@@ -67,6 +67,27 @@ export function snapWallEnd(
   return polarSnapPoint(from, to, opts.gridSize, opts.snap);
 }
 
+/**
+ * Drafting convention: a dimension never reads upside down. Angles fold into
+ * [-90, 90) so a label reads left to right, or bottom to top when it is vertical.
+ * `flipped` reports that the text turned around, so the caller can mirror its
+ * offset and keep the label on the same side of the line it belongs to.
+ */
+export function readableAngle(deg: number): { deg: number; flipped: boolean } {
+  if (!Number.isFinite(deg)) return { deg: 0, flipped: false };
+  let out = deg % 360;
+  let flipped = false;
+  while (out >= 90) {
+    out -= 180;
+    flipped = !flipped;
+  }
+  while (out < -90) {
+    out += 180;
+    flipped = !flipped;
+  }
+  return { deg: out + 0, flipped };
+}
+
 export function isDiagonal(a: Point, b: Point, eps = 0.2): boolean {
   return Math.abs(b.x - a.x) > eps && Math.abs(b.y - a.y) > eps;
 }

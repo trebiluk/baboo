@@ -9,10 +9,12 @@ import { LOCALES, t } from '../data/i18n.ts';
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 describe('P0.1 Edge Pocket chrome', () => {
-  it('chips at 2.0.1', () => {
-    assert.equal(APP_VERSION, '2.0.1');
+  it('keeps Edge Pocket after the version chip moves to 2.1.0', () => {
+    assert.equal(APP_VERSION, '2.1.0');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.1\.0'/);
     assert.match(changelog, /version:\s*'2\.0\.1'/);
+    assert.match(changelog, /Edge Pocket/);
   });
 
   it('long-press matches a right-click hold', () => {
@@ -41,6 +43,14 @@ describe('P0.1 Edge Pocket chrome', () => {
     assert.match(css, /\.tool-rail\.edge-pocket/);
     assert.match(css, /100svh/);
     assert.doesNotMatch(css, /\.dock-rail\s*\{/);
+  });
+
+  it('keeps the version chip in the header until phone widths', () => {
+    const css = readFileSync(join(studio, 'index.css'), 'utf8');
+    const tight = css.match(/@media \(width < 1540px\) \{[\s\S]*?\n\}/);
+    assert.ok(tight, 'expected the 1540px title-strip query');
+    assert.doesNotMatch(tight[0], /ver-chip/);
+    assert.match(css, /@media \(width <= 1100px\).*ver-chip-header/s);
   });
 
   it('Help copy describes the pocket, not a right Teach column', () => {
