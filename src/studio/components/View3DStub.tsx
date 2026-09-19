@@ -17,6 +17,7 @@ import {
   projectFaces,
   walkForward,
 } from '../lib/mass3d';
+import { asWallHeightFt } from '../lib/wallDraft';
 import { t } from '../data/i18n';
 import { FLOOR_FINISHES, asFloorGrain, type FloorFinishId } from '../data/flooring';
 import { furnitureLod } from '../lib/perf';
@@ -165,7 +166,8 @@ export function View3DStub() {
     floorId: settings.floorFinishId,
     floorGrain: asFloorGrain(settings.floorGrain),
     lod,
-  }), [skyId, siteId, tintId, showFurn, materials, lighting, blocky, settings.floorFinishId, settings.floorGrain, lod]);
+    wallH: asWallHeightFt(settings.wallHeight),
+  }), [skyId, siteId, tintId, showFurn, materials, lighting, blocky, settings.floorFinishId, settings.floorGrain, settings.wallHeight, lod]);
 
   const mass = useMemo(() => buildMass(floor, opts), [floor, opts]);
   const painted = useMemo(

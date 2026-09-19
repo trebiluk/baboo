@@ -8,13 +8,14 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('P0.1 Edge Pocket chrome', () => {
-  it('keeps Edge Pocket after the version chip moves to 2.1.0', () => {
-    assert.equal(APP_VERSION, '2.1.0');
+describe('2.1.1 fancy Edge Pocket chrome', () => {
+  it('chips 2.1.1 and keeps the 2.1.0 precision notes', () => {
+    assert.equal(APP_VERSION, '2.1.1');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.1\.1'/);
     assert.match(changelog, /version:\s*'2\.1\.0'/);
-    assert.match(changelog, /version:\s*'2\.0\.1'/);
     assert.match(changelog, /Edge Pocket/);
+    assert.match(changelog, /thickness/i);
   });
 
   it('long-press matches a right-click hold', () => {
@@ -35,6 +36,24 @@ describe('P0.1 Edge Pocket chrome', () => {
     assert.match(chrome, /toggleHelp/);
     assert.equal(chrome.includes('chrome-phone-only'), false);
     assert.match(chrome, /chrome-ess/);
+    assert.match(chrome, /data-baboo-chrome="top"/);
+    assert.doesNotMatch(chrome, /tool-bar chrome-tools/);
+    assert.match(chrome, /<VersionChip onTeacher/);
+    assert.match(chrome, /save-chip save-\$\{saveStatus\}/);
+    assert.doesNotMatch(chrome, /phoneChrome \? null/);
+  });
+
+  it('Wall flyout is docked to the Wall chip, not a permanent rail', () => {
+    const rail = readFileSync(join(studio, 'components/ToolRail.tsx'), 'utf8');
+    const fly = readFileSync(join(studio, 'components/WallFlyout.tsx'), 'utf8');
+    const draft = readFileSync(join(studio, 'lib/wallDraft.ts'), 'utf8');
+    assert.match(rail, /WallFlyout/);
+    assert.match(rail, /is-fancy/);
+    assert.match(fly, /WALL_THICKNESS_MM/);
+    assert.match(fly, /WALL_HEIGHT_M/);
+    assert.match(fly, /wall\.tip/);
+    assert.match(draft, /120, 200, 300/);
+    assert.match(draft, /2\.4, 2\.7, 3\.0/);
   });
 
   it('left rail is an overlay Edge Pocket, not a reserved right gutter', () => {
@@ -45,17 +64,28 @@ describe('P0.1 Edge Pocket chrome', () => {
     assert.doesNotMatch(css, /\.dock-rail\s*\{/);
   });
 
-  it('keeps the version chip in the header until phone widths', () => {
+  it('locks one thin Chromebook top row at 1280 and 1366', () => {
     const css = readFileSync(join(studio, 'index.css'), 'utf8');
-    const tight = css.match(/@media \(width < 1540px\) \{[\s\S]*?\n\}/);
-    assert.ok(tight, 'expected the 1540px title-strip query');
-    assert.doesNotMatch(tight[0], /ver-chip/);
-    assert.match(css, /@media \(width <= 1100px\).*ver-chip-header/s);
+    const phone = readFileSync(join(studio, 'hooks/usePhoneChrome.ts'), 'utf8');
+    assert.match(css, /@media \(width>=1100px\) \{[\s\S]*?flex-wrap:nowrap!important/s);
+    assert.match(css, /max-height:52px/);
+    assert.match(css, /@media \(width>=1100px\) \{[\s\S]*?\.save-chip \{\s*display:unset!important/s);
+    assert.match(phone, /min-width: 1100px/);
+    assert.match(phone, /coarse && !chromebook/);
+  });
+
+  it('open pocket sits above the plan card so Furn/Plant are not clipped', () => {
+    const css = readFileSync(join(studio, 'index.css'), 'utf8');
+    assert.match(css, /:has\(\.edge-pocket\.is-open\)[\s\S]*?overflow:\s*visible/s);
+    assert.match(css, /:has\(\.edge-pocket\.is-open\) \.plan-sheet/);
+    assert.match(css, /z-index:calc\(var\(--aw-z-catalogs\) \+ 4\)/);
+    assert.match(css, /html\[data-ell-english\]\s*\{\s*--aw-rail-left:\s*168px/);
   });
 
   it('Help copy describes the pocket, not a right Teach column', () => {
     assert.match(t('en', 'help.chrome'), /Edge Pocket/);
     assert.match(t('en', 'help.chrome'), /Teach/);
+    assert.match(t('en', 'help.chrome'), /plan card/i);
     assert.doesNotMatch(t('en', 'help.chrome'), /sit on the right/);
     assert.doesNotMatch(t('es', 'help.chrome'), /van a la derecha/);
     for (const loc of LOCALES) {

@@ -4,7 +4,7 @@ Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 
 **© 2026 Richard Kulibert Jr.**
 
-**Version 2.1.0** — Drafting precision: snap to walls, exact length and angle, arrow-key nudge. Edge Pocket chrome from 2.0.1 stays.
+**Version 2.1.1** — Fancy Edge Pocket chrome: one thin top row, fat left tools, Wall flyout. Drafting precision from 2.1.0 stays.
 
 Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the top chip. Plans save on the device as `.archworks.json`.
 
@@ -34,6 +34,13 @@ npm run pack:share
 - **Save file** downloads `.archworks.json` for Classroom
 - **Class folder** is a copy-to-the-share pack — Chrome, no login
 - No Google login inside the app
+
+## What’s in 2.1.1
+
+- Chromebook top bar stays one row at 1280 and 1366 — no stacked Arts & Craft / Undo / Saved labels
+- Left Edge Pocket is fat chips with words: Select, Sketch, Wall, Door. Wall opens thickness (120/200/300mm), height (2.4/2.7/3.0m), and style
+- When the pocket is open, the bottom plan card moves so it does not cover Furn/Plant or the status chip
+- 2.1.0 snaps, exact length/angle, and arrow-key nudge stay. No right Enseñar ribbon
 
 ## What’s in 2.1.0
 

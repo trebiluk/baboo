@@ -15,6 +15,7 @@ import { Icon, type IconName } from '../icons';
 import { usePhoneChrome } from '../hooks/usePhoneChrome';
 import { t as tx, ellToolParts, tipLoc } from '../data/i18n';
 import { capReached } from '../lib/caps';
+import { WallFlyout } from './WallFlyout';
 
 const PLANT_ICON: Record<PlantKind, IconName> = {
   tree: 'tree',
@@ -152,7 +153,7 @@ export function ToolRail() {
       setToolsPinned(true);
       return;
     }
-    if (phone && quickSet.has(id) && !toolsPinned) return;
+    if (quickSet.has(id)) return;
     setToolsPinned(true);
   };
 
@@ -163,7 +164,7 @@ export function ToolRail() {
 
   return (
     <nav
-      className={`tool-rail edge-pocket ${expanded ? 'is-open' : 'is-min'}${phone ? ' is-coarse' : ''}${sheetOpen ? ' is-behind-sheet' : ''}`}
+      className={`tool-rail edge-pocket is-fancy ${expanded ? 'is-open' : 'is-min'}${phone ? ' is-coarse' : ''}${sheetOpen ? ' is-behind-sheet' : ''}${tool === 'wall' && isPlan ? ' has-wall-flyout' : ''}`}
       data-edge-pocket="tools"
       aria-label={tx(locale, 'chrome.toolsPocket')}
       aria-expanded={expanded}
@@ -174,6 +175,7 @@ export function ToolRail() {
         if (!e.currentTarget.contains(e.relatedTarget as Node)) setFocus(false);
       }}
     >
+      <div className="edge-pocket-col">
       {visible.map((t) => {
         const quick = quickSet.has(t.id);
         const extra = !quick && t.id === tool;
@@ -184,7 +186,7 @@ export function ToolRail() {
         <button
           key={t.id}
           type="button"
-          className={`tool-rail-btn aw-pressable ${tool === t.id ? 'active is-current' : ''}${quick ? ' tool-rail-quick' : ''}${extra ? ' tool-rail-extra' : ''}${capped ? ' is-capped' : ''}`}
+          className={`tool-rail-btn aw-pressable ${tool === t.id ? 'active is-current' : ''}${quick ? ' tool-rail-quick' : ''}${extra ? ' tool-rail-extra' : ''}${capped ? ' is-capped' : ''}${t.id === 'wall' && tool === 'wall' ? ' has-caret' : ''}`}
           onClick={() => pick(t.id)}
           title={t.tip}
           aria-pressed={tool === t.id}
@@ -192,7 +194,6 @@ export function ToolRail() {
           tabIndex={expanded || quick || extra ? 0 : -1}
           aria-hidden={!(expanded || quick || extra)}
         >
-          {tool === t.id ? <span className="tool-check" aria-hidden="true">✓</span> : null}
           <Icon name={t.icon} />
           <ToolWord k={`tool.${t.id}`} />
         </button>
@@ -339,6 +340,8 @@ export function ToolRail() {
         <Icon name="min" />
         <ToolWord k="tool.min" />
       </button>
+      </div>
+      {isPlan && tool === 'wall' ? <WallFlyout /> : null}
     </nav>
   );
 }

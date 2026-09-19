@@ -4,6 +4,7 @@ import { generateRoof } from '../lib/roof';
 import { APP_VERSION } from '../version';
 import { uid } from '../lib/geometry';
 import { defaultTinyHomeTypology } from './typology';
+import { DEFAULT_WALL_HEIGHT_FT } from '../lib/wallDraft';
 
 export const STYLE_TEMPLATES: StyleTemplate[] = [
   { id: 'blank', name: 'Blank', blurb: 'Start empty · draw your own walls.' },
@@ -342,7 +343,7 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
   }
 
   const roofStyleId = DEFAULT_ROOF_BY_STYLE[styleId] ?? null;
-  floor.roof = generateRoof(floor.nodes, floor.walls, roofStyleId);
+  floor.roof = generateRoof(floor.nodes, floor.walls, roofStyleId, DEFAULT_WALL_HEIGHT_FT);
 
   return {
     meta: {
@@ -369,6 +370,7 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
       snap: true,
       ortho: true,
       osnap: true,
+      wallHeight: DEFAULT_WALL_HEIGHT_FT,
       units: 'ft',
       accent: '#6E72F5',
       guiTheme: 'stark',

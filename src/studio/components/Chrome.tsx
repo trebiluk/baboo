@@ -1,38 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
-import type { Tool } from '../types';
-import { DEFAULT_SKILL_LEVEL, toolsForLevel } from '../data/skill';
+import { DEFAULT_SKILL_LEVEL } from '../data/skill';
 import { BABOO_LOGO } from '../logo';
-import { Icon, type IconName } from '../icons';
+import { Icon } from '../icons';
 import { ClassShareModal } from './ClassShareModal';
-import { COPYRIGHT_LINE } from './HelpModal';
 import { VersionChip } from './VersionChip';
-import { usePhoneChrome } from '../hooks/usePhoneChrome';
 import { t, tipLoc } from '../data/i18n';
-import { capReached } from '../lib/caps';
-
-const TOOLS: { id: Tool; label: string; tip?: string; icon: IconName }[] = [
-  { id: 'select', label: 'Select', tip: 'Click something to move it', icon: 'select' },
-  { id: 'sketch', label: 'Sketch', tip: 'Drag like a pencil, then Trace into walls', icon: 'sketch' },
-  { id: 'wall', label: 'Wall', tip: 'Click start, then click end', icon: 'wall' },
-  { id: 'door', label: 'Door', tip: 'Click on a wall', icon: 'door' },
-  { id: 'window', label: 'Window', tip: 'Click on a wall', icon: 'window' },
-  { id: 'furniture', label: 'Furniture', tip: 'Pick an item, then click the plan', icon: 'furniture' },
-  { id: 'room', label: 'Room', tip: 'Pick a type, then click inside closed walls', icon: 'room' },
-  { id: 'dim', label: 'Size', tip: 'Click two points for a size label', icon: 'dim' },
-  { id: 'note', label: 'Note', tip: 'Click, then type', icon: 'note' },
-  { id: 'plant', label: 'Plant', tip: 'Tree, bed, or path', icon: 'plant' },
-  { id: 'pan', label: 'Pan', tip: 'Drag to move the view', icon: 'pan' },
-];
-
-/** Edit tools hidden in 3D (view-only). Select stays so chrome does not look empty. */
-const HIDDEN_IN_3D: Tool[] = ['sketch', 'wall', 'door', 'window', 'furniture', 'room', 'dim', 'note', 'plant', 'pan'];
-const DOLLHOUSE_TOOLS: Tool[] = ['select', 'furniture', 'plant', 'pan'];
-
 
 export function Chrome() {
-  const tool = useProjectStore((s) => s.tool);
-  const setTool = useProjectStore((s) => s.setTool);
   const title = useProjectStore((s) => s.doc.meta.title);
   const setTitle = useProjectStore((s) => s.setTitle);
   const saveStatus = useProjectStore((s) => s.saveStatus);
@@ -62,7 +37,6 @@ export function Chrome() {
   const [teacherChrome, setTeacherChrome] = useState(false);
   const [classShareOpen, setClassShareOpen] = useState(false);
   const fileShare = typeof window !== 'undefined' && window.location.protocol === 'file:';
-  const phoneChrome = usePhoneChrome();
 
   useEffect(() => {
     if (!moreOpen) return;
@@ -82,7 +56,6 @@ export function Chrome() {
     };
   }, [moreOpen]);
 
-  // Teacher gate: ?teacher=1 or localStorage, Alt+D still works via DebugPanel
   useEffect(() => {
     try {
       const q = new URLSearchParams(window.location.search);
@@ -97,8 +70,6 @@ export function Chrome() {
 
   const skillLevel = useProjectStore((s) => s.doc.settings.skillLevel) ?? DEFAULT_SKILL_LEVEL;
   const locale = tipLoc(useProjectStore((s) => s.doc.settings));
-  const floor = useProjectStore((s) => s.doc.floors[0]);
-  const showCapToast = useProjectStore((s) => s.showCapToast);
   const statusLabel =
     saveStatus === 'saved' ? t(locale, 'chrome.saved') :
     saveStatus === 'saving' ? t(locale, 'chrome.saving') :
@@ -112,17 +83,10 @@ export function Chrome() {
   const isPlan = viewMode === 'plan';
   const isDollhouse = viewMode === 'dollhouse';
   const canEdit = isPlan || isDollhouse;
-  const allowed = toolsForLevel(skillLevel);
-  const visibleTools = TOOLS.filter((t) => {
-    if (!allowed.includes(t.id)) return false;
-    if (isPlan) return true;
-    if (isDollhouse) return DOLLHOUSE_TOOLS.includes(t.id);
-    return !HIDDEN_IN_3D.includes(t.id);
-  });
 
   return (
     <>
-    <header className="chrome">
+    <header className="chrome" data-baboo-chrome="top">
       <div className="chrome-left">
         <div className="brand">
           <img
@@ -134,22 +98,18 @@ export function Chrome() {
             decoding="async"
           />
           <span className="brand-name">Baboo</span>
-          {phoneChrome ? null : <VersionChip onTeacher={() => setTeacherChrome(true)} />}
+          <VersionChip onTeacher={() => setTeacherChrome(true)} />
           {fileShare ? (
             <span className="save-chip" title="Opened from a class folder — no server">Class share</span>
           ) : null}
         </div>
-        <span className="brand-purpose" title={t(locale, 'chrome.drawHouse')}>{t(locale, 'chrome.drawHouse')}</span>
-        <span className="copyright-line copyright-chrome" title={COPYRIGHT_LINE}>{COPYRIGHT_LINE}</span>
         <input
           className="title-input"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           aria-label={t(locale, 'chrome.projectName')}
         />
-        {phoneChrome ? null : (
-          <span className={`save-chip save-${saveStatus}`}>{statusLabel}</span>
-        )}
+        <span className={`save-chip save-${saveStatus}`}>{statusLabel}</span>
         <button
           type="button"
           className="ghost-btn aw-pressable chrome-wide skill-chrome-chip"
@@ -160,38 +120,6 @@ export function Chrome() {
         </button>
       </div>
 
-      <div className="tool-bar chrome-tools" role="toolbar" aria-label="Primary tools">
-        {visibleTools.map((item) => {
-          const capped = (item.id === 'wall' && capReached(floor, 'walls'))
-            || (item.id === 'room' && capReached(floor, 'rooms'))
-            || ((item.id === 'furniture' || item.id === 'plant') && capReached(floor, 'objects'));
-          return (
-          <button
-            key={item.id}
-            type="button"
-            className={`tool-btn aw-pressable ${tool === item.id ? 'active' : ''}${capped ? ' is-capped' : ''}`}
-            onClick={() => {
-              if (capped) {
-                if (item.id === 'wall') showCapToast('walls');
-                else if (item.id === 'room') showCapToast('rooms');
-                else showCapToast('objects');
-                return;
-              }
-              setTool(item.id);
-            }}
-            title={item.tip}
-            aria-pressed={tool === item.id}
-            aria-disabled={capped}
-            disabled={!canEdit && item.id !== 'select'}
-          >
-            {tool === item.id ? <span className="tool-check" aria-hidden="true">✓ </span> : null}
-            <Icon name={item.icon} />
-            <span className="tool-btn-label">{t(locale, `tool.${item.id}`)}</span>
-          </button>
-          );
-        })}
-      </div>
-
       <div className="chrome-right">
         <button type="button" className="ghost-btn aw-pressable chrome-ico chrome-undo" onClick={undo} title={t(locale, 'chrome.undo')} aria-label={t(locale, 'chrome.undo')} disabled={!canEdit}>
           <Icon name="undo" /> <span className="chrome-label">{t(locale, 'chrome.undo')}</span>
@@ -199,40 +127,37 @@ export function Chrome() {
         <button type="button" className="ghost-btn aw-pressable chrome-ico chrome-wide" onClick={redo} title={t(locale, 'chrome.redo')} disabled={!canEdit}>
           <Icon name="redo" /> <span className="chrome-label">{t(locale, 'chrome.redo')}</span>
         </button>
-        <button type="button" className="ghost-btn aw-pressable chrome-wide keep-phone chrome-ico" onClick={fitPlan} title={t(locale, 'chrome.fit')} disabled={!canEdit}>
-          <Icon name="fit" /> <span className="chrome-label">{t(locale, 'chrome.fit')}</span>
-        </button>
-        <button
-          type="button"
-          className={`ghost-btn aw-pressable chrome-ico ${viewMode === 'plan' ? 'active' : ''}`}
-          onClick={() => { setRenderTier(0); setViewMode('plan'); }}
-          title={t(locale, 'chrome.plan')}
-        >
-          <Icon name="plan" /> <span className="chrome-label">{t(locale, 'chrome.plan')}</span>
-        </button>
-        <button
-          type="button"
-          className={`ghost-btn aw-pressable chrome-ico ${viewMode === 'dollhouse' ? 'active' : ''}`}
-          onClick={() => setViewMode('dollhouse')}
-          title={t(locale, 'chrome.dollhouse')}
-        >
-          <Icon name="room" /> <span className="chrome-label">{t(locale, 'chrome.dollhouse')}</span>
-        </button>
-        <button
-          type="button"
-          className={`ghost-btn aw-pressable chrome-ico ${viewMode !== 'plan' && viewMode !== 'dollhouse' ? 'active' : ''}`}
-          onClick={() => { setRenderTier(1); setViewMode('solid3d'); }}
-          title={t(locale, '3d.viewonly')}
-        >
-          <Icon name="view3d" /> <span className="chrome-label">{t(locale, 'chrome.view3d')}</span>
-        </button>
-        <span className="view-only-chip" hidden={canEdit} title={t(locale, 'chrome.viewonly')}>{t(locale, 'chrome.viewonly')}</span>
+
+        <div className="chrome-view" role="group" aria-label="Viewport">
+          <button
+            type="button"
+            className={`ghost-btn aw-pressable chrome-ico ${viewMode === 'plan' ? 'active' : ''}`}
+            onClick={() => { setRenderTier(0); setViewMode('plan'); }}
+            title={t(locale, 'chrome.plan')}
+          >
+            <Icon name="plan" /> <span className="chrome-label">{t(locale, 'chrome.plan')}</span>
+          </button>
+          <button
+            type="button"
+            className={`ghost-btn aw-pressable chrome-ico ${viewMode === 'dollhouse' ? 'active' : ''}`}
+            onClick={() => setViewMode('dollhouse')}
+            title={t(locale, 'chrome.dollhouse')}
+          >
+            <Icon name="room" /> <span className="chrome-label">{t(locale, 'chrome.dollhouse')}</span>
+          </button>
+          <button
+            type="button"
+            className={`ghost-btn aw-pressable chrome-ico ${viewMode !== 'plan' && viewMode !== 'dollhouse' ? 'active' : ''}`}
+            onClick={() => { setRenderTier(1); setViewMode('solid3d'); }}
+            title={t(locale, '3d.viewonly')}
+          >
+            <Icon name="view3d" /> <span className="chrome-label">{t(locale, 'chrome.view3d')}</span>
+          </button>
+          <span className="view-only-chip" hidden={canEdit} title={t(locale, 'chrome.viewonly')}>{t(locale, 'chrome.viewonly')}</span>
+        </div>
 
         <button type="button" className="ghost-btn aw-pressable chrome-primary chrome-ico chrome-ess" onClick={exportJson} title={t(locale, 'chrome.save')} aria-label={t(locale, 'chrome.save')}>
           <Icon name="save" /> <span className="chrome-label">{t(locale, 'chrome.save')}</span>
-        </button>
-        <button type="button" className="ghost-btn aw-pressable chrome-wide chrome-ico" onClick={() => openNewProject(true)}>
-          <Icon name="new" /> <span className="chrome-label">{t(locale, 'chrome.new')}</span>
         </button>
         <button
           type="button"
@@ -242,7 +167,7 @@ export function Chrome() {
           aria-label={teachingOpen ? t(locale, 'chrome.teachClose') : t(locale, 'chrome.teach')}
           aria-pressed={teachingOpen}
         >
-          <Icon name="teach" /> <span className="chrome-label">{teachingOpen ? t(locale, 'chrome.teachClose') : t(locale, 'chrome.teach')}</span>
+          <Icon name="teach" /> <span className="chrome-label">{t(locale, 'chrome.teach')}</span>
         </button>
         <button
           type="button"
@@ -268,6 +193,7 @@ export function Chrome() {
           </button>
           {moreOpen && (
             <div className="chrome-more-menu" role="menu">
+              <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(fitPlan)} disabled={!canEdit}><Icon name="fit" /> {t(locale, 'chrome.fit')}</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => openNewProject(true))}><Icon name="new" /> {t(locale, 'chrome.new')}</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => exportGalleryCard())}><Icon name="note" /> {t(locale, 'chrome.classCard')}</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => toggleContest())}><Icon name="contest" /> {t(locale, 'chrome.contestBaboo')}</button>

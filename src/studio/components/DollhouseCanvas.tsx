@@ -11,13 +11,13 @@ import {
   nextYaw,
   yawToFace,
   DOLL_PROJS,
-  WALL_H,
   shouldCutawayWall,
   isCameraFacingSide,
   type DollProj,
   type ProjSpec,
   type YawDeg,
 } from '../lib/iso';
+import { asWallHeightFt } from '../lib/wallDraft';
 import { packTileCanvas, textureStrokeFallback } from '../lib/texturePattern';
 import { furnitureParts, partWorldCorners, partWorldRing } from '../lib/furnShape';
 import { FURN_CAP, furnitureLod } from '../lib/perf';
@@ -72,6 +72,7 @@ export function DollhouseCanvas() {
     yaw: (settings.dollYaw ?? 0) as YawDeg,
     top: settings.dollProj === 'ortho' && settings.dollTop === true,
   };
+  const wallH = asWallHeightFt(settings.wallHeight);
   const face = yawToFace(spec.yaw, spec.top);
 
   useEffect(() => {
@@ -95,7 +96,7 @@ export function DollhouseCanvas() {
 
   const fit = useCallback(() => {
     const pts: { x: number; y: number }[] = [];
-    for (const n of floor.nodes) pts.push(project(n.x, n.y, 0, spec), project(n.x, n.y, WALL_H, spec));
+    for (const n of floor.nodes) pts.push(project(n.x, n.y, 0, spec), project(n.x, n.y, wallH, spec));
     for (const f of floor.furniture) pts.push(project(f.x, f.y, 0, spec));
     for (const L of floor.landscape ?? []) pts.push(project(L.x, L.y, 0, spec));
     if (!pts.length) {
@@ -118,7 +119,7 @@ export function DollhouseCanvas() {
       x: size.w / 2 - ((minX + maxX) / 2) * z,
       y: size.h / 2 - ((minY + maxY) / 2) * z,
     });
-  }, [floor.nodes, floor.furniture, floor.landscape, size.w, size.h, spec.kind, spec.yaw, spec.top]);
+  }, [floor.nodes, floor.furniture, floor.landscape, size.w, size.h, spec.kind, spec.yaw, spec.top, wallH]);
 
   useEffect(() => { fit(); }, [fit, fitNonce]);
 
@@ -152,9 +153,9 @@ export function DollhouseCanvas() {
 
   const lidPoly = useMemo(() => {
     const outline = floor.roof?.outline;
-    if (outline && outline.length >= 3) return projectPoints(outline.map((p) => ({ x: p.x, y: p.y, z: WALL_H })), spec);
+    if (outline && outline.length >= 3) return projectPoints(outline.map((p) => ({ x: p.x, y: p.y, z: wallH })), spec);
     return [];
-  }, [floor.roof, spec.kind, spec.yaw, spec.top]);
+  }, [floor.roof, spec.kind, spec.yaw, spec.top, wallH]);
 
   const sceneFaces = useMemo(() => {
     const originPts = floor.roof?.outline && floor.roof.outline.length >= 3
@@ -199,8 +200,8 @@ export function DollhouseCanvas() {
         pts: projectPoints([
           { x: e.a.x, y: e.a.y, z: 0 },
           { x: e.b.x, y: e.b.y, z: 0 },
-          { x: e.b.x, y: e.b.y, z: WALL_H },
-          { x: e.a.x, y: e.a.y, z: WALL_H },
+          { x: e.b.x, y: e.b.y, z: wallH },
+          { x: e.a.x, y: e.a.y, z: wallH },
         ], spec),
         fill,
         pattern: tile,
@@ -292,7 +293,7 @@ export function DollhouseCanvas() {
     return faces;
   }, [
     floor.walls, floor.nodes, floor.openings, floor.furniture, floor.roof,
-    houseTex, tiles, spec.kind, spec.yaw, spec.top, selected, light, blocky, zoom, furnLod, setSelected,
+    houseTex, tiles, spec.kind, spec.yaw, spec.top, selected, light, blocky, zoom, furnLod, setSelected, wallH,
   ]);
 
   const screenToWorld = (sx: number, sy: number) => {

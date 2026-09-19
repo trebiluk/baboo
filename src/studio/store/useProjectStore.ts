@@ -3,7 +3,7 @@ import type {
   Floor, FurnitureItem, Opening, ProjectDocument, ProjectSettings,
   SaveStatus, StyleId, Tool, ViewMode, RenderTier, Point, Wall, RoofStyleId,
   TypologyShell, Room, RoomKind, DimItem, NoteItem, LandscapeItem, PlantKind,
-  SketchStroke,
+  SketchStroke, WallDrawStyle,
 } from '../types';
 import { blankProject, buildTemplateProject } from '../data/templates';
 import { APP_VERSION } from '../version';
@@ -49,6 +49,13 @@ import {
   skillRank, toastMs, readSkillPref, writeSkillPref,
 } from '../data/skill';
 import type { SkillLevel } from '../types';
+import {
+  DEFAULT_WALL_DRAW_STYLE,
+  DEFAULT_WALL_HEIGHT_FT,
+  DEFAULT_WALL_THICKNESS_FT,
+  asWallDrawStyle,
+  asWallHeightFt,
+} from '../lib/wallDraft';
 
 const MAX_UNDO = 40;
 
@@ -111,6 +118,9 @@ interface Store {
   dimDraft: Point | null;
   wallKind: 'exterior' | 'interior';
   wallMode: 'draw' | 'clip';
+  /** Draft thickness for the next wall, in feet. Flyout chips are 120/200/300mm. */
+  wallThickness: number;
+  wallDrawStyle: WallDrawStyle;
   selectedPlantKind: PlantKind;
   viewport: { w: number; h: number };
   saveStatus: SaveStatus;
@@ -122,6 +132,9 @@ interface Store {
   setSkillLevel: (level: SkillLevel) => void;
   setWallKind: (kind: 'exterior' | 'interior') => void;
   setWallMode: (mode: 'draw' | 'clip') => void;
+  setWallThickness: (ft: number) => void;
+  setWallDrawStyle: (style: WallDrawStyle) => void;
+  setWallHeight: (ft: number) => void;
   setPlantKind: (kind: PlantKind) => void;
   setViewport: (w: number, h: number) => void;
   fitPlan: () => void;
@@ -182,7 +195,7 @@ interface Store {
   cancelWallDraft: () => void;
   placeOpening: (type: 'door' | 'window', p: Point) => void;
   patchOpening: (id: string, patch: Partial<Pick<Opening, 'width' | 'swing' | 'symbolKind' | 't'>>) => void;
-  patchWall: (id: string, patch: Partial<Pick<Wall, 'kind' | 'finishId' | 'thickness'>>) => void;
+  patchWall: (id: string, patch: Partial<Pick<Wall, 'kind' | 'finishId' | 'thickness' | 'drawStyle'>>) => void;
   patchFurniture: (id: string, patch: Partial<Pick<FurnitureItem, 'color' | 'x' | 'y' | 'w' | 'h' | 'rot'>>) => void;
   patchLandscape: (id: string, patch: Partial<Pick<LandscapeItem, 'x' | 'y' | 'w' | 'h'>>) => void;
   moveWallEnd: (wallId: string, end: 'a' | 'b', p: Point, forceOrtho?: boolean) => void;
@@ -236,8 +249,8 @@ function toneForToast(msg: string, fallback: ToastTone): ToastTone {
 }
 
 
-function refreshRoof(f: Floor, roofStyleId: RoofStyleId | null): Floor {
-  return { ...f, roof: generateRoof(f.nodes, f.walls, roofStyleId) };
+function refreshRoof(f: Floor, roofStyleId: RoofStyleId | null, eavesHeight?: number): Floor {
+  return { ...f, roof: generateRoof(f.nodes, f.walls, roofStyleId, eavesHeight) };
 }
 
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
@@ -278,6 +291,8 @@ export const useProjectStore = create<Store>((set, get) => ({
   dimDraft: null,
   wallKind: 'exterior',
   wallMode: 'draw',
+  wallThickness: DEFAULT_WALL_THICKNESS_FT,
+  wallDrawStyle: DEFAULT_WALL_DRAW_STYLE,
   selectedPlantKind: 'tree',
   viewport: { w: 800, h: 600 },
   saveStatus: 'saved',
@@ -368,6 +383,30 @@ export const useProjectStore = create<Store>((set, get) => ({
   },
   setWallKind: (wallKind) => set({ wallKind, wallMode: 'draw' }),
   setWallMode: (wallMode) => set({ wallMode, wallDraft: null, tool: 'wall' }),
+  setWallThickness: (ft) => {
+    const wallThickness = Math.max(0.2, Math.min(2, ft));
+    set({ wallThickness });
+    const sel = get().selected;
+    if (sel?.kind === 'wall') get().patchWall(sel.id, { thickness: wallThickness });
+  },
+  setWallDrawStyle: (style) => {
+    const wallDrawStyle = asWallDrawStyle(style);
+    set({ wallDrawStyle });
+    const sel = get().selected;
+    if (sel?.kind === 'wall') get().patchWall(sel.id, { drawStyle: wallDrawStyle });
+  },
+  setWallHeight: (ft) => {
+    const wallHeight = asWallHeightFt(ft);
+    const doc = get().doc;
+    const settings = { ...doc.settings, wallHeight };
+    set({
+      doc: {
+        ...withFloor(doc, (f) => refreshRoof(f, settings.roofStyleId ?? null, wallHeight)),
+        settings,
+      },
+      saveStatus: 'unsaved' as SaveStatus,
+    });
+  },
   setPlantKind: (selectedPlantKind) => set({ selectedPlantKind, tool: 'plant' }),
   setViewport: (w, h) => set({ viewport: { w, h } }),
   fitPlan: () => {
@@ -462,7 +501,7 @@ export const useProjectStore = create<Store>((set, get) => ({
       roofLabel: roofStyleId ? label : '',
       showRoof: roofStyleId != null ? true : doc.settings.showRoof,
     };
-    const next = withFloor(doc, (f) => refreshRoof(f, roofStyleId));
+    const next = withFloor(doc, (f) => refreshRoof(f, roofStyleId, doc.settings.wallHeight));
     set({ doc: { ...next, settings }, saveStatus: 'unsaved' as SaveStatus });
     get().showToast(roofStyleId ? `Roof: ${label}` : 'Roof cleared');
   },
@@ -835,7 +874,7 @@ export const useProjectStore = create<Store>((set, get) => ({
           walls: f.walls.filter((w) => w.id !== selected.id),
           openings: f.openings.filter((o) => o.wallId !== selected.id),
         };
-        return refreshRoof(next, get().doc.settings.roofStyleId ?? null);
+        return refreshRoof(next, get().doc.settings.roofStyleId ?? null, get().doc.settings.wallHeight);
       }
       if (selected.kind === 'opening') {
         return { ...f, openings: f.openings.filter((o) => o.id !== selected.id) };
@@ -910,10 +949,11 @@ export const useProjectStore = create<Store>((set, get) => ({
         const kind = get().wallKind;
         const wall: Wall = {
           id: uid('w'), a: aRes.id, b: bRes.id, kind,
-          thickness: kind === 'interior' ? 0.35 : 0.5,
+          thickness: get().wallThickness,
+          drawStyle: get().wallDrawStyle,
         };
         const next = { ...f, nodes, walls: [...walls, wall], openings };
-        return refreshRoof(next, get().doc.settings.roofStyleId ?? null);
+        return refreshRoof(next, get().doc.settings.roofStyleId ?? null, get().doc.settings.wallHeight);
       }),
       wallDraft: null,
     });
@@ -938,6 +978,7 @@ export const useProjectStore = create<Store>((set, get) => ({
       doc: withFloor(get().doc, (f) => refreshRoof(
         { ...f, nodes: cut.nodes, walls: cut.walls, openings: cut.openings },
         get().doc.settings.roofStyleId ?? null,
+        get().doc.settings.wallHeight,
       )),
     });
     get().markDirty();
@@ -1020,7 +1061,7 @@ export const useProjectStore = create<Store>((set, get) => ({
               ?? (patch.kind === 'interior' ? 0.35 : patch.kind === 'exterior' ? 0.5 : w.thickness),
           } : w)),
         };
-        return refreshRoof(next, get().doc.settings.roofStyleId ?? null);
+        return refreshRoof(next, get().doc.settings.roofStyleId ?? null, get().doc.settings.wallHeight);
       }),
     });
     get().markDirty();
@@ -1095,7 +1136,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     set({
       doc: withFloor(get().doc, (f) => {
         const next = { ...f, nodes: nodesAfterWallLength(f.nodes, wall, len) };
-        return refreshRoof(next, get().doc.settings.roofStyleId ?? null);
+        return refreshRoof(next, get().doc.settings.roofStyleId ?? null, get().doc.settings.wallHeight);
       }),
     });
     get().markDirty();
@@ -1394,7 +1435,8 @@ export const useProjectStore = create<Store>((set, get) => ({
     }
     const merge = s.snap ? s.gridSize * 0.4 : 0.35;
     const kind = get().wallKind;
-    const thick = kind === 'interior' ? 0.35 : 0.5;
+    const thick = get().wallThickness;
+    const drawStyle = get().wallDrawStyle;
     get().pushHistory();
     let added = 0;
     set({
@@ -1418,12 +1460,12 @@ export const useProjectStore = create<Store>((set, get) => ({
           ({ walls, openings } = splitWallsAtNode(walls, openings, nodes, aRes.id, merge));
           ({ walls, openings } = splitWallsAtNode(walls, openings, nodes, bRes.id, merge));
           walls.push({
-            id: uid('w'), a: aRes.id, b: bRes.id, kind, thickness: thick,
+            id: uid('w'), a: aRes.id, b: bRes.id, kind, thickness: thick, drawStyle,
           });
           added += 1;
         }
         if (added === 0) return f;
-        return refreshRoof({ ...f, nodes, walls, openings }, get().doc.settings.roofStyleId ?? null);
+        return refreshRoof({ ...f, nodes, walls, openings }, get().doc.settings.roofStyleId ?? null, get().doc.settings.wallHeight);
       }),
       selected: null,
       tool: 'select',
@@ -1600,7 +1642,7 @@ export const useProjectStore = create<Store>((set, get) => ({
         });
       } else if (selected?.kind === 'wall' && s.roofStyleId) {
         set({
-          doc: withFloor(get().doc, (f) => refreshRoof(f, s.roofStyleId)),
+          doc: withFloor(get().doc, (f) => refreshRoof(f, s.roofStyleId, s.wallHeight)),
         });
       }
       get().markDirty();
@@ -1612,7 +1654,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     get().moveSelected(dx, dy);
     const s = get().doc.settings;
     if (selected.kind === 'wall' && s.roofStyleId) {
-      set({ doc: withFloor(get().doc, (f) => refreshRoof(f, s.roofStyleId)) });
+      set({ doc: withFloor(get().doc, (f) => refreshRoof(f, s.roofStyleId, s.wallHeight)) });
     }
     if (nudgeTimer) clearTimeout(nudgeTimer);
     nudgeTimer = setTimeout(() => {
