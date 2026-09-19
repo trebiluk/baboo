@@ -335,6 +335,11 @@ button {
 }
 .chrome-left {
   flex:1;
+  min-width:0;
+  /* Clip rather than paint over the tools on the right. */
+  overflow:hidden
+}
+.chrome-left > .brand {
   min-width:0
 }
 .chrome-right {
@@ -381,7 +386,8 @@ button {
   background:var(--aw-elevated);
   border:1px solid var(--aw-border);
   border-radius:8px;
-  min-width:100px;
+  flex:0 1 auto;
+  min-width:80px;
   max-width:160px;
   padding:4px 8px
 }
@@ -3389,6 +3395,15 @@ html[data-udl-fat] .chrome > .chrome-right > .keep-phone,
 html[data-udl-fat] .chrome .chrome-more-btn {
   min-height: 52px;
   min-width: 52px;
+}
+/* Fat taps widen the right-hand chrome, so the decoration in the left-hand
+   chrome gives up its space first. Copyright still sits in Help; the version
+   still sits on the floating chip. */
+html[data-udl-fat] .copyright-chrome,
+html[data-udl-fat] .chrome .ver-chip,
+html[data-udl-fat] .brand-name,
+html[data-udl-fat] .skill-chrome-chip {
+  display: none !important;
 }
 html[data-udl-fat] .template-glyph {
   width: 88px;

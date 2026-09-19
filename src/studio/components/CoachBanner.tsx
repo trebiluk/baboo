@@ -3,7 +3,8 @@ import { DEFAULT_SKILL_LEVEL, nextCoach, skillRank } from '../data/skill';
 import { BABOO_LOGO } from '../logo';
 import { useProjectStore } from '../store/useProjectStore';
 import { t, tt, tipLoc } from '../data/i18n';
-import { hasTaWhisper, nextTip, tipKey } from '../data/tips';
+import { hasTaWhisper, tipKey } from '../data/tips';
+import { useNextTip } from '../data/useNextTip';
 import type { Tool } from '../types';
 import type { TipId } from '../data/tips';
 
@@ -37,29 +38,15 @@ export function CoachBanner() {
   const newProjectOpen = useProjectStore((s) => s.newProjectOpen);
   const selected = useProjectStore((s) => s.selected);
   const showTips = useProjectStore((s) => s.showTips);
-  const tipsDone = useProjectStore((s) => s.tipsDone);
-  const tipPending = useProjectStore((s) => s.tipPending);
-  const savedFile = useProjectStore((s) => s.savedFile);
   const taAssist = useProjectStore((s) => s.taAssist);
   const markTipDone = useProjectStore((s) => s.markTipDone);
   const [denDone, setDenDone] = useState<string | null>(null);
 
+  const tipNow = useNextTip();
+
   const den = styleId === 'dog-house';
   const denStep = den ? nextCoach(skillLevel, floor, styleId) : null;
-  const tipId = den
-    ? null
-    : nextTip({
-      showTips,
-      progress: {
-        walls: floor.walls.length,
-        doors: floor.openings.filter((o) => o.type === 'door').length,
-        savedFile,
-        drewSomething: floor.walls.length > 0 || (floor.sketches ?? []).length > 0,
-      },
-      done: tipsDone,
-      pending: tipPending,
-      taAssist,
-    });
+  const tipId = den ? null : tipNow;
 
   if (!showTips) return null;
   if (skillRank(skillLevel) > 1 && !den && !taAssist) return null;

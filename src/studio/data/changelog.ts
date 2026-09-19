@@ -17,6 +17,11 @@ export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
       'P0 inclusion / tools-ease: same Help for every student — bigger type, high contrast, and tip language at the top',
       'High contrast stays on Stark white + blue. Teach / Matteson words stay English; tips use tipsLocale',
       'Fat taps, icon-above-label, Undo always visible, visual success/miss toasts, cap toast, dirty-tile autosave',
+      'One tip at a time: sketch the house, draw a wall, add a door, save the file — then Baboo goes quiet',
+      'Roof name, 3D, Teach and Class card tips wait for those three wins, or for a TA to unlock them',
+      'Show tips and TA assist sit in the same Help and Settings as the other switches — no separate special Help',
+      'TA assist (Settings, Help, or ?ta=1): Next tip, an aide line under each tip, fat taps, Teach and the long Help folded',
+      'Template cards lead with a plain line drawing of the house, so the picture reads before the words',
     ],
   },
   {

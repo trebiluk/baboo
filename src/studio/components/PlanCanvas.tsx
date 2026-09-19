@@ -23,6 +23,7 @@ import { FurnitureSymbol } from './FurnitureSymbol';
 import { asFloorFinish, asFloorGrain, floorFinish, floorTileCanvas } from '../data/flooring';
 import { DEFAULT_GUI_THEME } from '../data/themes';
 import { DEFAULT_SKILL_LEVEL, skillRank } from '../data/skill';
+import { useNextTip } from '../data/useNextTip';
 import { furnitureLod } from '../lib/perf';
 
 export function PlanCanvas() {
@@ -50,6 +51,7 @@ export function PlanCanvas() {
   const [wallCtaDismissed, setWallCtaDismissed] = useState(() => {
     try { return localStorage.getItem('baboo-wall-cta-dismissed') === '1'; } catch { return false; }
   });
+  const tipNow = useNextTip();
   const lastRef = useRef<{ x: number; y: number } | null>(null);
   const panning = useRef(false);
   const pendingTap = useRef<{ screen: { x: number; y: number }; world: { x: number; y: number } } | null>(null);
@@ -491,7 +493,9 @@ export function PlanCanvas() {
   const selectedGrips = selectedWall ? wallGripPoints(selectedWall, floor.nodes) : null;
 
   const skillLevel = settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
-  const showWallCta = skillRank(skillLevel) <= 2 && floor.walls.length === 0 && !wallCtaDismissed && !wallDraft;
+  // The wall tip already says "click start, click end" — never both at once.
+  const showWallCta = skillRank(skillLevel) <= 2 && floor.walls.length === 0
+    && !wallCtaDismissed && !wallDraft && tipNow !== 'tip-wall';
   const objectCount =
     floor.nodes.length +
     floor.walls.length +

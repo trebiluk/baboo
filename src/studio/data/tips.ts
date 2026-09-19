@@ -96,18 +96,25 @@ export type TipCtx = {
  * same way — a student who needs the same shape each time gets it.
  *
  * An empty plan stops after the wall tip: there is nothing honest to say about
- * doors or saving yet.
+ * doors or saving yet. A student already sketching skips the welcome.
  */
 export function nextTip(ctx: TipCtx): TipId | null {
   if (!ctx.showTips) return null;
   const done = new Set(ctx.done);
   const p = ctx.progress;
 
+  const win = winTip(p, done);
+  if (win) return win;
+
+  // Later tips need the wins finished, or a TA who advanced past them.
   if (ctx.pending && !done.has(ctx.pending) && (winsDone(p) || ctx.taAssist)) {
     return ctx.pending;
   }
+  return null;
+}
 
-  if (!p.drewSomething) return done.has('tip-welcome') ? null : 'tip-welcome';
+function winTip(p: TipProgress, done: ReadonlySet<TipId>): TipId | null {
+  if (!p.drewSomething && !done.has('tip-welcome')) return 'tip-welcome';
   if (p.walls === 0) return done.has('tip-wall') ? null : 'tip-wall';
   if (p.doors === 0) return done.has('tip-door') ? null : 'tip-door';
   if (!p.savedFile) return done.has('tip-save') ? null : 'tip-save';

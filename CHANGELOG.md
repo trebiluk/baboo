@@ -10,6 +10,13 @@ In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**
 - Fat taps (≥44px), icon above the label, Undo always on the bar
 - Every place or miss shows a calm visual toast (Done / Try again / Full) — works with the sound off
 - Cap toast before a stamp: rooms 12 · walls 40 · objects 60. Autosave writes dirty awake tiles only
+- Tip pack folded in from Curriculum: eight locked tip ids, EN/ES approved copy pasted verbatim, the other five classroom languages built to the same one-step shape
+- One tip on screen. Three wins in the same order every period — wall, door, Save file — then Baboo stops coaching
+- Roof name, 3D, Teach and Class card tips wait behind those three wins, or a TA unlock. Roof shop words (gable, hip, grass) and `alias` stay English in every language
+- `Show tips` and `TA assist` sit in main Help and Settings beside contrast and big type — not a separate "special" Help
+- TA assist (Settings, Help, or `?ta=1`): `Next tip` for the aide to advance, a TA whisper under each first-run tip, fat taps, Teaching and the long Help list folded, no developer items. Never labels the student
+- Template cards lead with plain line art so a student who cannot read the blurb can still pick a house
+- Teaching never opens itself on first paint
 
 ## 1.3.5 — 2026-09-17
 - Selected walls show squares on the ends — drag them to stretch, drag the middle to slide

@@ -82,9 +82,12 @@ describe('three wins', () => {
   });
 
   it('Got it retires one tip and moves to the next', () => {
-    assert.equal(nextTip(ctx({ done: ['tip-welcome'] })), null);
-    const sketched = at({ drewSomething: true });
-    assert.equal(nextTip(ctx({ done: ['tip-welcome'], progress: sketched })), 'tip-wall');
+    assert.equal(nextTip(ctx({ done: ['tip-welcome'] })), 'tip-wall');
+    assert.equal(nextTip(ctx({ done: ['tip-welcome', 'tip-wall'] })), null);
+  });
+
+  it('skips the welcome for a student already sketching', () => {
+    assert.equal(nextTip(ctx({ progress: at({ drewSomething: true }) })), 'tip-wall');
   });
 
   it('shows nothing at all when tips are off', () => {
@@ -103,8 +106,14 @@ describe('later tips', () => {
     }
   });
 
-  it('lets a TA unlock a later tip early', () => {
-    assert.equal(nextTip(ctx({ pending: 'tip-roof', taAssist: true })), 'tip-roof');
+  it('lets a TA unlock a later tip without finishing the wins', () => {
+    const acked: TipId[] = ['tip-welcome', 'tip-wall'];
+    assert.equal(nextTip(ctx({ pending: 'tip-roof', done: acked, taAssist: true })), 'tip-roof');
+    assert.equal(nextTip(ctx({ pending: 'tip-roof', done: acked })), null);
+  });
+
+  it('never preempts the first-run path, even for a TA', () => {
+    assert.equal(nextTip(ctx({ pending: 'tip-roof', taAssist: true })), 'tip-welcome');
   });
 
   it('does not repeat a later tip that was acknowledged', () => {
