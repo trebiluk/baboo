@@ -3,6 +3,12 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.0.1 — 2026-09-19 — P0.1 Edge Pocket (kill right Enseñar ribbon)
+- Right Teach/Enseñar ribbon is gone — no leftover gutter. Teach and Help sit on the top row with Save
+- Left Edge Pocket: Select · Sketch · Wall · Door · More as overlay chips. Tap opens the flyout; hover also opens when a pointer exists. Right-click / long-press (~500ms) empty canvas opens the same Tools pocket
+- Menus overlay. Plan canvas fills remaining `100dvh` / `100svh` + safe-area. Stark white+blue stays the classroom default
+- Fat taps stay ≥44px with icon + word. EN/ES and the rest of the tip pack still work
+
 ## 2.0.0 — 2026-09-19 — P0 inclusion / tools-ease UDL defaults
 - Same Help for every student: bigger type, high contrast, and tip language sit at the top of Help and Settings
 - High contrast stays on Stark white + blue — darker words, thicker lines, stronger focus rings

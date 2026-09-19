@@ -11,6 +11,15 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.0.1',
+    date: '2026-09-19',
+    bullets: [
+      'P0.1 Edge Pocket: the right Teach/Enseñar ribbon is gone. Teach and Help sit on the top row with Save',
+      'Left overlay chips — Select · Sketch · Wall · Door · More. Tap or hover opens the pocket; right-click / long-press empty canvas does the same',
+      'Menus overlay; the plan fills remaining 100dvh / 100svh. Stark white+blue stays the classroom default',
+    ],
+  },
+  {
     version: '2.0.0',
     date: '2026-09-19',
     bullets: [

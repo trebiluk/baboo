@@ -61,7 +61,6 @@ export function ToolRail() {
   const setTool = useProjectStore((s) => s.setTool);
   const catalogOpen = useProjectStore((s) => s.catalogOpen);
   const toggleCatalog = useProjectStore((s) => s.toggleCatalog);
-  const wallDraft = useProjectStore((s) => s.wallDraft);
   const viewMode = useProjectStore((s) => s.viewMode);
   const toolsPinned = useProjectStore((s) => s.toolsPinned);
   const setToolsPinned = useProjectStore((s) => s.setToolsPinned);
@@ -77,7 +76,6 @@ export function ToolRail() {
   const setWallMode = useProjectStore((s) => s.setWallMode);
   const selectedPlantKind = useProjectStore((s) => s.selectedPlantKind);
   const setPlantKind = useProjectStore((s) => s.setPlantKind);
-  const dimDraft = useProjectStore((s) => s.dimDraft);
   const selected = useProjectStore((s) => s.selected);
   const duplicateSelected = useProjectStore((s) => s.duplicateSelected);
   const rotateSelected = useProjectStore((s) => s.rotateSelected);
@@ -117,12 +115,11 @@ export function ToolRail() {
   const later = isDollhouse ? [] : TOOLS.filter((t) => upcomingTools(skillLevel).includes(t.id));
   const expert = skillRank(skillLevel) >= 3;
   const showList = allowed.includes('furniture') || (!isDollhouse && allowed.includes('room'));
-  const drawing = wallDraft != null || dimDraft != null;
   const quickSet = isDollhouse ? QUICK_DOLL : QUICK;
   const expanded = !sheetOpen && (
     toolsPinned
     || catalogOpen
-    || (!phone && (hover || focus || tool !== 'select' || drawing))
+    || (!phone && (hover || focus))
   );
   const hasSketch = (sketches?.length ?? 0) > 0;
 
@@ -166,8 +163,9 @@ export function ToolRail() {
 
   return (
     <nav
-      className={`tool-rail ${expanded ? 'is-open' : 'is-min'}${phone ? ' is-coarse' : ''}${sheetOpen ? ' is-behind-sheet' : ''}`}
-      aria-label="Draw tools"
+      className={`tool-rail edge-pocket ${expanded ? 'is-open' : 'is-min'}${phone ? ' is-coarse' : ''}${sheetOpen ? ' is-behind-sheet' : ''}`}
+      data-edge-pocket="tools"
+      aria-label={tx(locale, 'chrome.toolsPocket')}
       aria-expanded={expanded}
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
@@ -322,8 +320,8 @@ export function ToolRail() {
           type="button"
           className="tool-rail-btn tool-rail-chip aw-pressable"
           onClick={() => setToolsPinned(true)}
-          title="Show every draw tool"
-          aria-label="More tools"
+          title={tx(locale, 'chrome.openTools')}
+          aria-label={tx(locale, 'chrome.openTools')}
         >
           <span className="tool-rail-kicker">Tools</span>
           <Icon name="more" />
