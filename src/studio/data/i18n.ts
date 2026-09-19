@@ -149,13 +149,13 @@ export const STR: Record<string, Gloss> = {
     es: 'Acceso', cu: 'Acceso', uk: 'Доступ', ru: 'Доступ', ti: 'መእተዊ', fa: 'دسترسی',
   }),
 
-  'cta.wall.title': g('Let’s put a wall on the grid', {
-    es: 'Pongamos un muro en la cuadrícula',
-    cu: 'Pongamos una pared en la cuadrícula',
-    uk: 'Поставмо стіну на сітку',
-    ru: 'Поставим стену на сетку',
-    ti: 'መንደቕ ኣብቲ መርበብ ንግበር',
-    fa: 'بیا یک دیوار روی شبکه بگذاریم',
+  'cta.wall.title': g('Wall → click start → click end', {
+    es: 'Muro → clic inicio → clic final',
+    cu: 'Pared → toca inicio → toca final',
+    uk: 'Стіна → клік початок → клік кінець',
+    ru: 'Стена → клик начало → клик конец',
+    ti: 'Wall → click start → click end',
+    fa: 'دیوار → کلیک شروع → کلیک پایان',
   }),
   'cta.wall.sub': g('Two clicks: start, then the other end. Then a door.', {
     es: 'Dos clics: el inicio, luego el otro extremo. Después una puerta.',
