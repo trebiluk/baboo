@@ -233,6 +233,11 @@ export interface ProjectSettings {
   snap: boolean;
   /** Straight H/V walls. Hold Shift to force; turn off in Settings for free angles. */
   ortho: boolean;
+  /**
+   * Latch onto drawn geometry — corner, middle, crossing, square-off, along-wall.
+   * Beats the grid when both are in reach. Default on.
+   */
+  osnap: boolean;
   units: 'ft' | 'm';
   accent: string;
   /** GUI chrome theme; default stark (Diego GO). */

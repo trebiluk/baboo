@@ -3524,3 +3524,80 @@ html[data-gui-theme=stark] .canvas-hint {
 }
 
 
+
+/* 2.1 — Exact entry while drawing (length + angle, tap or type) */
+.dyn-input {
+  z-index: var(--aw-z-overlays);
+  position: absolute;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 10px;
+  background: var(--aw-elevated);
+  border: 1px solid color-mix(in srgb, var(--aw-cyan) 55%, var(--aw-border));
+  box-shadow: 0 6px 18px #0a0a0a29;
+  pointer-events: auto;
+}
+.dyn-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dyn-field > span {
+  color: var(--aw-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.dyn-field > input {
+  width: 74px;
+  min-height: 36px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--aw-border);
+  background: var(--aw-bg);
+  color: var(--aw-fg);
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.dyn-field-ang > input {
+  width: 58px;
+}
+.dyn-field > input:focus-visible,
+.dyn-go:focus-visible {
+  outline: 3px solid var(--aw-cyan);
+  outline-offset: 1px;
+}
+.dyn-go {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--aw-cyan) 55%, var(--aw-border));
+  background: var(--aw-bg);
+  color: var(--aw-fg);
+  font-size: 13px;
+  font-weight: 700;
+}
+.canvas-readout {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+html[data-udl-fat] .dyn-field > input,
+html[data-udl-fat] .dyn-go {
+  min-height: 44px;
+  font-size: 15px;
+}
+html[data-udl-type] .dyn-field > input,
+html[data-udl-type] .dyn-go {
+  font-size: 1.1em;
+}
+html[data-udl-contrast] .dyn-input {
+  border-color: #000;
+}
+html[data-udl-contrast] .dyn-field > span,
+html[data-udl-contrast] .dyn-field > input,
+html[data-udl-contrast] .dyn-go {
+  color: #000;
+}
