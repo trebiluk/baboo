@@ -306,7 +306,7 @@ export function ObjectMenu() {
                     title={p.name}
                     onClick={() => patchWall(w.id, { finishId: p.id === 'pack:plain' ? null : p.id })}
                   >
-                    {p.name}
+                    <span className="tex-swatch-label">{p.name}</span>
                   </button>
                 );
               })}
@@ -348,7 +348,7 @@ export function ObjectMenu() {
                     title={p.label}
                     onClick={() => patchFurniture(f.id, { color: p.hex })}
                   >
-                    {p.label}
+                    <span className="tex-swatch-label">{p.label}</span>
                   </button>
                 );
               })}
@@ -423,7 +423,7 @@ export function ObjectMenu() {
                         title={p.name}
                         onClick={() => patchRoom(r.id, { floorFinishId: p.id })}
                       >
-                        {p.name}
+                        <span className="tex-swatch-label">{p.name}</span>
                       </button>
                     );
                   })}
