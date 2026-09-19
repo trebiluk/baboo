@@ -424,12 +424,11 @@ button {
 }
 /*
  * Past this width the right-hand controls leave the title strip too little
- * room for the version pill and the attribution line. Both appear elsewhere —
- * the floating version chip, and the dedication card under Help - About — so
- * dropping them here costs nothing and keeps the name and title readable.
+ * room for the attribution line and the wordmark. Both appear elsewhere —
+ * Help · About, and the logo — so dropping them here keeps Undo readable.
+ * Keep the version pill: the floating chip only appears at phone widths.
  */
 @media (width < 1540px) {
-  .chrome-left .ver-chip-header,
   .chrome-left .copyright-chrome,
   .chrome-left .brand-name {
     display:none

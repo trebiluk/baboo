@@ -45,6 +45,14 @@ describe('P0.1 Edge Pocket chrome', () => {
     assert.doesNotMatch(css, /\.dock-rail\s*\{/);
   });
 
+  it('keeps the version chip in the header until phone widths', () => {
+    const css = readFileSync(join(studio, 'index.css'), 'utf8');
+    const tight = css.match(/@media \(width < 1540px\) \{[\s\S]*?\n\}/);
+    assert.ok(tight, 'expected the 1540px title-strip query');
+    assert.doesNotMatch(tight[0], /ver-chip/);
+    assert.match(css, /@media \(width <= 1100px\).*ver-chip-header/s);
+  });
+
   it('Help copy describes the pocket, not a right Teach column', () => {
     assert.match(t('en', 'help.chrome'), /Edge Pocket/);
     assert.match(t('en', 'help.chrome'), /Teach/);
