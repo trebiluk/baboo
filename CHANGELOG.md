@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.1.1 — 2026-09-19 — ooh fancy Edge Pocket chrome
+- One thin Chromebook top row: Baboo + version · plan name · Saved · Beginner · Undo/Redo · viewport · Save · Teach · Help. Labels never stack or overlap at 1280 or 1366
+- Fat left Edge Pocket: Select · Sketch · Wall · Door (≥44px), icon + word, Stark white+blue. Wall docks a flyout — Thickness 120/200/300mm, Height 2.4/2.7/3.0m, style tiles, “Click grid to start, drag to draw.”
+- Open pocket sits above the plan card. Furn/Plant rows are not clipped; the title block moves clear. No right Enseñar ribbon. 2.1.0 snaps / exact / nudge stay
+
 ## 2.1.0 — 2026-09-19 — Drafting precision
 - Walls latch onto what is already drawn: corner, middle, crossing, square-off, along-wall. Each snap draws its own outline shape and its own word, so it reads without colour
 - Dashed line-up guides pull the cursor onto the x or y of a corner across the room, without breaking a 90°/45° lock

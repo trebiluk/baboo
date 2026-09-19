@@ -135,7 +135,7 @@ export const STR: Record<string, Gloss> = {
   'chrome.new': g('New', {
     es: 'Nuevo', cu: 'Nuevo', uk: 'Новий', ru: 'Новый', ti: 'ሓድሽ', fa: 'جدید',
   }),
-  'chrome.save': g('Save file', {
+  'chrome.save': g('Save', {
     es: 'Guardar', cu: 'Guardar', uk: 'Зберегти', ru: 'Сохранить', ti: 'ዓቅብ', fa: 'ذخیره',
   }),
   'chrome.plan': g('2D Plan', {
@@ -155,6 +155,32 @@ export const STR: Record<string, Gloss> = {
   }),
   'chrome.fit': g('Fit', {
     es: 'Ajustar', cu: 'Ajustar', uk: 'Вписати', ru: 'Вписать', ti: 'ኣቃልብ', fa: 'جا بده',
+  }),
+  'wall.thickness': g('Thickness', {
+    es: 'Grosor', cu: 'Grosor', uk: 'Товщина', ru: 'Толщина', ti: 'ውፍረት', fa: 'ضخامت',
+  }),
+  'wall.height': g('Height', {
+    es: 'Altura', cu: 'Altura', uk: 'Висота', ru: 'Высота', ti: 'ቁመት', fa: 'ارتفاع',
+  }),
+  'wall.style': g('Style', {
+    es: 'Estilo', cu: 'Estilo', uk: 'Стиль', ru: 'Стиль', ti: 'ቅዲ', fa: 'سبک',
+  }),
+  'wall.style.outline': g('Outline', {
+    es: 'Contorno', cu: 'Contorno', uk: 'Контур', ru: 'Контур', ti: 'መስመር', fa: 'خط',
+  }),
+  'wall.style.brick': g('Brick', {
+    es: 'Ladrillo', cu: 'Ladrillo', uk: 'Цегла', ru: 'Кирпич', ti: 'እምኒ', fa: 'آجر',
+  }),
+  'wall.style.cavity': g('Layers', {
+    es: 'Capas', cu: 'Capas', uk: 'Шари', ru: 'Слои', ti: 'ደረጃታት', fa: 'لایه',
+  }),
+  'wall.tip': g('Click grid to start, drag to draw.', {
+    es: 'Clic en la cuadrícula para empezar, arrastra para dibujar.',
+    cu: 'Toca la cuadrícula para empezar, arrastra para dibujar.',
+    uk: 'Клікни сітку, щоб почати, тягни щоб креслити.',
+    ru: 'Кликни сетку, чтобы начать, тяни чтобы чертить.',
+    ti: 'መርበብ ጠውቕ ንምጅማር፣ ስሕብ ንምስኣል.',
+    fa: 'روی شبکه کلیک کن تا شروع شود، بکش تا رسم شود.',
   }),
   'chrome.access': g('Access', {
     es: 'Acceso', cu: 'Acceso', uk: 'Доступ', ru: 'Доступ', ti: 'መእተዊ', fa: 'دسترسی',
@@ -1583,13 +1609,13 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣርትዖት 2D ጥራይ — ትርኢት 3D ምርኣይ ጥራይ እዩ. ምዝዋር፣ ንዋት፣ ብርሃንን ምጉዓዝን ነቲ ሓደ ትልሚ የንብቡ. መናድቕ ኣብ ትልሚ 2D ወይ ገዛ ዕሸል ኣርም.',
     fa: 'ویرایش فقط ۲بعدی — نمای سه‌بعدی فقط نگاه است. چرخش، مصالح، نور و گشت همان پلان را می‌خوانند. دیوارها را در پلان ۲بعدی یا خانه عروسکی ویرایش کن.',
   }),
-  'help.chrome': g('Tools sit in a left Edge Pocket (Select, Sketch, Wall, Door, More). Tap More, or right-click / long-press empty canvas. Save, Teach, and Help sit on the top row. Menus overlay — the grid fills the rest.', {
-    es: 'Las herramientas van en un bolsillo izquierdo (Elegir, Boceto, Muro, Puerta, Más). Toca Más, o clic derecho / mantén el plano vacío. Guardar, Enseñar y Ayuda van arriba. Los menús se superponen — la cuadrícula llena el resto.',
-    cu: 'Las herramientas van en un bolsillo izquierdo (Escoger, Boceto, Pared, Puerta, Más). Toca Más, o clic derecho / mantén el plano vacío. Guardar, Enseñar y Ayuda van arriba. Los menús se superponen — la cuadrícula llena el resto.',
-    uk: 'Інструменти в лівій кишені (Обрати, Ескіз, Стіна, Двері, Ще). Натисни Ще або ПКМ / довге натискання на порожньому плані. Зберегти, Навчання й Допомога зверху. Меню накладаються — сітка заповнює решту.',
-    ru: 'Инструменты в левом кармане (Выбрать, Эскиз, Стена, Дверь, Ещё). Нажми Ещё или ПКМ / долгое нажатие на пустом плане. Сохранить, Уроки и Помощь сверху. Меню поверх — сетка заполняет остальное.',
-    ti: 'መሳርሒታት ኣብ ጸጋም ኪስ እየን (ምረጽ፣ ስእሊ፣ መንደቕ፣ ማዕጾ፣ ተወሳኺ). ተወሳኺ ጠውቕ፣ ወይ የማናይ ጠውቕ / ንነዊሕ ኣብ ባዶ ትልሚ ጠውቕ. ኣቐምጥ፣ ምምሃርን ሓገዝን ኣብ ላዕሊ. ምናው ኣብ ልዕሊ እዩ — መርበብ ነቲ ዝተረፈ ይመልኦ.',
-    fa: 'ابزار در جیب چپ است (انتخاب، طرح، دیوار، در، بیشتر). بیشتر را بزن، یا راست‌کلیک / لمس طولانی روی پلان خالی. ذخیره، آموزش و راهنما بالا هستند. منوها روی پلان می‌آیند — شبکه بقیه را پر می‌کند.',
+  'help.chrome': g('Tools sit in a left Edge Pocket (Select, Sketch, Wall, Door). Wall opens a flyout for thickness, height, and style. Save, Teach, and Help sit on one thin top row. The plan card moves aside when the pocket is open so Furn and Plant stay tappable. Menus overlay — the grid fills the rest.', {
+    es: 'Las herramientas van en un bolsillo izquierdo (Elegir, Boceto, Muro, Puerta). Muro abre grosor, altura y estilo. Guardar, Enseñar y Ayuda van en una sola fila de arriba. La tarjeta del plano se aparta cuando el bolsillo está abierto. Los menús se superponen — la cuadrícula llena el resto.',
+    cu: 'Las herramientas van en un bolsillo izquierdo (Escoger, Boceto, Pared, Puerta). Pared abre grosor, altura y estilo. Guardar, Enseñar y Ayuda van en una sola fila de arriba. La tarjeta del plano se aparta cuando el bolsillo está abierto. Los menús se superponen — la cuadrícula llena el resto.',
+    uk: 'Інструменти в лівій кишені (Обрати, Ескіз, Стіна, Двері). Стіна відкриває товщину, висоту й стиль. Зберегти, Навчання й Допомога в одному тонкому верхньому рядку. Картка плану відступає, коли кишеня відкрита. Меню накладаються — сітка заповнює решту.',
+    ru: 'Инструменты в левом кармане (Выбрать, Эскиз, Стена, Дверь). Стена открывает толщину, высоту и стиль. Сохранить, Уроки и Помощь в одной тонкой верхней строке. Карточка плана отодвигается, когда карман открыт. Меню поверх — сетка заполняет остальное.',
+    ti: 'መሳርሒታት ኣብ ጸጋም ኪስ እየን (ምረጽ፣ ስእሊ፣ መንደቕ፣ ማዕጾ). መንደቕ ውፍረት፣ ቁመትን ቅድን ይኸፍት. ኣቐምጥ፣ ምምሃርን ሓገዝን ኣብ ሓደ ቀጢን ላዕሊ መስርዕ. እቲ ትልሚ ካርድ ኪስ ምስ ክፈተ ይግዕዝ. ምናው ኣብ ልዕሊ እዩ — መርበብ ነቲ ዝተረፈ ይመልኦ.',
+    fa: 'ابزار در جیب چپ است (انتخاب، طرح، دیوار، در). دیوار ضخامت، ارتفاع و سبک را باز می‌کند. ذخیره، آموزش و راهنما در یک ردیف نازک بالا هستند. کارت پلان کنار می‌رود وقتی جیب باز است. منوها روی پلان می‌آیند — شبکه بقیه را پر می‌کند.',
   }),
   'help.skill': g('Skill level — New plan or Settings. Novice and Beginner get extra help. Grey tools unlock at the next skill.', {
     es: 'Nivel de ayuda — Plano nuevo o Ajustes. Novato y Principiante reciben más ayuda. Las herramientas grises se abren en el siguiente nivel.',

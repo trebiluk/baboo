@@ -45,6 +45,8 @@ export type MassOpts = {
   floorId?: FloorFinishId;
   floorGrain?: FloorGrain;
   lod?: FurnLod;
+  /** Storey height in feet. Default WALL_H (9). */
+  wallH?: number;
 };
 
 export const ROOF_MAT: Record<string, { fill: string; shade: string; edge: string }> = {
@@ -200,6 +202,10 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
   const tint = WALL_TINT[opts.tint];
   const site = SITE_PALETTE[opts.site];
   const stroke = opts.blocky ? '#1a1208' : tint.edge;
+  const wallH = opts.wallH && opts.wallH > 0 ? opts.wallH : WALL_H;
+  const sillZ = wallH * (2.2 / 9);
+  const headZ = wallH * (7 / 9);
+  const doorHeadZ = wallH * (7.15 / 9);
   const nodes = Object.fromEntries(floor.nodes.map((n) => [n.id, n]));
   const b = exteriorBounds(floor.nodes, floor.walls);
   const minX = b?.minX ?? 0;
@@ -314,7 +320,7 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
     const ny = ux;
     const hw = (wall.thickness || 0.5) / 2;
     const fill = wall.kind === 'exterior' ? tint.fill : tint.fillShade;
-    const h = wall.kind === 'interior' ? WALL_H - 0.4 : WALL_H;
+    const h = wall.kind === 'interior' ? wallH - 0.4 : wallH;
     const ops = (byWall.get(wall.id) ?? []).slice().sort((p, q) => p.t - q.t);
     const foot = wallFootprint(wall, floor.nodes, floor.walls);
 
@@ -327,21 +333,21 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
       const t1 = Math.min(1, (o.t ?? 0.5) + half);
       if (t0 > cursor + 0.008) spans.push({ t0: cursor, t1: t0, z0: 0, z1: h });
       if (o.type === 'window') {
-        spans.push({ t0, t1, z0: 0, z1: 2.2 });
-        spans.push({ t0, t1, z0: 7, z1: h });
-        const g0 = along(a, ux, uy, nx, ny, len, t0, hw, 2.25);
-        const g1 = along(a, ux, uy, nx, ny, len, t1, hw, 2.25);
-        const g2 = along(a, ux, uy, nx, ny, len, t1, hw, 6.95);
-        const g3 = along(a, ux, uy, nx, ny, len, t0, hw, 6.95);
+        spans.push({ t0, t1, z0: 0, z1: sillZ });
+        spans.push({ t0, t1, z0: headZ, z1: h });
+        const g0 = along(a, ux, uy, nx, ny, len, t0, hw, sillZ + 0.05);
+        const g1 = along(a, ux, uy, nx, ny, len, t1, hw, sillZ + 0.05);
+        const g2 = along(a, ux, uy, nx, ny, len, t1, hw, headZ - 0.05);
+        const g3 = along(a, ux, uy, nx, ny, len, t0, hw, headZ - 0.05);
         faces.push(quad(g0, g1, g2, g3, opts.sky === 'dusk' ? '#F3D9A4' : '#9EC4DC', '#6A8AA4', 'glass'));
       } else {
-        spans.push({ t0, t1, z0: 7.15, z1: h });
+        spans.push({ t0, t1, z0: doorHeadZ, z1: h });
         const leaf = Math.min(0.85, (o.width || 3) * 0.55);
         const swing = o.swing === 'right' ? -1 : 1;
         const d0 = along(a, ux, uy, nx, ny, len, t0, hw, 0.05);
         const d1 = along(a, ux, uy, nx, ny, len, t0, hw + leaf * swing, 0.05);
-        const d2 = along(a, ux, uy, nx, ny, len, t0, hw + leaf * swing, 7.1);
-        const d3 = along(a, ux, uy, nx, ny, len, t0, hw, 7.1);
+        const d2 = along(a, ux, uy, nx, ny, len, t0, hw + leaf * swing, doorHeadZ);
+        const d3 = along(a, ux, uy, nx, ny, len, t0, hw, doorHeadZ);
         faces.push(quad(d0, d1, d2, d3, '#6B5344', '#3A2E24', 'door'));
       }
       cursor = Math.max(cursor, t1);
@@ -394,10 +400,10 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
   if (opts.lighting && opts.lod !== 'simple' && opts.sky !== 'overcast' && b) {
     const sun = sunDir(opts.sky);
     const corners = [
-      v3(minX, minY, WALL_H * 0.5),
-      v3(maxX, minY, WALL_H * 0.5),
-      v3(maxX, maxY, WALL_H * 0.5),
-      v3(minX, maxY, WALL_H * 0.5),
+      v3(minX, minY, wallH * 0.5),
+      v3(maxX, minY, wallH * 0.5),
+      v3(maxX, maxY, wallH * 0.5),
+      v3(minX, maxY, wallH * 0.5),
     ].map((p) => projectOntoGround(p, sun));
     if (corners.length === 4) {
       faces.push({

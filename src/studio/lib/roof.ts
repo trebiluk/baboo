@@ -55,6 +55,7 @@ export function generateRoof(
   nodes: Node[],
   walls: Wall[],
   styleId: RoofStyleId | null,
+  eavesHeightFt?: number,
 ): RoofGeometry | null {
   if (!styleId) return null;
   const b = exteriorBounds(nodes, walls);
@@ -63,7 +64,7 @@ export function generateRoof(
   const overhang = styleId === 'grass' ? 1.4 : 1.0;
   const outline = rectOutline(b.minX, b.minY, b.maxX, b.maxY, overhang);
   const horiz = b.w >= b.h;
-  const eavesHeight = 9;
+  const eavesHeight = eavesHeightFt && eavesHeightFt > 0 ? eavesHeightFt : 9;
   let ridgeHeight = eavesHeight + Math.min(b.w, b.h) * 0.28;
   ridgeHeight = Math.max(eavesHeight + 3, Math.min(ridgeHeight, eavesHeight + 12));
 

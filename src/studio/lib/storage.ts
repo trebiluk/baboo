@@ -5,6 +5,7 @@ import { isSkillLevel, readSkillPref } from '../data/skill';
 import { asShowFurniture3d, asSite, asSky, asTint } from '../data/scene3d';
 import { asFloorFinish, asFloorGrain } from '../data/flooring';
 import { asLocale } from '../data/i18n';
+import { asWallHeightFt } from './wallDraft';
 import { mergeChunk, type DirtyChunk } from './tiles';
 import { asDollProj, asYawDeg } from './iso';
 import { APP_VERSION } from '../version';
@@ -71,7 +72,7 @@ function normalizeDoc(data: ProjectDocument): ProjectDocument {
     };
     let roof = f.roof ?? null;
     if (!roof && roofStyleId) {
-      roof = generateRoof(f.nodes ?? [], f.walls ?? [], roofStyleId);
+      roof = generateRoof(f.nodes ?? [], f.walls ?? [], roofStyleId, asWallHeightFt(data.settings?.wallHeight));
     }
     return {
       ...f,
@@ -113,6 +114,7 @@ function normalizeDoc(data: ProjectDocument): ProjectDocument {
         imageBlobRef: data.settings?.imageBlobRef ?? null,
         ortho: data.settings?.ortho !== false,
         osnap: (data.settings as { osnap?: unknown })?.osnap !== false,
+        wallHeight: asWallHeightFt((data.settings as { wallHeight?: unknown })?.wallHeight),
         guiTheme: isGuiThemeId(data.settings?.guiTheme)
           ? data.settings.guiTheme
           : 'stark',

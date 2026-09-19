@@ -11,6 +11,15 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.1.1',
+    date: '2026-09-19',
+    bullets: [
+      'One thin top row on classroom laptops — Baboo, version, plan name, Saved, Beginner, Undo/Redo, viewport, Save, Teach, Help. Nothing stacks or overlaps',
+      'Fat left Edge Pocket: Select, Sketch, Wall, Door. Wall opens thickness, height, and style. Click grid to start, drag to draw',
+      'The plan card moves out of the way when the pocket is open, so Furn and Plant stay tappable. Teach stays on the top row — no right ribbon',
+    ],
+  },
+  {
     version: '2.1.0',
     date: '2026-09-19',
     bullets: [

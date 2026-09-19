@@ -1668,6 +1668,27 @@ function WallGrips({
   );
 }
 
+let brickTile: HTMLCanvasElement | null = null;
+function brickTileCanvas(): HTMLCanvasElement | null {
+  if (brickTile) return brickTile;
+  if (typeof document === 'undefined') return null;
+  const c = document.createElement('canvas');
+  c.width = 24;
+  c.height = 14;
+  const g = c.getContext('2d');
+  if (!g) return null;
+  g.fillStyle = '#c4a484';
+  g.fillRect(0, 0, 24, 14);
+  g.strokeStyle = '#6a5040';
+  g.strokeRect(0.5, 0.5, 23, 13);
+  g.beginPath();
+  g.moveTo(12, 0);
+  g.lineTo(12, 14);
+  g.stroke();
+  brickTile = c;
+  return c;
+}
+
 function WallShape({
   wall, walls, nodes, selected, accent, zoom, showDim, units, textureId, texturePattern,
   wallExt, wallInt, dimFg,
@@ -1691,8 +1712,12 @@ function WallShape({
   const fallback = textureStrokeFallback(textureId);
   const scale = patternWorldScale(textureId);
   const foot = wallFootprintFlat(wall, nodes, walls);
+  const style = wall.drawStyle || 'outline';
+  const brickImg = style === 'brick' && !textured ? brickTileCanvas() : null;
   const fill = textured ? (texturePattern ? paint : (fallback ?? paint)) : paint;
-  const usePattern = Boolean(textured && texturePattern);
+  const usePattern = Boolean((textured && texturePattern) || brickImg);
+  const patternImg = (textured && texturePattern ? texturePattern : brickImg) as HTMLImageElement | HTMLCanvasElement | null;
+  const patternScale = brickImg ? 1 / Math.max(8, zoom) : scale;
 
   return (
     <Group listening={false} perfectDrawEnabled={false}>
@@ -1702,12 +1727,12 @@ function WallShape({
           closed
           fill={fill}
           fillPriority={usePattern ? 'pattern' : 'color'}
-          fillPatternImage={usePattern ? texturePattern as CanvasImageSource as HTMLImageElement : undefined}
+          fillPatternImage={usePattern && patternImg ? patternImg as unknown as HTMLImageElement : undefined}
           fillPatternRepeat="repeat"
-          fillPatternScaleX={scale}
-          fillPatternScaleY={scale}
+          fillPatternScaleX={patternScale}
+          fillPatternScaleY={patternScale}
           fillPatternRotation={(ang * 180) / Math.PI}
-          opacity={wall.kind === 'exterior' ? 0.98 : 0.88}
+          opacity={style === 'cavity' ? 0.45 : wall.kind === 'exterior' ? 0.98 : 0.88}
           stroke={selected ? accent : 'transparent'}
           strokeWidth={selected ? 2 / zoom : 0}
           lineJoin="miter"

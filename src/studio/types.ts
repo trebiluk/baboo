@@ -54,6 +54,9 @@ export interface RoofGeometry {
 
 export interface Node { id: string; x: number; y: number; }
 
+/** Plan look for a wall. Draft chips live on the Wall flyout. */
+export type WallDrawStyle = 'outline' | 'brick' | 'cavity';
+
 export interface Wall {
   id: string;
   a: string;
@@ -62,6 +65,8 @@ export interface Wall {
   thickness: number;
   /** Wallpaper pack id for this wall (Dollhouse). */
   finishId?: string | null;
+  /** How the wall reads on the plan. Omit = outline. */
+  drawStyle?: WallDrawStyle;
 }
 
 export interface Opening {
@@ -238,6 +243,11 @@ export interface ProjectSettings {
    * Beats the grid when both are in reach. Default on.
    */
   osnap: boolean;
+  /**
+   * Storey height in feet. Wall flyout chips are 2.4 / 2.7 / 3.0 m.
+   * Default 2.7 m (~8.86 ft), which matches the old 9 ft massing.
+   */
+  wallHeight: number;
   units: 'ft' | 'm';
   accent: string;
   /** GUI chrome theme; default stark (Diego GO). */
