@@ -5,7 +5,6 @@ import { BABOO_LOGO } from '../logo';
 import { Icon } from '../icons';
 import { ClassShareModal } from './ClassShareModal';
 import { VersionChip } from './VersionChip';
-import { usePhoneChrome } from '../hooks/usePhoneChrome';
 import { t, tipLoc } from '../data/i18n';
 
 export function Chrome() {
@@ -38,7 +37,6 @@ export function Chrome() {
   const [teacherChrome, setTeacherChrome] = useState(false);
   const [classShareOpen, setClassShareOpen] = useState(false);
   const fileShare = typeof window !== 'undefined' && window.location.protocol === 'file:';
-  const phoneChrome = usePhoneChrome();
 
   useEffect(() => {
     if (!moreOpen) return;
@@ -100,7 +98,7 @@ export function Chrome() {
             decoding="async"
           />
           <span className="brand-name">Baboo</span>
-          {phoneChrome ? null : <VersionChip onTeacher={() => setTeacherChrome(true)} />}
+          <VersionChip onTeacher={() => setTeacherChrome(true)} />
           {fileShare ? (
             <span className="save-chip" title="Opened from a class folder — no server">Class share</span>
           ) : null}
@@ -111,9 +109,7 @@ export function Chrome() {
           onChange={(e) => setTitle(e.target.value)}
           aria-label={t(locale, 'chrome.projectName')}
         />
-        {phoneChrome ? null : (
-          <span className={`save-chip save-${saveStatus}`}>{statusLabel}</span>
-        )}
+        <span className={`save-chip save-${saveStatus}`}>{statusLabel}</span>
         <button
           type="button"
           className="ghost-btn aw-pressable chrome-wide skill-chrome-chip"

@@ -3667,12 +3667,12 @@ html[data-udl-contrast] .dyn-go {
   padding:6px 10px
 }
 .tool-rail.edge-pocket.is-fancy {
-  z-index:calc(var(--aw-z-overlays) + 24);
+  z-index:calc(var(--aw-z-catalogs) + 4);
   flex-direction:row;
   align-items:flex-start;
   width:auto;
   max-width:none;
-  max-height:none;
+  max-height:calc(100% - 8px);
   overflow:visible;
   background:transparent;
   border:none;
@@ -3842,22 +3842,45 @@ html[data-udl-contrast] .dyn-go {
 }
 
 /* StyleBot 2.1.0: plan card / status must not cover or clip open pocket rows */
+html[data-ell-english] {
+  --aw-rail-left:168px
+}
+.tool-rail.is-min .tool-rail-soon {
+  display:none
+}
+.stage-stack:has(.edge-pocket.is-open),
+.stage-stack:has(.edge-pocket.has-wall-flyout) {
+  overflow:visible
+}
 .stage-stack:has(.edge-pocket.is-open) .plan-sheet,
 .stage-stack:has(.edge-pocket.has-wall-flyout) .plan-sheet {
   left:auto;
   right:14px;
-  bottom:88px;
-  max-width:min(220px, 38%)
+  bottom:14px;
+  max-width:min(200px, 28%);
+  z-index:var(--aw-z-overlays)
 }
 .stage-stack:has(.edge-pocket.is-open) .canvas-hint,
 .stage-stack:has(.edge-pocket.has-wall-flyout) .canvas-hint {
-  left:calc(var(--aw-rail-left) + 12px)
+  left:calc(var(--aw-rail-left) + 12px);
+  right:220px;
+  max-width:min(520px, calc(100% - 240px));
+  z-index:calc(var(--aw-z-overlays) + 1)
 }
 @media (width>=1100px) {
   .chrome {
     flex-wrap:nowrap!important;
     height:52px;
     max-height:52px
+  }
+  .app-shell.is-phone .chrome .ver-chip,
+  .app-shell.is-phone .ver-chip-header,
+  .app-shell.is-phone .brand-name,
+  .app-shell.is-phone .save-chip {
+    display:unset!important
+  }
+  .app-shell.is-phone .ver-float {
+    display:none!important
   }
 }
 @media (width<=800px) {
