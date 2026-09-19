@@ -11,6 +11,15 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.1.0',
+    date: '2026-09-19',
+    bullets: [
+      'Walls now land on what you already drew — corner, middle, crossing, square-off, along-wall — with a marker and a word for each',
+      'Type an exact Length and Angle while a wall is in progress, or tap the boxes and set them',
+      'Arrow keys move what you picked; measurements never read upside down; wallpaper names read on every swatch',
+    ],
+  },
+  {
     version: '2.0.1',
     date: '2026-09-19',
     bullets: [

@@ -9,10 +9,12 @@ import { LOCALES, t } from '../data/i18n.ts';
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 describe('P0.1 Edge Pocket chrome', () => {
-  it('chips at 2.0.1', () => {
-    assert.equal(APP_VERSION, '2.0.1');
+  it('keeps Edge Pocket after the version chip moves to 2.1.0', () => {
+    assert.equal(APP_VERSION, '2.1.0');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.1\.0'/);
     assert.match(changelog, /version:\s*'2\.0\.1'/);
+    assert.match(changelog, /Edge Pocket/);
   });
 
   it('long-press matches a right-click hold', () => {

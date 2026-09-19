@@ -3,6 +3,18 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.1.0 — 2026-09-19 — Drafting precision
+- Walls latch onto what is already drawn: corner, middle, crossing, square-off, along-wall. Each snap draws its own outline shape and its own word, so it reads without colour
+- Dashed line-up guides pull the cursor onto the x or y of a corner across the room, without breaking a 90°/45° lock
+- While a wall is in progress, Length and Angle boxes track the cursor until you type in one. They are real inputs, so a tap works as well as a keystroke
+- The wall ghost reads out length and a real angle in degrees instead of a bare `· 45°`
+- Arrow keys move the selection one grid square, Shift for one inch; a burst undoes as a single move
+- The middle handle on a selected wall slides the whole wall — it was drawn but did nothing
+- Snap to walls is a setting beside grid snap and straight walls, on by default
+- Measurements never read upside down — labels fold to read left-to-right or bottom-to-top and stay on the outside of the room
+- Wallpaper and floor swatch names sit on a solid band, so pale textures no longer hide their own label
+- The title strip no longer paints over Undo / Redo when the window is narrow
+
 ## 2.0.1 — 2026-09-19 — P0.1 Edge Pocket (kill right Enseñar ribbon)
 - Right Teach/Enseñar ribbon is gone — no leftover gutter. Teach and Help sit on the top row with Save
 - Left Edge Pocket: Select · Sketch · Wall · Door · More as overlay chips. Tap opens the flyout; hover also opens when a pointer exists. Right-click / long-press (~500ms) empty canvas opens the same Tools pocket
