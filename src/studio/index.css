@@ -388,7 +388,8 @@ button {
   border-radius:999px;
   padding:2px 8px;
   font-family:IBM Plex Mono, ui-monospace, monospace;
-  font-size:12px
+  font-size:12px;
+  white-space:nowrap
 }
 .ver-chip:hover {
   background:var(--aw-hover);
