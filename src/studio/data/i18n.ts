@@ -105,6 +105,17 @@ export const STR: Record<string, Gloss> = {
   'tool.rot': g('Rot', {
     es: 'Girar', cu: 'Girar', uk: 'Обернути', ru: 'Повернуть', ti: 'ዘርግሕ', fa: 'چرخش',
   }),
+  'chrome.toolsPocket': g('Draw tools', {
+    es: 'Herramientas', cu: 'Herramientas', uk: 'Інструменти', ru: 'Инструменты', ti: 'መሳርሒታት', fa: 'ابزار',
+  }),
+  'chrome.openTools': g('Show every draw tool', {
+    es: 'Mostrar todas las herramientas',
+    cu: 'Mostrar todas las herramientas',
+    uk: 'Показати всі інструменти',
+    ru: 'Показать все инструменты',
+    ti: 'ኩሎም መሳርሒታት ኣርኢ',
+    fa: 'نمایش همهٔ ابزارها',
+  }),
 
   'chrome.settings': g('Settings', {
     es: 'Ajustes', cu: 'Ajustes', uk: 'Налаштування', ru: 'Настройки', ti: 'ቅጥዕታት', fa: 'تنظیمات',
@@ -1536,13 +1547,13 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣርትዖት 2D ጥራይ — ትርኢት 3D ምርኣይ ጥራይ እዩ. ምዝዋር፣ ንዋት፣ ብርሃንን ምጉዓዝን ነቲ ሓደ ትልሚ የንብቡ. መናድቕ ኣብ ትልሚ 2D ወይ ገዛ ዕሸል ኣርም.',
     fa: 'ویرایش فقط ۲بعدی — نمای سه‌بعدی فقط نگاه است. چرخش، مصالح، نور و گشت همان پلان را می‌خوانند. دیوارها را در پلان ۲بعدی یا خانه عروسکی ویرایش کن.',
   }),
-  'help.chrome': g('Tools sit on the left edge and tuck with Hide. Teach, Settings, Help sit on the right. The grid stays open.', {
-    es: 'Las herramientas van al borde izquierdo y se recogen con Ocultar. Enseñar, Ajustes y Ayuda van a la derecha. La cuadrícula sigue abierta.',
-    cu: 'Las herramientas van al borde izquierdo y se recogen con Ocultar. Enseñar, Ajustes y Ayuda van a la derecha. La cuadrícula sigue abierta.',
-    uk: 'Інструменти на лівому краї — сховай їх. Навчати, Налаштування, Допомога справа. Сітка лишається відкритою.',
-    ru: 'Инструменты на левом краю — спрячь их. Учить, Настройки, Справка справа. Сетка остаётся открытой.',
-    ti: 'መሳርሒታት ኣብ ጸጋም ወሰን ይቕመጡ፣ ብሓብእ ይኽውሉ. ኣምህር፣ ቅጥዕታት፣ ሓገዝ ኣብ የማን. መርበብ ክፉት ይጸንሕ.',
-    fa: 'ابزار روی لبهٔ چپ می‌نشیند و با پنهان جمع می‌شود. آموزش، تنظیمات، راهنما سمت راست. شبکه باز می‌ماند.',
+  'help.chrome': g('Tools sit in a left Edge Pocket (Select, Sketch, Wall, Door, More). Tap More, or right-click / long-press empty canvas. Save, Teach, and Help sit on the top row. Menus overlay — the grid fills the rest.', {
+    es: 'Las herramientas van en un bolsillo izquierdo (Elegir, Boceto, Muro, Puerta, Más). Toca Más, o clic derecho / mantén el plano vacío. Guardar, Enseñar y Ayuda van arriba. Los menús se superponen — la cuadrícula llena el resto.',
+    cu: 'Las herramientas van en un bolsillo izquierdo (Escoger, Boceto, Pared, Puerta, Más). Toca Más, o clic derecho / mantén el plano vacío. Guardar, Enseñar y Ayuda van arriba. Los menús se superponen — la cuadrícula llena el resto.',
+    uk: 'Інструменти в лівій кишені (Обрати, Ескіз, Стіна, Двері, Ще). Натисни Ще або ПКМ / довге натискання на порожньому плані. Зберегти, Навчання й Допомога зверху. Меню накладаються — сітка заповнює решту.',
+    ru: 'Инструменты в левом кармане (Выбрать, Эскиз, Стена, Дверь, Ещё). Нажми Ещё или ПКМ / долгое нажатие на пустом плане. Сохранить, Уроки и Помощь сверху. Меню поверх — сетка заполняет остальное.',
+    ti: 'መሳርሒታት ኣብ ጸጋም ኪስ እየን (ምረጽ፣ ስእሊ፣ መንደቕ፣ ማዕጾ፣ ተወሳኺ). ተወሳኺ ጠውቕ፣ ወይ የማናይ ጠውቕ / ንነዊሕ ኣብ ባዶ ትልሚ ጠውቕ. ኣቐምጥ፣ ምምሃርን ሓገዝን ኣብ ላዕሊ. ምናው ኣብ ልዕሊ እዩ — መርበብ ነቲ ዝተረፈ ይመልኦ.',
+    fa: 'ابزار در جیب چپ است (انتخاب، طرح، دیوار، در، بیشتر). بیشتر را بزن، یا راست‌کلیک / لمس طولانی روی پلان خالی. ذخیره، آموزش و راهنما بالا هستند. منوها روی پلان می‌آیند — شبکه بقیه را پر می‌کند.',
   }),
   'help.skill': g('Skill level — New plan or Settings. Novice and Beginner get extra help. Grey tools unlock at the next skill.', {
     es: 'Nivel de ayuda — Plano nuevo o Ajustes. Novato y Principiante reciben más ayuda. Las herramientas grises se abren en el siguiente nivel.',

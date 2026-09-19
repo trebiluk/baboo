@@ -24,6 +24,7 @@ import { asFloorFinish, asFloorGrain, floorFinish, floorTileCanvas } from '../da
 import { DEFAULT_GUI_THEME } from '../data/themes';
 import { DEFAULT_SKILL_LEVEL, skillRank } from '../data/skill';
 import { furnitureLod } from '../lib/perf';
+import { useCanvasToolsPocket } from '../hooks/useCanvasToolsPocket';
 
 export function PlanCanvas() {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -68,6 +69,7 @@ export function PlanCanvas() {
   } | null>(null);
   const gripDrag = useRef<{ wallId: string; end: 'a' | 'b' } | null>(null);
   const debugOpen = useProjectStore((s) => s.debugOpen);
+  const toolsPocket = useCanvasToolsPocket();
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -182,6 +184,7 @@ export function PlanCanvas() {
     } catch { /* ignore */ }
 
     if (pointersRef.current.size >= 2) {
+      toolsPocket.cancel();
       pendingTap.current = null;
       sketching.current = false;
       liveStrokeRef.current = null;
@@ -200,13 +203,21 @@ export function PlanCanvas() {
       return;
     }
 
+    const store = useProjectStore.getState();
+    const empty = !store.hitAt(world);
+    if (e.evt.button === 2) {
+      toolsPocket.armEmptyPress(e.evt, empty);
+      return;
+    }
+    if (empty && (tool === 'select' || tool === 'pan')) {
+      toolsPocket.armEmptyPress(e.evt, true);
+    }
+
     if (tool === 'pan' || e.evt.button === 1 || e.evt.altKey) {
       panning.current = true;
       lastRef.current = { x: pos.x, y: pos.y };
       return;
     }
-
-    const store = useProjectStore.getState();
     const shift = e.evt.shiftKey;
     if (tool === 'sketch') {
       sketching.current = true;
@@ -286,6 +297,7 @@ export function PlanCanvas() {
     const pos = stage.getPointerPosition();
     if (!pos) return;
     pointersRef.current.set(e.evt.pointerId, { x: pos.x, y: pos.y });
+    toolsPocket.noteMove(e.evt);
 
     if (pinchRef.current && pointersRef.current.size >= 2) {
       const pts = [...pointersRef.current.values()];
@@ -370,6 +382,12 @@ export function PlanCanvas() {
         pinchRef.current = null;
         useProjectStore.getState().setPanZoom(livePan.current.x, livePan.current.y, liveZoom.current);
       }
+      return;
+    }
+    if (toolsPocket.consumeIfOpened()) {
+      pendingTap.current = null;
+      panning.current = false;
+      lastRef.current = null;
       return;
     }
     if (sketching.current) {
@@ -525,6 +543,7 @@ export function PlanCanvas() {
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
+      onContextMenu={toolsPocket.onContextMenu}
       style={{ touchAction: 'none', cursor: hoverGrip ? (dragging ? 'grabbing' : 'grab') : undefined }}
     >
       <Stage

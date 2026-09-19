@@ -55,6 +55,7 @@ export function Chrome() {
   const setRenderTier = useProjectStore((s) => s.setRenderTier);
   const viewMode = useProjectStore((s) => s.viewMode);
   const teachingOpen = useProjectStore((s) => s.teachingOpen);
+  const helpOpen = useProjectStore((s) => s.helpOpen);
   const fileRef = useRef<HTMLInputElement>(null);
   const moreRef = useRef<HTMLDivElement>(null);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -227,16 +228,30 @@ export function Chrome() {
         </button>
         <span className="view-only-chip" hidden={canEdit} title={t(locale, 'chrome.viewonly')}>{t(locale, 'chrome.viewonly')}</span>
 
-        <button type="button" className="ghost-btn aw-pressable chrome-primary chrome-ico" onClick={exportJson} title={t(locale, 'chrome.save')}>
+        <button type="button" className="ghost-btn aw-pressable chrome-primary chrome-ico chrome-ess" onClick={exportJson} title={t(locale, 'chrome.save')} aria-label={t(locale, 'chrome.save')}>
           <Icon name="save" /> <span className="chrome-label">{t(locale, 'chrome.save')}</span>
         </button>
         <button type="button" className="ghost-btn aw-pressable chrome-wide chrome-ico" onClick={() => openNewProject(true)}>
           <Icon name="new" /> <span className="chrome-label">{t(locale, 'chrome.new')}</span>
         </button>
-        <button type="button" className="ghost-btn aw-pressable chrome-phone-only chrome-ico" onClick={toggleTeaching}>
+        <button
+          type="button"
+          className={`ghost-btn aw-pressable chrome-ico chrome-ess${teachingOpen ? ' active' : ''}`}
+          onClick={toggleTeaching}
+          title={t(locale, 'chrome.teach')}
+          aria-label={teachingOpen ? t(locale, 'chrome.teachClose') : t(locale, 'chrome.teach')}
+          aria-pressed={teachingOpen}
+        >
           <Icon name="teach" /> <span className="chrome-label">{teachingOpen ? t(locale, 'chrome.teachClose') : t(locale, 'chrome.teach')}</span>
         </button>
-        <button type="button" className="ghost-btn aw-pressable chrome-phone-only chrome-ico" onClick={toggleHelp}>
+        <button
+          type="button"
+          className={`ghost-btn aw-pressable chrome-ico chrome-ess${helpOpen ? ' active' : ''}`}
+          onClick={toggleHelp}
+          title={t(locale, 'chrome.help')}
+          aria-label={t(locale, 'chrome.help')}
+          aria-pressed={helpOpen}
+        >
           <Icon name="help" /> <span className="chrome-label">{t(locale, 'chrome.help')}</span>
         </button>
 

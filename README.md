@@ -4,9 +4,9 @@ Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 
 **© 2026 Richard Kulibert Jr.**
 
-**Version 2.0.0** — P0 inclusion: fat taps, tip language, high contrast on Stark.
+**Version 2.0.1** — P0.1 Edge Pocket: left tools overlay, Teach/Help on the top row.
 
-Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the side rail. Plans save on the device as `.archworks.json`.
+Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the top chip. Plans save on the device as `.archworks.json`.
 
 Live classroom: [baboo.kulibert.net](https://baboo.kulibert.net)
 
@@ -35,10 +35,11 @@ npm run pack:share
 - **Class folder** is a copy-to-the-share pack — Chrome, no login
 - No Google login inside the app
 
-## What’s in 2.0.0
+## What’s in 2.0.1
 
-- Help and Settings share the same classroom bar: bigger type, high contrast (Stark white + blue), tip language
-- Tools stay fat and icon-first. Every place or miss shows a visual toast. Caps refuse with a fat toast
+- Edge Pocket on the left: Select · Sketch · Wall · Door · More. Tap (or hover with a pointer) opens the flyout. Right-click / long-press empty canvas opens the same pocket
+- No right Teach ribbon. Save · Teach · Help sit on the top row. The plan fills remaining `100dvh`
+- Help and Settings still share the classroom bar: bigger type, high contrast (Stark white + blue), tip language
 - Teach / Matteson words stay English. Tips follow `tipsLocale`
 
 See [CHANGELOG.md](CHANGELOG.md) for the rest.

@@ -58,7 +58,7 @@
   --aw-z-toasts:90;
   --aw-z-blockers:100;
   --aw-rail-left:52px;
-  --aw-rail-right:44px;
+  --aw-rail-right:0px;
   --aw-float-inset:12px;
   --aw-dock-width:320px;
   --aw-motion-quick:.15s;
@@ -227,6 +227,11 @@ html[data-gui-theme=blocky] {
 html, body, #root, #app {
   background:var(--aw-bg);
   height:100%;
+  height:100svh;
+  height:100dvh;
+  max-height:100svh;
+  max-height:100dvh;
+  overflow:hidden;
   color:var(--aw-fg);
   margin:0
 }
@@ -246,7 +251,7 @@ button {
   .aw-pressable:active {
     transform:none
   }
-  .side-panel, .drawer, .teaching-drawer, .help-drawer, .customize-drawer, .tool-rail, .dock-rail, .tool-rail-btn, .dock-rail-btn, .skill-chip, .toast, .hello-card, .coach-card {
+  .side-panel, .drawer, .teaching-drawer, .help-drawer, .customize-drawer, .tool-rail, .tool-rail-btn, .skill-chip, .toast, .hello-card, .coach-card {
     transition:none;
     animation:none
   }
@@ -313,7 +318,11 @@ button {
   background:var(--aw-bg);
   flex-direction:column;
   height:100%;
-  display:flex
+  max-height:100dvh;
+  display:flex;
+  padding-left:env(safe-area-inset-left, 0px);
+  padding-right:env(safe-area-inset-right, 0px);
+  padding-bottom:env(safe-area-inset-bottom, 0px)
 }
 .chrome {
   z-index:var(--aw-z-chrome);
@@ -325,6 +334,7 @@ button {
   gap:8px;
   min-height:44px;
   padding:4px 10px;
+  padding-top:max(4px, env(safe-area-inset-top, 0px));
   display:flex
 }
 .chrome-left, .chrome-right {
@@ -525,27 +535,39 @@ button {
 }
 .tool-rail {
   z-index:calc(var(--aw-z-catalogs) + 2);
-  left:0;
-  top:0;
-  bottom:0;
+  left:8px;
+  top:8px;
+  bottom:auto;
   width:var(--aw-rail-left);
-  background:var(--aw-elevated);
+  background:transparent;
   border:none;
-  border-right:1px solid var(--aw-border);
-  height:100%;
-  max-height:none;
-  transition:box-shadow var(--aw-motion-quick) var(--aw-ease-out);
-  border-radius:0;
+  height:auto;
+  max-height:calc(100% - 16px);
+  transition:box-shadow var(--aw-motion-quick) var(--aw-ease-out), background var(--aw-motion-quick) var(--aw-ease-out);
+  border-radius:12px;
   flex-direction:column;
   gap:4px;
-  padding:6px 4px;
+  padding:4px;
   display:flex;
   position:absolute;
   overflow:auto;
-  box-shadow:none
+  box-shadow:none;
+  pointer-events:none
+}
+.tool-rail.edge-pocket.is-open {
+  background:var(--aw-elevated);
+  border:1px solid var(--aw-border);
+  box-shadow:0 8px 24px #0a0a0a29
 }
 .tool-rail.is-min {
-  padding:4px
+  padding:4px;
+  background:transparent;
+  border:none;
+  box-shadow:none
+}
+/* P0.1 Edge Pocket — overlay chips, never a reserved column */
+.tool-rail.edge-pocket {
+  left:max(8px, env(safe-area-inset-left, 0px))
 }
 .tool-rail-btn {
   min-width:44px;
@@ -563,11 +585,14 @@ button {
   font-size:10px;
   font-weight:700;
   line-height:1.15;
-  display:flex
+  display:flex;
+  pointer-events:auto
 }
-.tool-rail-btn:hover {
-  background:var(--aw-hover);
-  color:var(--aw-fg)
+@media (hover: hover) and (pointer: fine) {
+  .tool-rail-btn:hover {
+    background:var(--aw-hover);
+    color:var(--aw-fg)
+  }
 }
 .tool-rail-btn.active {
   background:var(--aw-royal);
@@ -607,75 +632,15 @@ button {
 .tool-rail.is-open .tool-rail-chip {
   display: none;
 }
-.dock-rail {
-  z-index:calc(var(--aw-z-drawers) + 2);
-  right:0;
-  top:0;
-  bottom:0;
-  width:var(--aw-rail-right);
-  background:var(--aw-elevated);
-  border:none;
-  border-left:1px solid var(--aw-border);
-  border-radius:0;
-  flex-direction:column;
-  gap:4px;
-  height:100%;
-  max-height:none;
-  padding:6px 2px;
-  display:flex;
-  position:absolute;
-  overflow:auto;
-  box-shadow:none
-}
-.dock-rail-btn {
-  min-width:40px;
-  min-height:72px;
-  color:var(--aw-muted);
-  writing-mode:vertical-rl;
-  letter-spacing:.04em;
-  text-transform:uppercase;
-  background:0 0;
-  border:1px solid #0000;
-  border-radius:8px;
-  justify-content:center;
-  align-items:center;
-  padding:8px 2px;
-  font-size:10px;
-  font-weight:700;
-  display:flex;
-  transform:rotate(180deg)
-}
-.dock-rail-btn:hover {
-  background:var(--aw-hover);
+.tool-rail.is-min .tool-rail-btn.tool-rail-quick,
+.tool-rail.is-min .tool-rail-btn.tool-rail-chip,
+.tool-rail.is-min .tool-rail-btn.tool-rail-trace-chip,
+.tool-rail.is-min .tool-rail-btn.tool-rail-extra {
+  background:color-mix(in srgb, var(--aw-elevated) 94%, transparent);
+  border-color:var(--aw-border);
   color:var(--aw-fg)
 }
-.dock-rail-btn.active {
-  background:var(--aw-royal);
-  border-color:var(--aw-royal);
-  color:var(--aw-on-accent)
-}
-.dock-rail-chip {
-  writing-mode:horizontal-tb;
-  letter-spacing:.02em;
-  text-transform:none;
-  border-color:var(--aw-border);
-  min-width:40px;
-  min-height:52px;
-  color:var(--aw-fg);
-  transform:none
-}
-.dock-rail-chip.aw-pressable:active {
-  transform:translateY(1px)
-}
-.dock-rail-min {
-  border-color:var(--aw-border);
-  min-height:48px;
-  color:var(--aw-subtle)
-}
-.dock-rail-label {
-  display:block
-}
-.dock-rail.is-min .dock-rail-btn:not(.dock-rail-chip), .dock-rail.is-open .dock-rail-chip, .chrome-phone-only {
+.chrome-phone-only {
   display:none
 }
 .chrome-wide {
@@ -1912,7 +1877,7 @@ html.aw-teaching-open, body.aw-teaching-open {
     grid-template-columns:1fr;
     min-height:0
   }
-  .tool-rail, .dock-rail {
+  .tool-rail {
     display:none
   }
   .stage-stack {
@@ -2475,13 +2440,17 @@ html.aw-teaching-open, body.aw-teaching-open {
   height:22px;
   display:block
 }
-.tool-rail-btn.active .tool-icon, .dock-rail-btn.active .tool-icon, .tool-btn.active .tool-icon, .ghost-btn.active .tool-icon {
+.tool-rail-btn.active .tool-icon, .tool-btn.active .tool-icon, .ghost-btn.active .tool-icon {
   filter:brightness(0)invert()
 }
 .chrome-ico {
   align-items:center;
   gap:6px;
   display:inline-flex
+}
+.chrome-ess {
+  min-width:44px;
+  min-height:44px
 }
 .chrome-ico .tool-icon, .chrome-more-btn .tool-icon {
   width:16px;
@@ -2502,28 +2471,6 @@ html.aw-teaching-open, body.aw-teaching-open {
 .tool-btn .tool-icon {
   width:18px;
   height:18px
-}
-.dock-rail-btn {
-  writing-mode:horizontal-tb;
-  flex-direction:column;
-  gap:2px;
-  min-width:40px;
-  min-height:56px;
-  padding:6px 2px;
-  transform:none
-}
-.dock-rail-btn.aw-pressable:active {
-  transform:translateY(1px)
-}
-.dock-rail-chip {
-  min-height:56px
-}
-.dock-rail-label {
-  writing-mode:horizontal-tb;
-  letter-spacing:.02em;
-  text-transform:none;
-  font-size:9px;
-  transform:none
 }
 .object-del, .object-chip {
   align-items:center;
@@ -2571,10 +2518,15 @@ html.aw-teaching-open, body.aw-teaching-open {
   .chrome-label {
     display:none
   }
+  .chrome-ess .chrome-label {
+    display:inline
+  }
 }
 @media (width<=1100px) {
   html, body, #root, #app, .app-shell {
+    height:100svh;
     height:100dvh;
+    max-height:100svh;
     max-height:100dvh;
     overflow:hidden
   }
@@ -2619,6 +2571,9 @@ html.aw-teaching-open, body.aw-teaching-open {
   .chrome-label {
     display:none
   }
+  .chrome-ess .chrome-label {
+    display:inline
+  }
   .ver-chip {
     flex-shrink:0;
     min-height:32px;
@@ -2647,7 +2602,7 @@ html.aw-teaching-open, body.aw-teaching-open {
   .keep-phone {
     display:inline-flex!important
   }
-  .tool-rail, .dock-rail {
+  .tool-rail {
     display:flex!important
   }
   .coach-card {
@@ -2697,6 +2652,9 @@ html.aw-teaching-open, body.aw-teaching-open {
   .title-input {
     max-width:120px
   }
+  .chrome-ess .chrome-label {
+    display:none
+  }
 }
 @media (width<=640px) {
   .chrome {
@@ -2711,7 +2669,7 @@ html.aw-teaching-open, body.aw-teaching-open {
     flex:64px;
     max-width:none
   }
-  .tool-rail, .dock-rail {
+  .tool-rail {
     display:flex!important
   }
   .chrome-phone-only {
@@ -2874,7 +2832,7 @@ html.aw-teaching-open, body.aw-teaching-open {
   display: none;
 }
 .tool-rail.is-behind-sheet,
-.dock-rail.is-behind-sheet {
+.tool-rail.is-behind-sheet .tool-rail-btn {
   opacity: 0;
   pointer-events: none;
 }
@@ -3332,7 +3290,6 @@ html[data-gui-theme=blocky] .solid-preview-svg {
 /* 1.1.2 — Help for everyone (UDL / special-ed) */
 html[data-udl-fat] .aw-pressable,
 html[data-udl-fat] .tool-rail-btn,
-html[data-udl-fat] .dock-rail-btn,
 html[data-udl-fat] .chrome-ico,
 html[data-udl-fat] .ghost-btn,
 html[data-udl-fat] .primary-btn,
@@ -3349,8 +3306,7 @@ html[data-udl-fat] .chrome .chrome-more-btn {
   min-width: 52px;
 }
 html[data-udl-fat] .tool-rail-label,
-html[data-udl-fat] .chrome-label,
-html[data-udl-fat] .dock-rail-label {
+html[data-udl-fat] .chrome-label {
   display: block;
   font-size: 12px;
   font-weight: 700;
@@ -3408,7 +3364,6 @@ html[data-dir="rtl"] .challenge-card,
 html[data-dir="rtl"] .new-project-modal,
 html[data-dir="rtl"] .aw-hint,
 html[data-dir="rtl"] .tool-rail-label,
-html[data-dir="rtl"] .dock-rail-label,
 html[data-dir="rtl"] .customize-drawer .field > span,
 html[data-dir="rtl"] .customize-drawer h3,
 html[data-dir="rtl"] .customize-drawer .muted {

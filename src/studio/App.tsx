@@ -18,7 +18,6 @@ import { ChangelogModal } from './components/ChangelogModal';
 import { Toast } from './components/Toast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToolRail } from './components/ToolRail';
-import { DockRail } from './components/DockRail';
 import { CoachBanner } from './components/CoachBanner';
 import { VersionChip } from './components/VersionChip';
 import { ObjectMenu } from './components/ObjectMenu';
@@ -168,7 +167,6 @@ export default function App() {
           <ErrorBoundary label="contest"><ContestDrawer /></ErrorBoundary>
           <HelpModal />
           <CustomizePanel />
-          <DockRail />
         </div>
       </div>
       <DebugDrawer />

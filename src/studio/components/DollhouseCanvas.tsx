@@ -25,6 +25,7 @@ import { asFloorFinish, asFloorGrain, floorFinish, floorTileCanvas } from '../da
 import { listInteriorFloors, roomPolygon } from '../lib/rooms';
 import { DEFAULT_GUI_THEME } from '../data/themes';
 import { t } from '../data/i18n';
+import { useCanvasToolsPocket } from '../hooks/useCanvasToolsPocket';
 
 type SceneFace = {
   key: string;
@@ -49,6 +50,7 @@ export function DollhouseCanvas() {
   const pinch = useRef<{ dist: number; zoom: number; pan: { x: number; y: number }; mid: { x: number; y: number } } | null>(null);
   const pendingTap = useRef<{ x: number; y: number } | null>(null);
   const dragging = useRef(false);
+  const toolsPocket = useCanvasToolsPocket();
 
   const floor = useProjectStore((s) => s.doc.floors[0]);
   const settings = useProjectStore((s) => s.doc.settings);
@@ -311,6 +313,7 @@ export function DollhouseCanvas() {
     try { (ev.evt.target as Element | null)?.setPointerCapture?.(ev.evt.pointerId); } catch { /* ignore */ }
 
     if (pointers.current.size >= 2) {
+      toolsPocket.cancel();
       pendingTap.current = null;
       dragging.current = false;
       const pts = [...pointers.current.values()];
@@ -326,16 +329,24 @@ export function DollhouseCanvas() {
       return;
     }
 
+    const name = typeof (ev.target as { name?: () => string }).name === 'function'
+      ? (ev.target as { name: () => string }).name()
+      : '';
+    const onEmpty = ev.target === ev.currentTarget || name === 'doll-floor' || name === 'doll-bg';
+    if (ev.evt.button === 2) {
+      toolsPocket.armEmptyPress(ev.evt, onEmpty);
+      return;
+    }
+    if (onEmpty && (tool === 'select' || tool === 'pan')) {
+      toolsPocket.armEmptyPress(ev.evt, true);
+    }
+
     if (tool === 'pan' || ev.evt.button === 1 || ev.evt.shiftKey) {
       panning.current = true;
       last.current = pos;
       return;
     }
 
-    const name = typeof (ev.target as { name?: () => string }).name === 'function'
-      ? (ev.target as { name: () => string }).name()
-      : '';
-    const onEmpty = ev.target === ev.currentTarget || name === 'doll-floor' || name === 'doll-bg';
     if (onEmpty) {
       pendingTap.current = pos;
       return;
@@ -349,6 +360,7 @@ export function DollhouseCanvas() {
   const onPointerMove = (ev: Konva.KonvaEventObject<PointerEvent>) => {
     const pos = pointerInWrap(ev.evt);
     pointers.current.set(ev.evt.pointerId, pos);
+    toolsPocket.noteMove(ev.evt);
 
     if (pinch.current && pointers.current.size >= 2) {
       const pts = [...pointers.current.values()];
@@ -404,6 +416,13 @@ export function DollhouseCanvas() {
       return;
     }
 
+    if (toolsPocket.consumeIfOpened()) {
+      pendingTap.current = null;
+      panning.current = false;
+      last.current = null;
+      return;
+    }
+
     if (pendingTap.current) {
       const world = screenToWorld(pendingTap.current.x, pendingTap.current.y);
       pendingTap.current = null;
@@ -421,7 +440,12 @@ export function DollhouseCanvas() {
   };
 
   return (
-    <div ref={wrapRef} className="plan-canvas dollhouse-canvas" style={{ touchAction: 'none' }}>
+    <div
+      ref={wrapRef}
+      className="plan-canvas dollhouse-canvas"
+      style={{ touchAction: 'none' }}
+      onContextMenu={toolsPocket.onContextMenu}
+    >
       <Stage
         width={size.w}
         height={size.h}
