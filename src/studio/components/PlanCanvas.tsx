@@ -25,6 +25,7 @@ import { DEFAULT_GUI_THEME } from '../data/themes';
 import { DEFAULT_SKILL_LEVEL, skillRank } from '../data/skill';
 import { furnitureLod } from '../lib/perf';
 import { useCanvasToolsPocket } from '../hooks/useCanvasToolsPocket';
+import { openToolsPocket } from '../lib/edgePocket';
 
 export function PlanCanvas() {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -543,7 +544,14 @@ export function PlanCanvas() {
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
-      onContextMenu={toolsPocket.onContextMenu}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        const el = wrapRef.current;
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        const world = toWorld(e.clientX - r.left, e.clientY - r.top);
+        if (!useProjectStore.getState().hitAt(world)) openToolsPocket();
+      }}
       style={{ touchAction: 'none', cursor: hoverGrip ? (dragging ? 'grabbing' : 'grab') : undefined }}
     >
       <Stage
@@ -554,6 +562,13 @@ export function PlanCanvas() {
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         onWheel={onWheel}
+        onContextMenu={(e) => {
+          e.evt.preventDefault();
+          const pos = e.target.getStage()?.getPointerPosition();
+          if (!pos) return;
+          const world = toWorld(pos.x, pos.y);
+          if (!useProjectStore.getState().hitAt(world)) openToolsPocket();
+        }}
         style={{ cursor: tool === 'pan' ? 'grab' : tool === 'select' ? 'default' : 'crosshair' }}
       >
         <Layer

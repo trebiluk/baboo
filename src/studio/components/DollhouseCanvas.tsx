@@ -26,6 +26,7 @@ import { listInteriorFloors, roomPolygon } from '../lib/rooms';
 import { DEFAULT_GUI_THEME } from '../data/themes';
 import { t } from '../data/i18n';
 import { useCanvasToolsPocket } from '../hooks/useCanvasToolsPocket';
+import { openToolsPocket } from '../lib/edgePocket';
 
 type SceneFace = {
   key: string;
@@ -444,7 +445,10 @@ export function DollhouseCanvas() {
       ref={wrapRef}
       className="plan-canvas dollhouse-canvas"
       style={{ touchAction: 'none' }}
-      onContextMenu={toolsPocket.onContextMenu}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        toolsPocket.onContextMenu(e);
+      }}
     >
       <Stage
         width={size.w}
@@ -457,6 +461,14 @@ export function DollhouseCanvas() {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
+        onContextMenu={(e) => {
+          e.evt.preventDefault();
+          const name = typeof (e.target as { name?: () => string }).name === 'function'
+            ? (e.target as { name: () => string }).name()
+            : '';
+          const onEmpty = e.target === e.currentTarget || name === 'doll-floor' || name === 'doll-bg' || name === '';
+          if (onEmpty) openToolsPocket();
+        }}
         onWheel={(e) => {
           e.evt.preventDefault();
           const rect = wrapRef.current?.getBoundingClientRect();

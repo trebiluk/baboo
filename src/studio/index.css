@@ -551,8 +551,7 @@ button {
   display:flex;
   position:absolute;
   overflow:auto;
-  box-shadow:none;
-  pointer-events:none
+  box-shadow:none
 }
 .tool-rail.edge-pocket.is-open {
   background:var(--aw-elevated);
@@ -585,8 +584,7 @@ button {
   font-size:10px;
   font-weight:700;
   line-height:1.15;
-  display:flex;
-  pointer-events:auto
+  display:flex
 }
 @media (hover: hover) and (pointer: fine) {
   .tool-rail-btn:hover {
