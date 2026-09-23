@@ -182,3 +182,15 @@ export function mergeChunk(floor: Floor, chunk: DirtyChunk): Floor {
     sketches: upsert(floor.sketches ?? [], chunk.sketches),
   };
 }
+
+/** Off-screen dirty tiles must not be skipped — that dropped the save. */
+export function autosaveMode(
+  dirtyCount: number,
+  awakeCount: number,
+  fullFlush: boolean,
+): 'skip' | 'chunks' | 'full' {
+  if (fullFlush) return 'full';
+  if (dirtyCount <= 0) return 'skip';
+  if (awakeCount === dirtyCount) return 'chunks';
+  return 'full';
+}

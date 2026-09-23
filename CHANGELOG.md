@@ -3,6 +3,13 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.1.2 — 2026-09-23 — Plan symbols and a 3D peek
+- Furniture on the plan uses Floor Plan SVG symbols (MIT). Zoomed-out pieces stay simple boxes
+- Select a piece for a model-viewer peek. Kenney Furniture Kit CC0 (20) matches the plan. Quaternius Ultimate House Interior CC0 is 18 models, not the full pack
+- Autosave writes the whole plan when an edit is off the screen, so a pan no longer drops it. Save file stays attached long enough for a Chromebook download
+- Small pieces grow their tap target toward 44px, capped so neighbors still win. Stark stays the default
+- floorist was not vendored. The class canvas is still this plan
+
 ## 2.1.1 — 2026-09-19 — ooh fancy Edge Pocket chrome
 - One thin Chromebook top row: Baboo + version · plan name · Saved · Beginner · Undo/Redo · viewport · Save · Teach · Help. Labels never stack or overlap at 1280 or 1366
 - Fat left Edge Pocket: Select · Sketch · Wall · Door (≥44px), icon + word, Stark white+blue. Wall docks a flyout — Thickness 120/200/300mm, Height 2.4/2.7/3.0m, style tiles, “Click grid to start, drag to draw.”

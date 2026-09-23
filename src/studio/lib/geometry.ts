@@ -188,7 +188,14 @@ export function nearestWall(
   return best;
 }
 
-export function hitFurniture(items: FurnitureItem[], p: Point): string | null {
+/** Extra feet so a 44px finger can hit a small stamp. Capped so neighbors stay tappable. */
+export function furnitureFingerPad(w: number, h: number, zoom: number): number {
+  const fingerFt = 44 / Math.max(zoom, 1);
+  const short = Math.min(Math.abs(w), Math.abs(h));
+  return Math.min(0.75, Math.max(0, (fingerFt - short) / 2));
+}
+
+export function hitFurniture(items: FurnitureItem[], p: Point, zoom = 24): string | null {
   for (let i = items.length - 1; i >= 0; i--) {
     const f = items[i];
     const dx = p.x - f.x;
@@ -197,7 +204,8 @@ export function hitFurniture(items: FurnitureItem[], p: Point): string | null {
     const sin = Math.sin(-f.rot);
     const lx = dx * cos - dy * sin;
     const ly = dx * sin + dy * cos;
-    if (Math.abs(lx) <= f.w / 2 && Math.abs(ly) <= f.h / 2) return f.id;
+    const pad = furnitureFingerPad(f.w, f.h, zoom);
+    if (Math.abs(lx) <= f.w / 2 + pad && Math.abs(ly) <= f.h / 2 + pad) return f.id;
   }
   return null;
 }

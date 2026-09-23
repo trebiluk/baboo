@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { dist, fitWallsFromStroke, hitSketch, polylineLength, readableAngle, simplifyPolyline, parseFeet, hitWallGrip, nodesAfterWallLength, nodesAfterWallEnd } from './geometry.ts';
+import { dist, fitWallsFromStroke, furnitureFingerPad, hitSketch, polylineLength, readableAngle, simplifyPolyline, parseFeet, hitWallGrip, nodesAfterWallLength, nodesAfterWallEnd } from './geometry.ts';
 import type { Wall, Node } from '../types.ts';
 
 describe('sketch geometry', () => {
@@ -180,5 +180,14 @@ describe('readableAngle', () => {
 
   it('shrugs off a bad number', () => {
     assert.deepEqual(readableAngle(Number.NaN), { deg: 0, flipped: false });
+  });
+});
+
+describe('furniture finger pad', () => {
+  it('pads a small piece toward a 44px finger and caps the pad', () => {
+    assert.equal(furnitureFingerPad(6, 4, 24), 0);
+    const night = furnitureFingerPad(1.5, 1.5, 24);
+    assert.ok(night > 0.15 && night < 0.2);
+    assert.equal(furnitureFingerPad(0.2, 0.2, 4), 0.75);
   });
 });

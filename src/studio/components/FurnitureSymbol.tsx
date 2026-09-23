@@ -1,7 +1,9 @@
-import { Group, Rect, Ellipse, Circle, Line, Arc } from 'react-konva';
+import { useEffect, useState } from 'react';
+import { Group, Rect, Ellipse, Circle, Line, Arc, Image as KImage } from 'react-konva';
 import type { FurnitureItem } from '../types';
 import { FURNITURE_CATALOG } from '../data/furniture';
 import { furnitureParts } from '../lib/furnShape';
+import { SOFA_PARTS, symbolSrc } from '../data/objectSymbols';
 
 type Props = {
   item: FurnitureItem;
@@ -64,6 +66,10 @@ export function FurnitureSymbol({ item, selected, accent, stroke, zoom, light, s
       </Group>
     );
   }
+
+  const src = symbolSrc(id);
+  if (src) return <SvgFootprint src={src} w={w} h={h} ink={ink} sw={sw} />;
+  if (id === 'sofa') return <SofaFootprint w={w} h={h} ink={ink} sw={sw} />;
 
   switch (id) {
     case 'bed-twin':
@@ -327,5 +333,62 @@ export function FurnitureGlyph({ catalogId }: { catalogId: string }) {
         );
       })}
     </svg>
+  );
+}
+
+const symbolCache = new Map<string, HTMLImageElement>();
+
+function usePlanSymbol(src: string) {
+  const [img, setImg] = useState<HTMLImageElement | null>(symbolCache.get(src) ?? null);
+  useEffect(() => {
+    const hit = symbolCache.get(src);
+    if (hit) {
+      setImg(hit);
+      return;
+    }
+    const el = new window.Image();
+    el.onload = () => {
+      symbolCache.set(src, el);
+      setImg(el);
+    };
+    el.src = src;
+  }, [src]);
+  return img;
+}
+
+function SvgFootprint({ src, w, h, ink, sw }: { src: string; w: number; h: number; ink: string; sw: number }) {
+  const img = usePlanSymbol(src);
+  const hw = w / 2;
+  const hh = h / 2;
+  return (
+    <Group listening={false}>
+      {img ? (
+        <KImage image={img} x={-hw} y={-hh} width={w} height={h} listening={false} />
+      ) : (
+        <Rect x={-hw} y={-hh} width={w} height={h} stroke={ink} strokeWidth={sw} listening={false} />
+      )}
+    </Group>
+  );
+}
+
+function SofaFootprint({ w, h, ink, sw }: { w: number; h: number; ink: string; sw: number }) {
+  const left = usePlanSymbol(SOFA_PARTS[0]);
+  const mid = usePlanSymbol(SOFA_PARTS[1]);
+  const right = usePlanSymbol(SOFA_PARTS[2]);
+  const hw = w / 2;
+  const hh = h / 2;
+  const ready = left && mid && right;
+  return (
+    <Group listening={false}>
+      {ready ? (
+        <>
+          <KImage image={left} x={-hw} y={-hh} width={w * 0.28} height={h} listening={false} />
+          <KImage image={mid} x={-hw + w * 0.28} y={-hh} width={w * 0.44} height={h} listening={false} />
+          <KImage image={right} x={-hw + w * 0.72} y={-hh} width={w * 0.28} height={h} listening={false} />
+        </>
+      ) : (
+        <Rect x={-hw} y={-hh} width={w} height={h} stroke={ink} strokeWidth={sw} listening={false} />
+      )}
+    </Group>
   );
 }

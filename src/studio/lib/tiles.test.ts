@@ -8,6 +8,7 @@ import {
   parseTileKey,
   tileCoord,
   tileKey,
+  autosaveMode,
 } from './tiles.ts';
 import type { Floor } from '../types.ts';
 
@@ -80,5 +81,15 @@ describe('awake tiles', () => {
     );
     assert.equal(merged.furniture[0].label, 'Moved bed');
     assert.equal(merged.walls.length, 1);
+  });
+});
+
+describe('autosave mode', () => {
+  it('writes the whole plan when a dirty tile is off screen', () => {
+    assert.equal(autosaveMode(0, 0, false), 'skip');
+    assert.equal(autosaveMode(2, 2, false), 'chunks');
+    assert.equal(autosaveMode(2, 0, false), 'full');
+    assert.equal(autosaveMode(3, 1, false), 'full');
+    assert.equal(autosaveMode(0, 0, true), 'full');
   });
 });

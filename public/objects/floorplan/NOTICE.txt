@@ -1,0 +1,4 @@
+Floor plan symbols in this folder are from FloorPlanSVGSymbols
+https://github.com/1337GameDev/FloorPlanSVGSymbols
+MIT License — Copyright (c) 2023 Richard Duerr
+Original paths. Not redrawn. See LICENSE.

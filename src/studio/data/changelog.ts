@@ -11,6 +11,15 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.1.2',
+    date: '2026-09-23',
+    bullets: [
+      'Furniture on the plan uses real floor-plan symbols. Zoomed out, they stay simple boxes',
+      'Tap a piece for a 3D peek. Kenney matches the plan. A short Quaternius house set is the other peek — not the whole pack',
+      'Autosave keeps edits that slide off the screen. Save file waits so the Chromebook can finish the download. Stark stays the default',
+    ],
+  },
+  {
     version: '2.1.1',
     date: '2026-09-19',
     bullets: [

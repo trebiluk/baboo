@@ -214,19 +214,27 @@ export async function clearDirtyChunks(): Promise<void> {
   }
 }
 
+export function triggerDownload(filename: string, blob: Blob): void {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.rel = 'noopener';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
 export function exportProjectFile(doc: ProjectDocument): void {
   const payload = {
     ...doc,
     meta: { ...doc.meta, version: APP_VERSION, updatedAt: new Date().toISOString() },
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
   const safe = payload.meta.title.replace(/[^\w\- ]+/g, '').trim() || 'project';
-  a.download = `${safe}.archworks.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+  triggerDownload(`${safe}.archworks.json`, blob);
 }
 
 export async function importProjectFile(file: File): Promise<ProjectDocument> {

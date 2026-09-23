@@ -41,7 +41,7 @@ import {
 } from '../data/typology';
 import { exportProjectFile, importProjectFile, loadProject, saveDirtyChunks, saveProject } from '../lib/storage';
 import { capReached, remaining, type CapKind } from '../lib/caps';
-import { awakeTileKeys, extractChunk, tileKey, type TileKey } from '../lib/tiles';
+import { awakeTileKeys, autosaveMode, extractChunk, tileKey, type TileKey } from '../lib/tiles';
 import { exportGalleryCardFile, type GalleryCardOptions } from '../lib/galleryExport';
 import { noteAutosaveSuccess } from './useDebugStore';
 import {
@@ -758,30 +758,50 @@ export const useProjectStore = create<Store>((set, get) => ({
     await get().autosave();
   },
   autosave: async () => {
-    const { doc, panX, panY, zoom, viewport } = get();
+    const snap = get();
+    const dirty = [...dirtyTiles];
+    const floor = snap.doc.floors[0];
+    let awakeCount = 0;
+    if (floor && dirty.length) {
+      const awake = new Set(awakeTileKeys({
+        floorId: floor.id,
+        panX: snap.panX,
+        panY: snap.panY,
+        zoom: snap.zoom,
+        w: snap.viewport.w,
+        h: snap.viewport.h,
+      }));
+      awakeCount = dirty.filter((k) => awake.has(k)).length;
+    }
+    const mode = autosaveMode(dirty.length, awakeCount, fullFlushNeeded);
+    if (mode === 'skip') return;
     try {
-      if (fullFlushNeeded) {
-        set({ saveStatus: 'saving' });
-        await saveProject(doc);
+      set({ saveStatus: 'saving' });
+      if (mode === 'chunks' && floor) {
+        const awake = new Set(awakeTileKeys({
+          floorId: floor.id,
+          panX: snap.panX,
+          panY: snap.panY,
+          zoom: snap.zoom,
+          w: snap.viewport.w,
+          h: snap.viewport.h,
+        }));
+        const writeKeys = dirty.filter((k) => awake.has(k));
+        const chunks = writeKeys
+          .map((key) => extractChunk(floor, key))
+          .filter((c): c is NonNullable<typeof c> => c != null);
+        if (chunks.length !== writeKeys.length) {
+          await saveProject(get().doc);
+          dirtyTiles.clear();
+          fullFlushNeeded = false;
+        } else {
+          await saveDirtyChunks(chunks);
+          for (const key of writeKeys) dirtyTiles.delete(key);
+        }
+      } else {
+        await saveProject(get().doc);
         dirtyTiles.clear();
         fullFlushNeeded = false;
-      } else if (dirtyTiles.size) {
-        const awake = new Set(awakeTileKeys({
-          floorId: doc.floors[0].id,
-          panX, panY, zoom,
-          w: viewport.w,
-          h: viewport.h,
-        }));
-        const writeKeys = [...dirtyTiles].filter((k) => awake.has(k));
-        if (!writeKeys.length) return;
-        set({ saveStatus: 'saving' });
-        const chunks = writeKeys
-          .map((key) => extractChunk(doc.floors[0], key))
-          .filter((c): c is NonNullable<typeof c> => c != null);
-        await saveDirtyChunks(chunks);
-        for (const key of writeKeys) dirtyTiles.delete(key);
-      } else {
-        return;
       }
       const ts = new Date().toISOString();
       noteAutosaveSuccess();
@@ -833,8 +853,8 @@ export const useProjectStore = create<Store>((set, get) => ({
     setTimeout(() => get().fitPlan(), 80);
   },
   exportJson: () => {
-    void get().flushSave();
     exportProjectFile(get().doc);
+    void get().flushSave();
     get().showToast(t(tip(get), 'toast.saved'), 2400, 'ok');
   },
   exportGalleryCard: (opts) => {
@@ -1490,7 +1510,7 @@ export const useProjectStore = create<Store>((set, get) => ({
 
   hitAt: (p) => {
     const f = get().floor();
-    const fid = hitFurniture(f.furniture, p);
+    const fid = hitFurniture(f.furniture, p, get().zoom);
     if (fid) return { kind: 'furniture', id: fid };
     const lid = hitLandscape(f.landscape ?? [], p);
     if (lid) return { kind: 'landscape', id: lid };

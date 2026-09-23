@@ -7,6 +7,7 @@ import { Icon } from '../icons';
 import { TEXTURE_PACKS } from '../data/textures';
 import { FLOOR_FINISHES, asFloorFinish } from '../data/flooring';
 import { FURN_PAINTS, samePaint } from '../data/furnPaint';
+import { ModelPeek } from './ModelPeek';
 
 const DOOR_WIDTHS = [
   { v: 1, label: '12"' },
@@ -354,6 +355,7 @@ export function ObjectMenu() {
               })}
             </div>
             <p className="object-menu-meta">Drag to move</p>
+            <ModelPeek catalogId={f.catalogId} name={f.label} />
             <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
           </>
         );

@@ -3894,3 +3894,14 @@ html[data-ell-english] {
   }
 }
 
+.model-peek { display:flex; flex-direction:column; gap:8px; margin:8px 0 4px }
+.model-peek-row { display:flex; gap:8px }
+.model-peek-view {
+  height:200px;
+  border:1px solid var(--aw-border);
+  border-radius:10px;
+  background:#fff;
+  overflow:hidden
+}
+.model-peek-view model-viewer { width:100%; height:200px; background:#fff }
+

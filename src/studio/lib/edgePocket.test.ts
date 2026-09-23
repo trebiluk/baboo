@@ -8,14 +8,22 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.1.1 fancy Edge Pocket chrome', () => {
-  it('chips 2.1.1 and keeps the 2.1.0 precision notes', () => {
-    assert.equal(APP_VERSION, '2.1.1');
+describe('2.1.2 symbols, peek, and Edge Pocket', () => {
+  it('chips 2.1.2 and keeps the 2.1.1 pocket notes', () => {
+    assert.equal(APP_VERSION, '2.1.2');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.1\.2'/);
     assert.match(changelog, /version:\s*'2\.1\.1'/);
-    assert.match(changelog, /version:\s*'2\.1\.0'/);
     assert.match(changelog, /Edge Pocket/);
     assert.match(changelog, /thickness/i);
+    assert.equal(existsSync(join(studio, '../../public/objects/floorplan/QueenBed.svg')), true);
+    assert.equal(existsSync(join(studio, '../../public/objects/kenney/bedSingle.glb')), true);
+    assert.equal(existsSync(join(studio, '../../public/objects/quaternius/bed-single.glb')), true);
+    const peek = readFileSync(join(studio, 'data/objectPeek.ts'), 'utf8');
+    assert.match(peek, /bedSingle\.glb/);
+    assert.match(peek, /bed-single\.glb/);
+    const pkg = readFileSync(join(studio, '../../package.json'), 'utf8');
+    assert.match(pkg, /@google\/model-viewer/);
   });
 
   it('long-press matches a right-click hold', () => {

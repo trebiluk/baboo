@@ -1,5 +1,6 @@
 import type { ProjectDocument, TypologyShell } from '../types';
 import { APP_VERSION } from '../version';
+import { triggerDownload } from './storage';
 import { STYLE_TEMPLATES } from '../data/templates';
 import { roofStyleName } from './roof';
 import { judgeDogHouse, ribbonLabel } from './contest';
@@ -103,14 +104,9 @@ function safeFilenamePart(s: string): string {
 /** Download gallery card JSON — no PNG/blob bytes. */
 export function downloadGalleryCard(card: GalleryCardDocument): void {
   const blob = new Blob([JSON.stringify(card, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
   const aliasPart = safeFilenamePart(card.meta.alias);
   const titlePart = safeFilenamePart(card.meta.title);
-  a.download = `${aliasPart}-${titlePart}-gallery-card.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+  triggerDownload(`${aliasPart}-${titlePart}-gallery-card.json`, blob);
 }
 
 export function exportGalleryCardFile(

@@ -4,7 +4,7 @@ Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 
 **© 2026 Richard Kulibert Jr.**
 
-**Version 2.1.1** — Fancy Edge Pocket chrome: one thin top row, fat left tools, Wall flyout. Drafting precision from 2.1.0 stays.
+**Version 2.1.2** — Floor-plan symbols on the furniture, and a model-viewer peek (Kenney CC0 matches the plan; 18 Quaternius house models). Edge Pocket from 2.1.1 stays. Stark stays the default.
 
 Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the top chip. Plans save on the device as `.archworks.json`.
 
@@ -34,6 +34,12 @@ npm run pack:share
 - **Save file** downloads `.archworks.json` for Classroom
 - **Class folder** is a copy-to-the-share pack — Chrome, no login
 - No Google login inside the app
+
+## What’s in 2.1.2
+
+- Plan stamps from FloorPlanSVGSymbols (MIT). A 3D peek uses model-viewer (Apache-2.0) — not the class canvas
+- Kenney Furniture Kit CC0 subset (20). Quaternius Ultimate House Interior CC0 subset (18), not the full pack
+- Autosave no longer drops off-screen edits. Save file waits for the Chromebook download. Small pieces are easier to tap
 
 ## What’s in 2.1.1
 

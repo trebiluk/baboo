@@ -1,0 +1,20 @@
+Baboo 2.1.2 third-party notes
+
+Floor plan symbols — FloorPlanSVGSymbols
+https://github.com/1337GameDev/FloorPlanSVGSymbols
+MIT License. Copyright (c) 2023 Richard Duerr
+See public/objects/floorplan/LICENSE
+
+Kenney Furniture Kit — CC0
+https://kenney.nl/assets/furniture-kit
+See public/objects/kenney/NOTICE.txt
+
+Quaternius Ultimate House Interior — CC0
+https://quaternius.com/packs/ultimatehomeinterior.html
+See public/objects/quaternius/NOTICE.txt
+
+model-viewer — Apache License 2.0
+https://github.com/google/model-viewer
+Copyright Google LLC. Loaded only for the furniture peek. The class canvas stays 2D.
+
+AimTune/floorist (MIT) was read as a 2D pattern source. It is not vendored and is not the class canvas.
