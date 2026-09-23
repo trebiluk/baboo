@@ -8,22 +8,19 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.1.2 symbols, peek, and Edge Pocket', () => {
-  it('chips 2.1.2 and keeps the 2.1.1 pocket notes', () => {
-    assert.equal(APP_VERSION, '2.1.2');
+describe('2.1.3 plant marks', () => {
+  it('chips 2.1.3 and draws a tree, not a green dot', () => {
+    assert.equal(APP_VERSION, '2.1.3');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.1\.3'/);
     assert.match(changelog, /version:\s*'2\.1\.2'/);
     assert.match(changelog, /version:\s*'2\.1\.1'/);
-    assert.match(changelog, /Edge Pocket/);
-    assert.match(changelog, /thickness/i);
-    assert.equal(existsSync(join(studio, '../../public/objects/floorplan/QueenBed.svg')), true);
-    assert.equal(existsSync(join(studio, '../../public/objects/kenney/bedSingle.glb')), true);
-    assert.equal(existsSync(join(studio, '../../public/objects/quaternius/bed-single.glb')), true);
-    const peek = readFileSync(join(studio, 'data/objectPeek.ts'), 'utf8');
-    assert.match(peek, /bedSingle\.glb/);
-    assert.match(peek, /bed-single\.glb/);
-    const pkg = readFileSync(join(studio, '../../package.json'), 'utf8');
-    assert.match(pkg, /@google\/model-viewer/);
+    const doll = readFileSync(join(studio, 'components/DollhouseCanvas.tsx'), 'utf8');
+    assert.equal(doll.includes('radius={18}'), false);
+    assert.match(doll, /function DollPlant/);
+    const plan = readFileSync(join(studio, 'components/PlanCanvas.tsx'), 'utf8');
+    assert.match(plan, /clipFunc/);
+    assert.equal(plan.includes('radius={r * 0.62}'), false);
   });
 
   it('long-press matches a right-click hold', () => {

@@ -4,7 +4,7 @@ Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 
 **© 2026 Richard Kulibert Jr.**
 
-**Version 2.1.2** — Floor-plan symbols on the furniture, and a model-viewer peek (Kenney CC0 matches the plan; 18 Quaternius house models). Edge Pocket from 2.1.1 stays. Stark stays the default.
+**Version 2.1.3** — Trees are a trunk and a canopy in the dollhouse. On the plan, a tree is a circle and a cross that stays inside its spot. Stark stays the default.
 
 Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the top chip. Plans save on the device as `.archworks.json`.
 

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Stage, Layer, Line, Rect, Text, Circle } from 'react-konva';
+import { Stage, Layer, Line, Rect, Text } from 'react-konva';
 import type Konva from 'konva';
 import { useProjectStore } from '../store/useProjectStore';
 import { wallEnds } from '../lib/geometry';
@@ -25,6 +25,7 @@ import { asFloorFinish, asFloorGrain, floorFinish, floorTileCanvas } from '../da
 import { listInteriorFloors, roomPolygon } from '../lib/rooms';
 import { DEFAULT_GUI_THEME } from '../data/themes';
 import { t } from '../data/i18n';
+import type { LandscapeItem } from '../types';
 import { useCanvasToolsPocket } from '../hooks/useCanvasToolsPocket';
 
 type SceneFace = {
@@ -575,30 +576,17 @@ export function DollhouseCanvas() {
               />
             );
           })}
-          {(floor.landscape ?? []).filter((L) => L.kind === 'tree').map((L) => {
-            const crown = project(L.x + L.w / 2, L.y + L.h / 2, 10, spec);
-            const sel = selected?.kind === 'landscape' && selected.id === L.id;
-            return (
-              <Circle
-                key={L.id}
-                name="doll-plant"
-                x={crown.x}
-                y={crown.y}
-                radius={18}
-                fill={light ? '#5f8f52' : '#3d6a38'}
-                stroke={sel ? '#6e72f5' : '#2f4a28'}
-                strokeWidth={(sel ? 2.5 : 1) / zoom}
-                onClick={(evt) => {
-                  evt.cancelBubble = true;
-                  setSelected({ kind: 'landscape', id: L.id });
-                }}
-                onTap={(evt) => {
-                  evt.cancelBubble = true;
-                  setSelected({ kind: 'landscape', id: L.id });
-                }}
-              />
-            );
-          })}
+          {(floor.landscape ?? []).map((L) => (
+            <DollPlant
+              key={L.id}
+              item={L}
+              spec={spec}
+              selected={selected?.kind === 'landscape' && selected.id === L.id}
+              light={light}
+              zoom={zoom}
+              onPick={() => setSelected({ kind: 'landscape', id: L.id })}
+            />
+          ))}
           {floor.rooms.map((r) => {
             const p = project(r.x, r.y, 0.2, spec);
             return (
@@ -685,6 +673,88 @@ export function DollhouseCanvas() {
               : t(settings.locale, 'hint.doll.paper')}
       </div>
     </div>
+  );
+}
+
+function dollPts(pts: { x: number; y: number }[]) {
+  const out: number[] = [];
+  for (const p of pts) out.push(p.x, p.y);
+  return out;
+}
+
+function DollPlant({
+  item, spec, selected, light, zoom, onPick,
+}: {
+  item: LandscapeItem;
+  spec: ProjSpec;
+  selected: boolean;
+  light: boolean;
+  zoom: number;
+  onPick: () => void;
+}) {
+  const sw = (selected ? 2.5 : 1) / zoom;
+  const stroke = selected ? '#6e72f5' : '#2f4a28';
+  const pick = (evt: { cancelBubble: boolean }) => {
+    evt.cancelBubble = true;
+    onPick();
+  };
+  if (item.kind === 'tree') {
+    const r = Math.max(item.w, item.h) / 2;
+    const trunk = Math.min(0.4, r * 0.16);
+    const z1 = 3.2;
+    const corners = [
+      [item.x - trunk, item.y - trunk],
+      [item.x + trunk, item.y - trunk],
+      [item.x + trunk, item.y + trunk],
+      [item.x - trunk, item.y + trunk],
+    ] as const;
+    const trunkFaces = corners.map((a, i) => {
+      const b = corners[(i + 1) % 4];
+      return dollPts([
+        project(a[0], a[1], 0, spec),
+        project(b[0], b[1], 0, spec),
+        project(b[0], b[1], z1, spec),
+        project(a[0], a[1], z1, spec),
+      ]);
+    });
+    const peak = project(item.x, item.y, z1 + r * 1.05, spec);
+    const ring = 7;
+    const canopy = Array.from({ length: ring }, (_, i) => {
+      const a0 = (Math.PI * 2 * i) / ring;
+      const a1 = (Math.PI * 2 * (i + 1)) / ring;
+      return dollPts([
+        project(item.x + Math.cos(a0) * r, item.y + Math.sin(a0) * r, z1, spec),
+        project(item.x + Math.cos(a1) * r, item.y + Math.sin(a1) * r, z1, spec),
+        peak,
+      ]);
+    });
+    const leaf = light ? '#4C9A5C' : '#3D7A4A';
+    return (
+      <>
+        {trunkFaces.map((pts, i) => (
+          <Line key={`${item.id}-t${i}`} name="doll-plant" points={pts} closed fill="#6B5344" stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
+        ))}
+        {canopy.map((pts, i) => (
+          <Line key={`${item.id}-c${i}`} name="doll-plant" points={pts} closed fill={i % 2 ? '#2F6B3A' : leaf} stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
+        ))}
+      </>
+    );
+  }
+  const hw = item.w / 2;
+  const hh = item.h / 2;
+  const c = Math.cos(item.rot);
+  const s = Math.sin(item.rot);
+  const corner = (x: number, y: number) => {
+    const rx = x * c - y * s;
+    const ry = x * s + y * c;
+    return project(item.x + rx, item.y + ry, 0.08, spec);
+  };
+  const pts = dollPts([
+    corner(-hw, -hh), corner(hw, -hh), corner(hw, hh), corner(-hw, hh),
+  ]);
+  const fill = item.kind === 'path' ? '#C4B59A' : (light ? '#8FBF78' : '#3D7A4A');
+  return (
+    <Line name="doll-plant" points={pts} closed fill={fill} opacity={0.9} stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
   );
 }
 

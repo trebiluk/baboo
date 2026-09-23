@@ -1447,46 +1447,74 @@ function PlantMark({
   accent: string;
   zoom: number;
 }) {
+  const sw = (selected ? 2 : 1.25) / zoom;
   const stroke = selected ? accent : '#2F5D3A';
   if (item.kind === 'tree') {
-    const r = Math.max(item.w, item.h) / 2;
+    const r = Math.min(item.w, item.h) / 2;
     return (
-      <Group x={item.x} y={item.y} listening={false} perfectDrawEnabled={false}>
-        <Circle radius={r} fill="#4C9A5C" opacity={0.55} stroke={stroke} strokeWidth={(selected ? 2 : 1) / zoom} />
-        <Circle radius={r * 0.62} fill="#3D7A4A" opacity={0.7} />
-        <Circle radius={r * 0.22} fill="#6B5344" />
+      <Group
+        x={item.x}
+        y={item.y}
+        listening={false}
+        perfectDrawEnabled={false}
+        clipFunc={(ctx) => {
+          ctx.beginPath();
+          ctx.arc(0, 0, r, 0, Math.PI * 2);
+        }}
+      >
+        <Circle radius={r * 0.9} stroke={stroke} strokeWidth={sw} fill="rgba(61,122,74,0.16)" />
+        <Line points={[-r * 0.5, 0, r * 0.5, 0]} stroke={stroke} strokeWidth={sw} />
+        <Line points={[0, -r * 0.5, 0, r * 0.5]} stroke={stroke} strokeWidth={sw} />
+        <Circle radius={Math.max(0.18, r * 0.12)} fill="#6B5344" />
       </Group>
     );
   }
   if (item.kind === 'path') {
+    const hw = item.w / 2;
+    const hh = item.h / 2;
     return (
-      <Group x={item.x} y={item.y} rotation={(item.rot * 180) / Math.PI} listening={false} perfectDrawEnabled={false}>
+      <Group
+        x={item.x}
+        y={item.y}
+        rotation={(item.rot * 180) / Math.PI}
+        listening={false}
+        perfectDrawEnabled={false}
+        clipFunc={(ctx) => {
+          ctx.beginPath();
+          ctx.rect(-hw, -hh, item.w, item.h);
+        }}
+      >
         <Rect
-          x={-item.w / 2}
-          y={-item.h / 2}
+          x={-hw}
+          y={-hh}
           width={item.w}
           height={item.h}
-          fill="#D4C4A8"
+          fill="#E7D7B8"
           stroke={stroke}
-          strokeWidth={(selected ? 2 : 1) / zoom}
-          cornerRadius={0.15}
+          strokeWidth={sw}
         />
+        <Line points={[-hw * 0.7, 0, hw * 0.7, 0]} stroke="#A09078" strokeWidth={sw} dash={[0.35, 0.25]} />
       </Group>
     );
   }
+  const hw = item.w / 2;
+  const hh = item.h / 2;
   return (
-    <Group x={item.x} y={item.y} rotation={(item.rot * 180) / Math.PI} listening={false} perfectDrawEnabled={false}>
-      <Rect
-        x={-item.w / 2}
-        y={-item.h / 2}
-        width={item.w}
-        height={item.h}
-        fill="#7CB56A"
-        opacity={0.7}
-        stroke={stroke}
-        strokeWidth={(selected ? 2 : 1) / zoom}
-        cornerRadius={0.2}
-      />
+    <Group
+      x={item.x}
+      y={item.y}
+      rotation={(item.rot * 180) / Math.PI}
+      listening={false}
+      perfectDrawEnabled={false}
+      clipFunc={(ctx) => {
+        ctx.beginPath();
+        ctx.rect(-hw, -hh, item.w, item.h);
+      }}
+    >
+      <Rect x={-hw} y={-hh} width={item.w} height={item.h} stroke={stroke} strokeWidth={sw} fill="rgba(124,181,106,0.28)" />
+      <Circle x={-hw * 0.35} radius={Math.min(hw, hh) * 0.22} fill="#3D7A4A" />
+      <Circle x={hw * 0.28} y={-hh * 0.15} radius={Math.min(hw, hh) * 0.18} fill="#5A8F4A" />
+      <Circle x={hw * 0.05} y={hh * 0.2} radius={Math.min(hw, hh) * 0.16} fill="#2F6B3A" />
     </Group>
   );
 }

@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.1.3',
+    date: '2026-09-23',
+    bullets: [
+      'A tree in the dollhouse is a trunk and a canopy, not a green dot',
+      'On the plan, a tree is a circle and a cross that stays inside its spot. A plant bed and a path stay inside theirs too',
+    ],
+  },
+  {
     version: '2.1.2',
     date: '2026-09-23',
     bullets: [

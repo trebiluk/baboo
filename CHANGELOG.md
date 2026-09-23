@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.1.3 — 2026-09-23 — Plant marks
+- A tree in the dollhouse is a trunk and a canopy, not a flat green dot
+- On the plan, a tree is a circle and a cross clipped to its spot, so it does not blob over the toolbar. Plant beds and paths stay inside their outlines
+- Stark stays the default
+
 ## 2.1.2 — 2026-09-23 — Plan symbols and a 3D peek
 - Furniture on the plan uses Floor Plan SVG symbols (MIT). Zoomed-out pieces stay simple boxes
 - Select a piece for a model-viewer peek. Kenney Furniture Kit CC0 (20) matches the plan. Quaternius Ultimate House Interior CC0 is 18 models, not the full pack
