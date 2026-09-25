@@ -1527,6 +1527,12 @@ export const STR: Record<string, Gloss> = {
   'chip.zoomOut': g('Zoom out', {
     es: 'Alejar', cu: 'Alejar', uk: 'Далі', ru: 'Дальше', ti: 'ርሐቕ', fa: 'دور',
   }),
+  'chip.roof': g('Roof', {
+    es: 'Techo', cu: 'Techo', uk: 'Дах', ru: 'Крыша', ti: 'ናሕሲ', fa: 'سقف',
+  }),
+  'chip.roofNone': g('No roof', {
+    es: 'Sin techo', cu: 'Sin techo', uk: 'Без даху', ru: 'Без крыши', ti: 'ናሕሲ የለን', fa: 'بدون سقف',
+  }),
   'osnap.endpoint': g('Corner', {
     es: 'Esquina', cu: 'Esquina', uk: 'Кут', ru: 'Угол', ti: 'ኩርናዕ', fa: 'گوشه',
   }),

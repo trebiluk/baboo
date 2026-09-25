@@ -18,7 +18,7 @@ import { wallFootprintFlat } from '../lib/wallJoin';
 import { chamferPreview, nearestChamferable } from '../lib/chamfer';
 import { ADA, circleFitsInPoly } from '../lib/access';
 import { kitchenTriangle } from '../lib/architect';
-import { exteriorBounds, roofStyleName } from '../lib/roof';
+import { exteriorBounds, ROOF_STYLE_OPTIONS, roofStyleName } from '../lib/roof';
 import { roomType } from '../data/rooms';
 import type { FurnitureItem, Opening, Wall, Node, Room, DimItem, NoteItem, LandscapeItem, Locale } from '../types';
 import { t, tipLoc } from '../data/i18n';
@@ -47,6 +47,23 @@ function zoomPlan(dir: 1 | -1) {
 
 export function PlanCanvas() {
   const wrapRef = useRef<HTMLDivElement>(null);
+  const roofRef = useRef<HTMLDivElement>(null);
+  const [roofOpen, setRoofOpen] = useState(false);
+  useEffect(() => {
+    if (!roofOpen) return;
+    const onDown = (e: PointerEvent) => {
+      if (e.target instanceof Element && roofRef.current && !roofRef.current.contains(e.target)) setRoofOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setRoofOpen(false);
+    };
+    window.addEventListener('pointerdown', onDown);
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [roofOpen]);
   const [size, setSize] = useState({ w: 800, h: 600 });
   const doc = useProjectStore((s) => s.doc);
   const floor = doc.floors[0];
@@ -1059,6 +1076,48 @@ export function PlanCanvas() {
         >
           {settings.osnap !== false ? t(tips, 'hint.osnapOn') : t(tips, 'chip.wallsOff')}
         </button>
+        <div className="plan-roof" ref={roofRef}>
+          <button
+            type="button"
+            className="plan-tap aw-pressable"
+            aria-expanded={roofOpen}
+            aria-pressed={!!settings.roofStyleId}
+            onClick={() => setRoofOpen((v) => !v)}
+          >
+            {settings.roofStyleId ? roofStyleName(settings.roofStyleId) : t(tips, 'chip.roof')}
+          </button>
+          {roofOpen && (
+            <div className="plan-roof-menu" role="listbox" aria-label={t(tips, 'chip.roof')}>
+              <button
+                type="button"
+                role="option"
+                className="plan-tap aw-pressable"
+                aria-selected={!settings.roofStyleId}
+                onClick={() => {
+                  useProjectStore.getState().setRoofStyle(null);
+                  setRoofOpen(false);
+                }}
+              >
+                {t(tips, 'chip.roofNone')}
+              </button>
+              {ROOF_STYLE_OPTIONS.map((o) => (
+                <button
+                  key={o.id}
+                  type="button"
+                  role="option"
+                  className="plan-tap aw-pressable"
+                  aria-selected={settings.roofStyleId === o.id}
+                  onClick={() => {
+                    useProjectStore.getState().setRoofStyle(o.id);
+                    setRoofOpen(false);
+                  }}
+                >
+                  {o.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <button
           type="button"
           className="plan-tap aw-pressable"
@@ -1145,7 +1204,7 @@ export function PlanCanvas() {
         gridSize={gridSize}
         locale={tips}
         updatedAt={doc.meta.updatedAt}
-        roof={settings.roofStyleId ? roofStyleName(settings.roofStyleId) : ''}
+        roof={(settings.roofLabel ?? '').trim() || (settings.roofStyleId ? roofStyleName(settings.roofStyleId) : '')}
       />
       <PlanLoadChip
         objectCount={objectCount}

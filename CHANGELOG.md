@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.2.1 — 2026-09-25 — Name the roof, keep the sheet
+- Roof is a tap on the plan. Pick a real word: gable, hip, shed, flat, and the rest
+- The title block sits above the coach so it is not covered. The tap row stays one line and leaves the north arrow clear
+- Stark stays the default
+
 ## 2.2.0 — 2026-09-25 — Ten taps on the plan
 - The next card stays up while a sketch is selected. Trace sits on that card
 - Snap, Straight, Wall snap, Fit, zoom, and feet/meters are taps on the plan — not buried in Settings

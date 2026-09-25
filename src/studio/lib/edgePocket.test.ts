@@ -8,34 +8,31 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.2.0 ten taps on the plan', () => {
-  it('chips 2.2.0 and keeps the first-step and plant notes', () => {
-    assert.equal(APP_VERSION, '2.2.0');
+describe('2.2.1 roof tap and a clear sheet', () => {
+  it('chips 2.2.1 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.2.1');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.2\.1'/);
     assert.match(changelog, /version:\s*'2\.2\.0'/);
     assert.match(changelog, /version:\s*'2\.1\.4'/);
-    assert.match(changelog, /version:\s*'2\.1\.3'/);
     assert.equal(t('en', 'coach.sketch.body').includes('Open Tools'), false);
     assert.match(t('en', 'coach.trace.body'), /Trace on this card/);
-    assert.match(t('en', 'toast.boxClosed'), /\{w\}/);
-    assert.match(t('en', 'sheet.roofNone'), /not named/);
+    assert.match(t('en', 'chip.roof'), /Roof/);
     for (const loc of LOCALES) {
-      assert.equal(t(loc, 'coach.sketch.body').includes('Open Tools'), false);
-      assert.match(t(loc, 'toast.boxClosed'), /\{w\}/);
-      assert.ok(t(loc, 'chip.straight').length > 0);
-      assert.ok(t(loc, 'chip.zoomIn').length > 0);
+      assert.ok(t(loc, 'chip.roof').length > 0);
+      assert.ok(t(loc, 'chip.roofNone').length > 0);
     }
     const plan = readFileSync(join(studio, 'components/PlanCanvas.tsx'), 'utf8');
+    assert.match(plan, /plan-roof-menu/);
+    assert.match(plan, /setRoofStyle/);
     assert.match(plan, /coachLeads/);
-    assert.match(plan, /className="plan-taps"/);
-    assert.match(plan, /sheet.roofNone/);
     const coach = readFileSync(join(studio, 'components/CoachBanner.tsx'), 'utf8');
     assert.match(coach, /selected.kind !== 'sketch'/);
-    assert.match(coach, /step.action === 'trace'/);
-    const skill = readFileSync(join(studio, 'data/skill.ts'), 'utf8');
-    assert.match(skill, /action: 'trace'/);
     const doll = readFileSync(join(studio, 'components/DollhouseCanvas.tsx'), 'utf8');
     assert.match(doll, /function DollPlant/);
+    const css = readFileSync(join(studio, 'index.css'), 'utf8');
+    assert.match(css, /flex-wrap:nowrap/);
+    assert.match(css, /:has\(\.coach-card\) \.plan-sheet/);
   });
 
   it('long-press matches a right-click hold', () => {

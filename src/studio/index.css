@@ -765,14 +765,22 @@ button {
   position:absolute;
   top:8px;
   left:calc(var(--aw-rail-left) + 8px);
-  right:72px;
+  right:188px;
   display:flex;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
   gap:6px;
-  pointer-events:none
+  max-height:52px;
+  overflow-x:auto;
+  overscroll-behavior-x:contain;
+  pointer-events:none;
+  scrollbar-width:thin
 }
 .plan-tap {
   pointer-events:auto;
+  flex:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
   min-height:44px;
   min-width:44px;
   padding:0 12px;
@@ -795,6 +803,44 @@ button {
 .plan-tap-zoom {
   padding:0;
   width:44px
+}
+.plan-roof {
+  position:relative;
+  pointer-events:auto;
+  flex:none
+}
+.plan-roof-menu {
+  position:absolute;
+  top:50px;
+  left:0;
+  z-index:3;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  width:280px;
+  padding:6px;
+  border:1px solid var(--aw-border);
+  border-radius:12px;
+  background:var(--aw-elevated);
+  box-shadow:0 8px 20px #0a0a0a29
+}
+.plan-roof-menu .plan-tap {
+  width:100%;
+  justify-content:flex-start
+}
+.app-shell:has(.coach-card) .plan-sheet,
+.app-shell:has(.coach-card) .stage-stack:has(.edge-pocket.is-open) .plan-sheet,
+.app-shell:has(.coach-card) .stage-stack:has(.edge-pocket.has-wall-flyout) .plan-sheet {
+  top:60px;
+  bottom:auto;
+  left:calc(var(--aw-rail-left) + 8px);
+  right:auto;
+  max-width:min(220px, 42%)
+}
+@media (width<=800px) {
+  .plan-taps {
+    right:96px
+  }
 }
 .plan-load-chip {
   z-index:var(--aw-z-overlays);

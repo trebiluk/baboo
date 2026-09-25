@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.2.1',
+    date: '2026-09-25',
+    bullets: [
+      'Roof is a tap on the plan. Pick a real word: gable, hip, shed, flat, and the rest',
+      'The title block sits above the coach. The tap row stays one line and leaves the north arrow clear. Stark stays the default',
+    ],
+  },
+  {
     version: '2.2.0',
     date: '2026-09-25',
     bullets: [

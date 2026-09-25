@@ -12,7 +12,7 @@ export const UNIT_1 = {
     'Place one door.',
     'Place one window.',
     'Look at the size labels. Do they look right?',
-    'Name your roof. Use a real word: gable, hip, grass, or conical.',
+    'Name your roof. Tap Roof on the plan and pick a real word: gable, hip, grass, or conical.',
     'Name the room. Room tool → pick a type → click inside the walls.',
   ],
   doneLooksLike: 'Closed room · named · door · window · clear sizes · roof named.',
