@@ -14,10 +14,10 @@ import {
   snapPoint, uid, hitDimension, hitNote, hitLandscape, hitSketch,
   snapWallEnd, splitWallsAtNode, wallLength, wallAngle,
   simplifyPolyline, polylineLength, fitWallsFromStroke,
-  nodesAfterWallEnd, nodesAfterWallLength, wallEnds,
+  nodesAfterWallEnd, nodesAfterWallLength, wallEnds, formatLength,
 } from '../lib/geometry';
 import { chamferCorner, nearestChamferable } from '../lib/chamfer';
-import { findEnclosedFace, formatArea, hitRoom, polygonArea } from '../lib/rooms';
+import { findEnclosedFace, formatArea, hitRoom, polygonArea, listInteriorFaces } from '../lib/rooms';
 import { DEFAULT_ROOM_KIND, roomType } from '../data/rooms';
 import { defaultFloorForKind } from '../data/flooring';
 import {
@@ -25,7 +25,7 @@ import {
   readUdlContrastPref, readEllEnglishPref, writeLocalePref, writeTipsLocalePref,
   writeUdlFatPref, writeUdlTypePref, writeUdlContrastPref, writeEllEnglishPref,
 } from '../data/i18n';
-import { generateRoof, roofStyleName } from '../lib/roof';
+import { exteriorBounds, generateRoof, roofStyleName } from '../lib/roof';
 import { textureName } from '../data/textures';
 import {
   deleteTextureBlob,
@@ -251,6 +251,29 @@ function toneForToast(msg: string, fallback: ToastTone): ToastTone {
 
 function refreshRoof(f: Floor, roofStyleId: RoofStyleId | null, eavesHeight?: number): Floor {
   return { ...f, roof: generateRoof(f.nodes, f.walls, roofStyleId, eavesHeight) };
+}
+
+function isClosedBox(floor: Floor): boolean {
+  return floor.walls.length > 2 && listInteriorFaces(floor.nodes, floor.walls).length > 0;
+}
+
+/** True when this edit just made the first closed room. Toast already shown. */
+function toastIfJustClosed(get: () => { floor: () => Floor; doc: ProjectDocument; showToast: Store['showToast'] }, before: Floor): boolean {
+  const after = get().floor();
+  if (isClosedBox(before) || !isClosedBox(after)) return false;
+  const units = get().doc.settings.units ?? get().doc.meta.units ?? 'ft';
+  const box = exteriorBounds(after.nodes, after.walls);
+  if (!box) return false;
+  const skill = get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
+  get().showToast(
+    t(tipLoc(get().doc.settings), 'toast.boxClosed', {
+      w: formatLength(box.w, units),
+      d: formatLength(box.h, units),
+    }),
+    toastMs(skill, 3600),
+    'ok',
+  );
+  return true;
 }
 
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
@@ -948,6 +971,7 @@ export const useProjectStore = create<Store>((set, get) => ({
       get().showToast(t(tip(get), 'toast.wallShort'), 2800, 'miss');
       return;
     }
+    const beforeFloor = get().floor();
     get().pushHistory();
     const merge = s.snap ? s.gridSize * 0.4 : 0.35;
     set({
@@ -978,7 +1002,9 @@ export const useProjectStore = create<Store>((set, get) => ({
       wallDraft: null,
     });
     get().markDirty(endPt);
-    get().showToast(t(tip(get), 'toast.wallIn'), 2400, 'ok');
+    if (!toastIfJustClosed(get, beforeFloor)) {
+      get().showToast(t(tip(get), 'toast.wallIn'), 2400, 'ok');
+    }
   },
   chamferAt: (p) => {
     const floor = get().floor();
@@ -1457,6 +1483,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     const kind = get().wallKind;
     const thick = get().wallThickness;
     const drawStyle = get().wallDrawStyle;
+    const beforeFloor = get().floor();
     get().pushHistory();
     let added = 0;
     set({
@@ -1493,7 +1520,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     get().markDirty();
     if (added === 0) {
       get().showToast(t(get().doc.settings.locale, 'toast.traceNeed'), 3200);
-    } else {
+    } else if (!toastIfJustClosed(get, beforeFloor)) {
       get().showToast(
         added === 1
           ? t(get().doc.settings.locale, 'toast.traceOne')

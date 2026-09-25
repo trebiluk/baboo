@@ -11,6 +11,15 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.2.0',
+    date: '2026-09-25',
+    bullets: [
+      'The next card stays up while a sketch is selected. Trace sits on that card',
+      'Snap, Straight, Wall snap, Fit, zoom, and feet or meters are taps on the plan',
+      'The sheet names the roof. When the walls close, the toast says the outside size. Stark stays the default',
+    ],
+  },
+  {
     version: '2.1.4',
     date: '2026-09-24',
     bullets: [

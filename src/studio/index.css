@@ -760,6 +760,42 @@ button {
   bottom:12px;
   left:calc(var(--aw-rail-left) + 8px)
 }
+.plan-taps {
+  z-index:var(--aw-z-overlays);
+  position:absolute;
+  top:8px;
+  left:calc(var(--aw-rail-left) + 8px);
+  right:72px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  pointer-events:none
+}
+.plan-tap {
+  pointer-events:auto;
+  min-height:44px;
+  min-width:44px;
+  padding:0 12px;
+  border-radius:999px;
+  border:1px solid var(--aw-border);
+  background:var(--aw-elevated);
+  color:var(--aw-fg);
+  font:700 14px/1 var(--aw-font, inherit);
+  box-shadow:0 2px 8px #0a0a0a14
+}
+.plan-tap[aria-pressed="true"] {
+  border-color:var(--aw-royal);
+  color:var(--aw-royal);
+  background:#fff
+}
+.plan-tap:focus-visible {
+  outline:3px solid var(--aw-royal);
+  outline-offset:2px
+}
+.plan-tap-zoom {
+  padding:0;
+  width:44px
+}
 .plan-load-chip {
   z-index:var(--aw-z-overlays);
   background:var(--aw-elevated);

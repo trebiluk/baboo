@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.2.0 — 2026-09-25 — Ten taps on the plan
+- The next card stays up while a sketch is selected. Trace sits on that card
+- Snap, Straight, Wall snap, Fit, zoom, and feet/meters are taps on the plan — not buried in Settings
+- The sheet names the roof. Closing the box toasts the outside size. Stark stays the default
+
 ## 2.1.4 — 2026-09-24 — One first step
 - The first card says Tap Sketch on the left. The extra Wall card stays hidden until a wall exists, so a new plan has one next action
 - After a sketch, the toast says it landed, then the card asks for a wall. Stark stays the default

@@ -10,6 +10,7 @@ export function CoachBanner() {
   const styleId = useProjectStore((s) => s.doc.settings.styleId);
   const locale = tipLoc(useProjectStore((s) => s.doc.settings));
   const setTool = useProjectStore((s) => s.setTool);
+  const traceSketch = useProjectStore((s) => s.traceSketch);
   const setToolsPinned = useProjectStore((s) => s.setToolsPinned);
   const toggleTeaching = useProjectStore((s) => s.toggleTeaching);
   const toggleContest = useProjectStore((s) => s.toggleContest);
@@ -25,7 +26,7 @@ export function CoachBanner() {
 
   if (skillRank(skillLevel) > 1 && styleId !== 'dog-house') return null;
   if (teachingOpen || contestOpen || customizeOpen || helpOpen || newProjectOpen) return null;
-  if (selected) return null;
+  if (selected && selected.kind !== 'sketch') return null;
   if (!step || dismissed === step.id) return null;
 
   const prefix = styleId === 'dog-house' ? `coach.den.${step.id}` : `coach.${step.id}`;
@@ -47,7 +48,15 @@ export function CoachBanner() {
         <strong>{title}</strong>
         <p>{body}</p>
         <div className="coach-card-actions">
-          {step.tool ? (
+          {step.action === 'trace' ? (
+            <button
+              type="button"
+              className="primary-btn aw-pressable"
+              onClick={() => traceSketch()}
+            >
+              {t(locale, 'tool.trace')}
+            </button>
+          ) : step.tool ? (
             <button
               type="button"
               className="primary-btn aw-pressable"

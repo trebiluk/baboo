@@ -120,6 +120,8 @@ export type CoachStep = {
   body: string;
   tool?: Tool;
   panel?: 'contest' | 'teach';
+  /** Primary button does this instead of only arming a tool. */
+  action?: 'trace';
 };
 
 function nextDogHouseCoach(floor: Floor, level: SkillLevel): CoachStep | null {
@@ -142,8 +144,9 @@ function nextDogHouseCoach(floor: Floor, level: SkillLevel): CoachStep | null {
     return {
       id: 'trace',
       title: 'Hard-line the den',
-      body: 'Tap the sketch → Trace, or pick Wall and click along it.',
+      body: 'Tap Trace on this card. Or pick Wall and click along the pencil.',
       tool: 'wall',
+      action: 'trace',
     };
   }
   if (!closed) {
@@ -239,8 +242,9 @@ export function nextCoach(level: SkillLevel, floor: Floor, styleId?: string): Co
     return {
       id: 'trace',
       title: 'Now hard-line a wall',
-      body: 'Tap the sketch → Trace, or pick Wall and click along it.',
+      body: 'Tap Trace on this card. Or pick Wall and click along the pencil.',
       tool: 'wall',
+      action: 'trace',
     };
   }
   if (!closed) {
@@ -291,7 +295,7 @@ export function nextCoach(level: SkillLevel, floor: Floor, styleId?: string): Co
 
 export const NOVICE_UNIT_STEPS = [
   'Tap Sketch on the left. Drag on the grid like a pencil.',
-  'Tap the sketch → Trace, or pick Wall and hard-line over it.',
+  'Tap Trace on the card. Or pick Wall and hard-line over the pencil.',
   'Pick Door. Click on one wall so we can walk in.',
   'Read the size labels. Do they feel like a real room?',
 ];

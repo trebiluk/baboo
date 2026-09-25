@@ -628,13 +628,13 @@ export const STR: Record<string, Gloss> = {
     ti: 'ሕጂ ቀጥታ መንደቕ ግበር',
     fa: 'حالا دیوار را خط‌کشی کن',
   }),
-  'coach.trace.body': g('Tap the sketch → Trace, or pick Wall and click along it.', {
-    es: 'Toca el boceto → Trazar, o elige Muro y haz clic por encima.',
-    cu: 'Toca el boceto → Trazar, o escoge Pared y toca por encima.',
-    uk: 'Торкнись ескізу → Обвести, або обери Стіна і клікай вздовж.',
-    ru: 'Нажми эскиз → Обвести, или выбери Стена и кликай вдоль.',
-    ti: 'ነቲ ስእሊ ጠውቕ → ቀጥታ፣ ወይ መንደቕ ምረጽ እሞ ኣብ ልዕሊኡ ጠውቕ.',
-    fa: 'طرح را بزن → خط‌کشی، یا دیوار را برگزین و روی آن کلیک کن.',
+  'coach.trace.body': g('Tap Trace on this card. Or pick Wall and click along the pencil.', {
+    es: 'Toca Trazar en esta tarjeta. O elige Muro y haz clic sobre el lápiz.',
+    cu: 'Toca Trazar en esta tarjeta. O escoge Pared y toca sobre el lápiz.',
+    uk: 'Торкнись Обвести на цій картці. Або обери Стіна і клікай уздовж олівця.',
+    ru: 'Нажми Обвести на этой карточке. Или выбери Стена и кликай вдоль карандаша.',
+    ti: 'ኣብዚ ካርድ ቀጥታ ጠውቕ። ወይ መንደቕ ምረጽ እሞ ኣብ ልዕሊ እቲ እርሳስ ጠውቕ.',
+    fa: 'روی این کارت خط‌کشی را بزن. یا دیوار را برگزین و روی مداد کلیک کن.',
   }),
   'coach.close.title': g('Close the box', {
     es: 'Cierra la caja',
@@ -773,13 +773,13 @@ export const STR: Record<string, Gloss> = {
     ti: 'ነቲ መደቀሲ ቀጥታ ግበር',
     fa: 'لانه را خط‌کشی کن',
   }),
-  'coach.den.trace.body': g('Tap the sketch → Trace, or pick Wall and click along it.', {
-    es: 'Toca el boceto → Trazar, o elige Muro y haz clic por encima.',
-    cu: 'Toca el boceto → Trazar, o escoge Pared y toca por encima.',
-    uk: 'Торкнись ескізу → Обвести, або обери Стіна і клікай вздовж.',
-    ru: 'Нажми эскиз → Обвести, или выбери Стена и кликай вдоль.',
-    ti: 'ነቲ ስእሊ ጠውቕ → ቀጥታ፣ ወይ መንደቕ ምረጽ እሞ ኣብ ልዕሊኡ ጠውቕ.',
-    fa: 'طرح را بزن → خط‌کشی، یا دیوار را برگزین و روی آن کلیک کن.',
+  'coach.den.trace.body': g('Tap Trace on this card. Or pick Wall and click along the pencil.', {
+    es: 'Toca Trazar en esta tarjeta. O elige Muro y haz clic sobre el lápiz.',
+    cu: 'Toca Trazar en esta tarjeta. O escoge Pared y toca sobre el lápiz.',
+    uk: 'Торкнись Обвести на цій картці. Або обери Стіна і клікай уздовж олівця.',
+    ru: 'Нажми Обвести на этой карточке. Или выбери Стена и кликай вдоль карандаша.',
+    ti: 'ኣብዚ ካርድ ቀጥታ ጠውቕ። ወይ መንደቕ ምረጽ እሞ ኣብ ልዕሊ እቲ እርሳስ ጠውቕ.',
+    fa: 'روی این کارت خط‌کشی را بزن. یا دیوار را برگزین و روی مداد کلیک کن.',
   }),
   'coach.den.close.title': g('Close the den', {
     es: 'Cierra la perrera',
@@ -1020,6 +1020,17 @@ export const STR: Record<string, Gloss> = {
   'sheet.scale': g('SCALE', {
     es: 'ESCALA', cu: 'ESCALA', uk: 'МАСШТАБ', ru: 'МАСШТАБ', ti: 'መለክዒ', fa: 'مقیاس',
   }),
+  'sheet.roof': g('Roof', {
+    es: 'Techo', cu: 'Techo', uk: 'Дах', ru: 'Крыша', ti: 'ናሕሲ', fa: 'سقف',
+  }),
+  'sheet.roofNone': g('Roof · not named yet', {
+    es: 'Techo · aún sin nombre',
+    cu: 'Techo · todavía sin nombre',
+    uk: 'Дах · ще без назви',
+    ru: 'Крыша · ещё без имени',
+    ti: 'ናሕሲ · ገና ስም የብሉን',
+    fa: 'سقف · هنوز اسم ندارد',
+  }),
   'sheet.north': g('N', {
     es: 'N', cu: 'N', uk: 'Пн', ru: 'С', ti: 'ሰ', fa: 'ش',
   }),
@@ -1170,6 +1181,14 @@ export const STR: Record<string, Gloss> = {
     ru: 'Стена есть — дальше дверь на стене',
     ti: 'Wall is in.',
     fa: 'دیوار گذاشته شد — بعد یک در روی دیوار بگذار',
+  }),
+  'toast.boxClosed': g('Closed · {w} by {d}. Add a door on a wall.', {
+    es: 'Cerrado · {w} por {d}. Pon una puerta en un muro.',
+    cu: 'Cerrado · {w} por {d}. Pon una puerta en una pared.',
+    uk: 'Замкнуто · {w} на {d}. Додай двері на стіні.',
+    ru: 'Замкнуто · {w} на {d}. Добавь дверь на стене.',
+    ti: 'ተዓጽዩ · {w} ብ {d}. ኣብ መንደቕ ማዕጾ ወስኽ.',
+    fa: 'بسته شد · {w} در {d}. یک در روی دیوار بگذار.',
   }),
   'toast.wallShort': g('Make the wall a bit longer', {
     es: 'Haz el muro un poco más largo',
@@ -1492,6 +1511,21 @@ export const STR: Record<string, Gloss> = {
   'hint.osnapOn': g('Wall snap', {
     es: 'Imán a muros', cu: 'Imán a paredes', uk: 'Прилипання до стін', ru: 'Привязка к стенам',
     ti: 'ናብ መንደቕ ምልጣፍ', fa: 'چسبیدن به دیوار',
+  }),
+  'chip.straight': g('Straight', {
+    es: 'Recto', cu: 'Recto', uk: 'Прямо', ru: 'Прямо', ti: 'ቀጥታ', fa: 'صاف',
+  }),
+  'chip.free': g('Free', {
+    es: 'Libre', cu: 'Libre', uk: 'Вільно', ru: 'Свободно', ti: 'ናጻ', fa: 'آزاد',
+  }),
+  'chip.wallsOff': g('Walls off', {
+    es: 'Muros no', cu: 'Paredes no', uk: 'Стіни вимк', ru: 'Стены выкл', ti: 'መንደቕ ጠፊኡ', fa: 'دیوار خاموش',
+  }),
+  'chip.zoomIn': g('Zoom in', {
+    es: 'Acercar', cu: 'Acercar', uk: 'Ближче', ru: 'Ближе', ti: 'ቀረብ', fa: 'نزدیک',
+  }),
+  'chip.zoomOut': g('Zoom out', {
+    es: 'Alejar', cu: 'Alejar', uk: 'Далі', ru: 'Дальше', ti: 'ርሐቕ', fa: 'دور',
   }),
   'osnap.endpoint': g('Corner', {
     es: 'Esquina', cu: 'Esquina', uk: 'Кут', ru: 'Угол', ti: 'ኩርናዕ', fa: 'گوشه',

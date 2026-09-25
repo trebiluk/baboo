@@ -6,7 +6,7 @@ export const UNIT_1 = {
   title: 'Unit 1 — Floor Plans & Scale',
   goal: 'Make one room that feels like a real size on the grid.',
   steps: [
-    'Open Settings. Turn on grid. Turn on snap.',
+    'Tap Snap, Straight, and Wall snap on the plan. They stay on.',
     'Sketch the rooms first — Tools → Sketch, then drag like a pencil.',
     'Tap the sketch → Trace, or draw the outside walls with two clicks.',
     'Place one door.',

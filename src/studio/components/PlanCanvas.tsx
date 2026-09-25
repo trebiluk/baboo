@@ -18,7 +18,7 @@ import { wallFootprintFlat } from '../lib/wallJoin';
 import { chamferPreview, nearestChamferable } from '../lib/chamfer';
 import { ADA, circleFitsInPoly } from '../lib/access';
 import { kitchenTriangle } from '../lib/architect';
-import { exteriorBounds } from '../lib/roof';
+import { exteriorBounds, roofStyleName } from '../lib/roof';
 import { roomType } from '../data/rooms';
 import type { FurnitureItem, Opening, Wall, Node, Room, DimItem, NoteItem, LandscapeItem, Locale } from '../types';
 import { t, tipLoc } from '../data/i18n';
@@ -34,6 +34,16 @@ import { DEFAULT_GUI_THEME } from '../data/themes';
 import { DEFAULT_SKILL_LEVEL, skillRank } from '../data/skill';
 import { furnitureLod } from '../lib/perf';
 import { useCanvasToolsPocket } from '../hooks/useCanvasToolsPocket';
+
+function zoomPlan(dir: 1 | -1) {
+  const s = useProjectStore.getState();
+  const old = s.zoom;
+  const z = Math.min(80, Math.max(8, dir > 0 ? old * 1.25 : old / 1.25));
+  const cx = s.viewport.w / 2;
+  const cy = s.viewport.h / 2;
+  const world = screenToWorld(cx, cy, s.panX, s.panY, old, 0, 0);
+  s.setPanZoom(cx - world.x * z, cy - world.y * z, z);
+}
 
 export function PlanCanvas() {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -1024,6 +1034,63 @@ export function PlanCanvas() {
           </button>
         </div>
       )}
+      <div className="plan-taps" role="toolbar" aria-label="Plan taps">
+        <button
+          type="button"
+          className="plan-tap aw-pressable"
+          aria-pressed={!!settings.snap}
+          onClick={() => useProjectStore.getState().setSettings({ snap: !settings.snap })}
+        >
+          {settings.snap ? t(tips, 'hint.snapOn') : t(tips, 'hint.snapOff')}
+        </button>
+        <button
+          type="button"
+          className="plan-tap aw-pressable"
+          aria-pressed={settings.ortho !== false}
+          onClick={() => useProjectStore.getState().setSettings({ ortho: settings.ortho === false })}
+        >
+          {settings.ortho !== false ? t(tips, 'chip.straight') : t(tips, 'chip.free')}
+        </button>
+        <button
+          type="button"
+          className="plan-tap aw-pressable"
+          aria-pressed={settings.osnap !== false}
+          onClick={() => useProjectStore.getState().setSettings({ osnap: settings.osnap === false })}
+        >
+          {settings.osnap !== false ? t(tips, 'hint.osnapOn') : t(tips, 'chip.wallsOff')}
+        </button>
+        <button
+          type="button"
+          className="plan-tap aw-pressable"
+          onClick={() => useProjectStore.getState().fitPlan()}
+        >
+          {t(tips, 'chrome.fit')}
+        </button>
+        <button
+          type="button"
+          className="plan-tap plan-tap-zoom aw-pressable"
+          aria-label={t(tips, 'chip.zoomOut')}
+          onClick={() => zoomPlan(-1)}
+        >
+          −
+        </button>
+        <button
+          type="button"
+          className="plan-tap plan-tap-zoom aw-pressable"
+          aria-label={t(tips, 'chip.zoomIn')}
+          onClick={() => zoomPlan(1)}
+        >
+          +
+        </button>
+        <button
+          type="button"
+          className="plan-tap aw-pressable"
+          aria-pressed={units === 'm'}
+          onClick={() => useProjectStore.getState().setSettings({ units: units === 'm' ? 'ft' : 'm' })}
+        >
+          {units === 'm' ? 'm' : 'ft'}
+        </button>
+      </div>
       {skillRank(skillLevel) < 3 && (
       <div className="canvas-hint">
         {tool === 'wall'
@@ -1078,6 +1145,7 @@ export function PlanCanvas() {
         gridSize={gridSize}
         locale={tips}
         updatedAt={doc.meta.updatedAt}
+        roof={settings.roofStyleId ? roofStyleName(settings.roofStyleId) : ''}
       />
       <PlanLoadChip
         objectCount={objectCount}
@@ -1550,13 +1618,14 @@ function PlanCompass({ zoom, units, locale }: { zoom: number; units: 'ft' | 'm';
 }
 
 function PlanSheet({
-  title, units, gridSize, locale, updatedAt,
+  title, units, gridSize, locale, updatedAt, roof,
 }: {
   title: string;
   units: 'ft' | 'm';
   gridSize: number;
   locale: Locale;
   updatedAt: string;
+  roof: string;
 }) {
   const square = units === 'm'
     ? `${Math.round(gridSize * 0.3048 * 100) / 100} m`
@@ -1570,6 +1639,7 @@ function PlanSheet({
   return (
     <div className="plan-sheet" aria-hidden="true">
       <strong className="plan-sheet-title">{title || 'Untitled Plan'}</strong>
+      <span>{roof ? `${t(locale, 'sheet.roof')} · ${roof}` : t(locale, 'sheet.roofNone')}</span>
       <span>{t(locale, 'sheet.scale')} · {t(locale, 'sheet.grid', { n: square })}</span>
       {date ? <span>{date}</span> : null}
     </div>

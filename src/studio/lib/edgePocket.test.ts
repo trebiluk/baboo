@@ -8,20 +8,32 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.1.4 one first step', () => {
-  it('chips 2.1.4 and keeps the plant and pocket notes', () => {
-    assert.equal(APP_VERSION, '2.1.4');
+describe('2.2.0 ten taps on the plan', () => {
+  it('chips 2.2.0 and keeps the first-step and plant notes', () => {
+    assert.equal(APP_VERSION, '2.2.0');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.2\.0'/);
     assert.match(changelog, /version:\s*'2\.1\.4'/);
     assert.match(changelog, /version:\s*'2\.1\.3'/);
-    assert.match(changelog, /version:\s*'2\.1\.1'/);
     assert.equal(t('en', 'coach.sketch.body').includes('Open Tools'), false);
-    assert.match(t('en', 'coach.sketch.body'), /Sketch on the left/);
+    assert.match(t('en', 'coach.trace.body'), /Trace on this card/);
+    assert.match(t('en', 'toast.boxClosed'), /\{w\}/);
+    assert.match(t('en', 'sheet.roofNone'), /not named/);
     for (const loc of LOCALES) {
       assert.equal(t(loc, 'coach.sketch.body').includes('Open Tools'), false);
+      assert.match(t(loc, 'toast.boxClosed'), /\{w\}/);
+      assert.ok(t(loc, 'chip.straight').length > 0);
+      assert.ok(t(loc, 'chip.zoomIn').length > 0);
     }
     const plan = readFileSync(join(studio, 'components/PlanCanvas.tsx'), 'utf8');
     assert.match(plan, /coachLeads/);
+    assert.match(plan, /className="plan-taps"/);
+    assert.match(plan, /sheet.roofNone/);
+    const coach = readFileSync(join(studio, 'components/CoachBanner.tsx'), 'utf8');
+    assert.match(coach, /selected.kind !== 'sketch'/);
+    assert.match(coach, /step.action === 'trace'/);
+    const skill = readFileSync(join(studio, 'data/skill.ts'), 'utf8');
+    assert.match(skill, /action: 'trace'/);
     const doll = readFileSync(join(studio, 'components/DollhouseCanvas.tsx'), 'utf8');
     assert.match(doll, /function DollPlant/);
   });
