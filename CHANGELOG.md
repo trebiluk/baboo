@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.1.4 — 2026-09-24 — One first step
+- The first card says Tap Sketch on the left. The extra Wall card stays hidden until a wall exists, so a new plan has one next action
+- After a sketch, the toast says it landed, then the card asks for a wall. Stark stays the default
+
 ## 2.1.3 — 2026-09-23 — Plant marks
 - A tree in the dollhouse is a trunk and a canopy, not a flat green dot
 - On the plan, a tree is a circle and a cross clipped to its spot, so it does not blob over the toolbar. Plant beds and paths stay inside their outlines

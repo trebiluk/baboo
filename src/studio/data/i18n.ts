@@ -612,13 +612,13 @@ export const STR: Record<string, Gloss> = {
     ti: 'መጀመርታ ነታ ገዛ ስኣል',
     fa: 'اول خانه را طرح بزن',
   }),
-  'coach.sketch.body': g('Open Tools, pick Sketch. Drag like a pencil. Architecture starts on paper.', {
-    es: 'Abre Herramientas, elige Boceto. Arrastra como lápiz. La arquitectura empieza en papel.',
-    cu: 'Abre Herramientas, escoge Boceto. Arrastra como lápiz. La arquitectura empieza en papel.',
-    uk: 'Відкрий Інструменти, обери Ескіз. Тягни як олівцем. Архітектура починається на папері.',
-    ru: 'Открой Инструменты, выбери Эскиз. Тяни как карандашом. Архитектура начинается на бумаге.',
-    ti: 'መሳርሒታት ክፈት፣ ስእሊ ምረጽ። ከም ብርዒ ስሓብ። ስነ-ህንጻ ኣብ ወረቐት ይጅምር።',
-    fa: 'ابزار را باز کن، طرح را برگزین. مثل مداد بکش. معماری از کاغذ شروع می‌شود.',
+  'coach.sketch.body': g('Tap Sketch on the left. Drag on the grid like a pencil.', {
+    es: 'Toca Boceto a la izquierda. Arrastra en la cuadrícula como un lápiz.',
+    cu: 'Toca Boceto a la izquierda. Arrastra en la cuadrícula como un lápiz.',
+    uk: 'Торкнись Ескіз ліворуч. Тягни по сітці як олівцем.',
+    ru: 'Нажми Эскиз слева. Тяни по сетке как карандашом.',
+    ti: 'ኣብ ጸጋም ስእሊ ጠውቕ። ኣብቲ ፍርግድ ከም ብርዒ ስሓብ።',
+    fa: 'طرح را سمت چپ بزن. روی شبکه مثل مداد بکش.',
   }),
   'coach.trace.title': g('Now hard-line a wall', {
     es: 'Ahora traza un muro derecho',
@@ -1089,13 +1089,13 @@ export const STR: Record<string, Gloss> = {
     es: 'quiere decir', cu: 'quiere decir', uk: 'означає', ru: 'значит', ti: 'ትርጉማ', fa: 'یعنی',
   }),
 
-  'help.lead': g('Sketch first, then two clicks make a wall. Open Tools on the left if you get stuck.', {
-    es: 'Primero boceto, luego dos clics hacen un muro. Abre Herramientas a la izquierda si te atoras.',
-    cu: 'Primero boceto, luego dos toques hacen una pared. Abre Herramientas a la izquierda si te atoras.',
-    uk: 'Спочатку ескіз, потім два кліки роблять стіну. Відкрий Інструменти ліворуч, якщо застряг.',
-    ru: 'Сначала эскиз, потом два клика делают стену. Открой Инструменты слева, если застрял.',
-    ti: 'መጀመርታ ስእሊ፣ ድሕሪኡ ክልተ ጠውቕታት መንደቕ ይገብሩ. እንተ ተሓንኪኻ ኣብ ጸጋም መሳርሒታት ክፈት.',
-    fa: 'اول طرح، بعد دو کلیک دیوار می‌سازد. اگر گیر کردی ابزار سمت چپ را باز کن.',
+  'help.lead': g('Tap Sketch on the left and drag. Two clicks make a wall.', {
+    es: 'Toca Boceto a la izquierda y arrastra. Dos clics hacen un muro.',
+    cu: 'Toca Boceto a la izquierda y arrastra. Dos toques hacen una pared.',
+    uk: 'Торкнись Ескіз ліворуч і тягни. Два кліки роблять стіну.',
+    ru: 'Нажми Эскиз слева и тяни. Два клика делают стену.',
+    ti: 'ኣብ ጸጋም ስእሊ ጠውቕ እሞ ስሓብ። ክልተ ጠውቕታት መንደቕ ይገብሩ።',
+    fa: 'طرح را سمت چپ بزن و بکش. دو کلیک دیوار می‌سازد.',
   }),
 
   'udl.title': g('Help for everyone', {

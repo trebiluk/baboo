@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.1.4',
+    date: '2026-09-24',
+    bullets: [
+      'The first card says tap Sketch on the left. The extra Wall card stays off until you have a wall, so there is one next step',
+      'When the sketch lands, the toast says so, then the card asks for a wall. Stark stays the default',
+    ],
+  },
+  {
     version: '2.1.3',
     date: '2026-09-23',
     bullets: [

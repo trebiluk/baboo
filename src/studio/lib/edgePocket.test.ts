@@ -8,19 +8,22 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.1.3 plant marks', () => {
-  it('chips 2.1.3 and draws a tree, not a green dot', () => {
-    assert.equal(APP_VERSION, '2.1.3');
+describe('2.1.4 one first step', () => {
+  it('chips 2.1.4 and keeps the plant and pocket notes', () => {
+    assert.equal(APP_VERSION, '2.1.4');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.1\.4'/);
     assert.match(changelog, /version:\s*'2\.1\.3'/);
-    assert.match(changelog, /version:\s*'2\.1\.2'/);
     assert.match(changelog, /version:\s*'2\.1\.1'/);
-    const doll = readFileSync(join(studio, 'components/DollhouseCanvas.tsx'), 'utf8');
-    assert.equal(doll.includes('radius={18}'), false);
-    assert.match(doll, /function DollPlant/);
+    assert.equal(t('en', 'coach.sketch.body').includes('Open Tools'), false);
+    assert.match(t('en', 'coach.sketch.body'), /Sketch on the left/);
+    for (const loc of LOCALES) {
+      assert.equal(t(loc, 'coach.sketch.body').includes('Open Tools'), false);
+    }
     const plan = readFileSync(join(studio, 'components/PlanCanvas.tsx'), 'utf8');
-    assert.match(plan, /clipFunc/);
-    assert.equal(plan.includes('radius={r * 0.62}'), false);
+    assert.match(plan, /coachLeads/);
+    const doll = readFileSync(join(studio, 'components/DollhouseCanvas.tsx'), 'utf8');
+    assert.match(doll, /function DollPlant/);
   });
 
   it('long-press matches a right-click hold', () => {

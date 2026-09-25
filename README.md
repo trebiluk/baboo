@@ -4,7 +4,7 @@ Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 
 **© 2026 Richard Kulibert Jr.**
 
-**Version 2.1.3** — Trees are a trunk and a canopy in the dollhouse. On the plan, a tree is a circle and a cross that stays inside its spot. Stark stays the default.
+**Version 2.1.4** — A new plan has one next step: tap Sketch on the left. Stark stays the default.
 
 Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the top chip. Plans save on the device as `.archworks.json`.
 

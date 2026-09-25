@@ -231,7 +231,7 @@ export function nextCoach(level: SkillLevel, floor: Floor, styleId?: string): Co
     return {
       id: 'sketch',
       title: 'Sketch the house first',
-      body: 'Open Tools, pick Sketch. Drag like a pencil. Architecture starts on paper.',
+      body: 'Tap Sketch on the left. Drag on the grid like a pencil.',
       tool: 'sketch',
     };
   }
@@ -290,7 +290,7 @@ export function nextCoach(level: SkillLevel, floor: Floor, styleId?: string): Co
 }
 
 export const NOVICE_UNIT_STEPS = [
-  'Open Tools on the left. Pick Sketch — draw the rooms like a pencil.',
+  'Tap Sketch on the left. Drag on the grid like a pencil.',
   'Tap the sketch → Trace, or pick Wall and hard-line over it.',
   'Pick Door. Click on one wall so we can walk in.',
   'Read the size labels. Do they feel like a real room?',

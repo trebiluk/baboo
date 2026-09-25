@@ -543,7 +543,8 @@ export function PlanCanvas() {
   const selectedGrips = selectedWall ? wallGripPoints(selectedWall, floor.nodes) : null;
 
   const skillLevel = settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
-  const showWallCta = skillRank(skillLevel) <= 2 && floor.walls.length === 0 && !wallCtaDismissed && !wallDraft;
+  const coachLeads = skillRank(skillLevel) <= 1 && floor.walls.length === 0;
+  const showWallCta = !coachLeads && skillRank(skillLevel) <= 2 && floor.walls.length === 0 && !wallCtaDismissed && !wallDraft;
   const objectCount =
     floor.nodes.length +
     floor.walls.length +
