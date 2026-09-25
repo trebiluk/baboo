@@ -47,6 +47,8 @@ export type MassOpts = {
   lod?: FurnLod;
   /** Storey height in feet. Default WALL_H (9). */
   wallH?: number;
+  /** Flat plaster lid for walkthrough. Orbit stays open so rooms read from above. */
+  ceiling?: boolean;
 };
 
 export const ROOF_MAT: Record<string, { fill: string; shade: string; edge: string }> = {
@@ -98,6 +100,14 @@ export function faceNormal(pts: Vec3[]): Vec3 {
   return norm(cross(sub(pts[1], pts[0]), sub(pts[2], pts[0])));
 }
 
+/** Flip a face so its normal points away from `inside`. */
+export function facingOut(pts: Vec3[], inside: Vec3): Vec3[] {
+  const n = faceNormal(pts);
+  const c = centroid3(pts);
+  if (dot(n, sub(c, inside)) < 0) return [...pts].reverse();
+  return pts;
+}
+
 export function centroid3(pts: Vec3[]): Vec3 {
   let x = 0, y = 0, z = 0;
   for (const p of pts) { x += p.x; y += p.y; z += p.z; }
@@ -139,6 +149,15 @@ export function project(p: Vec3, cam: Cam3, w: number, h: number): { x: number; 
   return { x: w / 2 + sx * k, y: h / 2 - sy * k, depth: sz };
 }
 
+/** Screen y of the ground horizon. A square yard always reads as a diamond. */
+export function horizonY(cam: Cam3, w: number, h: number): number {
+  const { up, forward } = camBasis(cam);
+  const focal = Math.min(w, h) * 0.72;
+  if (Math.abs(up.z) < 1e-3) return h * 0.42;
+  const y = h / 2 + (forward.z / up.z) * focal;
+  return Math.max(-h, Math.min(h * 2, y));
+}
+
 export function defaultCam(floor: Floor, walk: boolean): Cam3 {
   const b = exteriorBounds(floor.nodes, floor.walls);
   const cx = b?.cx ?? 12;
@@ -154,10 +173,10 @@ export function defaultCam(floor: Floor, walk: boolean): Cam3 {
     };
   }
   return {
-    target: { x: cx, y: cy, z: 4 },
+    target: { x: cx, y: cy, z: 5.2 },
     yaw: Math.PI * 0.28,
-    pitch: 0.46,
-    dist: span * 1.35 + 18,
+    pitch: 0.5,
+    dist: Math.max(16, span * 0.92 + 6),
     walk: false,
   };
 }
@@ -215,16 +234,6 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
   const cx = (minX + maxX) / 2;
   const cy = (minY + maxY) / 2;
 
-  const yardPad = 12;
-  faces.push(quad(
-    v3(minX - yardPad, minY - yardPad, 0),
-    v3(maxX + yardPad, minY - yardPad, 0),
-    v3(maxX + yardPad, maxY + yardPad, 0),
-    v3(minX - yardPad, maxY + yardPad, 0),
-    site.ground,
-    site.edge,
-    'yard',
-  ));
   const loops = listInteriorFaces(floor.nodes, floor.walls);
   if (loops.length) {
     for (const loop of loops) {
@@ -284,6 +293,26 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
         stroke: opts.blocky ? '#1a1208' : floorFinish(fid).color,
         kind: 'floor',
         pattern: opts.blocky ? undefined : fid,
+      });
+    }
+  }
+
+  if (opts.ceiling) {
+    const polys = loops.length
+      ? loops.map((loop) => loop.poly)
+      : (b ? [[
+        { x: minX, y: minY },
+        { x: maxX, y: minY },
+        { x: maxX, y: maxY },
+        { x: minX, y: maxY },
+      ]] : []);
+    for (const poly of polys) {
+      if (poly.length < 3) continue;
+      faces.push({
+        pts: poly.map((pt) => v3(pt.x, pt.y, wallH - 0.08)),
+        fill: '#F4EFE6',
+        stroke: '#E4D9C8',
+        kind: 'slab',
       });
     }
   }
@@ -373,7 +402,7 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
     }
   }
 
-  if (floor.roof) faces.push(...roofFaces(floor.roof, opts.blocky));
+  if (floor.roof) faces.push(...roofFaces(floor.roof, opts.blocky, tint.fill));
 
   if (opts.showFurn) {
     const lod = opts.lod ?? 'full';
@@ -450,7 +479,24 @@ function projectOntoGround(p: Vec3, sun: Vec3): Vec3 {
   return { x: p.x - sun.x * t, y: p.y - sun.y * t, z: 0 };
 }
 
-function roofFaces(roof: RoofGeometry, blocky: boolean): MassFace[] {
+function soffitUnder(out: MassFace[], eaves: Vec3[], inside: Vec3, stroke: string) {
+  if (eaves.length < 3) return;
+  const z = eaves[0].z - 0.06;
+  const inner = eaves.map((p) => {
+    const dx = inside.x - p.x;
+    const dy = inside.y - p.y;
+    const ix = Math.abs(dx) < 0.25 ? 0 : Math.sign(dx) * Math.min(1, Math.abs(dx) * 0.45);
+    const iy = Math.abs(dy) < 0.25 ? 0 : Math.sign(dy) * Math.min(1, Math.abs(dy) * 0.45);
+    return v3(p.x + ix, p.y + iy, z);
+  });
+  const outer = eaves.map((p) => v3(p.x, p.y, z));
+  for (let i = 0; i < eaves.length; i++) {
+    const j = (i + 1) % eaves.length;
+    out.push(quad(outer[i], outer[j], inner[j], inner[i], '#E7E1D4', stroke, 'slab'));
+  }
+}
+
+function roofFaces(roof: RoofGeometry, blocky: boolean, wallFill?: string): MassFace[] {
   const mat = ROOF_MAT[roof.styleId] ?? ROOF_MAT.gable;
   const stroke = blocky ? '#1a1208' : mat.edge;
   const eh = roof.eavesHeight;
@@ -490,12 +536,33 @@ function roofFaces(roof: RoofGeometry, blocky: boolean): MassFace[] {
     const p1 = v3(o[1].x, o[1].y, eh);
     const p2 = v3(o[2].x, o[2].y, eh);
     const p3 = v3(o[3].x, o[3].y, eh);
+    const ocx = (p0.x + p1.x + p2.x + p3.x) / 4;
+    const ocy = (p0.y + p1.y + p2.y + p3.y) / 4;
+    const inside = v3(ocx, ocy, (eh + rh) * 0.5);
+    const gable = wallFill ?? mat.shade;
     if (roof.longAxis === 'x') {
       out.push(quad(p0, p1, rb, ra, mat.fill, stroke, 'roof'));
       out.push(quad(p3, p2, rb, ra, mat.shade, stroke, 'roof'));
     } else {
       out.push(quad(p0, p3, ra, rb, mat.fill, stroke, 'roof'));
       out.push(quad(p1, p2, rb, ra, mat.shade, stroke, 'roof'));
+    }
+    if (roof.styleId === 'gable' || roof.styleId === 'gambrel') {
+      const ends = roof.longAxis === 'x'
+        ? [[p0, p3, ra], [p1, p2, rb]]
+        : [[p0, p1, ra], [p3, p2, rb]];
+      for (const pts of ends) {
+        out.push({ pts: facingOut(pts, inside), fill: gable, stroke, kind: 'wall' });
+      }
+      soffitUnder(out, [p0, p1, p2, p3], inside, stroke);
+    } else if (roof.styleId === 'hip' || roof.styleId === 'mansard') {
+      const ends = roof.longAxis === 'x'
+        ? [[p0, p3, ra], [p1, p2, rb]]
+        : [[p0, p1, ra], [p3, p2, rb]];
+      for (const pts of ends) {
+        out.push({ pts: facingOut(pts, inside), fill: mat.shade, stroke, kind: 'roof' });
+      }
+      soffitUnder(out, [p0, p1, p2, p3], inside, stroke);
     }
     if (roof.styleId === 'gambrel' && roof.breaks.length >= 2) {
       const br = roof.breaks[0];

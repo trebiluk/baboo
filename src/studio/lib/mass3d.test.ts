@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildMass, camBasis, defaultCam, project, projectFaces, sunDir, walkForward } from './mass3d.ts';
+import { buildMass, camBasis, centroid3, defaultCam, dot, faceNormal, horizonY, project, projectFaces, sunDir, walkForward } from './mass3d.ts';
+import { generateRoof } from './roof.ts';
 import type { Floor, Node, Opening, Wall } from '../types';
 
 function boxFloor(w: number, h: number): Floor {
@@ -61,8 +62,30 @@ describe('mass3d', () => {
     const faces = buildMass(boxFloor(12, 10), opts);
     const walls = faces.filter((f) => f.kind === 'wall');
     assert.ok(walls.length >= 8, `walls ${walls.length}`);
-    assert.ok(faces.some((f) => f.kind === 'yard'));
+    assert.equal(faces.some((f) => f.kind === 'yard'), false);
     assert.ok(faces.some((f) => f.kind === 'slab'));
+  });
+
+  it('gable ends face out and walk gets a ceiling', () => {
+    const floor = boxFloor(16, 10);
+    floor.roof = generateRoof(floor.nodes, floor.walls, 'gable');
+    const faces = buildMass(floor, opts);
+    const gables = faces.filter((f) => f.kind === 'wall' && f.pts.length === 3 && f.pts.some((p) => p.z > 10));
+    assert.ok(gables.length >= 2, `gable triangles ${gables.length}`);
+    for (const g of gables) {
+      const n = faceNormal(g.pts);
+      const c = centroid3(g.pts);
+      assert.ok(dot(n, { x: c.x - 8, y: c.y - 5, z: 0 }) > 0.2);
+    }
+    const cam = defaultCam(floor, false);
+    const y = horizonY(cam, 900, 520);
+    assert.ok(y > 20 && y < 280, `horizon ${y}`);
+    const walk = buildMass(floor, { ...opts, ceiling: true });
+    const open = buildMass(floor, opts);
+    const lids = (list: { kind: string; fill: string; pts: { z: number }[] }[]) =>
+      list.filter((f) => f.kind === 'slab' && f.fill === '#F4EFE6' && f.pts[0].z > 8);
+    assert.ok(lids(walk).length >= 1);
+    assert.equal(lids(open).length, 0);
   });
 
   it('cuts glass for a window', () => {

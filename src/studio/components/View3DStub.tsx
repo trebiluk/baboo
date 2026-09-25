@@ -14,6 +14,7 @@ import {
   type Cam3,
   buildMass,
   defaultCam,
+  horizonY,
   projectFaces,
   walkForward,
 } from '../lib/mass3d';
@@ -167,7 +168,8 @@ export function View3DStub() {
     floorGrain: asFloorGrain(settings.floorGrain),
     lod,
     wallH: asWallHeightFt(settings.wallHeight),
-  }), [skyId, siteId, tintId, showFurn, materials, lighting, blocky, settings.floorFinishId, settings.floorGrain, settings.wallHeight, lod]);
+    ceiling: walk,
+  }), [skyId, siteId, tintId, showFurn, materials, lighting, blocky, settings.floorFinishId, settings.floorGrain, settings.wallHeight, lod, walk]);
 
   const mass = useMemo(() => buildMass(floor, opts), [floor, opts]);
   const painted = useMemo(
@@ -261,10 +263,20 @@ export function View3DStub() {
             ))}
           </defs>
           <rect width={size.w} height={size.h} fill={`url(#${skyGrad})`} />
-          {lighting && skyId === 'dusk' ? (
+          <rect
+            x={0}
+            y={Math.min(size.h, Math.max(-size.h, horizonY(cam, size.w, size.h)))}
+            width={size.w}
+            height={size.h * 2}
+            fill={materials && lod === 'full' ? 'url(#aw3d-grass)' : site.ground}
+          />
+          {lighting && !walk && skyId === 'dusk' ? (
             <circle cx={size.w * 0.78} cy={size.h * 0.18} r="22" fill="#E8B07A" opacity="0.85" />
-          ) : lighting && skyId === 'day' ? (
-            <circle cx={size.w * 0.82} cy={size.h * 0.12} r="16" fill="#FFF4C8" opacity="0.9" />
+          ) : lighting && !walk && skyId === 'day' ? (
+            <>
+              <circle cx={size.w * 0.82} cy={size.h * 0.12} r="36" fill="#FFF6D0" opacity="0.28" />
+              <circle cx={size.w * 0.82} cy={size.h * 0.12} r="16" fill="#FFF4C8" opacity="0.92" />
+            </>
           ) : null}
           <rect x="0" y={size.h * 0.52} width={size.w} height={size.h * 0.16} fill={sky.fog} opacity="0.28" />
           {painted.map((p, i) => (

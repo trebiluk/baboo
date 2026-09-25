@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.2.2 — 2026-09-25 — A closed house in 3D
+- 3D closes the gable ends and tucks a soffit under the eaves
+- The yard is a field to the horizon, not a diamond of grass. Walkthrough has a ceiling so the sun stays outside
+- On a phone the version chip sits above the scale. Stark stays the default
+
 ## 2.2.1 — 2026-09-25 — Name the roof, keep the sheet
 - Roof is a tap on the plan. Pick a real word: gable, hip, shed, flat, and the rest
 - The title block sits above the coach so it is not covered. The tap row stays one line and leaves the north arrow clear

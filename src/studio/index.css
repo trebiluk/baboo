@@ -1446,6 +1446,28 @@ html[data-ell-english] {
   flex-wrap:wrap;
   gap:6px
 }
+@media (max-width: 800px) {
+  .view3d-hud {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .view3d-hint {
+    flex: none;
+    text-align: start;
+    line-height: 1.35;
+  }
+  .view3d-hud-btns {
+    width: 100%;
+  }
+  .view3d-hud-btns .ghost-btn {
+    flex: 1 1 42%;
+    min-height: 44px;
+  }
+  .app-shell.is-phone .plan-compass {
+    top: 52px;
+  }
+}
 .view3d-stub .solid-preview {
   min-height:280px
 }

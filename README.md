@@ -4,7 +4,7 @@ Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 
 **© 2026 Richard Kulibert Jr.**
 
-**Version 2.2.1** — Roof is a tap on the plan. The title block stays above the coach. Stark stays the default.
+**Version 2.2.2** — 3D closes the gable. The yard meets the horizon. Stark stays the default.
 
 Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the top chip. Plans save on the device as `.archworks.json`.
 

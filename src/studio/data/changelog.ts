@@ -11,6 +11,15 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.2.2',
+    date: '2026-09-25',
+    bullets: [
+      '3D closes the gable ends and tucks a soffit under the eaves',
+      'The yard is a field to the horizon, not a diamond of grass. Walkthrough has a ceiling',
+      'On a phone the version chip sits above the scale. Stark stays the default',
+    ],
+  },
+  {
     version: '2.2.1',
     date: '2026-09-25',
     bullets: [
