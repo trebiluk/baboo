@@ -4588,4 +4588,93 @@ html:not([data-gui-theme="ink"]) {
   box-shadow:0 -10px 28px #0a0a0a1a
 }
 
+/* 2.2.8 — one ribbon. Plan taps and dollhouse controls share it. */
+.aw-ribbon {
+  display:flex;
+  flex-flow:row nowrap;
+  align-items:center;
+  gap:2px;
+  width:max-content;
+  max-width:calc(100% - 168px);
+  overflow-x:auto;
+  overscroll-behavior-x:contain;
+  scrollbar-width:none;
+  background:var(--aw-elevated, #fff);
+  border:1px solid var(--aw-border);
+  border-radius:12px;
+  padding:3px;
+  box-shadow:0 1px 2px #0a0a0a0c
+}
+.plan-taps.aw-ribbon {
+  left:64px;
+  right:auto;
+  top:8px
+}
+.doll-proj.aw-ribbon {
+  left:64px;
+  right:auto;
+  top:8px;
+  flex-direction:row;
+  max-width:calc(100% - 80px)
+}
+.doll-proj-row {
+  display:flex;
+  flex-flow:row nowrap;
+  gap:2px
+}
+.doll-chip {
+  min-height:44px;
+  min-width:44px;
+  border:none;
+  border-radius:8px;
+  background:transparent;
+  box-shadow:none;
+  font-size:13px;
+  font-weight:600
+}
+.doll-chip.active {
+  background:color-mix(in srgb, var(--aw-royal) 16%, #fff);
+  color:var(--aw-deep);
+  border-color:transparent
+}
+.doll-proj-lesson {
+  position:absolute;
+  top:calc(100% + 8px);
+  left:0;
+  right:auto;
+  margin:0;
+  max-width:min(320px, calc(100vw - 96px));
+  pointer-events:none
+}
+.app-shell.is-phone .plan-taps.aw-ribbon,
+.app-shell.is-phone .doll-proj.aw-ribbon {
+  top:52px;
+  left:64px;
+  right:auto;
+  max-width:calc(100% - 76px)
+}
+.app-shell.is-phone:has(.chrome.is-hidden) .plan-taps.aw-ribbon,
+.app-shell.is-phone:has(.chrome.is-hidden) .doll-proj.aw-ribbon {
+  top:8px
+}
+.app-shell.is-phone .doll-proj-lesson {
+  top:calc(100% + 8px)
+}
+.app-shell.is-phone .plan-compass {
+  top:108px
+}
+.app-shell.is-phone:has(.chrome.is-hidden) .plan-compass {
+  top:60px
+}
+.app-shell.is-phone .canvas-hint {
+  left:64px;
+  right:88px;
+  max-width:none
+}
+.app-shell.is-phone .ver-float {
+  top:auto;
+  right:8px;
+  bottom:max(8px, env(safe-area-inset-bottom, 0px))
+}
+
 

@@ -605,7 +605,7 @@ export function DollhouseCanvas() {
           })}
         </Layer>
       </Stage>
-      <div className="doll-proj" role="toolbar" aria-label={t(settings.locale, 'doll.proj')}>
+      <div className="doll-proj aw-ribbon" role="toolbar" aria-label={t(settings.locale, 'doll.proj')}>
         <div className="doll-proj-row">
           {DOLL_PROJS.map((p) => (
             <button

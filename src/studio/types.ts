@@ -1,4 +1,4 @@
-export type Tool = 'select' | 'sketch' | 'wall' | 'door' | 'window' | 'furniture' | 'room' | 'dim' | 'note' | 'plant' | 'pan';
+export type Tool = 'select' | 'sketch' | 'wall' | 'box' | 'door' | 'window' | 'furniture' | 'room' | 'dim' | 'note' | 'plant' | 'pan';
 export type ViewMode = 'plan' | 'dollhouse' | 'solid3d' | 'materials' | 'lighting' | 'walkthrough';
 export type RenderTier = 0 | 1 | 2 | 3;
 export type DollProj = 'iso' | 'oblique' | 'elevation' | 'ortho';

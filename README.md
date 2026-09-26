@@ -4,7 +4,7 @@ Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 
 **© 2026 Richard Kulibert Jr.**
 
-**Version 2.2.7** — Every house object has its own vector. Paint is the color. 3D shows the texture.
+**Version 2.2.8** — Box closes a room in two clicks. Plan and dollhouse share one ribbon.
 
 Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the top chip. Plans save on the device as `.archworks.json`.
 

@@ -57,6 +57,9 @@ export const STR: Record<string, Gloss> = {
   'tool.wall': g('Wall', {
     es: 'Muro (Wall)', cu: 'Pared (Wall)', uk: 'Стіна (Wall)', ru: 'Стена (Wall)', ti: 'መንደቕ (Wall)', fa: 'دیوار (Wall)',
   }),
+  'tool.box': g('Box', {
+    es: 'Caja (Box)', cu: 'Caja (Box)', uk: 'Коробка (Box)', ru: 'Коробка (Box)', ti: 'ሳጹን (Box)', fa: 'جعبه (Box)',
+  }),
   'tool.door': g('Door', {
     es: 'Puerta (Door)', cu: 'Puerta (Door)', uk: 'Двері (Door)', ru: 'Дверь (Door)', ti: 'ማዕጾ (Door)', fa: 'در (Door)',
   }),
@@ -237,6 +240,22 @@ export const STR: Record<string, Gloss> = {
     ru: 'Кликни, где стена кончается',
     ti: 'ኣብቲ መንደቕ ዝውዳእ ጠውቕ',
     fa: 'جایی که دیوار تمام می‌شود کلیک کن',
+  }),
+  'hint.box': g('Box → one corner, then the opposite corner', {
+    es: 'Caja (Box) → una esquina, luego la esquina de enfrente',
+    cu: 'Caja (Box) → una esquina, luego la esquina de enfrente',
+    uk: 'Коробка (Box) → один кут, потім протилежний',
+    ru: 'Коробка (Box) → один угол, потом противоположный',
+    ti: 'ሳጹን (Box) → ሓደ ኩርናዕ፡ ድሕሪኡ እቲ ዝመጣጠን',
+    fa: 'جعبه (Box) → یک گوشه، بعد گوشهٔ روبه‌رو',
+  }),
+  'hint.box.end': g('Click the opposite corner', {
+    es: 'Clic en la esquina de enfrente',
+    cu: 'Toca la esquina de enfrente',
+    uk: 'Клікни протилежний кут',
+    ru: 'Кликни противоположный угол',
+    ti: 'ነቲ ዝመጣጠን ኩርናዕ ጠውቕ',
+    fa: 'گوشهٔ روبه‌رو را کلیک کن',
   }),
   'hint.clip': g('Clip → click a sharp corner', {
     es: 'Recorte → clic en una esquina aguda',
@@ -644,13 +663,13 @@ export const STR: Record<string, Gloss> = {
     ti: 'ነታ ሳጹን ዕጸው',
     fa: 'جعبه را ببند',
   }),
-  'coach.close.body': g('Keep going until the walls meet. That’s when it becomes a room.', {
-    es: 'Sigue hasta que los muros se junten. Ahí se vuelve un cuarto.',
-    cu: 'Sigue hasta que las paredes se junten. Ahí se vuelve un cuarto.',
-    uk: 'Продовжуй, доки стіни зійдуться. Тоді це стане кімнатою.',
-    ru: 'Продолжай, пока стены не сойдутся. Тогда это станет комнатой.',
-    ti: 'መናድቕ ክሳብ ዝራኸባ ቀጽል። ሽዑ ክፍሊ ይኸውን።',
-    fa: 'ادامه بده تا دیوارها به هم برسند. همان‌جا اتاق می‌شود.',
+  'coach.close.body': g('Tap Box, then two corners. Baboo draws the four walls.', {
+    es: 'Toca Caja (Box), luego dos esquinas. Baboo dibuja las cuatro paredes.',
+    cu: 'Toca Caja (Box), luego dos esquinas. Baboo dibuja las cuatro paredes.',
+    uk: 'Торкнись Коробка (Box), потім два кути. Baboo малює чотири стіни.',
+    ru: 'Нажми Коробка (Box), потом два угла. Baboo рисует четыре стены.',
+    ti: 'ሳጹን (Box) ጠውቕ፡ ድሕሪኡ ክልተ ኩርናዓት። Baboo ኣርባዕተ መናድቕ ትስእል።',
+    fa: 'جعبه (Box) را بزن، بعد دو گوشه. بابو چهار دیوار می‌کشد.',
   }),
   'coach.door.title': g('Add a door so we can walk in', {
     es: 'Pon una puerta para entrar',

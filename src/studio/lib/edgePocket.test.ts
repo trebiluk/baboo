@@ -8,10 +8,11 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.2.7 object pictures', () => {
-  it('chips 2.2.7 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.2.7');
+describe('2.2.8 box and ribbon', () => {
+  it('chips 2.2.8 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.2.8');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.2\.8'/);
     assert.match(changelog, /version:\s*'2\.2\.7'/);
     assert.match(changelog, /version:\s*'2\.2\.6'/);
     assert.match(changelog, /version:\s*'2\.2\.5'/);
@@ -86,6 +87,11 @@ describe('2.2.7 object pictures', () => {
     assert.match(css, /is-phone \.chrome/);
     assert.match(css, /chrome\.is-hidden/);
     assert.match(chrome, /requestFullscreen/);
+    assert.match(css, /\.aw-ribbon/);
+    const rail = readFileSync(join(studio, 'components/ToolRail.tsx'), 'utf8');
+    assert.match(rail, /id: 'box'/);
+    assert.match(t('en', 'coach.close.body'), /Tap Box/);
+    assert.match(t('en', 'tool.box'), /Box/);
   });
 
   it('Wall flyout is docked to the Wall chip, not a permanent rail', () => {

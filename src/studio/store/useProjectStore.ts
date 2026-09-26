@@ -17,6 +17,7 @@ import {
   nodesAfterWallEnd, nodesAfterWallLength, wallEnds, formatLength,
 } from '../lib/geometry';
 import { chamferCorner, nearestChamferable } from '../lib/chamfer';
+import { boxCorners } from '../lib/boxWalls';
 import { findEnclosedFace, formatArea, hitRoom, polygonArea, listInteriorFaces } from '../lib/rooms';
 import { DEFAULT_ROOM_KIND, roomType } from '../data/rooms';
 import { defaultFloorForKind } from '../data/flooring';
@@ -191,6 +192,7 @@ interface Store {
   /** `exact` means the canvas already resolved an object snap — do not re-snap. */
   beginWall: (p: Point, exact?: boolean) => void;
   finishWall: (p: Point, ortho?: boolean, exact?: boolean) => void;
+  commitBox: (p: Point, exact?: boolean) => void;
   chamferAt: (p: Point) => void;
   cancelWallDraft: () => void;
   placeOpening: (type: 'door' | 'window', p: Point) => void;
@@ -1001,6 +1003,69 @@ export const useProjectStore = create<Store>((set, get) => ({
       wallDraft: null,
     });
     get().markDirty(endPt);
+    if (!toastIfJustClosed(get, beforeFloor)) {
+      get().showToast(t(tip(get), 'toast.wallIn'), 2400, 'ok');
+    }
+  },
+  commitBox: (p, exact) => {
+    const { wallDraft, doc } = get();
+    if (!wallDraft) return;
+    if (get().floor().walls.length + 4 > 40) {
+      set({ wallDraft: null });
+      get().showCapToast('walls');
+      return;
+    }
+    const s = doc.settings;
+    const end = exact ? p : snapPoint(p, s.gridSize, s.snap);
+    const corners = boxCorners(wallDraft, end);
+    if (!corners) {
+      set({ wallDraft: null });
+      get().showToast(t(tip(get), 'toast.wallShort'), 2800, 'miss');
+      return;
+    }
+    const beforeFloor = get().floor();
+    get().pushHistory();
+    const merge = s.snap ? s.gridSize * 0.4 : 0.35;
+    const kind = get().wallKind;
+    set({
+      doc: withFloor(doc, (f) => {
+        let nodes = [...f.nodes];
+        let walls = [...f.walls];
+        let openings = [...f.openings];
+        const ids: string[] = [];
+        for (const c of corners) {
+          const res = findOrCreateNode(nodes, c, merge);
+          nodes = res.nodes;
+          ids.push(res.id);
+        }
+        for (let i = 0; i < 4; i++) {
+          const a = ids[i];
+          const b = ids[(i + 1) % 4];
+          if (!a || !b || a === b) continue;
+          const dup = walls.some(
+            (w) => (w.a === a && w.b === b) || (w.a === b && w.b === a),
+          );
+          if (dup) continue;
+          ({ walls, openings } = splitWallsAtNode(walls, openings, nodes, a, merge));
+          ({ walls, openings } = splitWallsAtNode(walls, openings, nodes, b, merge));
+          walls.push({
+            id: uid('w'),
+            a,
+            b,
+            kind,
+            thickness: get().wallThickness,
+            drawStyle: get().wallDrawStyle,
+          });
+        }
+        return refreshRoof(
+          { ...f, nodes, walls, openings },
+          get().doc.settings.roofStyleId ?? null,
+          get().doc.settings.wallHeight,
+        );
+      }),
+      wallDraft: null,
+    });
+    get().markDirty(end);
     if (!toastIfJustClosed(get, beforeFloor)) {
       get().showToast(t(tip(get), 'toast.wallIn'), 2400, 'ok');
     }

@@ -132,6 +132,7 @@ export default function App() {
       } else if (e.key.toLowerCase() === 'v') setTool('select');
       else if (e.key.toLowerCase() === 's') { if (viewMode === 'plan') setTool('sketch'); }
       else if (e.key.toLowerCase() === 'w') { if (viewMode === 'plan') setTool('wall'); }
+      else if (e.key.toLowerCase() === 'b') { if (viewMode === 'plan') setTool('box'); }
       else if (e.key.toLowerCase() === 'd') { if (viewMode === 'plan') setTool('door'); }
       else if (e.key.toLowerCase() === 'n') { if (viewMode === 'plan') setTool('window'); }
       else if (e.key.toLowerCase() === 'f') { if (viewMode === 'plan' || viewMode === 'dollhouse') setTool('furniture'); }

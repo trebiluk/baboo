@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.2.8 — 2026-09-26 — Box and one ribbon
+- Box draws a room in two clicks. Wall still draws one line
+- Plan taps and dollhouse controls share one ribbon
+- The version chip no longer sits on the hint
+
 ## 2.2.7 — 2026-09-26 — Object pictures
 - Every house object has its own scalable vector picture
 - Paint changes the color. Porcelain, metal, and glass stay themselves

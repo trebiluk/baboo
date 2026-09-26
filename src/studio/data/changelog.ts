@@ -11,6 +11,15 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.2.8',
+    date: '2026-09-26',
+    bullets: [
+      'Box draws a room in two clicks. Wall still draws one line',
+      'Plan taps and dollhouse controls share one ribbon',
+      'The version chip no longer sits on the hint',
+    ],
+  },
+  {
     version: '2.2.7',
     date: '2026-09-26',
     bullets: [

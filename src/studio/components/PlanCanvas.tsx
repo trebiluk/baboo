@@ -4,6 +4,7 @@ import Konva from 'konva';
 import { useProjectStore } from '../store/useProjectStore';
 import { useDebugStore } from '../store/useDebugStore';
 import { formatLength, nearestWall, parseFeet, pointOnWall, readableAngle, screenToWorld, wallAngle, wallEnds, wallLength, dist, hitWallGrip, wallGripPoints } from '../lib/geometry';
+import { boxCorners } from '../lib/boxWalls';
 import {
   headingDeg,
   polarPoint,
@@ -298,6 +299,11 @@ export function PlanCanvas() {
       else store.finishWall(resolveAt(world, store.wallDraft, shift).p, shift, true);
       return;
     }
+    if (tool === 'box') {
+      if (!store.wallDraft) store.beginWall(resolveAt(world, null, shift).p, true);
+      else store.commitBox(resolveAt(world, store.wallDraft, shift).p, true);
+      return;
+    }
     if (tool === 'dim') {
       if (!store.dimDraft) store.beginDim(resolveAt(world, null, shift).p, true);
       else store.finishDim(resolveAt(world, store.dimDraft, shift).p, shift, true);
@@ -547,8 +553,8 @@ export function PlanCanvas() {
   }, [tool, hover, floor.nodes, floor.walls]);
 
   /* Ghost and marker both read the same resolve the click will use. */
-  const aim: Resolved | null = hover && (tool === 'wall' || tool === 'dim')
-    ? resolveAt(hover, tool === 'wall' ? wallDraft : dimDraft, shiftHeld)
+  const aim: Resolved | null = hover && (tool === 'wall' || tool === 'box' || tool === 'dim')
+    ? resolveAt(hover, tool === 'dim' ? dimDraft : wallDraft, shiftHeld)
     : null;
   const drawAim = tool === 'wall' && wallMode === 'clip' ? null : aim;
   const wallPreview = wallDraft && drawAim ? drawAim.p : null;
@@ -948,7 +954,7 @@ export function PlanCanvas() {
             );
           })()}
 
-          {wallDraft && wallPreview && (
+          {tool !== 'box' && wallDraft && wallPreview && (
             <Line
               points={[wallDraft.x, wallDraft.y, wallPreview.x, wallPreview.y]}
               stroke={accent}
@@ -957,11 +963,29 @@ export function PlanCanvas() {
               listening={false}
             />
           )}
+          {tool === 'box' && wallDraft && wallPreview && (
+            <Rect
+              x={Math.min(wallDraft.x, wallPreview.x)}
+              y={Math.min(wallDraft.y, wallPreview.y)}
+              width={Math.abs(wallPreview.x - wallDraft.x)}
+              height={Math.abs(wallPreview.y - wallDraft.y)}
+              stroke={accent}
+              strokeWidth={3 / zoom}
+              dash={[0.45, 0.28]}
+              listening={false}
+            />
+          )}
           {wallDraft && wallPreview && (
             <Text
               x={(wallDraft.x + wallPreview.x) / 2}
               y={(wallDraft.y + wallPreview.y) / 2 - 0.7}
-              text={`${formatLength(dist(wallDraft, wallPreview), units)} · ${Math.round(headingDeg(wallDraft, wallPreview))}°`}
+              text={tool === 'box'
+                ? (() => {
+                  const c = boxCorners(wallDraft, wallPreview);
+                  if (!c) return '';
+                  return `${formatLength(c[1].x - c[0].x, units)} × ${formatLength(c[2].y - c[1].y, units)}`;
+                })()
+                : `${formatLength(dist(wallDraft, wallPreview), units)} · ${Math.round(headingDeg(wallDraft, wallPreview))}°`}
               fontSize={Math.max(10, 12) / zoom}
               fill={planColors.dimFg}
               listening={false}
@@ -1051,7 +1075,7 @@ export function PlanCanvas() {
           </button>
         </div>
       )}
-      <div className="plan-taps" role="toolbar" aria-label="Plan taps">
+      <div className="plan-taps aw-ribbon" role="toolbar" aria-label="Plan taps">
         <button
           type="button"
           className="plan-tap aw-pressable"
@@ -1152,7 +1176,9 @@ export function PlanCanvas() {
       </div>
       {skillRank(skillLevel) < 3 && (
       <div className="canvas-hint">
-        {tool === 'wall'
+        {tool === 'box'
+          ? (wallDraft ? t(tips, 'hint.box.end') : t(tips, 'hint.box'))
+          : tool === 'wall'
           ? (wallMode === 'clip'
             ? (clipHover ? t(tips, 'hint.clip.hot') : t(tips, 'hint.clip'))
             : (wallDraft

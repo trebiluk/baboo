@@ -49,6 +49,7 @@ const TOOL_MIN_RANK: Record<Tool, number> = {
   select: 0,
   sketch: 0,
   wall: 0,
+  box: 0,
   door: 0,
   pan: 0,
   window: 1,
@@ -73,7 +74,7 @@ export function skillInfo(level: SkillLevel) {
 
 export function toolsForLevel(level: SkillLevel): Tool[] {
   const rank = skillRank(level);
-  const order: Tool[] = ['select', 'sketch', 'wall', 'door', 'window', 'furniture', 'room', 'dim', 'note', 'plant', 'pan'];
+  const order: Tool[] = ['select', 'sketch', 'wall', 'box', 'door', 'window', 'furniture', 'room', 'dim', 'note', 'plant', 'pan'];
   return order.filter((t) => TOOL_MIN_RANK[t] <= rank);
 }
 
@@ -81,7 +82,7 @@ export function toolsForLevel(level: SkillLevel): Tool[] {
 export function upcomingTools(level: SkillLevel): Tool[] {
   const next = skillRank(level) + 1;
   if (next > 3) return [];
-  const order: Tool[] = ['select', 'sketch', 'wall', 'door', 'window', 'furniture', 'room', 'dim', 'note', 'plant', 'pan'];
+  const order: Tool[] = ['select', 'sketch', 'wall', 'box', 'door', 'window', 'furniture', 'room', 'dim', 'note', 'plant', 'pan'];
   return order.filter((t) => TOOL_MIN_RANK[t] === next);
 }
 
@@ -154,7 +155,7 @@ function nextDogHouseCoach(floor: Floor, level: SkillLevel): CoachStep | null {
       id: 'close',
       title: 'Close the den',
       body: 'Walls have to meet. Rain stays out only when it’s a box.',
-      tool: 'wall',
+      tool: 'box',
     };
   }
   if (doors.length === 0) {
@@ -252,7 +253,7 @@ export function nextCoach(level: SkillLevel, floor: Floor, styleId?: string): Co
       id: 'close',
       title: 'Close the box',
       body: 'Keep going until the walls meet. That’s when it becomes a room.',
-      tool: 'wall',
+      tool: 'box',
     };
   }
   if (doors === 0) {
