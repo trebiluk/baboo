@@ -8,10 +8,11 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.2.3 quieter desk', () => {
-  it('chips 2.2.3 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.2.3');
+describe('2.2.4 gear and hamburger', () => {
+  it('chips 2.2.4 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.2.4');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.2\.4'/);
     assert.match(changelog, /version:\s*'2\.2\.3'/);
     assert.match(changelog, /version:\s*'2\.2\.2'/);
     assert.match(changelog, /version:\s*'2\.2\.1'/);
@@ -49,10 +50,13 @@ describe('2.2.3 quieter desk', () => {
     assert.equal(existsSync(join(studio, 'components/DockRail.tsx')), false);
   });
 
-  it('Teach and Help sit on the top row, not a phone-only ribbon', () => {
+  it('gear and hamburger sit on the top row; Teach and Help are menu pictograms', () => {
     const chrome = readFileSync(join(studio, 'components/Chrome.tsx'), 'utf8');
+    const themes = readFileSync(join(studio, 'data/themes.ts'), 'utf8');
     assert.match(chrome, /toggleTeaching/);
     assert.match(chrome, /toggleHelp/);
+    assert.match(chrome, /chrome-gear/);
+    assert.match(chrome, /chrome-hamburger/);
     assert.equal(chrome.includes('chrome-phone-only'), false);
     assert.match(chrome, /chrome-ess/);
     assert.match(chrome, /data-baboo-chrome="top"/);
@@ -60,6 +64,9 @@ describe('2.2.3 quieter desk', () => {
     assert.match(chrome, /<VersionChip onTeacher/);
     assert.match(chrome, /save-chip save-\$\{saveStatus\}/);
     assert.doesNotMatch(chrome, /phoneChrome \? null/);
+    assert.match(themes, /only light/);
+    assert.match(themes, /only dark/);
+    assert.doesNotMatch(themes, /prefers-color-scheme/);
   });
 
   it('Wall flyout is docked to the Wall chip, not a permanent rail', () => {

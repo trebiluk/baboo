@@ -50,10 +50,16 @@ export function themeColorScheme(id: GuiThemeId): 'light' | 'dark' {
   return id === 'ink' ? 'dark' : 'light';
 }
 
-/** Always set data-gui-theme. Null / dream / unknown → stark. */
+/** Always set data-gui-theme. Null / dream / unknown → stark.
+ * Device dark mode never wins. Only Ink, chosen from the gear, is dark. */
 export function applyGuiTheme(theme: GuiThemeId | null | undefined): void {
   const id: GuiThemeId = isGuiThemeId(theme) ? theme : DEFAULT_GUI_THEME;
   const root = document.documentElement;
+  const scheme = themeColorScheme(id) === 'dark' ? 'only dark' : 'only light';
   root.setAttribute('data-gui-theme', id);
-  root.style.colorScheme = themeColorScheme(id);
+  root.style.setProperty('color-scheme', scheme);
+  const meta = document.querySelector('meta[name="color-scheme"]');
+  if (meta) meta.setAttribute('content', scheme);
+  const bar = document.querySelector('meta[name="theme-color"]');
+  if (bar) bar.setAttribute('content', id === 'ink' ? '#05070d' : '#FFFFFF');
 }

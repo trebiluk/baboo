@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.2.4 — 2026-09-26 — Gear, hamburger, Stark stays put
+- A phone or Chromebook in dark mode does not restyle Baboo
+- The gear is the only way to pick Ink, Projector, or Blocky. Stark stays the default
+- The top bar is pictograms. The hamburger holds Teach, Help, and the rest
+
 ## 2.2.3 — 2026-09-26 — A quieter desk
 - Tools share one card. Tucked in, they are a slim icon stack so the plan stays open
 - Plan, Rooms, and 3D are one switch. Save is the blue button. The version stays in the top bar, not on the drawing

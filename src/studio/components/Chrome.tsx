@@ -19,6 +19,7 @@ export function Chrome() {
   const importJson = useProjectStore((s) => s.importJson);
   const openNewProject = useProjectStore((s) => s.openNewProject);
   const toggleCustomize = useProjectStore((s) => s.toggleCustomize);
+  const customizeOpen = useProjectStore((s) => s.customizeOpen);
   const toggleTeaching = useProjectStore((s) => s.toggleTeaching);
   const toggleHelp = useProjectStore((s) => s.toggleHelp);
   const toggleDebug = useProjectStore((s) => s.toggleDebug);
@@ -110,22 +111,14 @@ export function Chrome() {
           aria-label={t(locale, 'chrome.projectName')}
         />
         <span className={`save-chip save-${saveStatus}`}>{statusLabel}</span>
-        <button
-          type="button"
-          className="ghost-btn aw-pressable chrome-wide skill-chrome-chip"
-          onClick={toggleCustomize}
-          title={t(locale, 'skill.legend')}
-        >
-          {t(locale, `skill.${skillLevel}`)}
-        </button>
       </div>
 
       <div className="chrome-right">
         <button type="button" className="ghost-btn aw-pressable chrome-ico chrome-undo" onClick={undo} title={t(locale, 'chrome.undo')} aria-label={t(locale, 'chrome.undo')} disabled={!canEdit}>
-          <Icon name="undo" /> <span className="chrome-label">{t(locale, 'chrome.undo')}</span>
+          <Icon name="undo" />
         </button>
-        <button type="button" className="ghost-btn aw-pressable chrome-ico chrome-wide" onClick={redo} title={t(locale, 'chrome.redo')} disabled={!canEdit}>
-          <Icon name="redo" /> <span className="chrome-label">{t(locale, 'chrome.redo')}</span>
+        <button type="button" className="ghost-btn aw-pressable chrome-ico chrome-wide" onClick={redo} title={t(locale, 'chrome.redo')} aria-label={t(locale, 'chrome.redo')} disabled={!canEdit}>
+          <Icon name="redo" />
         </button>
 
         <div className="chrome-view" role="group" aria-label="Viewport">
@@ -134,65 +127,64 @@ export function Chrome() {
             className={`ghost-btn aw-pressable chrome-ico ${viewMode === 'plan' ? 'active' : ''}`}
             onClick={() => { setRenderTier(0); setViewMode('plan'); }}
             title={t(locale, 'chrome.plan')}
+            aria-label={t(locale, 'chrome.plan')}
+            aria-pressed={viewMode === 'plan'}
           >
-            <Icon name="plan" /> <span className="chrome-label">{t(locale, 'chrome.plan')}</span>
+            <Icon name="plan" />
           </button>
           <button
             type="button"
             className={`ghost-btn aw-pressable chrome-ico ${viewMode === 'dollhouse' ? 'active' : ''}`}
             onClick={() => setViewMode('dollhouse')}
             title={t(locale, 'chrome.dollhouse')}
+            aria-label={t(locale, 'chrome.dollhouse')}
+            aria-pressed={viewMode === 'dollhouse'}
           >
-            <Icon name="room" /> <span className="chrome-label">{t(locale, 'chrome.dollhouse')}</span>
+            <Icon name="room" />
           </button>
           <button
             type="button"
             className={`ghost-btn aw-pressable chrome-ico ${viewMode !== 'plan' && viewMode !== 'dollhouse' ? 'active' : ''}`}
             onClick={() => { setRenderTier(1); setViewMode('solid3d'); }}
-            title={t(locale, '3d.viewonly')}
+            title={t(locale, 'chrome.view3d')}
+            aria-label={t(locale, 'chrome.view3d')}
+            aria-pressed={viewMode !== 'plan' && viewMode !== 'dollhouse'}
           >
-            <Icon name="view3d" /> <span className="chrome-label">{t(locale, 'chrome.view3d')}</span>
+            <Icon name="view3d" />
           </button>
           <span className="view-only-chip" hidden={canEdit} title={t(locale, 'chrome.viewonly')}>{t(locale, 'chrome.viewonly')}</span>
         </div>
 
         <button type="button" className="ghost-btn aw-pressable chrome-primary chrome-ico chrome-ess" onClick={exportJson} title={t(locale, 'chrome.save')} aria-label={t(locale, 'chrome.save')}>
-          <Icon name="save" /> <span className="chrome-label">{t(locale, 'chrome.save')}</span>
+          <Icon name="save" />
         </button>
         <button
           type="button"
-          className={`ghost-btn aw-pressable chrome-ico chrome-ess${teachingOpen ? ' active' : ''}`}
-          onClick={toggleTeaching}
-          title={t(locale, 'chrome.teach')}
-          aria-label={teachingOpen ? t(locale, 'chrome.teachClose') : t(locale, 'chrome.teach')}
-          aria-pressed={teachingOpen}
+          className={`ghost-btn aw-pressable chrome-ico chrome-gear${customizeOpen ? ' active' : ''}`}
+          onClick={toggleCustomize}
+          title={t(locale, 'chrome.settings')}
+          aria-label={t(locale, 'chrome.settings')}
+          aria-pressed={customizeOpen}
         >
-          <Icon name="teach" /> <span className="chrome-label">{t(locale, 'chrome.teach')}</span>
-        </button>
-        <button
-          type="button"
-          className={`ghost-btn aw-pressable chrome-ico chrome-ess${helpOpen ? ' active' : ''}`}
-          onClick={toggleHelp}
-          title={t(locale, 'chrome.help')}
-          aria-label={t(locale, 'chrome.help')}
-          aria-pressed={helpOpen}
-        >
-          <Icon name="help" /> <span className="chrome-label">{t(locale, 'chrome.help')}</span>
+          <Icon name="settings" />
         </button>
 
         <div className="chrome-more" ref={moreRef}>
           <button
             type="button"
-            className={`ghost-btn aw-pressable chrome-more-btn chrome-ico${moreOpen ? ' active' : ''}`}
+            className={`ghost-btn aw-pressable chrome-more-btn chrome-ico chrome-hamburger${moreOpen ? ' active' : ''}`}
             aria-expanded={moreOpen}
             aria-haspopup="menu"
             onClick={() => setMoreOpen((v) => !v)}
             title={t(locale, 'chrome.more')}
+            aria-label={t(locale, 'chrome.more')}
           >
-            <Icon name="more" /> <span className="chrome-label">{t(locale, 'chrome.more')}</span>
+            <Icon name="more" />
           </button>
           {moreOpen && (
             <div className="chrome-more-menu" role="menu">
+              <button type="button" role="menuitem" className={`ghost-btn aw-pressable chrome-ico${teachingOpen ? ' active' : ''}`} onClick={runAndClose(toggleTeaching)} aria-pressed={teachingOpen}><Icon name="teach" /> {t(locale, 'chrome.teach')}</button>
+              <button type="button" role="menuitem" className={`ghost-btn aw-pressable chrome-ico${helpOpen ? ' active' : ''}`} onClick={runAndClose(toggleHelp)} aria-pressed={helpOpen}><Icon name="help" /> {t(locale, 'chrome.help')}</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(fitPlan)} disabled={!canEdit}><Icon name="fit" /> {t(locale, 'chrome.fit')}</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => openNewProject(true))}><Icon name="new" /> {t(locale, 'chrome.new')}</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => exportGalleryCard())}><Icon name="note" /> {t(locale, 'chrome.classCard')}</button>

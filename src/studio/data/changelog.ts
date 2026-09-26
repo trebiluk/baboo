@@ -11,6 +11,15 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.2.4',
+    date: '2026-09-26',
+    bullets: [
+      'A phone or Chromebook in dark mode does not restyle Baboo',
+      'The gear is the only way to pick Ink, Projector, or Blocky. Stark stays the default',
+      'The top bar is pictograms. The hamburger holds Teach, Help, and the rest',
+    ],
+  },
+  {
     version: '2.2.3',
     date: '2026-09-26',
     bullets: [

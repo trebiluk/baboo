@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Ethiopic:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap");
+/* OS dark mode must not flip utilities. Ink is the only dark look, and only from the gear. */
+@custom-variant dark (&:where([data-gui-theme=ink], [data-gui-theme=ink] *));
 
 @theme {
   --color-bg: #ffffff;
@@ -30,7 +32,14 @@
     overflow: hidden;
     background: #ffffff;
     color: #0a0a0a;
+    color-scheme: only light;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+  html[data-gui-theme="ink"],
+  html[data-gui-theme="ink"] body {
+    color-scheme: only dark;
+    background: #05070d;
+    color: #f8fafc;
   }
 }

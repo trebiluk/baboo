@@ -75,7 +75,7 @@
   --lightningcss-dark: ;
   --lightningcss-light:initial;
   --lightningcss-dark: ;
-  color-scheme:light;
+  color-scheme:only light;
   color:var(--aw-fg);
   background:var(--aw-bg);
   font-family:Archivo, "Noto Sans", "Noto Sans Ethiopic", "Noto Sans Arabic", Segoe UI, system-ui, -apple-system, sans-serif;
@@ -114,7 +114,7 @@ html[data-gui-theme=stark] {
   --lightningcss-dark: ;
   --lightningcss-light:initial;
   --lightningcss-dark: ;
-  color-scheme:light
+  color-scheme:only light
 }
 html[data-gui-theme=ink] {
   --aw-bg:#05070d;
@@ -149,7 +149,7 @@ html[data-gui-theme=ink] {
   --lightningcss-dark:initial;
   --lightningcss-light: ;
   --lightningcss-dark:initial;
-  color-scheme:dark
+  color-scheme:only dark
 }
 html[data-gui-theme=projector] {
   --aw-bg:#f4f6fa;
@@ -184,7 +184,7 @@ html[data-gui-theme=projector] {
   --lightningcss-dark: ;
   --lightningcss-light:initial;
   --lightningcss-dark: ;
-  color-scheme:light
+  color-scheme:only light
 }
 html[data-gui-theme=blocky] {
   --aw-bg:#7ec0ee;
@@ -219,7 +219,7 @@ html[data-gui-theme=blocky] {
   --aw-radius:0;
   --lightningcss-light:initial;
   --lightningcss-dark: ;
-  color-scheme:light
+  color-scheme:only light
 }
 * {
   box-sizing:border-box
@@ -4363,6 +4363,31 @@ html[data-ell-english] {
     min-width:44px;
     min-height:44px
   }
+}
+
+/* 2.2.4 — pictograms on the bar. Device dark mode does not restyle Stark. */
+html:not([data-gui-theme="ink"]) {
+  color-scheme:only light
+}
+.chrome-ico .tool-icon,
+.chrome-gear .tool-icon,
+.chrome-hamburger .tool-icon,
+.chrome-more-menu .tool-icon {
+  width:22px;
+  height:22px
+}
+.chrome-right>.chrome-ico,
+.chrome-view .chrome-ico,
+.chrome-gear,
+.chrome-hamburger {
+  width:44px;
+  min-width:44px;
+  min-height:44px;
+  padding:0;
+  justify-content:center
+}
+.chrome-more-menu .ghost-btn {
+  gap:10px
 }
 
 
