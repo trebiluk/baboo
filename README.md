@@ -4,7 +4,7 @@ Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 
 **© 2026 Richard Kulibert Jr.**
 
-**Version 2.2.6** — On a phone the plan is the screen. Full screen hides the bar. Stark stays the default.
+**Version 2.2.7** — Every house object has its own vector. Paint is the color. 3D shows the texture.
 
 Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the top chip. Plans save on the device as `.archworks.json`.
 

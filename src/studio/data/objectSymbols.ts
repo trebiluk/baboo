@@ -1,36 +1,8 @@
-/** Plan symbols from FloorPlanSVGSymbols (MIT, Richard Duerr, 2023). */
-const BASE = '/objects/floorplan/';
+/** One Baboo vector per catalog object. See public/objects/baboo/. */
+import { FURNITURE_CATALOG } from './furniture';
 
-const FILE: Record<string, string> = {
-  'bed-twin': 'QueenBed.svg',
-  'bed-queen': 'QueenBed.svg',
-  nightstand: 'EndTable.svg',
-  dresser: 'Cabinet.svg',
-  closet: 'Cabinet.svg',
-  'storage-shelf': 'Cabinet.svg',
-  chair: 'Chair.svg',
-  'coffee-table': 'Table.svg',
-  'dining-table': 'Table.svg',
-  'dining-chair': 'Chair.svg',
-  fridge: 'Refrigerator.svg',
-  stove: 'Stove.svg',
-  sink: 'Sink.svg',
-  toilet: 'Toilet.svg',
-  bathtub: 'Tub.svg',
-  desk: 'Table.svg',
-  'water-heater': 'WaterHeater.svg',
-  'mech-closet': 'Cabinet.svg',
-  washer: 'Washer.svg',
-  dryer: 'Dryer.svg',
-};
+const IDS = new Set(FURNITURE_CATALOG.map((c) => c.id));
 
 export function symbolSrc(catalogId: string): string | undefined {
-  const file = FILE[catalogId];
-  return file ? `${BASE}${file}` : undefined;
+  return IDS.has(catalogId) ? `/objects/baboo/${catalogId}.svg` : undefined;
 }
-
-export const SOFA_PARTS = [
-  `${BASE}CouchLeft.svg`,
-  `${BASE}CouchMiddle.svg`,
-  `${BASE}CouchRight.svg`,
-] as const;

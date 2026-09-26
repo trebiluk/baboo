@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2.78 -1.53 5.56 3.06" role="img" aria-label="Bathtub">
+<rect x="-2.78" y="-1.53" width="5.56" height="3.06" fill="#ffffff"/>
+<ellipse cx="0" cy="0" rx="2.5" ry="1.25" fill="#EEF2F6" stroke="#2a2e34" stroke-width="0.05" data-tex="ceramic"/>
+<ellipse cx="0" cy="0.04" rx="1.8" ry="0.688" fill="#7EB3D4" stroke="#2a2e34" stroke-width="0.05" data-tex="glass"/>
+<ellipse cx="-1.9" cy="-0.55" rx="0.08" ry="0.08" fill="#D0D8E0" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<rect x="-1.54" y="-0.6" width="0.28" height="0.1" rx="0.06" fill="#D0D8E0" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+</svg>

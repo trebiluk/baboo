@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.03 -1.03 2.06 2.06" role="img" aria-label="Nightstand">
+<rect x="-1.03" y="-1.03" width="2.06" height="2.06" fill="#ffffff"/>
+<rect x="-0.69" y="-0.69" width="0.12" height="0.12" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="0.57" y="-0.69" width="0.12" height="0.12" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-0.69" y="0.57" width="0.12" height="0.12" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="0.57" y="0.57" width="0.12" height="0.12" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-0.72" y="-0.69" width="1.44" height="1.38" rx="0.06" fill="#8B6914" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-0.75" y="-0.75" width="1.5" height="1.5" rx="0.06" fill="#C4A074" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-0.585" y="-0.125" width="1.17" height="0.33" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<ellipse cx="0" cy="0.27" rx="0.06" ry="0.06" fill="#D4C4A0" stroke="#2a2e34" stroke-width="0.05"/>
+</svg>

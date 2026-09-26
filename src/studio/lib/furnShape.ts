@@ -4,6 +4,7 @@ import { FURNITURE_CATALOG } from '../data/furniture';
 import type { FurnLod } from './perf';
 
 export type FurnShapeKind = 'box' | 'cyl' | 'oval';
+export type FurnTex = 'wood' | 'fabric' | 'metal' | 'ceramic' | 'glass';
 
 export type FurnPart = {
   lx: number;
@@ -14,6 +15,8 @@ export type FurnPart = {
   z1: number;
   fill: string;
   shape?: FurnShapeKind;
+  /** How the top should read in 3D. Color is separate, on fill. */
+  tex?: FurnTex;
 };
 
 const WOOD = '#8B6914';
@@ -68,16 +71,46 @@ function paintFurnParts(parts: FurnPart[], color?: string | null): FurnPart[] {
   });
 }
 
+function texForFill(fill: string): FurnTex | undefined {
+  switch (fill) {
+    case WOOD:
+    case WOOD_LT:
+    case WOOD_DK:
+      return 'wood';
+    case LINEN:
+    case BLANKET:
+    case UPH:
+    case UPH_DK:
+    case UPH_LT:
+    case PILLOW:
+      return 'fabric';
+    case STEEL:
+    case STEEL_DK:
+    case CHROME:
+    case IRON:
+    case BLACK:
+      return 'metal';
+    case WHITE:
+    case PORC:
+    case DRUM:
+      return 'ceramic';
+    case WATER:
+      return 'glass';
+    default:
+      return undefined;
+  }
+}
+
 function box(lx: number, ly: number, lw: number, lh: number, z0: number, z1: number, fill: string): FurnPart {
-  return { lx, ly, lw, lh, z0, z1, fill, shape: 'box' };
+  return { lx, ly, lw, lh, z0, z1, fill, shape: 'box', tex: texForFill(fill) };
 }
 
 function cyl(lx: number, ly: number, d: number, z0: number, z1: number, fill: string): FurnPart {
-  return { lx, ly, lw: d, lh: d, z0, z1, fill, shape: 'cyl' };
+  return { lx, ly, lw: d, lh: d, z0, z1, fill, shape: 'cyl', tex: texForFill(fill) };
 }
 
 function oval(lx: number, ly: number, lw: number, lh: number, z0: number, z1: number, fill: string): FurnPart {
-  return { lx, ly, lw, lh, z0, z1, fill, shape: 'oval' };
+  return { lx, ly, lw, lh, z0, z1, fill, shape: 'oval', tex: texForFill(fill) };
 }
 
 function legs(w: number, h: number, inset: number, thick: number, z1: number, fill = WOOD_DK): FurnPart[] {

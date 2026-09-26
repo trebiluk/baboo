@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.2.7 — 2026-09-26 — Object pictures
+- Every house object has its own scalable vector picture
+- Paint changes the color. Porcelain, metal, and glass stay themselves
+- In 3D, wood, fabric, metal, and ceramic show on the top of the object
+
 ## 2.2.6 — 2026-09-26 — Full screen
 - On a phone the plan is the screen. The bar is one floating row, not two
 - Full screen hides that bar. The Baboo mark brings it back

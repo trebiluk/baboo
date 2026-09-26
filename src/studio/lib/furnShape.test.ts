@@ -2,7 +2,12 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { furnitureParts, partWorldCorners, partWorldRing } from './furnShape.ts';
 import { FURNITURE_CATALOG } from '../data/furniture.ts';
+import { objectSvg } from '../data/objectArt.ts';
+import { symbolSrc } from '../data/objectSymbols.ts';
 import type { FurnitureItem } from '../types.ts';
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 function item(catalogId: string, w: number, h: number): FurnitureItem {
   return { id: 'f1', catalogId, x: 10, y: 8, w, h, rot: 0, zIndex: 1, label: catalogId };
@@ -59,9 +64,34 @@ describe('furniture parts', () => {
     sofa.color = '#3D4F6F';
     const painted = furnitureParts(sofa);
     assert.ok(painted.some((p) => p.fill.toLowerCase() === '#3d4f6f' || p.fill.toLowerCase().startsWith('#3')));
+    assert.ok(painted.some((p) => p.tex === 'fabric' && p.fill.toLowerCase() === '#3d4f6f'));
     const toilet = item('toilet', 1.5, 2.5);
     toilet.color = '#3D4F6F';
     const bowl = furnitureParts(toilet);
     assert.ok(bowl.some((p) => p.fill === '#E8EEF2' || p.fill === '#EEF2F6'));
+    assert.ok(bowl.some((p) => p.tex === 'ceramic'));
+  });
+
+  it('every object has its own scalable vector', () => {
+    const dir = join(dirname(fileURLToPath(import.meta.url)), '../../../public/objects/baboo');
+    const sofa = objectSvg('sofa');
+    const closet = objectSvg('closet');
+    const dresser = objectSvg('dresser');
+    assert.notEqual(sofa, objectSvg('chair'));
+    assert.notEqual(closet, dresser);
+    assert.match(sofa, /data-tex="fabric"/);
+    assert.match(dresser, /data-tex="wood"/);
+    assert.match(objectSvg('fridge'), /data-tex="metal"/);
+    assert.match(objectSvg('sofa', '#3D4F6F'), /#3D4F6F/i);
+    assert.match(objectSvg('toilet', '#3D4F6F'), /#E8EEF2|#EEF2F6/);
+    for (const cat of FURNITURE_CATALOG) {
+      assert.equal(symbolSrc(cat.id), `/objects/baboo/${cat.id}.svg`);
+      const file = join(dir, `${cat.id}.svg`);
+      assert.equal(existsSync(file), true, cat.id);
+      const text = readFileSync(file, 'utf8');
+      assert.match(text, /viewBox=/);
+      const shapes = text.match(/<(rect|ellipse) /g) ?? [];
+      assert.ok(shapes.length >= 2, `${cat.id} shapes ${shapes.length}`);
+    }
   });
 });

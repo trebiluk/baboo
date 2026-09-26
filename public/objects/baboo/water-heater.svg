@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.28 -1.28 2.56 2.56" role="img" aria-label="Water Heater">
+<rect x="-1.28" y="-1.28" width="2.56" height="2.56" fill="#ffffff"/>
+<ellipse cx="0" cy="0" rx="0.92" ry="0.92" fill="#9AA8B8" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<ellipse cx="0" cy="0" rx="0.78" ry="0.78" fill="#6A7888" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<ellipse cx="0.12" cy="0" rx="0.08" ry="0.08" fill="#D0D8E0" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<rect x="0.22" y="-0.06" width="0.12" height="0.12" rx="0.06" fill="#2A2A2E" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+</svg>

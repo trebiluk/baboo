@@ -716,14 +716,14 @@ button {
   background:color-mix(in srgb, var(--aw-royal) 28%, var(--aw-elevated))
 }
 .furn-glyph {
-  width:44px;
-  height:44px;
+  width:52px;
+  height:52px;
   grid-row:span 2;
   align-self:center;
   display:block;
-  border-radius:6px;
+  border-radius:8px;
   border:1px solid var(--aw-border);
-  background:#f3eee4
+  background:#fff
 }
 .swatch {
   border-radius:4px;

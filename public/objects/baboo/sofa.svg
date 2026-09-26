@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-3.78 -1.78 7.56 3.56" role="img" aria-label="Sofa">
+<rect x="-3.78" y="-1.78" width="7.56" height="3.56" fill="#ffffff"/>
+<rect x="-3.01" y="-0.94" width="0.16" height="0.16" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="2.85" y="-0.94" width="0.16" height="0.16" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-3.01" y="0.78" width="0.16" height="0.16" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="2.85" y="0.78" width="0.16" height="0.16" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-3.01" y="-0.75" width="6.02" height="1.86" rx="0.06" fill="#4A6741" stroke="#2a2e34" stroke-width="0.05" data-tex="fabric"/>
+<rect x="-2.8" y="-0.6" width="2.52" height="1.44" rx="0.06" fill="#6A8A62" stroke="#2a2e34" stroke-width="0.05" data-tex="fabric"/>
+<rect x="0.28" y="-0.6" width="2.52" height="1.44" rx="0.06" fill="#6A8A62" stroke="#2a2e34" stroke-width="0.05" data-tex="fabric"/>
+<rect x="-3.22" y="-1.49" width="6.44" height="0.42" rx="0.06" fill="#3A5234" stroke="#2a2e34" stroke-width="0.05" data-tex="fabric"/>
+<ellipse cx="-3.22" cy="0.08" rx="0.26" ry="1.17" fill="#3A5234" stroke="#2a2e34" stroke-width="0.05" data-tex="fabric"/>
+<ellipse cx="3.22" cy="0.08" rx="0.26" ry="1.17" fill="#3A5234" stroke="#2a2e34" stroke-width="0.05" data-tex="fabric"/>
+</svg>

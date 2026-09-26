@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2.78 -1.155 5.56 2.31" role="img" aria-label="Dresser">
+<rect x="-2.78" y="-1.155" width="5.56" height="2.31" fill="#ffffff"/>
+<rect x="-2.43" y="-0.805" width="0.14" height="0.14" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="2.29" y="-0.805" width="0.14" height="0.14" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-2.43" y="0.665" width="0.14" height="0.14" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="2.29" y="0.665" width="0.14" height="0.14" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-2.5" y="-0.875" width="5" height="1.75" rx="0.06" fill="#8B6914" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-2.55" y="-0.91" width="5.1" height="1.82" rx="0.06" fill="#C4A074" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-2.2" y="-0.192" width="4.4" height="0.385" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-2.2" y="-0.192" width="4.4" height="0.385" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-2.2" y="-0.192" width="4.4" height="0.385" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<ellipse cx="-0.9" cy="0.49" rx="0.05" ry="0.05" fill="#D4C4A0" stroke="#2a2e34" stroke-width="0.05"/>
+<ellipse cx="0.9" cy="0.49" rx="0.05" ry="0.05" fill="#D4C4A0" stroke="#2a2e34" stroke-width="0.05"/>
+<ellipse cx="-0.9" cy="0.49" rx="0.05" ry="0.05" fill="#D4C4A0" stroke="#2a2e34" stroke-width="0.05"/>
+<ellipse cx="0.9" cy="0.49" rx="0.05" ry="0.05" fill="#D4C4A0" stroke="#2a2e34" stroke-width="0.05"/>
+<ellipse cx="-0.9" cy="0.49" rx="0.05" ry="0.05" fill="#D4C4A0" stroke="#2a2e34" stroke-width="0.05"/>
+<ellipse cx="0.9" cy="0.49" rx="0.05" ry="0.05" fill="#D4C4A0" stroke="#2a2e34" stroke-width="0.05"/>
+</svg>

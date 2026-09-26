@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.78 -1.28 3.56 2.56" role="img" aria-label="Kitchen Sink">
+<rect x="-1.78" y="-1.28" width="3.56" height="2.56" fill="#ffffff"/>
+<rect x="-1.5" y="-1" width="3" height="2" rx="0.06" fill="#9AA8B8" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<rect x="-1.47" y="-0.85" width="0.22" height="1.7" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="1.25" y="-0.85" width="0.22" height="1.7" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<ellipse cx="0" cy="0.08" rx="0.87" ry="0.52" fill="#7EB3D4" stroke="#2a2e34" stroke-width="0.05" data-tex="glass"/>
+<ellipse cx="0" cy="-0.64" rx="0.06" ry="0.06" fill="#D0D8E0" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<rect x="-0.05" y="-0.57" width="0.1" height="0.42" rx="0.06" fill="#D0D8E0" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+</svg>

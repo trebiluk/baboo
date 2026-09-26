@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2.78 -1.78 5.56 3.56" role="img" aria-label="Dining Table">
+<rect x="-2.78" y="-1.78" width="5.56" height="3.56" fill="#ffffff"/>
+<rect x="-2.09" y="-1.17" width="0.2" height="0.2" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="1.89" y="-1.17" width="0.2" height="0.2" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-2.09" y="0.97" width="0.2" height="0.2" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="1.89" y="0.97" width="0.2" height="0.2" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-2.5" y="-1.5" width="5" height="3" rx="0.06" fill="#C4A074" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-2.05" y="-0.12" width="4.1" height="0.24" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-0.2" y="-1.08" width="0.4" height="2.16" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+</svg>

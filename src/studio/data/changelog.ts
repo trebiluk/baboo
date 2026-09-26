@@ -11,6 +11,15 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.2.7',
+    date: '2026-09-26',
+    bullets: [
+      'Every house object has its own scalable vector picture',
+      'Paint changes the color. Porcelain, metal, and glass stay themselves',
+      'In 3D, wood, fabric, metal, and ceramic show on the top of the object',
+    ],
+  },
+  {
     version: '2.2.6',
     date: '2026-09-26',
     bullets: [

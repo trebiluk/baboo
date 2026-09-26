@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.905 -3.405 3.81 6.81" role="img" aria-label="Twin Bed">
+<rect x="-1.905" y="-3.405" width="3.81" height="6.81" fill="#ffffff"/>
+<rect x="-1.395" y="-2.65" width="0.16" height="0.16" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="1.235" y="-2.65" width="0.16" height="0.16" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-1.395" y="2.49" width="0.16" height="0.16" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="1.235" y="2.49" width="0.16" height="0.16" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-1.592" y="-3" width="3.185" height="6" rx="0.06" fill="#8B6914" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-1.463" y="-2.482" width="2.925" height="5.125" rx="0.06" fill="#E8DCC8" stroke="#2a2e34" stroke-width="0.05" data-tex="fabric"/>
+<rect x="-1.592" y="-3.125" width="3.185" height="0.24" rx="0.06" fill="#8B6914" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-1.495" y="2.925" width="2.99" height="0.16" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-1.43" y="-0.625" width="2.86" height="3" rx="0.06" fill="#5E6E8E" stroke="#2a2e34" stroke-width="0.05" data-tex="fabric"/>
+<ellipse cx="0" cy="-2.345" rx="0.942" ry="0.525" fill="#F4EEE4" stroke="#2a2e34" stroke-width="0.05" data-tex="fabric"/>
+</svg>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.53 -1.53 3.06 3.06" role="img" aria-label="Stove">
+<rect x="-1.53" y="-1.53" width="3.06" height="3.06" fill="#ffffff"/>
+<rect x="-1.25" y="-1.25" width="2.5" height="2.5" rx="0.06" fill="#3A3A40" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<rect x="-1.2" y="-1.2" width="2.4" height="2.4" rx="0.06" fill="#6A7888" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<rect x="-0.975" y="-0.337" width="1.95" height="1.05" rx="0.06" fill="#2A2A2E" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<rect x="-0.687" y="0.148" width="1.375" height="0.08" rx="0.06" fill="#9AA8B8" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<ellipse cx="-0.7" cy="-1.09" rx="0.06" ry="0.06" fill="#D0D8E0" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<ellipse cx="-0.25" cy="-1.09" rx="0.06" ry="0.06" fill="#D0D8E0" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<ellipse cx="0.25" cy="-1.09" rx="0.06" ry="0.06" fill="#D0D8E0" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<ellipse cx="0.7" cy="-1.09" rx="0.06" ry="0.06" fill="#D0D8E0" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<ellipse cx="-0.55" cy="-0.5" rx="0.275" ry="0.275" fill="#3A3A40" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<ellipse cx="-0.55" cy="-0.5" rx="0.151" ry="0.151" fill="#2A2A2E" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<ellipse cx="0.55" cy="-0.5" rx="0.275" ry="0.275" fill="#3A3A40" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<ellipse cx="0.55" cy="-0.5" rx="0.151" ry="0.151" fill="#2A2A2E" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<ellipse cx="-0.55" cy="0.5" rx="0.275" ry="0.275" fill="#3A3A40" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<ellipse cx="-0.55" cy="0.5" rx="0.151" ry="0.151" fill="#2A2A2E" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<ellipse cx="0.55" cy="0.5" rx="0.275" ry="0.275" fill="#3A3A40" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<ellipse cx="0.55" cy="0.5" rx="0.151" ry="0.151" fill="#2A2A2E" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+</svg>

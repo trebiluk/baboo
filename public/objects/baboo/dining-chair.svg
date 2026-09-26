@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.03 -1.03 2.06 2.06" role="img" aria-label="Dining Chair">
+<rect x="-1.03" y="-1.03" width="2.06" height="2.06" fill="#ffffff"/>
+<rect x="-0.47" y="-0.455" width="0.1" height="0.1" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="0.37" y="-0.455" width="0.1" height="0.1" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-0.47" y="0.355" width="0.1" height="0.1" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="0.37" y="0.355" width="0.1" height="0.1" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-0.615" y="-0.41" width="1.23" height="1.02" rx="0.06" fill="#8B6914" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-0.585" y="-0.7" width="1.17" height="0.14" rx="0.06" fill="#8B6914" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-0.31" y="-0.67" width="0.08" height="0.08" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="0.23" y="-0.67" width="0.08" height="0.08" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+</svg>

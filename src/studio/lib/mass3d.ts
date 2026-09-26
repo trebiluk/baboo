@@ -3,7 +3,7 @@ import type { Floor, FurnitureItem, LandscapeItem, Opening, Point, RoofGeometry,
 import type { SiteFinish, SkyPreset, WallTintId } from '../data/scene3d';
 import { SITE_PALETTE, WALL_TINT, hexAlpha } from '../data/scene3d';
 import { exteriorBounds } from './roof';
-import { furnitureParts, partWorldCorners, partWorldRing } from './furnShape';
+import { furnitureParts, partWorldCorners, partWorldRing, type FurnPart } from './furnShape';
 import { floorFinish, asFloorFinish, type FloorFinishId, type FloorGrain } from '../data/flooring';
 import { listInteriorFaces, listInteriorFloors, roomPolygon } from './rooms';
 import { FACE_BUDGET, FURN_CAP, PLANT_CAP, type FurnLod } from './perf';
@@ -603,7 +603,10 @@ function roofFaces(roof: RoofGeometry, blocky: boolean, wallFill?: string): Mass
 function furnBox(item: FurnitureItem, blocky: boolean, lod: FurnLod = 'full'): MassFace[] {
   const stroke = blocky ? '#1a1208' : '#3f3f46';
   const out: MassFace[] = [];
-  for (const part of furnitureParts(item, lod)) {
+  const parts = furnitureParts(item, lod);
+  let top: FurnPart | null = null;
+  let topArea = 0;
+  for (const part of parts) {
     const ring = lod === 'simple' ? partWorldCorners(item, part) : partWorldRing(item, part);
     if (ring.length < 3) continue;
     const z0 = part.z0;
@@ -611,6 +614,11 @@ function furnBox(item: FurnitureItem, blocky: boolean, lod: FurnLod = 'full'): M
     const T = ring.map((c) => v3(c.x, c.y, z1));
     const B = ring.map((c) => v3(c.x, c.y, z0));
     out.push({ pts: T, fill: part.fill, stroke, kind: 'furn' });
+    const area = part.lw * part.lh;
+    if (part.tex && area > topArea && z1 > 0.25) {
+      top = part;
+      topArea = area;
+    }
     if (z1 - z0 < 0.1) continue;
     if (lod === 'simple' && ring.length >= 4) {
       out.push(quad(B[1], B[2], T[2], T[1], part.fill, stroke, 'furn'));
@@ -621,6 +629,48 @@ function furnBox(item: FurnitureItem, blocky: boolean, lod: FurnLod = 'full'): M
     for (let i = 0; i < n; i++) {
       const j = (i + 1) % n;
       out.push(quad(B[i], B[j], T[j], T[i], part.fill, stroke, 'furn'));
+    }
+  }
+  if (lod === 'full' && !blocky && top?.tex) out.push(...textureStripes(item, top, stroke));
+  return out;
+}
+
+function shadeFill(hex: string, k: number): string {
+  const n = hex.replace('#', '');
+  const full = n.length === 3 ? n.split('').map((c) => c + c).join('') : n;
+  const ch = (i: number) => parseInt(full.slice(i, i + 2), 16);
+  const mix = (c: number) => Math.max(0, Math.min(255, Math.round(k >= 1 ? c + (255 - c) * (k - 1) : c * k)));
+  const h = (c: number) => mix(c).toString(16).padStart(2, '0');
+  return `#${h(ch(0))}${h(ch(2))}${h(ch(4))}`;
+}
+
+/** Grain, weave, or brush lines stuck to the top face so they orbit with the object. */
+function textureStripes(item: FurnitureItem, part: FurnPart, stroke: string): MassFace[] {
+  const n = part.tex === 'fabric' ? 4 : part.tex === 'wood' ? 5 : 3;
+  const ink = shadeFill(part.fill, part.tex === 'metal' || part.tex === 'ceramic' ? 1.18 : 0.78);
+  const alongX = part.lw >= part.lh;
+  const span = alongX ? part.lw : part.lh;
+  const thick = Math.max(0.04, span * 0.045);
+  const out: MassFace[] = [];
+  const push = (lx: number, ly: number, lw: number, lh: number) => {
+    const fake = { ...part, lx, ly, lw, lh, shape: 'box' as const };
+    const ring = partWorldCorners(item, fake);
+    const z = part.z1 + 0.04;
+    out.push({ pts: ring.map((c) => v3(c.x, c.y, z)), fill: ink, stroke, kind: 'furn' });
+  };
+  for (let i = 1; i <= n; i++) {
+    const t = (i / (n + 1) - 0.5) * span * 0.84;
+    if (alongX) push(part.lx + t, part.ly, thick, part.lh * (part.tex === 'fabric' ? 0.55 : 0.78));
+    else push(part.lx, part.ly + t, part.lw * (part.tex === 'fabric' ? 0.55 : 0.78), thick);
+  }
+  if (part.tex === 'fabric') {
+    const cross = alongX ? part.lw : part.lh;
+    const other = alongX ? part.lh : part.lw;
+    const ct = Math.max(0.04, other * 0.05);
+    for (let i = 1; i <= 3; i++) {
+      const t = (i / 4 - 0.5) * other * 0.7;
+      if (alongX) push(part.lx, part.ly + t, cross * 0.7, ct);
+      else push(part.lx + t, part.ly, ct, cross * 0.7);
     }
   }
   return out;

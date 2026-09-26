@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.78 -1.78 3.56 3.56" role="img" aria-label="Mech Closet">
+<rect x="-1.78" y="-1.78" width="3.56" height="3.56" fill="#ffffff"/>
+<rect x="-1.5" y="-1.5" width="3" height="3" rx="0.06" fill="#6A7380" stroke="#2a2e34" stroke-width="0.05"/>
+<rect x="-1.17" y="-1.05" width="2.34" height="2.1" rx="0.06" fill="#7A8490" stroke="#2a2e34" stroke-width="0.05"/>
+<rect x="-0.58" y="-0.825" width="0.08" height="1.65" rx="0.06" fill="#4A5460" stroke="#2a2e34" stroke-width="0.05"/>
+<rect x="0.5" y="-0.825" width="0.08" height="1.65" rx="0.06" fill="#4A5460" stroke="#2a2e34" stroke-width="0.05"/>
+<rect x="-0.825" y="-0.04" width="1.65" height="0.08" rx="0.06" fill="#4A5460" stroke="#2a2e34" stroke-width="0.05"/>
+</svg>

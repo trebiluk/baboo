@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2.28 -1.28 4.56 2.56" role="img" aria-label="Closet">
+<rect x="-2.28" y="-1.28" width="4.56" height="2.56" fill="#ffffff"/>
+<rect x="-2" y="-1" width="4" height="2" rx="0.06" fill="#8B6914" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-1.8" y="-0.86" width="1.68" height="1.76" rx="0.06" fill="#C4A074" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="0.12" y="-0.86" width="1.68" height="1.76" rx="0.06" fill="#C4A074" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-0.28" y="0.36" width="0.08" height="0.08" rx="0.06" fill="#D4C4A0" stroke="#2a2e34" stroke-width="0.05"/>
+<rect x="0.2" y="0.36" width="0.08" height="0.08" rx="0.06" fill="#D4C4A0" stroke="#2a2e34" stroke-width="0.05"/>
+<rect x="-1.44" y="-0.44" width="2.88" height="0.08" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+</svg>
