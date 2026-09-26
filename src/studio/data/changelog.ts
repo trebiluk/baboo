@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.2.9',
+    date: '2026-09-26',
+    bullets: [
+      'Dollhouse walls have thickness, a top, and a lawn under the house',
+      'The view stays on the house. A far tree no longer shrinks it to a line',
+    ],
+  },
+  {
     version: '2.2.8',
     date: '2026-09-26',
     bullets: [

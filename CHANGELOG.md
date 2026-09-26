@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.2.9 — 2026-09-26 — A model, not a line
+- Dollhouse walls have thickness, a top, and a lawn under the house
+- The view stays on the house. A far tree no longer shrinks it to a line
+
 ## 2.2.8 — 2026-09-26 — Box and one ribbon
 - Box draws a room in two clicks. Wall still draws one line
 - Plan taps and dollhouse controls share one ribbon

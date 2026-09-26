@@ -20,6 +20,7 @@ import {
 import { asWallHeightFt } from '../lib/wallDraft';
 import { packTileCanvas, textureStrokeFallback } from '../lib/texturePattern';
 import { furnitureParts, partWorldCorners, partWorldRing } from '../lib/furnShape';
+import { footprintPad, wallPrism } from '../lib/dollWalls';
 import { FURN_CAP, furnitureLod } from '../lib/perf';
 import { asFloorFinish, asFloorGrain, floorFinish, floorTileCanvas } from '../data/flooring';
 import { listInteriorFloors, roomPolygon } from '../lib/rooms';
@@ -97,9 +98,21 @@ export function DollhouseCanvas() {
 
   const fit = useCallback(() => {
     const pts: { x: number; y: number }[] = [];
-    for (const n of floor.nodes) pts.push(project(n.x, n.y, 0, spec), project(n.x, n.y, wallH, spec));
-    for (const f of floor.furniture) pts.push(project(f.x, f.y, 0, spec));
-    for (const L of floor.landscape ?? []) pts.push(project(L.x, L.y, 0, spec));
+    const house = floor.nodes;
+    let cx = 0;
+    let cy = 0;
+    for (const n of house) { cx += n.x; cy += n.y; }
+    if (house.length) { cx /= house.length; cy /= house.length; }
+    const anchors = house.length ? house : (floor.landscape ?? []).map((L) => ({ x: L.x, y: L.y }));
+    for (const n of anchors) pts.push(project(n.x, n.y, 0, spec), project(n.x, n.y, wallH, spec));
+    const pad = footprintPad(house);
+    if (pad) for (const n of pad) pts.push(project(n.x, n.y, 0, spec));
+    for (const f of floor.furniture) {
+      if (!house.length || Math.hypot(f.x - cx, f.y - cy) < 40) pts.push(project(f.x, f.y, 0, spec));
+    }
+    for (const L of floor.landscape ?? []) {
+      if (!house.length || Math.hypot(L.x - cx, L.y - cy) < 22) pts.push(project(L.x, L.y, 0, spec));
+    }
     if (!pts.length) {
       setPan({ x: size.w / 2, y: size.h / 3 });
       setZoom(1);
@@ -158,6 +171,12 @@ export function DollhouseCanvas() {
     return [];
   }, [floor.roof, spec.kind, spec.yaw, spec.top, wallH]);
 
+  const padPoly = useMemo(() => {
+    const pad = footprintPad(floor.nodes);
+    if (!pad) return [];
+    return projectPoints(pad.map((p) => ({ x: p.x, y: p.y, z: -0.12 })), spec);
+  }, [floor.nodes, spec.kind, spec.yaw, spec.top]);
+
   const sceneFaces = useMemo(() => {
     const originPts = floor.roof?.outline && floor.roof.outline.length >= 3
       ? floor.roof.outline
@@ -196,20 +215,24 @@ export function DollhouseCanvas() {
         ? (light ? '#d8dce8' : '#3a4560')
         : (light ? '#ece4d4' : '#4a4034'));
       const tile = useTex ? tiles.get(useTex) : undefined;
-      faces.push({
-        key: `w-${w.id}`,
-        pts: projectPoints([
-          { x: e.a.x, y: e.a.y, z: 0 },
-          { x: e.b.x, y: e.b.y, z: 0 },
-          { x: e.b.x, y: e.b.y, z: wallH },
-          { x: e.a.x, y: e.a.y, z: wallH },
-        ], spec),
-        fill,
-        pattern: tile,
-        stroke: sel ? '#6e72f5' : ink,
-        sw: swWall(sel),
-        depth: cameraDepth(mx, my, spec),
-        pick: () => setSelected({ kind: 'wall', id: w.id }),
+      const thick = Math.max(0.42, w.thickness || 0.5);
+      const faces3 = wallPrism(e.a, e.b, thick, wallH);
+      const shades = light
+        ? ['#e4e7f0', '#c5cad6', '#d8dce8', '#d0d4e0', '#f4f6fb']
+        : ['#3a4560', '#2a3348', '#33405a', '#303a52', '#4a5670'];
+      faces3.forEach((ring, i) => {
+        const mx = ring.reduce((s, p) => s + p.x, 0) / ring.length;
+        const my = ring.reduce((s, p) => s + p.y, 0) / ring.length;
+        faces.push({
+          key: `w-${w.id}-${i}`,
+          pts: projectPoints(ring, spec),
+          fill: blocky ? (i === 4 ? '#c4a574' : '#d8c4a0') : (useTex && i < 4 ? fill : shades[i]),
+          pattern: useTex && i < 4 ? tile : undefined,
+          stroke: sel ? '#6e72f5' : ink,
+          sw: swWall(sel),
+          depth: cameraDepth(mx, my, spec) + (i === 4 ? 0.2 : 0),
+          pick: () => setSelected({ kind: 'wall', id: w.id }),
+        });
       });
     }
 
@@ -334,7 +357,7 @@ export function DollhouseCanvas() {
     const name = typeof (ev.target as { name?: () => string }).name === 'function'
       ? (ev.target as { name: () => string }).name()
       : '';
-    const onEmpty = ev.target === ev.currentTarget || name === 'doll-floor' || name === 'doll-bg';
+    const onEmpty = ev.target === ev.currentTarget || name === 'doll-floor' || name === 'doll-bg' || name === 'doll-pad';
     if (ev.evt.button === 2) {
       toolsPocket.armEmptyPress(ev.evt, onEmpty);
       return;
@@ -481,6 +504,17 @@ export function DollhouseCanvas() {
             height={8000}
             fill={light ? '#e8edf2' : '#121820'}
           />
+          {padPoly.length >= 8 && (
+            <Line
+              name="doll-pad"
+              points={padPoly}
+              closed
+              fill={light ? '#d5e3cc' : '#1e3328'}
+              stroke={light ? '#b7c9ae' : '#3d5a48'}
+              strokeWidth={1 / zoom}
+              listening={false}
+            />
+          )}
           {interiorFloors.length
             ? interiorFloors.map((rf, i) => (
               <Line
