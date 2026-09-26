@@ -11,6 +11,15 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.2.6',
+    date: '2026-09-26',
+    bullets: [
+      'On a phone the plan is the screen. The bar is one floating row, not two',
+      'Full screen hides that bar. The Baboo mark brings it back',
+      'Tools stay icons. Furniture and the size card sit on the bottom, not over the grid',
+    ],
+  },
+  {
     version: '2.2.5',
     date: '2026-09-26',
     bullets: [

@@ -4434,4 +4434,158 @@ html:not([data-gui-theme="ink"]) {
   outline-offset:2px
 }
 
+/* 2.2.6 — the plan is the screen. Phone bar floats. It does not stack. */
+.app-shell.is-phone .chrome {
+  position:absolute;
+  top:0;
+  left:60px;
+  right:0;
+  z-index:var(--aw-z-chrome);
+  flex-flow:row nowrap!important;
+  align-items:center!important;
+  height:48px!important;
+  min-height:48px!important;
+  max-height:48px!important;
+  padding:2px 4px!important;
+  padding-top:max(2px, env(safe-area-inset-top, 0px))!important;
+  gap:2px!important;
+  background:color-mix(in srgb, #fff 94%, transparent);
+  border-bottom:none;
+  box-shadow:0 1px 0 var(--aw-border);
+  overflow:hidden
+}
+.app-shell.is-phone .chrome-left {
+  display:none!important
+}
+.app-shell.is-phone .chrome-right {
+  flex:1 1 auto!important;
+  width:auto!important;
+  min-width:0!important;
+  flex-wrap:nowrap!important;
+  justify-content:flex-end;
+  overflow-x:auto;
+  gap:2px;
+  scrollbar-width:none
+}
+.app-shell.is-phone .chrome.is-hidden {
+  display:none!important
+}
+.chrome-restore {
+  position:absolute;
+  z-index:calc(var(--aw-z-chrome) + 5);
+  top:max(8px, env(safe-area-inset-top, 0px));
+  left:max(8px, env(safe-area-inset-left, 0px));
+  width:44px;
+  height:44px;
+  padding:0;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--aw-border);
+  border-radius:12px;
+  background:#fff;
+  box-shadow:0 6px 18px #0a0a0a22
+}
+.chrome-restore img {
+  width:28px;
+  height:28px;
+  border-radius:7px
+}
+.chrome-menu-id, .chrome-menu-redo {
+  display:none
+}
+.app-shell.is-phone .chrome-menu-id {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:4px 6px 8px;
+  border-bottom:1px solid var(--aw-border);
+  margin-bottom:4px
+}
+.app-shell.is-phone .chrome-menu-id .title-input {
+  flex:1;
+  width:auto;
+  min-width:0;
+  max-width:none
+}
+.app-shell.is-phone .chrome-menu-redo {
+  display:inline-flex
+}
+.app-shell.is-phone .ver-float {
+  display:inline-flex!important;
+  position:absolute;
+  right:10px;
+  bottom:max(10px, env(safe-area-inset-bottom, 0px));
+  left:auto;
+  top:auto;
+  z-index:var(--aw-z-overlays)
+}
+.app-shell.is-phone .tool-rail.is-fancy .edge-pocket-col,
+.app-shell.is-phone .tool-rail.is-fancy .tool-rail-btn,
+.app-shell.is-phone .tool-rail.is-fancy.is-open .edge-pocket-col,
+.app-shell.is-phone .tool-rail.is-fancy.is-open .tool-rail-btn {
+  width:52px!important;
+  min-width:52px!important;
+  max-width:52px!important
+}
+.app-shell.is-phone .tool-rail.is-fancy .tool-rail-btn {
+  padding:0;
+  justify-content:center
+}
+.app-shell.is-phone .tool-rail.is-fancy .tool-rail-label,
+.app-shell.is-phone .tool-rail.is-fancy .tool-rail-kicker {
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0, 0, 0, 0);
+  white-space:nowrap;
+  border:0
+}
+.app-shell.is-phone .tool-rail {
+  top:max(4px, env(safe-area-inset-top, 0px))
+}
+.app-shell.is-phone .plan-taps {
+  top:52px;
+  left:64px;
+  right:8px
+}
+.app-shell.is-phone:has(.chrome.is-hidden) .plan-taps {
+  top:8px
+}
+.app-shell.is-phone .plan-compass {
+  top:56px
+}
+.app-shell.is-phone:has(.chrome.is-hidden) .plan-compass {
+  top:10px
+}
+.app-shell.is-phone .side-panel {
+  position:absolute;
+  left:60px;
+  right:0;
+  top:auto;
+  bottom:0;
+  width:auto;
+  height:auto;
+  max-height:42vh;
+  border:none;
+  border-top:1px solid var(--aw-border);
+  border-radius:16px 16px 0 0;
+  box-shadow:0 -10px 28px #0a0a0a1a
+}
+.app-shell.is-phone .inspect-dock:not(.is-min) {
+  left:60px;
+  right:0;
+  top:auto;
+  bottom:0;
+  width:auto;
+  height:auto;
+  max-height:36vh;
+  border-left:none;
+  border-top:1px solid var(--aw-border);
+  border-radius:16px 16px 0 0;
+  box-shadow:0 -10px 28px #0a0a0a1a
+}
+
 

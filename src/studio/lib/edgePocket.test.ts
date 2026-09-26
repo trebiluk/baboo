@@ -8,10 +8,11 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.2.5 start drawing', () => {
-  it('chips 2.2.5 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.2.5');
+describe('2.2.6 full screen', () => {
+  it('chips 2.2.6 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.2.6');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.2\.6'/);
     assert.match(changelog, /version:\s*'2\.2\.5'/);
     assert.match(changelog, /version:\s*'2\.2\.4'/);
     assert.match(changelog, /version:\s*'2\.2\.3'/);
@@ -78,7 +79,12 @@ describe('2.2.5 start drawing', () => {
     for (const loc of LOCALES) {
       assert.ok(t(loc, 'set.look').length > 0);
       assert.ok(t(loc, 'set.look.lead').length > 0);
+      assert.ok(t(loc, 'chrome.full').length > 0);
     }
+    const css = readFileSync(join(studio, 'index.css'), 'utf8');
+    assert.match(css, /is-phone \.chrome/);
+    assert.match(css, /chrome\.is-hidden/);
+    assert.match(chrome, /requestFullscreen/);
   });
 
   it('Wall flyout is docked to the Wall chip, not a permanent rail', () => {

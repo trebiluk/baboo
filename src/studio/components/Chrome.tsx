@@ -37,6 +37,7 @@ export function Chrome() {
   const [moreOpen, setMoreOpen] = useState(false);
   const [teacherChrome, setTeacherChrome] = useState(false);
   const [classShareOpen, setClassShareOpen] = useState(false);
+  const [focus, setFocus] = useState(false);
   const fileShare = typeof window !== 'undefined' && window.location.protocol === 'file:';
 
   useEffect(() => {
@@ -69,6 +70,27 @@ export function Chrome() {
     return () => window.removeEventListener('baboo-teacher', onTeacher);
   }, []);
 
+  useEffect(() => {
+    const onFs = () => {
+      if (!document.fullscreenElement) setFocus(false);
+    };
+    document.addEventListener('fullscreenchange', onFs);
+    return () => document.removeEventListener('fullscreenchange', onFs);
+  }, []);
+
+  const enterFocus = () => {
+    setMoreOpen(false);
+    setFocus(true);
+    const root = document.documentElement;
+    if (!document.fullscreenElement && root.requestFullscreen) {
+      void root.requestFullscreen().catch(() => { /* the bar still hides */ });
+    }
+  };
+  const exitFocus = () => {
+    setFocus(false);
+    if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
+  };
+
   const skillLevel = useProjectStore((s) => s.doc.settings.skillLevel) ?? DEFAULT_SKILL_LEVEL;
   const locale = tipLoc(useProjectStore((s) => s.doc.settings));
   const statusLabel =
@@ -87,7 +109,7 @@ export function Chrome() {
 
   return (
     <>
-    <header className="chrome" data-baboo-chrome="top">
+    <header className={`chrome${focus ? ' is-hidden' : ''}`} data-baboo-chrome="top">
       <div className="chrome-left">
         <div className="brand">
           <img
@@ -183,6 +205,18 @@ export function Chrome() {
           </button>
           {moreOpen && (
             <div className="chrome-more-menu" role="menu">
+              <div className="chrome-menu-id">
+                <img className="brand-logo" src={BABOO_LOGO} alt="" width={28} height={28} decoding="async" />
+                <VersionChip onTeacher={() => setTeacherChrome(true)} />
+                <input
+                  className="title-input"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  aria-label={t(locale, 'chrome.projectName')}
+                />
+              </div>
+              <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={focus ? exitFocus : enterFocus}><Icon name="fit" /> {t(locale, focus ? 'chrome.exitFull' : 'chrome.full')}</button>
+              <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico chrome-menu-redo" onClick={runAndClose(redo)} disabled={!canEdit}><Icon name="redo" /> {t(locale, 'chrome.redo')}</button>
               <button type="button" role="menuitem" className={`ghost-btn aw-pressable chrome-ico${teachingOpen ? ' active' : ''}`} onClick={runAndClose(toggleTeaching)} aria-pressed={teachingOpen}><Icon name="teach" /> {t(locale, 'chrome.teach')}</button>
               <button type="button" role="menuitem" className={`ghost-btn aw-pressable chrome-ico${helpOpen ? ' active' : ''}`} onClick={runAndClose(toggleHelp)} aria-pressed={helpOpen}><Icon name="help" /> {t(locale, 'chrome.help')}</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(fitPlan)} disabled={!canEdit}><Icon name="fit" /> {t(locale, 'chrome.fit')}</button>
@@ -217,6 +251,11 @@ export function Chrome() {
         />
       </div>
     </header>
+    {focus ? (
+      <button type="button" className="chrome-restore aw-pressable" onClick={exitFocus} aria-label={t(locale, 'chrome.showBar')}>
+        <img src={BABOO_LOGO} alt="" width={28} height={28} decoding="async" />
+      </button>
+    ) : null}
     {classShareOpen ? <ClassShareModal onClose={() => setClassShareOpen(false)} /> : null}
     </>
   );

@@ -1445,6 +1445,15 @@ export const STR: Record<string, Gloss> = {
   'chrome.more': g('More', {
     es: 'Más', cu: 'Más', uk: 'Ще', ru: 'Ещё', ti: 'ተወሳኺ', fa: 'بیشتر',
   }),
+  'chrome.full': g('Full screen', {
+    es: 'Pantalla completa', cu: 'Pantalla completa', uk: 'На весь екран', ru: 'На весь экран', ti: 'ምሉእ ስክሪን', fa: 'تمام‌صفحه',
+  }),
+  'chrome.exitFull': g('Exit full screen', {
+    es: 'Salir de pantalla completa', cu: 'Salir de pantalla completa', uk: 'Вийти з повного екрана', ru: 'Выйти из полного экрана', ti: 'ካብ ምሉእ ስክሪን ውጻእ', fa: 'خروج از تمام‌صفحه',
+  }),
+  'chrome.showBar': g('Show the bar', {
+    es: 'Mostrar la barra', cu: 'Mostrar la barra', uk: 'Показати смугу', ru: 'Показать полосу', ti: 'ነቲ መስመር ኣርእዩ', fa: 'نوار را نشان بده',
+  }),
   'chrome.viewonly': g('View only', {
     es: 'Solo mirar', cu: 'Solo mirar', uk: 'Лише дивитись', ru: 'Только смотреть', ti: 'ምርኣይ ጥራይ', fa: 'فقط نگاه',
   }),

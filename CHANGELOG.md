@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.2.6 — 2026-09-26 — Full screen
+- On a phone the plan is the screen. The bar is one floating row, not two
+- Full screen hides that bar. The Baboo mark brings it back
+- Tools stay icons. Furniture and the size card sit on the bottom, not over the grid
+
 ## 2.2.5 — 2026-09-26 — Start drawing
 - A new visit lands on a blank plan and the coach. Sketch comes first
 - The 13 houses live under the hamburger, on New
