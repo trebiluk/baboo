@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.3.1',
+    date: '2026-09-26',
+    bullets: [
+      'The title block sits clear of the tool rail',
+      'The Baboo button no longer covers Select',
+    ],
+  },
+  {
     version: '2.3.0',
     date: '2026-09-26',
     bullets: [

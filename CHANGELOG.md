@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.3.1 — 2026-09-26 — Nothing on top of the title
+- The title block sits clear of the tool rail
+- The Baboo button no longer covers Select
+
 ## 2.3.0 — 2026-09-26 — One look
 - The plan ribbon is roof and zoom. Snap, straight walls, and units stay in the gear
 - The dollhouse is turn left and turn right. Other drawings stay in the gear

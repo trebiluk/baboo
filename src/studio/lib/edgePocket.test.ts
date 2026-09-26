@@ -8,10 +8,11 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.3.0 one look', () => {
-  it('chips 2.3.0 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.3.0');
+describe('2.3.1 clear title', () => {
+  it('chips 2.3.1 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.3.1');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.3\.1'/);
     assert.match(changelog, /version:\s*'2\.3\.0'/);
     assert.match(changelog, /version:\s*'2\.2\.9'/);
     assert.match(changelog, /version:\s*'2\.2\.8'/);
@@ -99,6 +100,7 @@ describe('2.3.0 one look', () => {
     assert.doesNotMatch(student, /classCard/);
     assert.match(menu, /teacherChrome[\s\S]*classCard/);
     assert.doesNotMatch(readFileSync(join(studio, 'components/View3DStub.tsx'), 'utf8'), /tier-ladder/);
+    assert.match(css, /left:88px/);
   });
 
   it('Wall flyout is docked to the Wall chip, not a permanent rail', () => {
