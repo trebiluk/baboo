@@ -19,7 +19,7 @@ import {
 import { asWallHeightFt } from '../lib/wallDraft';
 import { packTileCanvas, textureStrokeFallback } from '../lib/texturePattern';
 import { furnitureParts, partWorldCorners, partWorldRing } from '../lib/furnShape';
-import { footprintPad, wallPrism } from '../lib/dollWalls';
+import { footprintPad, wallCutFaces } from '../lib/dollWalls';
 import { FURN_CAP, furnitureLod } from '../lib/perf';
 import { asFloorFinish, asFloorGrain, floorFinish, floorTileCanvas } from '../data/flooring';
 import { listInteriorFloors, roomPolygon } from '../lib/rooms';
@@ -198,7 +198,6 @@ export function DollhouseCanvas() {
     }
 
     const faces: SceneFace[] = [];
-    const cutAway = new Set<string>();
     const ink = blocky ? '#1a1208' : (light ? '#2a2a32' : '#c5d0ea');
     const furnInk = blocky ? '#1a1208' : '#3f3f46';
     const swWall = (sel: boolean) => (sel ? 3 : (blocky ? 2.5 : 1.25)) / zoom;
@@ -209,10 +208,7 @@ export function DollhouseCanvas() {
       if (!e) continue;
       const mx = (e.a.x + e.b.x) / 2;
       const my = (e.a.y + e.b.y) / 2;
-      if (shouldCutawayWall(mx, my, ox, oy, spec)) {
-        cutAway.add(w.id);
-        continue;
-      }
+      if (shouldCutawayWall(mx, my, ox, oy, spec)) continue;
       const texId = w.finishId || houseTex;
       const useTex = texId && texId !== 'pack:plain' ? texId : null;
       const sel = selected?.kind === 'wall' && selected.id === w.id;
@@ -221,54 +217,49 @@ export function DollhouseCanvas() {
         : (light ? '#ece4d4' : '#4a4034'));
       const tile = useTex ? tiles.get(useTex) : undefined;
       const thick = Math.max(0.42, w.thickness || 0.5);
-      const faces3 = wallPrism(e.a, e.b, thick, wallH);
+      const cuts = wallCutFaces(
+        e.a,
+        e.b,
+        thick,
+        wallH,
+        floor.openings
+          .filter((o) => o.wallId === w.id)
+          .map((o) => ({ t: o.t, width: o.width, kind: o.type })),
+      );
       const shades = light
         ? ['#f4f0e8', '#e3dcd0', '#ebe4d8', '#e7dfd2', '#faf7f2']
         : ['#3a4560', '#2a3348', '#33405a', '#303a52', '#4a5670'];
-      faces3.forEach((ring, i) => {
+      cuts.walls.forEach((ring, i) => {
         const mx = ring.reduce((s, p) => s + p.x, 0) / ring.length;
         const my = ring.reduce((s, p) => s + p.y, 0) / ring.length;
+        const top = ring.every((p) => p.z > wallH - 0.05);
         faces.push({
           key: `w-${w.id}-${i}`,
           pts: projectPoints(ring, spec),
-          fill: blocky ? (i === 4 ? '#c4a574' : '#d8c4a0') : (useTex && i < 4 ? fill : shades[i]),
-          pattern: useTex && i < 4 ? tile : undefined,
+          fill: blocky ? (top ? '#c4a574' : '#d8c4a0') : (useTex && !top ? fill : shades[i % shades.length]),
+          pattern: useTex && !top ? tile : undefined,
           stroke: sel ? '#6e72f5' : ink,
           sw: swWall(sel),
-          depth: cameraDepth(mx, my, spec) + (i === 4 ? 0.2 : 0),
+          depth: cameraDepth(mx, my, spec) + (top ? 0.2 : 0),
           pick: () => setSelected({ kind: 'wall', id: w.id }),
         });
       });
-    }
-
-    for (const o of floor.openings) {
-      const wall = floor.walls.find((w) => w.id === o.wallId);
-      if (!wall || cutAway.has(wall.id)) continue;
-      const e = wallEnds(wall, floor.nodes);
-      if (!e) continue;
-      const dx = e.b.x - e.a.x;
-      const dy = e.b.y - e.a.y;
-      const len = Math.max(0.01, Math.hypot(dx, dy));
-      const t0 = o.t - o.width / (2 * len);
-      const t1 = o.t + o.width / (2 * len);
-      const z0 = o.type === 'door' ? 0 : 3;
-      const z1 = o.type === 'door' ? 7 : 6.5;
-      const a = { x: e.a.x + dx * t0, y: e.a.y + dy * t0 };
-      const b = { x: e.a.x + dx * t1, y: e.a.y + dy * t1 };
-      const sel = selected?.kind === 'opening' && selected.id === o.id;
-      faces.push({
-        key: `o-${o.id}`,
-        pts: projectPoints([
-          { x: a.x, y: a.y, z: z0 },
-          { x: b.x, y: b.y, z: z0 },
-          { x: b.x, y: b.y, z: z1 },
-          { x: a.x, y: a.y, z: z1 },
-        ], spec),
-        fill: o.type === 'door' ? (light ? '#8b5a2b' : '#6b4220') : (light ? '#b9d7ee' : '#3d6a88'),
-        stroke: sel ? '#6e72f5' : '#1a1a1a',
-        sw: (sel ? 2.5 : 1) / zoom,
-        depth: cameraDepth((a.x + b.x) / 2, (a.y + b.y) / 2, spec) + 0.08,
-        pick: () => setSelected({ kind: 'opening', id: o.id }),
+      cuts.holes.forEach((hole, i) => {
+        const opening = floor.openings.filter((o) => o.wallId === w.id)[i];
+        const mx = hole.ring.reduce((s, p) => s + p.x, 0) / hole.ring.length;
+        const my = hole.ring.reduce((s, p) => s + p.y, 0) / hole.ring.length;
+        const picked = opening && selected?.kind === 'opening' && selected.id === opening.id;
+        faces.push({
+          key: `o-${w.id}-${i}`,
+          pts: projectPoints(hole.ring, spec),
+          fill: hole.kind === 'door'
+            ? (light ? '#8b5a2b' : '#6b4220')
+            : (light ? '#b9d7ee' : '#3d6a88'),
+          stroke: picked ? '#6e72f5' : ink,
+          sw: (picked ? 2.5 : 1) / zoom,
+          depth: cameraDepth(mx, my, spec) + 0.35,
+          pick: opening ? () => setSelected({ kind: 'opening', id: opening.id }) : undefined,
+        });
       });
     }
 

@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.3.2',
+    date: '2026-09-26',
+    bullets: [
+      'A door or window cuts through the dollhouse wall. It is not a sticker',
+      'Roof, Fit, and zoom read as buttons. The tool column scrolls instead of covering the title',
+    ],
+  },
+  {
     version: '2.3.1',
     date: '2026-09-26',
     bullets: [

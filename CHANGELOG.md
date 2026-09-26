@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.3.2 — 2026-09-26 — Openings cut the wall
+- A door or window cuts through the dollhouse wall. It is not a sticker
+- Roof, Fit, and zoom read as buttons. The tool column scrolls instead of covering the title
+
 ## 2.3.1 — 2026-09-26 — Nothing on top of the title
 - The title block sits clear of the tool rail
 - The Baboo button no longer covers Select

@@ -4700,5 +4700,14 @@ html:not([data-gui-theme="ink"]) {
   bottom:max(12px, env(safe-area-inset-bottom, 0px));
   left:max(8px, env(safe-area-inset-left, 0px))
 }
+.plan-tap {
+  min-height:40px;
+  min-width:40px;
+  padding:0 12px
+}
+.tool-rail.edge-pocket.is-fancy .edge-pocket-col {
+  max-height:calc(100dvh - 148px);
+  overflow:auto
+}
 
 
