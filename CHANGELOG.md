@@ -3,6 +3,12 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.3.0 — 2026-09-26 — One look
+- The plan ribbon is roof and zoom. Snap, straight walls, and units stay in the gear
+- The dollhouse is turn left and turn right. Other drawings stay in the gear
+- 3D opens as a finished look. Walk is one button. The tier cards are gone
+- Class tools stay behind the teacher unlock. The student menu is short
+
 ## 2.2.9 — 2026-09-26 — A model, not a line
 - Dollhouse walls have thickness, a top, and a lawn under the house
 - The view stays on the house. A far tree no longer shrinks it to a line

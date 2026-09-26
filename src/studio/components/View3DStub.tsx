@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as REPointerEvent, type WheelEvent as REWheelEvent } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
-import type { RenderTier } from '../types';
-import { roofStyleName } from '../lib/roof';
 import {
   SKY_PALETTE,
   SITE_PALETTE,
@@ -23,19 +21,10 @@ import { t } from '../data/i18n';
 import { FLOOR_FINISHES, asFloorGrain, type FloorFinishId } from '../data/flooring';
 import { furnitureLod } from '../lib/perf';
 
-const TIERS: { tier: RenderTier; id: 'plan' | 'solid3d' | 'materials' | 'lighting'; labelKey: string; blurbKey: string }[] = [
-  { tier: 0, id: 'plan', labelKey: '3d.tier.plan', blurbKey: '3d.tier.plan.blurb' },
-  { tier: 1, id: 'solid3d', labelKey: '3d.tier.solid', blurbKey: '3d.tier.solid.blurb' },
-  { tier: 2, id: 'materials', labelKey: '3d.tier.mat', blurbKey: '3d.tier.mat.blurb' },
-  { tier: 3, id: 'lighting', labelKey: '3d.tier.light', blurbKey: '3d.tier.light.blurb' },
-];
-
 export function View3DStub() {
   const viewMode = useProjectStore((s) => s.viewMode);
   const setViewMode = useProjectStore((s) => s.setViewMode);
-  const setRenderTier = useProjectStore((s) => s.setRenderTier);
   const roofStyleId = useProjectStore((s) => s.doc.settings.roofStyleId);
-  const roofLabel = useProjectStore((s) => s.doc.settings.roofLabel);
   const settings = useProjectStore((s) => s.doc.settings);
   const floor = useProjectStore((s) => s.doc.floors[0]);
 
@@ -181,7 +170,6 @@ export function View3DStub() {
 
   const skyGrad = `aw3d-sky-${skyId}`;
   const loc = settings.locale;
-  const activeId = walk ? 'walkthrough' : viewMode === 'materials' ? 'materials' : viewMode === 'lighting' ? 'lighting' : 'solid3d';
 
   return (
     <div
@@ -194,38 +182,7 @@ export function View3DStub() {
       data-aw3d-lod={lod}
     >
       <div className="view3d-banner">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          <strong>{t(loc, walk ? '3d.walk.title' : '3d.preview')}</strong>
-          <span className="save-chip" style={{ color: 'var(--accent-hot)' }}>{t(loc, '3d.viewonly')}</span>
-          {roofStyleId && (
-            <span className="save-chip">Roof: {roofLabel?.trim() || roofStyleName(roofStyleId)}</span>
-          )}
-        </div>
-        <span>{t(loc, '3d.banner')} <button type="button" className="linkish" onClick={() => { setRenderTier(0); setViewMode('plan'); }}>{t(loc, 'chrome.plan')}</button>.</span>
-      </div>
-      <div className="tier-ladder">
-        {TIERS.map((row) => (
-          <button
-            key={row.id}
-            type="button"
-            className={`tier-card ${activeId === row.id ? 'active' : ''}`}
-            onClick={() => {
-              if (row.id === 'plan') { setRenderTier(0); setViewMode('plan'); }
-              else { setRenderTier(row.tier); setViewMode(row.id); }
-            }}
-          >
-            <strong>{t(loc, row.labelKey)}</strong>
-            <span>{t(loc, row.blurbKey)}</span>
-          </button>
-        ))}
-        <button
-          type="button"
-          className={`tier-card ${walk ? 'active' : ''}`}
-          onClick={() => setViewMode('walkthrough')}
-        >
-          <strong>{t(loc, '3d.tier.walk')}</strong>
-          <span>{t(loc, '3d.tier.walk.blurb')}</span>
-        </button>
+        <span>{t(loc, walk ? '3d.drag.walk' : '3d.drag')}</span>
       </div>
       <div className="solid-preview" aria-label="Solid 3D preview with site and sky" ref={wrapRef}>
         <svg
@@ -296,7 +253,6 @@ export function View3DStub() {
           )}
         </svg>
         <div className="view3d-hud">
-          <p className="muted center view3d-hint">{t(loc, walk ? '3d.drag.walk' : '3d.drag')}</p>
           <div className="view3d-hud-btns">
             {walk ? (
               <>
@@ -305,6 +261,13 @@ export function View3DStub() {
               </>
             ) : null}
             <button type="button" className="ghost-btn aw-pressable" onClick={() => setCam(defaultCam(floor, walk))}>{t(loc, '3d.reset')}</button>
+            <button
+              type="button"
+              className="ghost-btn aw-pressable"
+              onClick={() => setViewMode(walk ? 'solid3d' : 'walkthrough')}
+            >
+              {t(loc, walk ? '3d.preview' : '3d.tier.walk')}
+            </button>
           </div>
         </div>
       </div>

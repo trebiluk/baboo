@@ -4,7 +4,7 @@ Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 
 **© 2026 Richard Kulibert Jr.**
 
-**Version 2.2.9** — The dollhouse is a model: thick walls, a top, and a lawn. The frame stays on the house.
+**Version 2.3.0** — One look. Precision stays in the gear. The student menu is short.
 
 Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the top chip. Plans save on the device as `.archworks.json`.
 

@@ -11,6 +11,16 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.3.0',
+    date: '2026-09-26',
+    bullets: [
+      'The plan ribbon is roof and zoom. Snap, straight walls, and units stay in the gear',
+      'The dollhouse is turn left and turn right. Other drawings stay in the gear',
+      '3D opens as a finished look. Walk is one button. The tier cards are gone',
+      'Class tools stay behind the teacher unlock. The student menu is short',
+    ],
+  },
+  {
     version: '2.2.9',
     date: '2026-09-26',
     bullets: [

@@ -10,7 +10,6 @@ import {
   cameraDepth,
   nextYaw,
   yawToFace,
-  DOLL_PROJS,
   shouldCutawayWall,
   isCameraFacingSide,
   type DollProj,
@@ -177,6 +176,12 @@ export function DollhouseCanvas() {
     return projectPoints(pad.map((p) => ({ x: p.x, y: p.y, z: -0.12 })), spec);
   }, [floor.nodes, spec.kind, spec.yaw, spec.top]);
 
+  const shadowPoly = useMemo(() => {
+    const pad = footprintPad(floor.nodes);
+    if (!pad) return [];
+    return projectPoints(pad.map((p) => ({ x: p.x + 1.1, y: p.y + 1.1, z: -0.4 })), spec);
+  }, [floor.nodes, spec.kind, spec.yaw, spec.top]);
+
   const sceneFaces = useMemo(() => {
     const originPts = floor.roof?.outline && floor.roof.outline.length >= 3
       ? floor.roof.outline
@@ -218,7 +223,7 @@ export function DollhouseCanvas() {
       const thick = Math.max(0.42, w.thickness || 0.5);
       const faces3 = wallPrism(e.a, e.b, thick, wallH);
       const shades = light
-        ? ['#e4e7f0', '#c5cad6', '#d8dce8', '#d0d4e0', '#f4f6fb']
+        ? ['#f4f0e8', '#e3dcd0', '#ebe4d8', '#e7dfd2', '#faf7f2']
         : ['#3a4560', '#2a3348', '#33405a', '#303a52', '#4a5670'];
       faces3.forEach((ring, i) => {
         const mx = ring.reduce((s, p) => s + p.x, 0) / ring.length;
@@ -504,6 +509,15 @@ export function DollhouseCanvas() {
             height={8000}
             fill={light ? '#e8edf2' : '#121820'}
           />
+          {shadowPoly.length >= 8 && (
+            <Line
+              points={shadowPoly}
+              closed
+              fill={light ? '#9aab98' : '#0c1410'}
+              opacity={0.28}
+              listening={false}
+            />
+          )}
           {padPoly.length >= 8 && (
             <Line
               name="doll-pad"
@@ -639,63 +653,25 @@ export function DollhouseCanvas() {
           })}
         </Layer>
       </Stage>
-      <div className="doll-proj aw-ribbon" role="toolbar" aria-label={t(settings.locale, 'doll.proj')}>
-        <div className="doll-proj-row">
-          {DOLL_PROJS.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              className={`doll-chip${spec.kind === p.id ? ' active' : ''} aw-pressable`}
-              onClick={() => setSettings({ dollProj: p.id, dollTop: false })}
-            >
-              {t(settings.locale, `doll.proj.${p.id}`)}
-            </button>
-          ))}
-        </div>
-        <div className="doll-proj-row">
-          <button
-            type="button"
-            className="doll-chip aw-pressable"
-            aria-label={t(settings.locale, 'doll.turn.left')}
-            onClick={() => setSettings({ dollYaw: nextYaw(spec.yaw, -1), dollTop: false })}
-          >
-            ◀
-          </button>
-          {(['front', 'right', 'rear', 'left'] as const).map((id) => (
-            <button
-              key={id}
-              type="button"
-              className={`doll-chip${face === id ? ' active' : ''} aw-pressable`}
-              onClick={() => setSettings({
-                dollYaw: id === 'right' ? 90 : id === 'rear' ? 180 : id === 'left' ? 270 : 0,
-                dollTop: false,
-              })}
-            >
-              {t(settings.locale, `doll.face.${id}`)}
-            </button>
-          ))}
-          {spec.kind === 'ortho' ? (
-            <button
-              type="button"
-              className={`doll-chip${spec.top ? ' active' : ''} aw-pressable`}
-              onClick={() => setSettings({ dollProj: 'ortho', dollTop: true })}
-            >
-              {t(settings.locale, 'doll.face.top')}
-            </button>
-          ) : null}
-          <button
-            type="button"
-            className="doll-chip aw-pressable"
-            aria-label={t(settings.locale, 'doll.turn.right')}
-            onClick={() => setSettings({ dollYaw: nextYaw(spec.yaw, 1), dollTop: false })}
-          >
-            ▶
-          </button>
-          <AxisGizmo spec={spec} light={light} />
-        </div>
-        <p className="doll-proj-lesson">
-          {t(settings.locale, spec.top ? 'doll.lesson.ortho.top' : `doll.lesson.${spec.kind}`)}
-        </p>
+      <div className="doll-proj aw-ribbon" role="toolbar" aria-label={t(settings.locale, 'doll.turn.left')}>
+        <button
+          type="button"
+          className="doll-chip aw-pressable"
+          aria-label={t(settings.locale, 'doll.turn.left')}
+          onClick={() => setSettings({ dollYaw: nextYaw(spec.yaw, -1), dollTop: false })}
+        >
+          ◀
+        </button>
+        <span className="doll-face">{t(settings.locale, `doll.face.${face === 'top' ? 'front' : face}`)}</span>
+        <button
+          type="button"
+          className="doll-chip aw-pressable"
+          aria-label={t(settings.locale, 'doll.turn.right')}
+          onClick={() => setSettings({ dollYaw: nextYaw(spec.yaw, 1), dollTop: false })}
+        >
+          ▶
+        </button>
+        <AxisGizmo spec={spec} light={light} />
       </div>
       <div className="canvas-hint">
         {floor.walls.length === 0

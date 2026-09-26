@@ -1076,30 +1076,6 @@ export function PlanCanvas() {
         </div>
       )}
       <div className="plan-taps aw-ribbon" role="toolbar" aria-label="Plan taps">
-        <button
-          type="button"
-          className="plan-tap aw-pressable"
-          aria-pressed={!!settings.snap}
-          onClick={() => useProjectStore.getState().setSettings({ snap: !settings.snap })}
-        >
-          {settings.snap ? t(tips, 'hint.snapOn') : t(tips, 'hint.snapOff')}
-        </button>
-        <button
-          type="button"
-          className="plan-tap aw-pressable"
-          aria-pressed={settings.ortho !== false}
-          onClick={() => useProjectStore.getState().setSettings({ ortho: settings.ortho === false })}
-        >
-          {settings.ortho !== false ? t(tips, 'chip.straight') : t(tips, 'chip.free')}
-        </button>
-        <button
-          type="button"
-          className="plan-tap aw-pressable"
-          aria-pressed={settings.osnap !== false}
-          onClick={() => useProjectStore.getState().setSettings({ osnap: settings.osnap === false })}
-        >
-          {settings.osnap !== false ? t(tips, 'hint.osnapOn') : t(tips, 'chip.wallsOff')}
-        </button>
         <div className="plan-roof" ref={roofRef}>
           <button
             type="button"
@@ -1165,14 +1141,6 @@ export function PlanCanvas() {
         >
           +
         </button>
-        <button
-          type="button"
-          className="plan-tap aw-pressable"
-          aria-pressed={units === 'm'}
-          onClick={() => useProjectStore.getState().setSettings({ units: units === 'm' ? 'ft' : 'm' })}
-        >
-          {units === 'm' ? 'm' : 'ft'}
-        </button>
       </div>
       {skillRank(skillLevel) < 3 && (
       <div className="canvas-hint">
@@ -1205,11 +1173,6 @@ export function PlanCanvas() {
                 : t(tips, selected?.kind === 'wall'
                   ? 'hint.select.wall'
                   : skillRank(skillLevel) <= 1 ? 'hint.select' : 'hint.select.short')}
-        {settings.snap ? ` · ${t(tips, 'hint.snapOn')}` : ` · ${t(tips, 'hint.snapOff')}`}
-        {useOsnap ? ` · ${t(tips, 'hint.osnapOn')}` : ''}
-        {settings.ortho !== false ? ' · 90°+45°' : ''}
-        {' · '}{zoomLabel}
-        {units === 'm' ? ' · m' : ' · ft'}
       </div>
       )}
       {skillRank(skillLevel) >= 3 && (

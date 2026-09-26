@@ -4632,10 +4632,12 @@ html:not([data-gui-theme="ink"]) {
   font-size:13px;
   font-weight:600
 }
-.doll-chip.active {
-  background:color-mix(in srgb, var(--aw-royal) 16%, #fff);
-  color:var(--aw-deep);
-  border-color:transparent
+.doll-face {
+  padding:0 8px;
+  font-size:13px;
+  font-weight:700;
+  color:var(--aw-fg);
+  white-space:nowrap
 }
 .doll-proj-lesson {
   position:absolute;

@@ -8,6 +8,7 @@ import { DEFAULT_SKILL_LEVEL, skillRank } from '../data/skill';
 import { SkillPicker } from './SkillPicker';
 import { THEME_OPTIONS } from '../data/themes';
 import { LOCALE_OPTIONS, asLocale, t, tipLoc } from '../data/i18n';
+import { DOLL_PROJS, type DollProj } from '../lib/iso';
 import {
   SKY_OPTIONS,
   SITE_OPTIONS,
@@ -146,6 +147,22 @@ export function CustomizePanel() {
           >
             <option value="ft">Feet</option>
             <option value="m">Meters</option>
+          </select>
+        </label>
+        <label className="field">
+          <span>{t(settings.locale, 'doll.proj')}</span>
+          <select
+            value={settings.dollTop ? 'top' : (settings.dollProj ?? 'iso')}
+            onChange={(e) => {
+              const v = e.target.value;
+              if (v === 'top') setSettings({ dollProj: 'ortho', dollTop: true });
+              else setSettings({ dollProj: v as DollProj, dollTop: false });
+            }}
+          >
+            {DOLL_PROJS.map((p) => (
+              <option key={p.id} value={p.id}>{t(settings.locale, `doll.proj.${p.id}`)}</option>
+            ))}
+            <option value="top">{t(settings.locale, 'doll.face.top')}</option>
           </select>
         </label>
 

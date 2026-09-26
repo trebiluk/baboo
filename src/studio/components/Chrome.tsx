@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
-import { DEFAULT_SKILL_LEVEL } from '../data/skill';
 import { BABOO_LOGO } from '../logo';
 import { Icon } from '../icons';
 import { ClassShareModal } from './ClassShareModal';
@@ -91,7 +90,6 @@ export function Chrome() {
     if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
   };
 
-  const skillLevel = useProjectStore((s) => s.doc.settings.skillLevel) ?? DEFAULT_SKILL_LEVEL;
   const locale = tipLoc(useProjectStore((s) => s.doc.settings));
   const statusLabel =
     saveStatus === 'saved' ? t(locale, 'chrome.saved') :
@@ -167,7 +165,7 @@ export function Chrome() {
           <button
             type="button"
             className={`ghost-btn aw-pressable chrome-ico ${viewMode !== 'plan' && viewMode !== 'dollhouse' ? 'active' : ''}`}
-            onClick={() => { setRenderTier(1); setViewMode('solid3d'); }}
+            onClick={() => { setRenderTier(3); setViewMode('solid3d'); }}
             title={t(locale, 'chrome.view3d')}
             aria-label={t(locale, 'chrome.view3d')}
             aria-pressed={viewMode !== 'plan' && viewMode !== 'dollhouse'}
@@ -221,15 +219,14 @@ export function Chrome() {
               <button type="button" role="menuitem" className={`ghost-btn aw-pressable chrome-ico${helpOpen ? ' active' : ''}`} onClick={runAndClose(toggleHelp)} aria-pressed={helpOpen}><Icon name="help" /> {t(locale, 'chrome.help')}</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(fitPlan)} disabled={!canEdit}><Icon name="fit" /> {t(locale, 'chrome.fit')}</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => openNewProject(true))}><Icon name="new" /> {t(locale, 'chrome.new')}</button>
-              <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => exportGalleryCard())}><Icon name="note" /> {t(locale, 'chrome.classCard')}</button>
-              <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => toggleContest())}><Icon name="contest" /> {t(locale, 'chrome.contestBaboo')}</button>
-              <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => toggleAccess())}><Icon name="access" /> {t(locale, 'chrome.accessCheck')}</button>
-              <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => openDriveWizard(true))}><Icon name="drive" /> {t(locale, 'chrome.drive')}</button>
-              <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => setClassShareOpen(true))}><Icon name="folder" /> {t(locale, 'chrome.classFolder')}</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => fileRef.current?.click())}><Icon name="import" /> {t(locale, 'chrome.import')}</button>
-              <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(toggleCustomize)}><Icon name="settings" /> {t(locale, 'chrome.settings')} · {t(locale, `skill.${skillLevel}`)}</button>
               {teacherChrome && (
                 <>
+                  <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => exportGalleryCard())}><Icon name="note" /> {t(locale, 'chrome.classCard')}</button>
+                  <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => toggleContest())}><Icon name="contest" /> {t(locale, 'chrome.contestBaboo')}</button>
+                  <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => toggleAccess())}><Icon name="access" /> {t(locale, 'chrome.accessCheck')}</button>
+                  <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => openDriveWizard(true))}><Icon name="drive" /> {t(locale, 'chrome.drive')}</button>
+                  <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => setClassShareOpen(true))}><Icon name="folder" /> {t(locale, 'chrome.classFolder')}</button>
                   <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => seedCrowd(250))}><Icon name="list" /> Crowd test · 250</button>
                   <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(toggleDebug)}><Icon name="teach" /> {t(locale, 'chrome.teacher')}</button>
                 </>
