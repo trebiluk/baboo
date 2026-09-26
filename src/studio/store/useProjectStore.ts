@@ -259,6 +259,27 @@ function isClosedBox(floor: Floor): boolean {
   return floor.walls.length > 2 && listInteriorFaces(floor.nodes, floor.walls).length > 0;
 }
 
+/** The first closed face gets a name, so the plan is not an empty box. */
+function withFirstRoom(f: Floor): Floor {
+  if ((f.rooms ?? []).length) return f;
+  const poly = listInteriorFaces(f.nodes, f.walls)[0]?.poly;
+  if (!poly || poly.length < 3) return f;
+  let x = 0;
+  let y = 0;
+  for (const p of poly) { x += p.x; y += p.y; }
+  return {
+    ...f,
+    rooms: [{
+      id: uid('rm'),
+      kind: 'living',
+      name: 'Living',
+      x: x / poly.length,
+      y: y / poly.length,
+      floorFinishId: defaultFloorForKind('living'),
+    }],
+  };
+}
+
 /** True when this edit just made the first closed room. Toast already shown. */
 function toastIfJustClosed(get: () => { floor: () => Floor; doc: ProjectDocument; showToast: Store['showToast'] }, before: Floor): boolean {
   const after = get().floor();
@@ -998,7 +1019,7 @@ export const useProjectStore = create<Store>((set, get) => ({
           drawStyle: get().wallDrawStyle,
         };
         const next = { ...f, nodes, walls: [...walls, wall], openings };
-        return refreshRoof(next, get().doc.settings.roofStyleId ?? null, get().doc.settings.wallHeight);
+        return refreshRoof(withFirstRoom(next), get().doc.settings.roofStyleId ?? null, get().doc.settings.wallHeight);
       }),
       wallDraft: null,
     });
@@ -1058,7 +1079,7 @@ export const useProjectStore = create<Store>((set, get) => ({
           });
         }
         return refreshRoof(
-          { ...f, nodes, walls, openings },
+          withFirstRoom({ ...f, nodes, walls, openings }),
           get().doc.settings.roofStyleId ?? null,
           get().doc.settings.wallHeight,
         );
@@ -1576,7 +1597,7 @@ export const useProjectStore = create<Store>((set, get) => ({
           added += 1;
         }
         if (added === 0) return f;
-        return refreshRoof({ ...f, nodes, walls, openings }, get().doc.settings.roofStyleId ?? null, get().doc.settings.wallHeight);
+        return refreshRoof(withFirstRoom({ ...f, nodes, walls, openings }), get().doc.settings.roofStyleId ?? null, get().doc.settings.wallHeight);
       }),
       selected: null,
       tool: 'select',

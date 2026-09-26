@@ -20,6 +20,13 @@ describe('dollhouse walls', () => {
     assert.equal(cut.holes[0].kind, 'door');
     const zs = cut.holes[0].ring.map((p) => p.z);
     assert.ok(Math.max(...zs) < 8);
+    assert.ok(cut.holes[0].ring.some((p) => Math.abs(p.y) > 0.4));
+    const jamb = cut.walls.find((ring) => {
+      const xs = ring.map((p) => p.x);
+      const ys = ring.map((p) => p.y);
+      return Math.min(...xs) > 1 && Math.max(...xs) < 11 && Math.max(...ys) - Math.min(...ys) > 0.3;
+    });
+    assert.ok(jamb);
     assert.ok(cut.walls.length >= 5);
     const full = wallPrism({ x: 0, y: 0 }, { x: 12, y: 0 }, 0.5, 9);
     assert.equal(full.length, 5);

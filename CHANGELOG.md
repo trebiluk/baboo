@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.4.0 — 2026-09-26 — The door opens
+- The dollhouse door swings open. You can see the jamb and the head of the hole
+- Closing a box names the room Living. Rename it whenever you want
+
 ## 2.3.2 — 2026-09-26 — Openings cut the wall
 - A door or window cuts through the dollhouse wall. It is not a sticker
 - Roof, Fit, and zoom read as buttons. The tool column scrolls instead of covering the title

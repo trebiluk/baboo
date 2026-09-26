@@ -224,7 +224,7 @@ export function DollhouseCanvas() {
         wallH,
         floor.openings
           .filter((o) => o.wallId === w.id)
-          .map((o) => ({ t: o.t, width: o.width, kind: o.type })),
+          .map((o) => ({ t: o.t, width: o.width, kind: o.type, swing: o.swing })),
       );
       const shades = light
         ? ['#f4f0e8', '#e3dcd0', '#ebe4d8', '#e7dfd2', '#faf7f2']

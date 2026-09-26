@@ -25,7 +25,7 @@ export function wallPrism(a: { x: number; y: number }, b: { x: number; y: number
   ];
 }
 
-export type OpeningCut = { t: number; width: number; kind: 'door' | 'window' };
+export type OpeningCut = { t: number; width: number; kind: 'door' | 'window'; swing?: 'left' | 'right' };
 
 export type CutModel = {
   walls: Xyz[][];
@@ -58,6 +58,22 @@ export function wallCutFaces(
     });
     return [p(s0, z0), p(s1, z0), p(s1, z1), p(s0, z1)];
   };
+  const jamb = (s: number, z0: number, z1: number): Xyz[] => {
+    const p = (side: number, z: number): Xyz => ({
+      x: a.x + ux * s + nx * side,
+      y: a.y + uy * s + ny * side,
+      z,
+    });
+    return [p(-half, z0), p(half, z0), p(half, z1), p(-half, z1)];
+  };
+  const soffit = (s0: number, s1: number, z: number): Xyz[] => {
+    const p = (s: number, side: number): Xyz => ({
+      x: a.x + ux * s + nx * side,
+      y: a.y + uy * s + ny * side,
+      z,
+    });
+    return [p(s0, -half), p(s1, -half), p(s1, half), p(s0, half)];
+  };
   const walls: Xyz[][] = [];
   const holes: CutModel['holes'] = [];
   const cuts = openings
@@ -66,29 +82,46 @@ export function wallCutFaces(
       const mid = Math.min(len - w / 2 - 0.15, Math.max(w / 2 + 0.15, (o.t ?? 0.5) * len));
       const head = o.kind === 'door' ? Math.min(7, wallH - 0.35) : Math.min(6.5, wallH - 0.4);
       const sill = o.kind === 'door' ? 0 : Math.min(3, head - 1);
-      return { s0: mid - w / 2, s1: mid + w / 2, head, sill, kind: o.kind };
+      return { s0: mid - w / 2, s1: mid + w / 2, head, sill, kind: o.kind, swing: o.swing };
     })
     .filter((c) => c.s1 - c.s0 > 0.4 && c.head > c.sill + 0.4)
     .sort((p, q) => p.s0 - q.s0);
 
   let cursor = 0;
   for (const c of cuts) {
-    if (c.s0 > cursor + 0.05) {
-      walls.push(panel(cursor, c.s0, 0, wallH, half), panel(cursor, c.s0, 0, wallH, -half));
+    const s0 = Math.max(c.s0, cursor);
+    if (s0 >= c.s1 - 0.2) continue;
+    if (s0 > cursor + 0.05) {
+      walls.push(panel(cursor, s0, 0, wallH, half), panel(cursor, s0, 0, wallH, -half));
     }
     if (c.sill > 0.05) {
-      walls.push(panel(c.s0, c.s1, 0, c.sill, half), panel(c.s0, c.s1, 0, c.sill, -half));
+      walls.push(panel(s0, c.s1, 0, c.sill, half), panel(s0, c.s1, 0, c.sill, -half));
     }
     if (wallH - c.head > 0.15) {
-      walls.push(panel(c.s0, c.s1, c.head, wallH, half), panel(c.s0, c.s1, c.head, wallH, -half));
+      walls.push(panel(s0, c.s1, c.head, wallH, half), panel(s0, c.s1, c.head, wallH, -half));
     }
+    walls.push(jamb(s0, c.sill, c.head), jamb(c.s1, c.sill, c.head), soffit(s0, c.s1, c.head));
     const inset = 0.12;
     if (c.kind === 'window') {
-      holes.push({ kind: 'window', ring: panel(c.s0 + inset, c.s1 - inset, c.sill + 0.08, c.head - 0.08, 0) });
+      holes.push({ kind: 'window', ring: panel(s0 + inset, c.s1 - inset, c.sill + 0.08, c.head - 0.08, 0) });
     } else {
+      const side = c.swing === 'right' ? -1 : 1;
+      const hingeS = side > 0 ? s0 : c.s1;
+      const along = side;
+      const ang = 0.65;
+      const leaf = (c.s1 - s0) * 0.9;
+      const hx = a.x + ux * hingeS;
+      const hy = a.y + uy * hingeS;
+      const tx = hx + ux * along * Math.cos(ang) * leaf + nx * side * Math.sin(ang) * leaf;
+      const ty = hy + uy * along * Math.cos(ang) * leaf + ny * side * Math.sin(ang) * leaf;
       holes.push({
         kind: 'door',
-        ring: panel(c.s0 + inset, c.s1 - inset, 0.06, c.head - 0.12, half * 0.35),
+        ring: [
+          { x: hx, y: hy, z: 0.08 },
+          { x: tx, y: ty, z: 0.08 },
+          { x: tx, y: ty, z: c.head - 0.15 },
+          { x: hx, y: hy, z: c.head - 0.15 },
+        ],
       });
     }
     cursor = Math.max(cursor, c.s1);
