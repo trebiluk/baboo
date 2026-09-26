@@ -80,6 +80,29 @@ export function CustomizePanel() {
           </button>
         </div>
 
+        <section className="look-picker" aria-labelledby="look-title">
+          <h3 id="look-title">{t(settings.locale, 'set.look')}</h3>
+          <p className="muted dense-lead">{t(settings.locale, 'set.look.lead')}</p>
+          <div className="look-grid" role="group" aria-label={t(settings.locale, 'set.look')}>
+            {THEME_OPTIONS.map((opt) => {
+              const on = (settings.guiTheme ?? 'stark') === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  className={`look-chip aw-pressable${on ? ' active' : ''}`}
+                  aria-pressed={on}
+                  title={opt.blurb}
+                  onClick={() => setSettings({ guiTheme: opt.id as GuiThemeId })}
+                >
+                  <strong>{opt.name}</strong>
+                  <span>{opt.blurb}</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
         <label className="field">
           <span>Grid size ({settings.units === 'm' ? 'ft world' : 'ft'})</span>
           <input
@@ -123,22 +146,6 @@ export function CustomizePanel() {
           >
             <option value="ft">Feet</option>
             <option value="m">Meters</option>
-          </select>
-        </label>
-
-        <label className="field">
-          <span>Theme</span>
-          <select
-            value={settings.guiTheme ?? 'stark'}
-            onChange={(e) => {
-              setSettings({ guiTheme: e.target.value as GuiThemeId });
-            }}
-          >
-            {THEME_OPTIONS.map((opt) => (
-              <option key={opt.id} value={opt.id}>
-                {opt.name} — {opt.blurb}
-              </option>
-            ))}
           </select>
         </label>
 

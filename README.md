@@ -4,7 +4,7 @@ Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 
 **© 2026 Richard Kulibert Jr.**
 
-**Version 2.2.4** — Stark stays put unless you pick a look from the gear. The top bar is pictograms and a hamburger.
+**Version 2.2.5** — A new visit starts drawing. Houses live under New. The gear leads with Look. Stark stays the default.
 
 Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the top chip. Plans save on the device as `.archworks.json`.
 

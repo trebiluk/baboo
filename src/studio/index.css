@@ -4389,5 +4389,49 @@ html:not([data-gui-theme="ink"]) {
 .chrome-more-menu .ghost-btn {
   gap:10px
 }
+.look-picker {
+  margin:0 0 16px
+}
+.look-picker h3 {
+  margin:0 0 4px;
+  font-size:15px
+}
+.look-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px
+}
+.look-chip {
+  min-height:64px;
+  text-align:left;
+  border:1px solid var(--aw-border);
+  background:#fff;
+  border-radius:12px;
+  padding:10px 12px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:2px;
+  color:var(--aw-fg)
+}
+.look-chip strong {
+  font-size:14px;
+  font-weight:700
+}
+.look-chip span {
+  color:var(--aw-muted);
+  font-size:12px;
+  font-weight:500;
+  line-height:1.3
+}
+.look-chip.active {
+  border-color:var(--aw-royal);
+  background:color-mix(in srgb, var(--aw-royal) 12%, #fff);
+  box-shadow:inset 3px 0 0 var(--aw-royal)
+}
+.look-chip:focus-visible {
+  outline:2px solid var(--aw-royal);
+  outline-offset:2px
+}
 
 

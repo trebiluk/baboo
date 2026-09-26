@@ -11,6 +11,15 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.2.5',
+    date: '2026-09-26',
+    bullets: [
+      'A new visit lands on a blank plan and the coach. Sketch comes first',
+      'The 13 houses live under the hamburger, on New',
+      'The gear opens on Look: Stark, Ink, Projector, Blocky. Stark stays the default',
+    ],
+  },
+  {
     version: '2.2.4',
     date: '2026-09-26',
     bullets: [

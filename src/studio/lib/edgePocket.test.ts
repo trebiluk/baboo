@@ -8,10 +8,11 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.2.4 gear and hamburger', () => {
-  it('chips 2.2.4 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.2.4');
+describe('2.2.5 start drawing', () => {
+  it('chips 2.2.5 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.2.5');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.2\.5'/);
     assert.match(changelog, /version:\s*'2\.2\.4'/);
     assert.match(changelog, /version:\s*'2\.2\.3'/);
     assert.match(changelog, /version:\s*'2\.2\.2'/);
@@ -67,6 +68,17 @@ describe('2.2.4 gear and hamburger', () => {
     assert.match(themes, /only light/);
     assert.match(themes, /only dark/);
     assert.doesNotMatch(themes, /prefers-color-scheme/);
+    const store = readFileSync(join(studio, 'store/useProjectStore.ts'), 'utf8');
+    assert.doesNotMatch(store, /newProjectOpen:\s*true/);
+    assert.match(chrome, /openNewProject\(true\)/);
+    const gear = readFileSync(join(studio, 'components/CustomizePanel.tsx'), 'utf8');
+    assert.match(gear, /look-chip/);
+    assert.match(gear, /set\.look/);
+    assert.doesNotMatch(gear, /<span>Theme<\/span>/);
+    for (const loc of LOCALES) {
+      assert.ok(t(loc, 'set.look').length > 0);
+      assert.ok(t(loc, 'set.look.lead').length > 0);
+    }
   });
 
   it('Wall flyout is docked to the Wall chip, not a permanent rail', () => {

@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.2.5 — 2026-09-26 — Start drawing
+- A new visit lands on a blank plan and the coach. Sketch comes first
+- The 13 houses live under the hamburger, on New
+- The gear opens on Look: Stark, Ink, Projector, Blocky. Stark stays the default
+
 ## 2.2.4 — 2026-09-26 — Gear, hamburger, Stark stays put
 - A phone or Chromebook in dark mode does not restyle Baboo
 - The gear is the only way to pick Ink, Projector, or Blocky. Stark stays the default

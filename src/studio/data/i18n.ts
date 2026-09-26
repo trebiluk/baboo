@@ -977,6 +977,17 @@ export const STR: Record<string, Gloss> = {
   'new.cancel': g('Cancel', {
     es: 'Cancelar', cu: 'Cancelar', uk: 'Скасувати', ru: 'Отмена', ti: 'ሰርዝ', fa: 'لغو',
   }),
+  'set.look': g('Look', {
+    es: 'Aspecto', cu: 'Aspecto', uk: 'Вигляд', ru: 'Вид', ti: 'ገጽ', fa: 'ظاهر',
+  }),
+  'set.look.lead': g('Stark is the class default. A dark phone does not change this.', {
+    es: 'Stark es el de la clase. Un teléfono oscuro no lo cambia.',
+    cu: 'Stark es el de la clase. Un teléfono oscuro no lo cambia.',
+    uk: 'Stark — вигляд класу. Темний телефон його не змінює.',
+    ru: 'Stark — вид класса. Тёмный телефон его не меняет.',
+    ti: 'Stark ናይ ክፍሊ እዩ. ጸሊም ተሌፎን ኣይቅይሮን።',
+    fa: 'Stark پیش‌فرض کلاس است. گوشی تیره آن را عوض نمی‌کند.',
+  }),
 
   'teach.hello': g('One step at a time. Hide this whenever you want the whole grid.', {
     es: 'Un paso a la vez. Ocúltalo cuando quieras toda la cuadrícula.',

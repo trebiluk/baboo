@@ -352,7 +352,6 @@ export const useProjectStore = create<Store>((set, get) => ({
       const skill = readSkillPref();
       const doc = get().doc;
       set({
-        newProjectOpen: true,
         saveStatus: 'saved',
         doc: {
           ...doc,
