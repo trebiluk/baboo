@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.2.3 — 2026-09-26 — A quieter desk
+- Tools share one card. Tucked in, they are a slim icon stack so the plan stays open
+- Plan, Rooms, and 3D are one switch. Save is the blue button. The version stays in the top bar, not on the drawing
+- Stark stays the default
+
 ## 2.2.2 — 2026-09-25 — A closed house in 3D
 - 3D closes the gable ends and tucks a soffit under the eaves
 - The yard is a field to the horizon, not a diamond of grass. Walkthrough has a ceiling so the sun stays outside

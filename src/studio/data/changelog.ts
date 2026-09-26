@@ -11,6 +11,15 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.2.3',
+    date: '2026-09-26',
+    bullets: [
+      'Tools share one card. Tucked in, they are a slim icon stack so the plan stays open',
+      'Plan, Rooms, and 3D are one switch. Save is the blue button. The version stays in the top bar, not on the drawing',
+      'Stark stays the default',
+    ],
+  },
+  {
     version: '2.2.2',
     date: '2026-09-25',
     bullets: [
