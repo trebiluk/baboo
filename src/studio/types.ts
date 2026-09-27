@@ -17,7 +17,8 @@ export type StyleId =
   | 'tudor'
   | 'yurt'
   | 'tiny-home'
-  | 'dog-house';
+  | 'dog-house'
+  | 'mansion';
 
 /**
  * Roof styles — ROOF-STYLES-MVP.md + Diego grass/sod for Hobbit + conical for Yurt.
@@ -110,7 +111,7 @@ export interface NoteItem {
   text: string;
 }
 
-export type PlantKind = 'tree' | 'bed' | 'path';
+export type PlantKind = 'tree' | 'bed' | 'path' | 'hedge' | 'lamp';
 
 /** Indoor floor finish. */
 export type FloorFinishId =

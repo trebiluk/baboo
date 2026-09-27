@@ -336,6 +336,62 @@ function furniturePartsFull(item: FurnitureItem): FurnPart[] {
         box(-w * 0.28, -hh + 0.18, w * 0.35, 0.16, 3.32, 3.48, STEEL_DK),
       ];
     }
+    case 'fireplace':
+      return [
+        box(0, 0.1, w, h, 0, 0.2, '#5C4030'),
+        box(0, 0, w * 0.96, h * 0.9, 0.2, 3.7, '#8C4A3A'),
+        box(0, 0.04, w * 0.48, h * 0.55, 0.45, 2.35, '#1A1A1A'),
+        box(0, 0, w * 1.08, h, 3.7, 4.05, WOOD_DK),
+        cyl(0, 0.02, 0.28, 2.4, 3.55, '#C4A35A'),
+      ];
+    case 'rug':
+      return [
+        oval(0, 0, w, h, 0.02, 0.07, '#6E2E3A'),
+        oval(0, 0, w * 0.72, h * 0.62, 0.07, 0.1, '#8E4250'),
+      ];
+    case 'stairs': {
+      const steps = 6;
+      const parts: FurnPart[] = [];
+      for (let i = 0; i < steps; i++) {
+        const y = -hh + (i + 0.5) * (h / steps);
+        parts.push(box(0, y, w * 0.9, (h / steps) * 0.92, 0, 0.45 + i * 0.55, i % 2 ? WOOD : WOOD_LT));
+      }
+      parts.push(box(-hw + 0.12, 0, 0.16, h, 0.5, 4.4, WOOD_DK));
+      parts.push(box(hw - 0.12, 0, 0.16, h, 0.5, 4.4, WOOD_DK));
+      return parts;
+    }
+    case 'banister':
+      return [
+        box(0, 0, w, Math.min(h, 0.22), 2.9, 3.15, WOOD_DK),
+        box(-hw + 0.12, 0, 0.16, Math.min(h, 0.2), 0, 3.15, WOOD),
+        box(hw - 0.12, 0, 0.16, Math.min(h, 0.2), 0, 3.15, WOOD),
+        box(0, 0, 0.16, Math.min(h, 0.2), 0, 3.15, WOOD),
+      ];
+    case 'floor-lamp':
+      return [
+        cyl(0, 0, 0.4, 0, 0.08, IRON),
+        cyl(0, 0, 0.1, 0.08, 4.7, '#C4A35A'),
+        oval(0, 0, 1.05, 1.05, 4.55, 5.35, '#F3E2A8'),
+      ];
+    case 'sconce':
+      return [
+        box(0, 0, w * 0.7, 0.16, 4.3, 4.55, '#C4A35A'),
+        oval(0, 0.08, w, h, 4.45, 5.15, '#F3E2A8'),
+      ];
+    case 'chandelier':
+      return [
+        cyl(0, 0, 0.1, 6.4, 8.4, '#C4A35A'),
+        oval(0, 0, w, h, 5.7, 6.45, '#E6C36A'),
+        cyl(-w * 0.28, 0, 0.22, 5.15, 5.75, '#F3E2A8'),
+        cyl(w * 0.28, 0, 0.22, 5.15, 5.75, '#F3E2A8'),
+        cyl(0, h * 0.28, 0.22, 5.15, 5.75, '#F3E2A8'),
+        cyl(0, -h * 0.28, 0.22, 5.15, 5.75, '#F3E2A8'),
+      ];
+    case 'wainscot':
+      return [
+        box(0, 0, w, h, 0, 3.15, '#E7D7C1'),
+        box(0, 0, w, Math.max(0.12, h * 0.45), 3.05, 3.3, WOOD_DK),
+      ];
     default: {
       const color = FURNITURE_CATALOG.find((c) => c.id === id)?.color ?? '#6a7080';
       return [box(0, 0, w, h, 0, Math.min(4.2, 1.2 + Math.min(w, h) * 0.4), color)];
@@ -384,6 +440,19 @@ function furnitureSilhouette(item: FurnitureItem): FurnPart[] {
       ];
     case 'stove':
       return [box(0, 0, w, h, 0, 3.0, BLACK)];
+    case 'fireplace':
+      return [box(0, 0, w, h, 0, 3.6, '#8C4A3A')];
+    case 'rug':
+      return [oval(0, 0, w, h, 0.02, 0.08, '#6E2E3A')];
+    case 'stairs':
+      return [box(0, 0, w, h, 0, 3.2, WOOD)];
+    case 'banister':
+    case 'wainscot':
+      return [box(0, 0, w, h, 0, 3.1, WOOD_DK)];
+    case 'floor-lamp':
+    case 'sconce':
+    case 'chandelier':
+      return [cyl(0, 0, Math.min(w, h), 3.2, 5.2, '#F3E2A8')];
     default: {
       const color = FURNITURE_CATALOG.find((c) => c.id === id)?.color ?? '#6a7080';
       const z1 = id === 'fridge' || id === 'closet' || id === 'mech-closet' ? 6.2 : 3.1;

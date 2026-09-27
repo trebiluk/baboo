@@ -18,6 +18,8 @@ const PLANT_ICON: Record<PlantKind, IconName> = {
   tree: 'tree',
   bed: 'bed',
   path: 'path',
+  hedge: 'plant',
+  lamp: 'furniture',
 };
 
 const TOOLS: { id: Tool; label: string; tip: string; icon: IconName }[] = [

@@ -18,6 +18,7 @@ export function Chrome() {
   const exportGalleryCard = useProjectStore((s) => s.exportGalleryCard);
   const importJson = useProjectStore((s) => s.importJson);
   const openNewProject = useProjectStore((s) => s.openNewProject);
+  const newFromTemplate = useProjectStore((s) => s.newFromTemplate);
   const toggleCustomize = useProjectStore((s) => s.toggleCustomize);
   const customizeOpen = useProjectStore((s) => s.customizeOpen);
   const toggleTeaching = useProjectStore((s) => s.toggleTeaching);
@@ -228,6 +229,7 @@ export function Chrome() {
               <button type="button" role="menuitem" className={`ghost-btn aw-pressable chrome-ico${teachingOpen ? ' active' : ''}`} onClick={runAndClose(toggleTeaching)} aria-pressed={teachingOpen}><Icon name="teach" /> {t(locale, 'chrome.teach')}</button>
               <button type="button" role="menuitem" className={`ghost-btn aw-pressable chrome-ico${helpOpen ? ' active' : ''}`} onClick={runAndClose(toggleHelp)} aria-pressed={helpOpen}><Icon name="help" /> {t(locale, 'chrome.help')}</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(fitPlan)} disabled={!canEdit}><Icon name="fit" /> {t(locale, 'chrome.fit')}</button>
+              <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => newFromTemplate('mansion'))}><Icon name="room" /> The Mansion</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => openNewProject(true))}><Icon name="new" /> {t(locale, 'chrome.new')}</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => fileRef.current?.click())}><Icon name="import" /> {t(locale, 'chrome.import')}</button>
               {teacherChrome && (

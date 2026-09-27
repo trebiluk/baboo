@@ -725,6 +725,17 @@ function plantFaces(item: LandscapeItem, site: SiteFinish, blocky: boolean, lod:
     dome(3.15, r * 0.55, 4.85, '#3D8A4E', '#67B56A');
     return out;
   }
+  if (item.kind === 'hedge') {
+    return boxFaces(
+      item.x - item.w / 2, item.y - item.h / 2, item.x + item.w / 2, item.y + item.h / 2,
+      0, 3.2, '#2F6B3A', stroke, 'tree',
+    );
+  }
+  if (item.kind === 'lamp') {
+    const post = boxFaces(item.x - 0.12, item.y - 0.12, item.x + 0.12, item.y + 0.12, 0, 6.2, '#3A3A40', stroke, 'tree');
+    post.push(...boxFaces(item.x - 0.45, item.y - 0.45, item.x + 0.45, item.y + 0.45, 6.1, 7.1, '#F3E2A8', '#C4A35A', 'tree'));
+    return post;
+  }
   if (item.kind === 'path') {
     return boxFaces(
       item.x - item.w / 2,

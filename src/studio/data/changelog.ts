@@ -11,6 +11,15 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.9.0',
+    date: '2026-09-27',
+    bullets: [
+      'The Mansion: parlor, hall, stairs, dining, kitchen, bath, library, and grounds',
+      'New pieces: fireplace, rug, stairs, banister, lamps, sconces, chandelier, paneling, hedges, lampposts',
+      'More menu → The Mansion',
+    ],
+  },
+  {
     version: '2.8.1',
     date: '2026-09-27',
     bullets: [

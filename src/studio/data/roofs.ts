@@ -42,6 +42,7 @@ export const DEFAULT_ROOF_BY_STYLE: Record<StyleId, RoofStyleId | null> = {
   yurt: 'conical',
   'tiny-home': 'shed',
   'dog-house': 'gable',
+  mansion: 'mansard',
 };
 
 export function roofDefaultForStyle(styleId: StyleId | string): RoofStyleId | null {

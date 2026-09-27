@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.9.0 — 2026-09-27 — The Mansion
+- The Mansion: parlor, hall, stairs, dining, kitchen, bath, library, and grounds
+- New pieces: fireplace, rug, stairs, banister, lamps, sconces, chandelier, paneling, hedges, lampposts
+- More menu → The Mansion
+
 ## 2.8.1 — 2026-09-27 — Day one, checked
 - Until the walls close, the rail is Sketch, Wall, and Door even on Beginner
 - Show me only draws when the plan is empty. Save waits until the write finishes

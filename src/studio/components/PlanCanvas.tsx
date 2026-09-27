@@ -1617,6 +1617,24 @@ function PlantMark({
       </Group>
     );
   }
+  if (item.kind === 'hedge') {
+    return (
+      <Group x={item.x} y={item.y} listening={false} perfectDrawEnabled={false}>
+        <Rect x={-item.w / 2} y={-item.h / 2} width={item.w} height={item.h} cornerRadius={item.h / 2} fill="#1E4A28" />
+        <Rect x={-item.w / 2 + 0.2} y={-item.h / 2 + 0.15} width={item.w - 0.4} height={item.h * 0.55} cornerRadius={item.h / 3} fill="#3D8A4E" />
+        {selected ? <Rect x={-item.w / 2} y={-item.h / 2} width={item.w} height={item.h} stroke={accent} strokeWidth={sw} /> : null}
+      </Group>
+    );
+  }
+  if (item.kind === 'lamp') {
+    return (
+      <Group x={item.x} y={item.y} listening={false} perfectDrawEnabled={false}>
+        <Circle radius={0.55} fill="#F3E2A8" stroke="#C4A35A" strokeWidth={sw} />
+        <Rect x={-0.08} y={-0.08} width={0.16} height={0.7} fill="#3A3A40" />
+        {selected ? <Circle radius={0.8} stroke={accent} strokeWidth={sw} /> : null}
+      </Group>
+    );
+  }
   if (item.kind === 'path') {
     const hw = item.w / 2;
     const hh = item.h / 2;

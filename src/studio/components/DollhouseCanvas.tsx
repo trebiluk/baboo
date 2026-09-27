@@ -757,6 +757,35 @@ function DollPlant({
       </>
     );
   }
+  if (item.kind === 'hedge') {
+    const top = dollPts([
+      project(item.x - item.w / 2, item.y - item.h / 2, 3.1, spec),
+      project(item.x + item.w / 2, item.y - item.h / 2, 3.1, spec),
+      project(item.x + item.w / 2, item.y + item.h / 2, 3.1, spec),
+      project(item.x - item.w / 2, item.y + item.h / 2, 3.1, spec),
+    ]);
+    return <Line name="doll-plant" points={top} closed fill="#2F6B3A" stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />;
+  }
+  if (item.kind === 'lamp') {
+    const post = dollPts([
+      project(item.x - 0.12, item.y, 0, spec),
+      project(item.x + 0.12, item.y, 0, spec),
+      project(item.x + 0.12, item.y, 6.2, spec),
+      project(item.x - 0.12, item.y, 6.2, spec),
+    ]);
+    const globe = dollPts([
+      project(item.x - 0.45, item.y - 0.45, 6.4, spec),
+      project(item.x + 0.45, item.y - 0.45, 6.4, spec),
+      project(item.x + 0.45, item.y + 0.45, 7.1, spec),
+      project(item.x - 0.45, item.y + 0.45, 7.1, spec),
+    ]);
+    return (
+      <>
+        <Line name="doll-plant" points={post} closed fill="#3A3A40" stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
+        <Line name="doll-plant" points={globe} closed fill="#F3E2A8" stroke="#C4A35A" strokeWidth={sw} onClick={pick} onTap={pick} />
+      </>
+    );
+  }
   const hw = item.w / 2;
   const hh = item.h / 2;
   const c = Math.cos(item.rot);

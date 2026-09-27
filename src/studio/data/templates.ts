@@ -1,4 +1,4 @@
-import type { Floor, Opening, ProjectDocument, StyleId, StyleTemplate, Wall, Node, FurnitureItem, Room, RoomKind, LandscapeItem, PlantKind } from '../types';
+import type { Floor, Opening, ProjectDocument, StyleId, StyleTemplate, Wall, Node, FurnitureItem, Room, RoomKind, LandscapeItem, PlantKind, FloorFinishId } from '../types';
 import { DEFAULT_ROOF_BY_STYLE, roofStyleName } from './roofs';
 import { exteriorBounds, generateRoof } from '../lib/roof';
 import { APP_VERSION } from '../version';
@@ -14,6 +14,7 @@ export const STYLE_TEMPLATES: StyleTemplate[] = [
   { id: 'hobbit', name: 'Hobbit', blurb: 'Storybook cottage · round door · green living roof.' },
   { id: 'ranch', name: 'Ranch', blurb: 'Long one-story · rooms in a line · yard all around.' },
   { id: 'victorian', name: 'Victorian', blurb: 'Tall fancy house · steep fancy roof (mansard).' },
+  { id: 'mansion', name: 'The Mansion', blurb: 'Victorian mansion · parlor, stairs, lamps, hedges, and grounds.' },
   { id: 'cape-cod', name: 'Cape Cod', blurb: 'Compact rectangle — steep gable feel, simple rooms.' },
   { id: 'modern', name: 'Modern', blurb: 'Clean rectangle — open plan, flat roof default.' },
   { id: 'tudor', name: 'Tudor', blurb: 'Compact L-ish starter — steep gable vocabulary.' },
@@ -61,6 +62,9 @@ function rectPlan(
 
 function doorOn(wallId: string, t = 0.5, width = 3): Opening {
   return { id: uid('o'), wallId, t, width, type: 'door', symbolKind: 'swingDoor', swing: 'left' };
+}
+function slideOn(wallId: string, t = 0.5, width = 6): Opening {
+  return { id: uid('o'), wallId, t, width, type: 'door', symbolKind: 'slidingDoor' };
 }
 function windowOn(wallId: string, t = 0.5, width = 3): Opening {
   return { id: uid('o'), wallId, t, width, type: 'window', symbolKind: 'windowFixed' };
@@ -116,8 +120,8 @@ function polygonPlan(cx: number, cy: number, r: number, sides: number, thick = 0
   return { nodes, walls };
 }
 
-function furn(catalogId: string, x: number, y: number, w: number, h: number, label: string): FurnitureItem {
-  return { id: uid('f'), catalogId, x, y, w, h, rot: 0, zIndex: 1, label };
+function furn(catalogId: string, x: number, y: number, w: number, h: number, label: string, rot = 0, color?: string): FurnitureItem {
+  return { id: uid('f'), catalogId, x, y, w, h, rot, zIndex: 1, label, ...(color ? { color } : {}) };
 }
 
 function plant(kind: PlantKind, x: number, y: number, w: number, h: number, label: string): LandscapeItem {
@@ -158,13 +162,151 @@ function furnishYard(floor: Floor) {
   floor.layers = { ...floor.layers, landscape: true };
 }
 
-function room(kind: RoomKind, x: number, y: number, name?: string): Room {
+function room(kind: RoomKind, x: number, y: number, name?: string, floorFinishId?: FloorFinishId): Room {
   const names: Record<RoomKind, string> = {
     entry: 'Entry', living: 'Living', kitchen: 'Kitchen', dining: 'Dining',
     bedroom: 'Bedroom', bath: 'Bath', office: 'Office', utility: 'Utility',
     storage: 'Storage', outdoor: 'Outdoor', other: 'Other',
   };
-  return { id: uid('rm'), kind, name: name ?? names[kind], x, y };
+  return { id: uid('rm'), kind, name: name ?? names[kind], x, y, floorFinishId };
+}
+
+/** Evaluation house: a closed Victorian mansion with grounds. */
+function buildMansion(floor: Floor) {
+  const N = (x: number, y: number): Node => ({ id: uid('n'), x, y });
+  const pFL = N(18, 0);
+  const pFR = N(38, 0);
+  const fL = N(0, 8);
+  const hL = N(22, 8);
+  const hR = N(34, 8);
+  const fR = N(56, 8);
+  const midL = N(0, 24);
+  const parR = N(22, 24);
+  const dinL = N(34, 24);
+  const kSplit = N(46, 24);
+  const midR = N(56, 24);
+  const stL = N(22, 28);
+  const stR = N(34, 28);
+  const bL = N(0, 40);
+  const bHL = N(22, 40);
+  const bHR = N(34, 40);
+  const bBath = N(46, 40);
+  const bR = N(56, 40);
+  const W = (a: Node, b: Node, kind: Wall['kind'] = 'exterior'): Wall => ({
+    id: uid('w'), a: a.id, b: b.id, kind, thickness: kind === 'exterior' ? 0.55 : 0.35,
+  });
+  const porchFront = W(pFL, pFR);
+  const porchLeft = W(pFL, hL);
+  const porchRight = W(pFR, hR);
+  const frontL = W(fL, hL);
+  const frontDoor = W(hL, hR);
+  const frontR = W(hR, fR);
+  const rightL = W(fR, midR);
+  const rightU = W(midR, bR);
+  const backR = W(bR, bBath);
+  const backBath = W(bBath, bHR);
+  const backStair = W(bHR, bHL);
+  const backLib = W(bHL, bL);
+  const leftU = W(bL, midL);
+  const leftL = W(midL, fL);
+  const parLib = W(midL, parR, 'interior');
+  const hallPar = W(hL, parR, 'interior');
+  const hallDin = W(hR, dinL, 'interior');
+  const galL = W(parR, stL, 'interior');
+  const galR = W(dinL, stR, 'interior');
+  const stairFront = W(stL, stR, 'interior');
+  const stairL = W(stL, bHL, 'interior');
+  const stairR = W(stR, bHR, 'interior');
+  const dinKit = W(dinL, kSplit, 'interior');
+  const dinBath = W(kSplit, midR, 'interior');
+  const bathWall = W(kSplit, bBath, 'interior');
+  floor.nodes = [pFL, pFR, fL, hL, hR, fR, midL, parR, dinL, kSplit, midR, stL, stR, bL, bHL, bHR, bBath, bR];
+  floor.walls = [
+    porchFront, porchLeft, porchRight, frontL, frontDoor, frontR, rightL, rightU,
+    backR, backBath, backStair, backLib, leftU, leftL,
+    parLib, hallPar, hallDin, galL, galR, stairFront, stairL, stairR, dinKit, dinBath, bathWall,
+  ];
+  floor.openings = [
+    slideOn(porchFront.id, 0.5, 8),
+    doorOn(frontDoor.id, 0.5, 3.5),
+    windowOn(frontL.id, 0.35, 4),
+    windowOn(frontL.id, 0.72, 3),
+    slideOn(frontR.id, 0.55, 6),
+    windowOn(rightL.id, 0.45, 4),
+    windowOn(rightU.id, 0.4, 3),
+    windowOn(leftL.id, 0.5, 4),
+    windowOn(leftU.id, 0.55, 3),
+    windowOn(backLib.id, 0.5, 4),
+    windowOn(backR.id, 0.5, 3),
+    doorOn(hallPar.id, 0.55, 2.8),
+    doorOn(hallDin.id, 0.45, 2.8),
+    doorOn(parLib.id, 0.62, 2.6),
+    doorOn(dinKit.id, 0.5, 2.6),
+    doorOn(bathWall.id, 0.3, 2.4),
+    doorOn(stairFront.id, 0.5, 3),
+  ];
+  floor.furniture = [
+    furn('rug', 11, 16, 12, 8, 'Parlor rug'),
+    furn('sofa', 11, 12, 7, 3, 'Settee', 0, '#6E2E3A'),
+    furn('chair', 5, 18, 2.5, 2.5, 'Armchair', 0, '#6E2E3A'),
+    furn('chair', 17, 18, 2.5, 2.5, 'Armchair', 0, '#4A3A28'),
+    furn('coffee-table', 11, 15.2, 4, 2, 'Table'),
+    furn('fireplace', 11, 22.7, 6, 1.2, 'Fireplace'),
+    furn('floor-lamp', 3.4, 11, 1.2, 1.2, 'Lamp'),
+    furn('sconce', 3, 16, 0.8, 0.5, 'Sconce'),
+    furn('wainscot', 11, 9.2, 16, 0.35, 'Paneling'),
+    furn('desk', 8, 32, 4, 2, 'Library desk'),
+    furn('chair', 8, 34.4, 1.6, 1.6, 'Desk chair', 0, '#5C4030'),
+    furn('storage-shelf', 4, 36.5, 3, 1.3, 'Bookcase'),
+    furn('floor-lamp', 16, 34, 1.2, 1.2, 'Reading lamp'),
+    furn('rug', 28, 16, 4.5, 12, 'Hall runner', 0, '#1E3A5F'),
+    furn('chandelier', 28, 15, 3.2, 3.2, 'Hall chandelier'),
+    furn('banister', 28, 27.5, 10, 0.35, 'Banister'),
+    furn('stairs', 28, 34, 6, 8, 'Stairs'),
+    furn('dining-table', 45, 15, 8, 3.6, 'Dining table'),
+    furn('dining-chair', 42, 12.6, 1.5, 1.5, 'Chair'),
+    furn('dining-chair', 48, 12.6, 1.5, 1.5, 'Chair'),
+    furn('dining-chair', 42, 17.4, 1.5, 1.5, 'Chair'),
+    furn('dining-chair', 48, 17.4, 1.5, 1.5, 'Chair'),
+    furn('chandelier', 45, 15, 3.4, 3.4, 'Dining chandelier'),
+    furn('stove', 38, 36.5, 2.5, 2.2, 'Range'),
+    furn('sink', 42.5, 37.2, 3, 1.6, 'Sink'),
+    furn('fridge', 40, 29, 3, 2.2, 'Ice box'),
+    furn('bathtub', 51.2, 36, 4, 2.3, 'Tub'),
+    furn('toilet', 52.2, 27.5, 1.5, 2.2, 'WC'),
+  ];
+  floor.rooms = [
+    room('outdoor', 28, 4, 'Porch', 'brick'),
+    room('living', 11, 16, 'Parlor', 'herringbone'),
+    room('office', 11, 32, 'Library', 'carpet'),
+    room('entry', 28, 16, 'Hall', 'marble'),
+    room('other', 28, 34, 'Stair hall', 'oak'),
+    room('dining', 45, 15, 'Dining room', 'walnut'),
+    room('kitchen', 40, 32, 'Kitchen', 'checker'),
+    room('bath', 51, 33, 'Bath', 'hex'),
+  ];
+  floor.landscape = [
+    plant('path', 28, -8, 4.2, 14, 'Carriage walk'),
+    plant('hedge', 9, -1.2, 16, 2.2, 'Box hedge'),
+    plant('hedge', 47, -1.2, 16, 2.2, 'Box hedge'),
+    plant('hedge', 28, 46, 36, 2.2, 'Back hedge'),
+    plant('hedge', -2, 24, 2.2, 18, 'Side hedge'),
+    plant('hedge', 58, 24, 2.2, 18, 'Side hedge'),
+    plant('lamp', 14, -6, 1.2, 1.2, 'Lamppost'),
+    plant('lamp', 42, -6, 1.2, 1.2, 'Lamppost'),
+    plant('lamp', 4, 16, 1.2, 1.2, 'Lamppost'),
+    plant('lamp', 52, 16, 1.2, 1.2, 'Lamppost'),
+    plant('tree', 8, -10, 8, 8, 'Oak'),
+    plant('tree', 48, -10, 8, 8, 'Elm'),
+    plant('tree', -6, 12, 7, 7, 'Beech'),
+    plant('tree', 62, 12, 7, 7, 'Maple'),
+    plant('tree', 6, 48, 8, 8, 'Oak'),
+    plant('tree', 50, 48, 8, 8, 'Chestnut'),
+    plant('bed', 8, 3, 7, 3, 'Roses'),
+    plant('bed', 48, 3, 7, 3, 'Lilies'),
+    plant('bed', 28, 44, 10, 3, 'Border'),
+  ];
+  floor.layers = { ...floor.layers, landscape: true, rooms: true, furniture: true };
 }
 
 export function buildTemplateProject(styleId: StyleId, title?: string): ProjectDocument {
@@ -284,6 +426,8 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
       furn('mech-closet', 4, 18, 3, 3, 'Mech'),
     ];
     floor.rooms = [room('living', 14, 11)];
+  } else if (styleId === 'mansion') {
+    buildMansion(floor);
   } else if (styleId === 'cape-cod') {
     const outer = rectPlan(0, 0, 30, 20);
     floor.nodes = outer.nodes;
@@ -381,13 +525,14 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
   }
 
   const roofStyleId = DEFAULT_ROOF_BY_STYLE[styleId] ?? null;
-  if (styleId !== 'dog-house' && styleId !== 'tiny-home' && floor.walls.length > 2) furnishYard(floor);
-  floor.roof = generateRoof(floor.nodes, floor.walls, roofStyleId, DEFAULT_WALL_HEIGHT_FT);
+  const wallH = styleId === 'mansion' ? 10 : DEFAULT_WALL_HEIGHT_FT;
+  if (styleId !== 'dog-house' && styleId !== 'tiny-home' && styleId !== 'mansion' && floor.walls.length > 2) furnishYard(floor);
+  floor.roof = generateRoof(floor.nodes, floor.walls, roofStyleId, wallH);
 
   return {
     meta: {
       id: uid('proj'),
-      title: title ?? `${style.name} Plan`,
+      title: title ?? (styleId === 'mansion' ? 'The Mansion' : `${style.name} Plan`),
       units: 'ft',
       version: APP_VERSION,
       createdAt: now,
@@ -409,7 +554,7 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
       snap: true,
       ortho: true,
       osnap: true,
-      wallHeight: DEFAULT_WALL_HEIGHT_FT,
+      wallHeight: wallH,
       units: 'ft',
       accent: '#6E72F5',
       guiTheme: 'stark',

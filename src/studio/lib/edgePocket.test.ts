@@ -8,11 +8,14 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.8.1 day one check', () => {
-  it('chips 2.8.1 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.8.1');
+describe('2.9.0 the mansion', () => {
+  it('chips 2.9.0 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.9.0');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.9\.0'/);
     assert.match(changelog, /version:\s*'2\.8\.1'/);
+    const templates = readFileSync(join(studio, 'data/templates.ts'), 'utf8');
+    assert.match(templates, /function buildMansion/);
     assert.match(changelog, /version:\s*'2\.8\.0'/);
     assert.match(changelog, /version:\s*'2\.7\.0'/);
     assert.match(changelog, /version:\s*'2\.6\.0'/);
@@ -23,7 +26,6 @@ describe('2.8.1 day one check', () => {
     assert.match(changelog, /version:\s*'2\.5\.1'/);
     assert.match(changelog, /version:\s*'2\.5\.0'/);
     assert.match(changelog, /version:\s*'2\.4\.3'/);
-    const templates = readFileSync(join(studio, 'data/templates.ts'), 'utf8');
     assert.match(templates, /function furnishYard/);
     assert.match(templates, /Bookcase/);
     assert.match(changelog, /version:\s*'2\.4\.2'/);

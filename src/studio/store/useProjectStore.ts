@@ -871,7 +871,8 @@ export const useProjectStore = create<Store>((set, get) => ({
 
   newFromTemplate: (styleId) => {
     const cur = get().doc.settings;
-    const skillLevel = cur.skillLevel ?? DEFAULT_SKILL_LEVEL;
+    const skillLevel = styleId === 'mansion' ? 'moderate' : (cur.skillLevel ?? DEFAULT_SKILL_LEVEL);
+    if (styleId === 'mansion') writeSkillPref('moderate');
     const doc = buildTemplateProject(styleId);
     doc.settings.skillLevel = skillLevel;
     doc.settings.locale = cur.locale;
@@ -898,7 +899,9 @@ export const useProjectStore = create<Store>((set, get) => ({
     get().showToast(
       styleId === 'dog-house'
         ? t(doc.settings.locale, 'toast.contestStart')
-        : t(doc.settings.locale, 'toast.ready', { title: doc.meta.title }),
+        : styleId === 'mansion'
+          ? 'The Mansion is ready. Open the dollhouse, then 3D.'
+          : t(doc.settings.locale, 'toast.ready', { title: doc.meta.title }),
     );
     setTimeout(() => get().fitPlan(), 80);
   },

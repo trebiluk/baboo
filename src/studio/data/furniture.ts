@@ -23,4 +23,12 @@ export const FURNITURE_CATALOG: CatalogItem[] = [
   { id: 'mech-closet', name: 'Mech Closet', category: 'Utility', w: 3, h: 3, color: '#5a6670' },
   { id: 'washer', name: 'Washer', category: 'Utility', w: 2.5, h: 2.5, color: '#6a7888' },
   { id: 'dryer', name: 'Dryer', category: 'Utility', w: 2.5, h: 2.5, color: '#6a7888' },
+  { id: 'fireplace', name: 'Fireplace', category: 'Living', w: 5, h: 1.4, color: '#8C4A3A' },
+  { id: 'rug', name: 'Rug', category: 'Living', w: 8, h: 5, color: '#6E2E3A' },
+  { id: 'stairs', name: 'Stairs', category: 'Entry', w: 4, h: 8, color: '#8B6914' },
+  { id: 'banister', name: 'Banister', category: 'Entry', w: 8, h: 0.4, color: '#5C4030' },
+  { id: 'floor-lamp', name: 'Floor lamp', category: 'Living', w: 1.2, h: 1.2, color: '#C4A35A' },
+  { id: 'sconce', name: 'Sconce', category: 'Living', w: 0.8, h: 0.6, color: '#E8D5A3' },
+  { id: 'chandelier', name: 'Chandelier', category: 'Dining', w: 3, h: 3, color: '#E6C36A' },
+  { id: 'wainscot', name: 'Wall paneling', category: 'Living', w: 8, h: 0.4, color: '#E7D7C1' },
 ];
