@@ -31,4 +31,7 @@ export const FURNITURE_CATALOG: CatalogItem[] = [
   { id: 'sconce', name: 'Sconce', category: 'Living', w: 0.8, h: 0.6, color: '#E8D5A3' },
   { id: 'chandelier', name: 'Chandelier', category: 'Dining', w: 3, h: 3, color: '#E6C36A' },
   { id: 'wainscot', name: 'Wall paneling', category: 'Living', w: 8, h: 0.4, color: '#E7D7C1' },
+  { id: 'column', name: 'Porch column', category: 'Entry', w: 0.8, h: 0.8, color: '#F4F0E8' },
+  { id: 'window-seat', name: 'Window seat', category: 'Living', w: 6, h: 1.8, color: '#6E2E3A' },
+  { id: 'painting', name: 'Painting', category: 'Living', w: 3, h: 0.3, color: '#C4A574' },
 ];

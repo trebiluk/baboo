@@ -221,9 +221,12 @@ export function DollhouseCanvas() {
       const texId = w.finishId || houseTex;
       const useTex = texId && texId !== 'pack:plain' ? texId : null;
       const sel = selected?.kind === 'wall' && selected.id === w.id;
-      const fill = textureStrokeFallback(useTex) ?? (w.kind === 'exterior'
-        ? (light ? '#d8dce8' : '#3a4560')
-        : (light ? '#ece4d4' : '#4a4034'));
+      const brick = w.drawStyle === 'brick' && w.kind === 'exterior';
+      const fill = textureStrokeFallback(useTex) ?? (brick
+        ? '#A15A48'
+        : w.kind === 'exterior'
+          ? (light ? '#d8dce8' : '#3a4560')
+          : (light ? '#ece4d4' : '#4a4034'));
       const tile = useTex ? tiles.get(useTex) : undefined;
       const thick = Math.max(0.42, w.thickness || 0.5);
       const cuts = wallCutFaces(
@@ -235,9 +238,11 @@ export function DollhouseCanvas() {
           .filter((o) => o.wallId === w.id)
           .map((o) => ({ t: o.t, width: o.width, kind: o.type, swing: o.swing })),
       );
-      const shades = light
-        ? ['#f4f0e8', '#e3dcd0', '#ebe4d8', '#e7dfd2', '#faf7f2']
-        : ['#3a4560', '#2a3348', '#33405a', '#303a52', '#4a5670'];
+      const shades = brick
+        ? ['#C47860', '#A15A48', '#B56A55', '#8E4E3E', '#D08970']
+        : light
+          ? ['#f4f0e8', '#e3dcd0', '#ebe4d8', '#e7dfd2', '#faf7f2']
+          : ['#3a4560', '#2a3348', '#33405a', '#303a52', '#4a5670'];
       cuts.walls.forEach((ring, i) => {
         const mx = ring.reduce((s, p) => s + p.x, 0) / ring.length;
         const my = ring.reduce((s, p) => s + p.y, 0) / ring.length;

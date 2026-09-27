@@ -349,7 +349,9 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
     const nx = -uy;
     const ny = ux;
     const hw = (wall.thickness || 0.5) / 2;
-    const fill = wall.kind === 'exterior' ? tint.fill : tint.fillShade;
+    const brick = wall.drawStyle === 'brick' && wall.kind === 'exterior';
+    const fill = brick ? '#A15A48' : (wall.kind === 'exterior' ? tint.fill : tint.fillShade);
+    const cap = brick ? '#C47860' : tint.fillShade;
     const h = wall.kind === 'interior' ? wallH - 0.4 : wallH;
     const ops = (byWall.get(wall.id) ?? []).slice().sort((p, q) => p.t - q.t);
     const foot = wallFootprint(wall, floor.nodes, floor.walls);
@@ -398,7 +400,7 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
       faces.push(quad(p00, p10, p11, p01, fill, stroke, 'wall'));
       faces.push(quad(n10, n00, n01, n11, fill, stroke, 'wall'));
       if (s.z1 >= h - 0.05) {
-        faces.push(quad(p01, p11, n11, n01, tint.fillShade, stroke, 'wall'));
+        faces.push(quad(p01, p11, n11, n01, cap, stroke, 'wall'));
       }
     }
   }

@@ -397,6 +397,23 @@ function furniturePartsFull(item: FurnitureItem): FurnPart[] {
         box(0, 0, w, h, 0, 3.15, '#E7D7C1'),
         box(0, 0, w, Math.max(0.12, h * 0.45), 3.05, 3.3, WOOD_DK),
       ];
+    case 'column':
+      return [
+        cyl(0, 0, Math.max(w, h) * 1.15, 0, 0.35, '#E7E2D8'),
+        cyl(0, 0, Math.max(w, h) * 0.72, 0.35, 8.6, '#F7F4EE'),
+        cyl(0, 0, Math.max(w, h) * 1.2, 8.6, 9.15, '#E7E2D8'),
+      ];
+    case 'window-seat':
+      return [
+        box(0, 0, w, h, 0, 1.15, WOOD),
+        box(0, 0, w * 0.92, h * 0.8, 1.15, 1.55, UPH),
+        box(0, -hh * 0.15, w * 0.7, h * 0.35, 1.5, 1.85, PILLOW),
+      ];
+    case 'painting':
+      return [
+        box(0, 0, w, h, 4.2, 6.4, WOOD_DK),
+        box(0, 0.02, w * 0.82, h * 0.4, 4.45, 6.15, '#6E8F74'),
+      ];
     default: {
       const color = FURNITURE_CATALOG.find((c) => c.id === id)?.color ?? '#6a7080';
       return [box(0, 0, w, h, 0, Math.min(4.2, 1.2 + Math.min(w, h) * 0.4), color)];
@@ -458,6 +475,12 @@ function furnitureSilhouette(item: FurnitureItem): FurnPart[] {
     case 'sconce':
     case 'chandelier':
       return [cyl(0, 0, Math.min(w, h), 3.2, 5.2, '#F3E2A8')];
+    case 'column':
+      return [cyl(0, 0, Math.max(w, h), 0, 9, '#F4F0E8')];
+    case 'window-seat':
+      return [box(0, 0, w, h, 0, 1.5, UPH)];
+    case 'painting':
+      return [box(0, 0, w, h, 4.2, 6.3, WOOD_DK)];
     default: {
       const color = FURNITURE_CATALOG.find((c) => c.id === id)?.color ?? '#6a7080';
       const z1 = id === 'fridge' || id === 'closet' || id === 'mech-closet' ? 6.2 : 3.1;

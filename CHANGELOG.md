@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.10.0 — 2026-09-27 — Bay and brick
+- The Mansion is brick, with a parlor bay, a window seat, and four porch columns
+- A portrait hangs over the fireplace. Brick walls read in the plan, dollhouse, and 3D
+
 ## 2.9.1 — 2026-09-27 — Mansion polish
 - The Mansion keeps its furniture detail instead of flat stamps
 - Hedges, lampposts, and stairs read as objects. The grounds stay in the dollhouse view

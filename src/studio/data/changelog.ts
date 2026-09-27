@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.10.0',
+    date: '2026-09-27',
+    bullets: [
+      'The Mansion is brick, with a parlor bay, a window seat, and four porch columns',
+      'A portrait hangs over the fireplace. Brick walls read in the plan, dollhouse, and 3D',
+    ],
+  },
+  {
     version: '2.9.1',
     date: '2026-09-27',
     bullets: [

@@ -14,7 +14,7 @@ export const STYLE_TEMPLATES: StyleTemplate[] = [
   { id: 'hobbit', name: 'Hobbit', blurb: 'Storybook cottage · round door · green living roof.' },
   { id: 'ranch', name: 'Ranch', blurb: 'Long one-story · rooms in a line · yard all around.' },
   { id: 'victorian', name: 'Victorian', blurb: 'Tall fancy house · steep fancy roof (mansard).' },
-  { id: 'mansion', name: 'The Mansion', blurb: 'Victorian mansion · parlor, stairs, lamps, hedges, and grounds.' },
+  { id: 'mansion', name: 'The Mansion', blurb: 'Victorian mansion · brick, bay window, columns, and grounds.' },
   { id: 'cape-cod', name: 'Cape Cod', blurb: 'Compact rectangle — steep gable feel, simple rooms.' },
   { id: 'modern', name: 'Modern', blurb: 'Clean rectangle — open plan, flat roof default.' },
   { id: 'tudor', name: 'Tudor', blurb: 'Compact L-ish starter — steep gable vocabulary.' },
@@ -193,12 +193,22 @@ function buildMansion(floor: Floor) {
   const bBath = N(46, 40);
   const bR = N(56, 40);
   const W = (a: Node, b: Node, kind: Wall['kind'] = 'exterior'): Wall => ({
-    id: uid('w'), a: a.id, b: b.id, kind, thickness: kind === 'exterior' ? 0.55 : 0.35,
+    id: uid('w'), a: a.id, b: b.id, kind,
+    thickness: kind === 'exterior' ? 0.55 : 0.35,
+    drawStyle: kind === 'exterior' ? 'brick' : 'outline',
   });
+  const bayA = N(3, 8);
+  const bayB = N(3, 4.2);
+  const bayC = N(15, 4.2);
+  const bayD = N(15, 8);
   const porchFront = W(pFL, pFR);
   const porchLeft = W(pFL, hL);
   const porchRight = W(pFR, hR);
-  const frontL = W(fL, hL);
+  const frontFar = W(fL, bayA);
+  const baySideL = W(bayA, bayB);
+  const bayFront = W(bayB, bayC);
+  const baySideR = W(bayC, bayD);
+  const frontNear = W(bayD, hL);
   const frontDoor = W(hL, hR);
   const frontR = W(hR, fR);
   const rightL = W(fR, midR);
@@ -220,17 +230,18 @@ function buildMansion(floor: Floor) {
   const dinKit = W(dinL, kSplit, 'interior');
   const dinBath = W(kSplit, midR, 'interior');
   const bathWall = W(kSplit, bBath, 'interior');
-  floor.nodes = [pFL, pFR, fL, hL, hR, fR, midL, parR, dinL, kSplit, midR, stL, stR, bL, bHL, bHR, bBath, bR];
+  floor.nodes = [pFL, pFR, fL, bayA, bayB, bayC, bayD, hL, hR, fR, midL, parR, dinL, kSplit, midR, stL, stR, bL, bHL, bHR, bBath, bR];
   floor.walls = [
-    porchFront, porchLeft, porchRight, frontL, frontDoor, frontR, rightL, rightU,
+    porchFront, porchLeft, porchRight, frontFar, baySideL, bayFront, baySideR, frontNear, frontDoor, frontR, rightL, rightU,
     backR, backBath, backStair, backLib, leftU, leftL,
     parLib, hallPar, hallDin, galL, galR, stairFront, stairL, stairR, dinKit, dinBath, bathWall,
   ];
   floor.openings = [
     slideOn(porchFront.id, 0.5, 8),
     doorOn(frontDoor.id, 0.5, 3.5),
-    windowOn(frontL.id, 0.35, 4),
-    windowOn(frontL.id, 0.72, 3),
+    windowOn(bayFront.id, 0.5, 6),
+    windowOn(baySideL.id, 0.55, 2.4),
+    windowOn(baySideR.id, 0.55, 2.4),
     slideOn(frontR.id, 0.55, 6),
     windowOn(rightL.id, 0.45, 4),
     windowOn(rightU.id, 0.4, 3),
@@ -278,6 +289,12 @@ function buildMansion(floor: Floor) {
     furn('fridge', 40, 29, 3, 2.2, 'Ice box'),
     furn('bathtub', 51.2, 36, 4, 2.3, 'Tub'),
     furn('toilet', 52.2, 27.5, 1.5, 2.2, 'WC'),
+    furn('window-seat', 9, 6.15, 8, 1.5, 'Window seat', 0, '#6E2E3A'),
+    furn('painting', 11, 21.5, 3.4, 0.22, 'Portrait'),
+    furn('column', 20.2, 1.3, 0.7, 0.7, 'Column'),
+    furn('column', 24.6, 1.3, 0.7, 0.7, 'Column'),
+    furn('column', 31.4, 1.3, 0.7, 0.7, 'Column'),
+    furn('column', 35.8, 1.3, 0.7, 0.7, 'Column'),
   ];
   floor.rooms = [
     room('outdoor', 28, 4, 'Porch', 'brick'),
@@ -306,7 +323,7 @@ function buildMansion(floor: Floor) {
     plant('tree', 62, 12, 7, 7, 'Maple'),
     plant('tree', 6, 48, 8, 8, 'Oak'),
     plant('tree', 50, 48, 8, 8, 'Chestnut'),
-    plant('bed', 8, 3, 7, 3, 'Roses'),
+    plant('bed', 8, 1.6, 6, 2.4, 'Roses'),
     plant('bed', 48, 3, 7, 3, 'Lilies'),
     plant('bed', 28, 44, 10, 3, 'Border'),
   ];
