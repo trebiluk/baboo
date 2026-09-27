@@ -68,7 +68,7 @@ export function DollhouseCanvas() {
   const fitNonce = useProjectStore((s) => s.fitNonce);
   const light = (settings.guiTheme ?? DEFAULT_GUI_THEME) !== 'ink';
   const blocky = settings.guiTheme === 'blocky';
-  const furnLod = furnitureLod({ count: floor.furniture.length, zoom: zoom * 16 });
+  const furnLod = furnitureLod({ count: floor.furniture.length });
   const spec: ProjSpec = {
     kind: (settings.dollProj ?? 'iso') as DollProj,
     yaw: (settings.dollYaw ?? 0) as YawDeg,
@@ -195,7 +195,7 @@ export function DollhouseCanvas() {
     const faces: SceneFace[] = [];
     const ink = blocky ? '#1a1208' : (light ? '#3a342c' : '#c5d0ea');
     const furnInk = blocky ? '#1a1208' : '#3f3f46';
-    const swWall = (sel: boolean) => (sel ? 3 : (blocky ? 2.5 : 1.75)) / zoom;
+    const swWall = (sel: boolean) => (sel ? 2.5 : (blocky ? 2.5 : 1.05)) / zoom;
     const swFurn = (sel: boolean) => (sel ? 2 : (blocky ? 2 : 1)) / zoom;
 
     for (const w of floor.walls) {
@@ -523,9 +523,9 @@ export function DollhouseCanvas() {
                 points={rf.pts}
                 closed
                 fill={floorFinish(rf.finish).color}
-                fillPatternImage={furnLod === 'full' ? floorTileCanvas(rf.finish, asFloorGrain(settings.floorGrain)) as CanvasImageSource as HTMLImageElement : undefined}
+                fillPatternImage={!blocky ? floorTileCanvas(rf.finish, asFloorGrain(settings.floorGrain)) as CanvasImageSource as HTMLImageElement : undefined}
                 fillPatternRepeat="repeat"
-                fillPriority={furnLod === 'full' ? 'pattern' : 'color'}
+                fillPriority={!blocky ? 'pattern' : 'color'}
                 fillPatternScaleX={0.04}
                 fillPatternScaleY={0.04}
                 stroke={blocky ? '#1a1208' : (light ? '#9aa890' : '#6d7a62')}
@@ -538,9 +538,9 @@ export function DollhouseCanvas() {
               points={floorPoly}
               closed
               fill={floorFinish(asFloorFinish(settings.floorFinishId)).color}
-              fillPatternImage={furnLod === 'full' ? floorTileCanvas(asFloorFinish(settings.floorFinishId), asFloorGrain(settings.floorGrain)) as CanvasImageSource as HTMLImageElement : undefined}
+              fillPatternImage={!blocky ? floorTileCanvas(asFloorFinish(settings.floorFinishId), asFloorGrain(settings.floorGrain)) as CanvasImageSource as HTMLImageElement : undefined}
               fillPatternRepeat="repeat"
-              fillPriority={furnLod === 'full' ? 'pattern' : 'color'}
+              fillPriority={!blocky ? 'pattern' : 'color'}
               fillPatternScaleX={0.04}
               fillPatternScaleY={0.04}
               stroke={blocky ? '#1a1208' : (light ? '#9aa890' : '#6d7a62')}
@@ -561,9 +561,9 @@ export function DollhouseCanvas() {
                 points={pts}
                 closed
                 fill={floorFinish(fid).color}
-                fillPatternImage={furnLod === 'full' ? floorTileCanvas(fid, grain) as CanvasImageSource as HTMLImageElement : undefined}
+                fillPatternImage={!blocky ? floorTileCanvas(fid, grain) as CanvasImageSource as HTMLImageElement : undefined}
                 fillPatternRepeat="repeat"
-                fillPriority={furnLod === 'full' ? 'pattern' : 'color'}
+                fillPriority={!blocky ? 'pattern' : 'color'}
                 fillPatternScaleX={0.04}
                 fillPatternScaleY={0.04}
                 listening={false}

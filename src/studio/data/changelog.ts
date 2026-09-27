@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.5.3',
+    date: '2026-09-27',
+    bullets: [
+      'Dollhouse furniture has height, and the floor keeps its wood grain',
+      'The coach card stays on the plan, so it does not cover the dollhouse',
+    ],
+  },
+  {
     version: '2.5.2',
     date: '2026-09-27',
     bullets: [

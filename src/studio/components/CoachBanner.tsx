@@ -20,10 +20,12 @@ export function CoachBanner() {
   const helpOpen = useProjectStore((s) => s.helpOpen);
   const newProjectOpen = useProjectStore((s) => s.newProjectOpen);
   const selected = useProjectStore((s) => s.selected);
+  const viewMode = useProjectStore((s) => s.viewMode);
   const [dismissed, setDismissed] = useState<string | null>(null);
 
   const step = nextCoach(skillLevel, floor, styleId);
 
+  if (viewMode !== 'plan') return null;
   if (skillRank(skillLevel) > 1 && styleId !== 'dog-house') return null;
   if (teachingOpen || contestOpen || customizeOpen || helpOpen || newProjectOpen) return null;
   if (selected && selected.kind !== 'sketch') return null;
