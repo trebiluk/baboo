@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.11.1',
+    date: '2026-09-27',
+    bullets: [
+      'The 3D engine stays up when you walk in. Shadows cover the house, not the whole field',
+      'Brick, floors, and the roof pick up a light texture. A small screen draws fewer pixels',
+    ],
+  },
+  {
     version: '2.11.0',
     date: '2026-09-27',
     bullets: [

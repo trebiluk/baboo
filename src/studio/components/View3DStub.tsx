@@ -30,9 +30,9 @@ export function View3DStub() {
     tint: WALL_TINT[tintId].fill,
     ground: site.ground,
     showFurn: asShowFurniture3d(settings.showFurniture3d),
-    ceiling: walk,
+    ceiling: true,
     houseFinish: asFloorFinish(settings.floorFinishId),
-  }), [settings.wallHeight, settings.showFurniture3d, settings.floorFinishId, tintId, site.ground, walk]);
+  }), [settings.wallHeight, settings.showFurniture3d, settings.floorFinishId, tintId, site.ground]);
 
   if (viewMode === 'plan' || viewMode === 'dollhouse') return null;
 

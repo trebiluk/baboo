@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.11.1 — 2026-09-27 — Engine tuned
+- The 3D engine stays up when you walk in. Shadows cover the house, not the whole field
+- Brick, floors, and the roof pick up a light texture. A small screen draws fewer pixels
+
 ## 2.11.0 — 2026-09-27 — WebGL engine
 - The cube and the walk are a real WebGL engine: lights, shadows, and walls with holes
 - Drag to orbit. Walk in stops at walls. The plan and the dollhouse stay the same

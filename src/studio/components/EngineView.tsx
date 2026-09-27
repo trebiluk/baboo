@@ -67,8 +67,12 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
   useEffect(() => {
     const wrap = wrapRef.current;
     if (!wrap) return;
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(1.5, window.devicePixelRatio || 1));
+    const renderer = new THREE.WebGLRenderer({
+      antialias: (wrap.clientWidth || 800) >= 900,
+      powerPreference: 'default',
+    });
+    const narrow = (wrap.clientWidth || 800) < 1000;
+    renderer.setPixelRatio(Math.min(narrow ? 1 : 1.25, window.devicePixelRatio || 1));
     renderer.setSize(wrap.clientWidth || 800, wrap.clientHeight || 480);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -91,21 +95,39 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     const sun = new THREE.DirectionalLight(0xfff2d8, 1.45);
     sun.position.set(48, 72, 28);
     sun.castShadow = true;
-    sun.shadow.mapSize.set(1024, 1024);
-    sun.shadow.camera.near = 2;
-    sun.shadow.camera.far = 220;
-    const span = 90;
-    sun.shadow.camera.left = -span;
-    sun.shadow.camera.right = span;
-    sun.shadow.camera.top = span;
-    sun.shadow.camera.bottom = -span;
-    sun.shadow.bias = -0.0003;
-    sun.shadow.normalBias = 0.04;
+    sun.shadow.mapSize.set(512, 512);
+    sun.shadow.camera.near = 1;
+    sun.shadow.camera.far = 160;
+    sun.shadow.bias = -0.0004;
+    sun.shadow.normalBias = 0.05;
     scene.add(sun);
-    scene.add(new THREE.AmbientLight(0xffffff, 0.18));
+    scene.add(sun.target);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.22));
 
     const built = buildHouse(floor, look);
     scene.add(built.root);
+    const ceilings: THREE.Object3D[] = [];
+    const shade = new THREE.Box3();
+    built.root.traverse((obj) => {
+      if (obj.name === 'ceiling') ceilings.push(obj);
+      const mesh = obj as THREE.Mesh;
+      if (!mesh.isMesh || mesh.geometry?.type === 'CircleGeometry' || obj.name === 'ceiling') return;
+      shade.expandByObject(mesh);
+    });
+    if (!shade.isEmpty()) {
+      const c = shade.getCenter(new THREE.Vector3());
+      const s = shade.getSize(new THREE.Vector3());
+      const span = Math.min(64, Math.max(s.x, s.z) * 0.62 + 8);
+      sun.position.set(c.x + 26, Math.max(24, s.y + 36), c.z + 14);
+      sun.target.position.set(c.x, c.y, c.z);
+      const cam = sun.shadow.camera;
+      cam.left = -span;
+      cam.right = span;
+      cam.top = span;
+      cam.bottom = -span;
+      cam.updateProjectionMatrix();
+    }
+    for (const lid of ceilings) lid.visible = walkRef.current;
     camRef.current = fitCam(built.root);
     const home = { ...camRef.current };
 
@@ -197,15 +219,22 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     });
     ro.observe(wrap);
 
+    let hidden = document.hidden;
+    const onVis = () => { hidden = document.hidden; };
+    document.addEventListener('visibilitychange', onVis);
+
     let frame = 0;
     const loop = () => {
       frame = requestAnimationFrame(loop);
+      if (hidden) return;
+      for (const lid of ceilings) lid.visible = walkRef.current;
       apply();
       renderer.render(scene, camera);
     };
     loop();
 
     return () => {
+      document.removeEventListener('visibilitychange', onVis);
       cancelAnimationFrame(frame);
       ro.disconnect();
       renderer.domElement.removeEventListener('pointerdown', down);
