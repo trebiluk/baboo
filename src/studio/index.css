@@ -1412,16 +1412,27 @@ html[data-ell-english] {
   display:flex;
   position:relative
 }
-.solid-preview-svg {
-  background:var(--aw3d-sky-mid);
-  border-radius:0;
+.engine-view {
   position:absolute;
   inset:0;
-  width:100%;
-  height:100%
 }
-.solid-preview-svg:active {
-  cursor:grabbing
+.engine-view canvas {
+  width:100%;
+  height:100%;
+  display:block;
+  touch-action:none;
+}
+.view3d-empty {
+  position:absolute;
+  left:50%;
+  top:46%;
+  transform:translate(-50%, -50%);
+  margin:0;
+  color:#1a1a1a;
+  background:#ffffffd4;
+  border-radius:8px;
+  padding:8px 12px;
+  pointer-events:none;
 }
 .view3d-hud {
   position:absolute;

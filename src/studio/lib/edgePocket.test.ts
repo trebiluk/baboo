@@ -8,11 +8,19 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.10.1 roof that reads', () => {
-  it('chips 2.10.1 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.10.1');
+describe('2.11.0 webgl engine', () => {
+  it('chips 2.11.0 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.11.0');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.11\.0'/);
     assert.match(changelog, /version:\s*'2\.10\.1'/);
+    const engine = readFileSync(join(studio, 'lib/engine3d.ts'), 'utf8');
+    assert.match(engine, /ExtrudeGeometry/);
+    const view = readFileSync(join(studio, 'components/EngineView.tsx'), 'utf8');
+    assert.match(view, /WebGLRenderer/);
+    const stub = readFileSync(join(studio, 'components/View3DStub.tsx'), 'utf8');
+    assert.match(stub, /import\('\.\/EngineView'\)/);
+    assert.doesNotMatch(stub, /<svg/);
     assert.match(changelog, /version:\s*'2\.10\.0'/);
     assert.match(changelog, /version:\s*'2\.9\.1'/);
     assert.match(changelog, /version:\s*'2\.9\.0'/);

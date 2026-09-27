@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.11.0 — 2026-09-27 — WebGL engine
+- The cube and the walk are a real WebGL engine: lights, shadows, and walls with holes
+- Drag to orbit. Walk in stops at walls. The plan and the dollhouse stay the same
+
 ## 2.10.1 — 2026-09-27 — Roof that reads
 - Mansard roof is steep sides, a flat cap, and two dormers — not one dark pyramid
 - Brick walls use a masonry pattern in 3D. Chandeliers are thinner. Walk buttons sit lower

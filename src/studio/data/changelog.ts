@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.11.0',
+    date: '2026-09-27',
+    bullets: [
+      'The cube and the walk are a real WebGL engine: lights, shadows, and walls with holes',
+      'Drag to orbit. Walk in stops at walls. The plan and the dollhouse stay the same',
+    ],
+  },
+  {
     version: '2.10.1',
     date: '2026-09-27',
     bullets: [

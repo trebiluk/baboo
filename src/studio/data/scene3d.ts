@@ -1,4 +1,4 @@
-/** Solid 3D look palettes — 1.1.1 knobs. Chromebook SVG, no WebGL. */
+/** Solid 3D look palettes. The cube and the walk use the WebGL engine. */
 import type { SiteFinish, SkyPreset, WallTintId } from '../types';
 
 export type { SkyPreset, SiteFinish, WallTintId };
