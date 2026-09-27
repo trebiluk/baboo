@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.10.1',
+    date: '2026-09-27',
+    bullets: [
+      'Mansard roof is steep sides, a flat cap, and two dormers — not one dark pyramid',
+      'Brick walls use a masonry pattern in 3D. Chandeliers are thinner. Walk buttons sit lower',
+    ],
+  },
+  {
     version: '2.10.0',
     date: '2026-09-27',
     bullets: [

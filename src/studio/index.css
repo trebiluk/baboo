@@ -1462,11 +1462,14 @@ html[data-ell-english] {
     line-height: 1.35;
   }
   .view3d-hud-btns {
-    width: 100%;
+    width: auto;
+    flex-wrap: nowrap;
   }
   .view3d-hud-btns .ghost-btn {
-    flex: 1 1 42%;
-    min-height: 44px;
+    flex: 0 1 auto;
+    min-height: 36px;
+    padding: 4px 10px;
+    font-size: 13px;
   }
   .app-shell.is-phone .plan-compass {
     top: 52px;

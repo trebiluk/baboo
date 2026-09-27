@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.10.1 — 2026-09-27 — Roof that reads
+- Mansard roof is steep sides, a flat cap, and two dormers — not one dark pyramid
+- Brick walls use a masonry pattern in 3D. Chandeliers are thinner. Walk buttons sit lower
+
 ## 2.10.0 — 2026-09-27 — Bay and brick
 - The Mansion is brick, with a parlor bay, a window seat, and four porch columns
 - A portrait hangs over the fireplace. Brick walls read in the plan, dollhouse, and 3D

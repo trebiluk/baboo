@@ -25,7 +25,7 @@ export type Cam3 = {
 
 export type FaceKind =
   | 'yard' | 'slab' | 'floor' | 'path' | 'wall' | 'glass' | 'door'
-  | 'furn' | 'roof' | 'tree' | 'shadow' | 'bed';
+  | 'furn' | 'roof' | 'cap' | 'tree' | 'shadow' | 'bed';
 
 export type MassFace = {
   pts: Vec3[];
@@ -397,10 +397,10 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
       const n10 = side1 ? v3(side1.right.x, side1.right.y, s.z0) : along(a, ux, uy, nx, ny, len, s.t1, -hw, s.z0);
       const n11 = side1 ? v3(side1.right.x, side1.right.y, s.z1) : along(a, ux, uy, nx, ny, len, s.t1, -hw, s.z1);
       const n01 = side0 ? v3(side0.right.x, side0.right.y, s.z1) : along(a, ux, uy, nx, ny, len, s.t0, -hw, s.z1);
-      faces.push(quad(p00, p10, p11, p01, fill, stroke, 'wall'));
-      faces.push(quad(n10, n00, n01, n11, fill, stroke, 'wall'));
+      faces.push({ pts: [p00, p10, p11, p01], fill, stroke, kind: 'wall', ...(brick ? { pattern: 'brick' as const } : {}) });
+      faces.push({ pts: [n10, n00, n01, n11], fill, stroke, kind: 'wall', ...(brick ? { pattern: 'brick' as const } : {}) });
       if (s.z1 >= h - 0.05) {
-        faces.push(quad(p01, p11, n11, n01, cap, stroke, 'wall'));
+        faces.push({ pts: [p01, p11, n11, n01], fill: cap, stroke, kind: 'wall' });
       }
     }
   }
@@ -512,6 +512,65 @@ function roofFaces(roof: RoofGeometry, blocky: boolean, wallFill?: string): Mass
   if (roof.styleId === 'flat') {
     const z = eh + 0.45;
     out.push({ pts: o.map((p) => v3(p.x, p.y, z)), fill: mat.fill, stroke, kind: 'roof' });
+    return out;
+  }
+
+  if (roof.styleId === 'mansard' && o.length >= 4 && roof.breaks.length >= 4) {
+    const inner = roof.breaks.slice(0, 4).map((b) => b.a);
+    const rise = Math.max(4.5, (rh - eh) * 0.78);
+    const capZ = eh + rise;
+    const topZ = capZ + Math.max(0.55, (rh - eh) * 0.1);
+    for (let i = 0; i < 4; i++) {
+      const j = (i + 1) % 4;
+      out.push(quad(
+        v3(o[i].x, o[i].y, eh),
+        v3(o[j].x, o[j].y, eh),
+        v3(inner[j].x, inner[j].y, capZ),
+        v3(inner[i].x, inner[i].y, capZ),
+        i % 2 ? mat.shade : mat.fill,
+        stroke,
+        'roof',
+      ));
+    }
+    out.push({
+      pts: inner.map((p) => v3(p.x, p.y, topZ)),
+      fill: '#9AA3AE',
+      stroke,
+      kind: 'cap',
+    });
+    const dormer = (t: number) => {
+      const mix = (a: { x: number; y: number }, b: { x: number; y: number }, u: number) => ({
+        x: a.x + (b.x - a.x) * u,
+        y: a.y + (b.y - a.y) * u,
+      });
+      const eave = mix(o[0], o[1], t);
+      const top = mix(inner[0], inner[1], t);
+      const x = eave.x * 0.42 + top.x * 0.58;
+      const y = eave.y * 0.42 + top.y * 0.58 - 0.35;
+      const z = eh * 0.42 + capZ * 0.58;
+      const w = 2.4;
+      const h = 2.6;
+      out.push(quad(
+        v3(x - w / 2 - 0.25, y, z - 0.15),
+        v3(x + w / 2 + 0.25, y, z - 0.15),
+        v3(x + w / 2 + 0.25, y, z + h + 0.7),
+        v3(x - w / 2 - 0.25, y, z + h + 0.7),
+        '#E7D7C1',
+        stroke,
+        'roof',
+      ));
+      out.push(quad(
+        v3(x - w / 2, y - 0.05, z),
+        v3(x + w / 2, y - 0.05, z),
+        v3(x + w / 2, y - 0.05, z + h),
+        v3(x - w / 2, y - 0.05, z + h),
+        '#D5E8F4',
+        '#6A8AA4',
+        'roof',
+      ));
+    };
+    dormer(0.34);
+    dormer(0.66);
     return out;
   }
 
@@ -824,7 +883,7 @@ export function projectFaces(faces: MassFace[], cam: Cam3, w: number, h: number,
   painted.sort((a, b) => {
     const order: Record<FaceKind, number> = {
       yard: 0, shadow: 1, path: 2, bed: 2, slab: 3, floor: 3.5, wall: 4, door: 5, glass: 5,
-      furn: 6, tree: 6, roof: 7,
+      furn: 6, tree: 6, roof: 7, cap: 7,
     };
     const oa = order[a.kind] - order[b.kind];
     if (Math.abs(oa) && (a.kind === 'yard' || b.kind === 'yard' || a.kind === 'shadow' || b.kind === 'shadow')) return oa;

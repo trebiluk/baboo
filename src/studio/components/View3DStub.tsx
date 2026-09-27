@@ -202,15 +202,24 @@ export function View3DStub() {
               <stop offset="100%" stopColor={sky.horizon} />
             </linearGradient>
             {materials ? (
-              <pattern id="aw3d-grass" width="10" height="10" patternUnits="userSpaceOnUse">
-                <rect width="10" height="10" fill={site.ground} />
-                <path d="M1 9 L3 2 M5 10 L7 3 M8 9 L10 4" stroke={site.edge} strokeWidth="0.8" fill="none" />
+              <pattern id="aw3d-grass" width="18" height="18" patternUnits="userSpaceOnUse">
+                <rect width="18" height="18" fill={site.ground} />
+                <path d="M3 16 L4 11 M9 17 L10 12 M14 16 L15 11" stroke={site.edge} strokeWidth="0.7" fill="none" opacity="0.45" />
               </pattern>
             ) : null}
             {materials ? (
-              <pattern id="aw3d-shingle" width="12" height="8" patternUnits="userSpaceOnUse">
-                <rect width="12" height="8" fill="#5C6B82" />
-                <path d="M0 4 H12 M4 0 V4 M8 4 V8" stroke="#8A9BB0" strokeWidth="0.6" opacity="0.55" />
+              <pattern id="aw3d-shingle" width="14" height="8" patternUnits="userSpaceOnUse">
+                <rect width="14" height="8" fill="#6A7A90" />
+                <path d="M0 4 H14 M0 8 H14 M3.5 0 V4 M10.5 4 V8" stroke="#3E4A5C" strokeWidth="0.7" />
+              </pattern>
+            ) : null}
+            {materials ? (
+              <pattern id="aw3d-masonry" width="16" height="8" patternUnits="userSpaceOnUse">
+                <rect width="16" height="8" fill="#8E4E3E" />
+                <rect x="0.4" y="0.4" width="7" height="3.2" fill="#C47860" />
+                <rect x="8.4" y="0.4" width="7" height="3.2" fill="#A15A48" />
+                <rect x="4.4" y="4.4" width="7" height="3.2" fill="#C47860" />
+                <rect x="12.4" y="4.4" width="3.2" height="3.2" fill="#A15A48" />
               </pattern>
             ) : null}
             {lod === 'full' && FLOOR_FINISHES.map((fin) => (
@@ -229,7 +238,7 @@ export function View3DStub() {
             <path
               key={i}
               d={p.d}
-              fill={p.kind === 'yard' && materials && lod === 'full' ? 'url(#aw3d-grass)' : p.kind === 'roof' && materials && lod === 'full' && roofStyleId !== 'grass' && roofStyleId !== 'conical' ? 'url(#aw3d-shingle)' : p.pattern && lod === 'full' ? `url(#aw3d-floor-${p.pattern})` : p.fill}
+              fill={p.kind === 'yard' && materials && lod === 'full' ? 'url(#aw3d-grass)' : p.kind === 'roof' && materials && lod === 'full' && roofStyleId !== 'grass' && roofStyleId !== 'conical' ? 'url(#aw3d-shingle)' : p.pattern === 'brick' && materials && lod === 'full' ? 'url(#aw3d-masonry)' : p.pattern && lod === 'full' ? `url(#aw3d-floor-${p.pattern})` : p.fill}
               stroke={p.stroke}
               strokeWidth={p.sw}
               opacity={p.kind === 'glass' ? 0.8 : 1}
