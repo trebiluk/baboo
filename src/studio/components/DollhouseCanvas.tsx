@@ -107,11 +107,26 @@ export function DollhouseCanvas() {
     for (const n of anchors) pts.push(project(n.x, n.y, 0, spec), project(n.x, n.y, wallH, spec));
     const pad = footprintPad(house);
     if (pad) for (const n of pad) pts.push(project(n.x, n.y, 0, spec));
+    let span = 24;
+    if (house.length) {
+      let minX = house[0].x;
+      let maxX = minX;
+      let minY = house[0].y;
+      let maxY = minY;
+      for (const n of house) {
+        if (n.x < minX) minX = n.x;
+        if (n.x > maxX) maxX = n.x;
+        if (n.y < minY) minY = n.y;
+        if (n.y > maxY) maxY = n.y;
+      }
+      span = Math.max(maxX - minX, maxY - minY, 12);
+    }
+    const reach = Math.max(22, span * 0.9);
     for (const f of floor.furniture) {
       if (!house.length || Math.hypot(f.x - cx, f.y - cy) < 40) pts.push(project(f.x, f.y, 0, spec));
     }
     for (const L of floor.landscape ?? []) {
-      if (!house.length || Math.hypot(L.x - cx, L.y - cy) < 22) pts.push(project(L.x, L.y, 0, spec));
+      if (!house.length || Math.hypot(L.x - cx, L.y - cy) < reach) pts.push(project(L.x, L.y, 0, spec));
     }
     if (!pts.length) {
       setPan({ x: size.w / 2, y: size.h / 3 });
@@ -758,29 +773,46 @@ function DollPlant({
     );
   }
   if (item.kind === 'hedge') {
+    const x0 = item.x - item.w / 2;
+    const y0 = item.y - item.h / 2;
+    const x1 = item.x + item.w / 2;
+    const y1 = item.y + item.h / 2;
+    const face = (ax: number, ay: number, bx: number, by: number, z0: number, z1: number) => dollPts([
+      project(ax, ay, z0, spec), project(bx, by, z0, spec), project(bx, by, z1, spec), project(ax, ay, z1, spec),
+    ]);
     const top = dollPts([
-      project(item.x - item.w / 2, item.y - item.h / 2, 3.1, spec),
-      project(item.x + item.w / 2, item.y - item.h / 2, 3.1, spec),
-      project(item.x + item.w / 2, item.y + item.h / 2, 3.1, spec),
-      project(item.x - item.w / 2, item.y + item.h / 2, 3.1, spec),
-    ]);
-    return <Line name="doll-plant" points={top} closed fill="#2F6B3A" stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />;
-  }
-  if (item.kind === 'lamp') {
-    const post = dollPts([
-      project(item.x - 0.12, item.y, 0, spec),
-      project(item.x + 0.12, item.y, 0, spec),
-      project(item.x + 0.12, item.y, 6.2, spec),
-      project(item.x - 0.12, item.y, 6.2, spec),
-    ]);
-    const globe = dollPts([
-      project(item.x - 0.45, item.y - 0.45, 6.4, spec),
-      project(item.x + 0.45, item.y - 0.45, 6.4, spec),
-      project(item.x + 0.45, item.y + 0.45, 7.1, spec),
-      project(item.x - 0.45, item.y + 0.45, 7.1, spec),
+      project(x0, y0, 3.2, spec), project(x1, y0, 3.2, spec), project(x1, y1, 3.2, spec), project(x0, y1, 3.2, spec),
     ]);
     return (
       <>
+        <Line name="doll-plant" points={face(x0, y0, x1, y0, 0, 3.2)} closed fill="#1E4A28" stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
+        <Line name="doll-plant" points={face(x1, y0, x1, y1, 0, 3.2)} closed fill="#245C34" stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
+        <Line name="doll-plant" points={top} closed fill="#3D8A4E" stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
+      </>
+    );
+  }
+  if (item.kind === 'lamp') {
+    const post = dollPts([
+      project(item.x - 0.08, item.y, 0.2, spec),
+      project(item.x + 0.08, item.y, 0.2, spec),
+      project(item.x + 0.08, item.y, 6.2, spec),
+      project(item.x - 0.08, item.y, 6.2, spec),
+    ]);
+    const base = dollPts([
+      project(item.x - 0.32, item.y - 0.32, 0.22, spec),
+      project(item.x + 0.32, item.y - 0.32, 0.22, spec),
+      project(item.x + 0.32, item.y + 0.32, 0.22, spec),
+      project(item.x - 0.32, item.y + 0.32, 0.22, spec),
+    ]);
+    const globe = dollPts([
+      project(item.x - 0.42, item.y - 0.42, 6.15, spec),
+      project(item.x + 0.42, item.y - 0.42, 6.15, spec),
+      project(item.x + 0.42, item.y + 0.42, 7.15, spec),
+      project(item.x - 0.42, item.y + 0.42, 7.15, spec),
+    ]);
+    return (
+      <>
+        <Line name="doll-plant" points={base} closed fill="#2A2A2E" stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
         <Line name="doll-plant" points={post} closed fill="#3A3A40" stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
         <Line name="doll-plant" points={globe} closed fill="#F3E2A8" stroke="#C4A35A" strokeWidth={sw} onClick={pick} onTap={pick} />
       </>

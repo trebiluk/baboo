@@ -4,7 +4,7 @@ Classroom floor-plan studio. Local-first. Dedicated to Dr. Donna Matteson.
 
 **© 2026 Richard Kulibert Jr.**
 
-**Version 2.9.0** — The Mansion is in the More menu.
+**Version 2.9.1** — The Mansion keeps its furniture and its grounds.
 
 Draw walls, doors, windows, rooms, furniture, and plants. Sketch first, then Trace to walls. Check access. Teach from the top chip. Plans save on the device as `.archworks.json`.
 

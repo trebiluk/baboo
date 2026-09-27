@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.9.1',
+    date: '2026-09-27',
+    bullets: [
+      'The Mansion keeps its furniture detail instead of flat stamps',
+      'Hedges, lampposts, and stairs read as objects. The grounds stay in the dollhouse view',
+    ],
+  },
+  {
     version: '2.9.0',
     date: '2026-09-27',
     bullets: [

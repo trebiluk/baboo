@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.9.1 — 2026-09-27 — Mansion polish
+- The Mansion keeps its furniture detail instead of flat stamps
+- Hedges, lampposts, and stairs read as objects. The grounds stay in the dollhouse view
+
 ## 2.9.0 — 2026-09-27 — The Mansion
 - The Mansion: parlor, hall, stairs, dining, kitchen, bath, library, and grounds
 - New pieces: fireplace, rug, stairs, banister, lamps, sconces, chandelier, paneling, hedges, lampposts

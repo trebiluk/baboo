@@ -39,7 +39,9 @@ const WATER = '#7EB3D4';
 const CHROME = '#D0D8E0';
 const KNOB = '#D4C4A0';
 
-const PAINTABLE = new Set([WOOD, WOOD_LT, WOOD_DK, LINEN, BLANKET, UPH, UPH_DK, UPH_LT, PILLOW]);
+const RUG = '#6E2E3A';
+const RUG_IN = '#8E4250';
+const PAINTABLE = new Set([WOOD, WOOD_LT, WOOD_DK, LINEN, BLANKET, UPH, UPH_DK, UPH_LT, PILLOW, RUG, RUG_IN]);
 
 function hexRgb(hex: string): [number, number, number] {
   const n = hex.replace('#', '');
@@ -71,7 +73,7 @@ function paintFurnParts(parts: FurnPart[], color?: string | null): FurnPart[] {
   return parts.map((p) => {
     if (!PAINTABLE.has(p.fill)) return p;
     if (p.fill === WOOD_DK || p.fill === UPH_DK || p.fill === BLANKET) return { ...p, fill: shadeHex(color, 0.72) };
-    if (p.fill === WOOD_LT || p.fill === UPH_LT || p.fill === LINEN || p.fill === PILLOW) return { ...p, fill: shadeHex(color, 1.22) };
+    if (p.fill === RUG_IN || p.fill === WOOD_LT || p.fill === UPH_LT || p.fill === LINEN || p.fill === PILLOW) return { ...p, fill: shadeHex(color, 1.22) };
     return { ...p, fill: color };
   });
 }
@@ -346,8 +348,8 @@ function furniturePartsFull(item: FurnitureItem): FurnPart[] {
       ];
     case 'rug':
       return [
-        oval(0, 0, w, h, 0.02, 0.07, '#6E2E3A'),
-        oval(0, 0, w * 0.72, h * 0.62, 0.07, 0.1, '#8E4250'),
+        oval(0, 0, w, h, 0.02, 0.07, RUG),
+        oval(0, 0, w * 0.72, h * 0.62, 0.07, 0.1, RUG_IN),
       ];
     case 'stairs': {
       const steps = 6;
@@ -356,8 +358,11 @@ function furniturePartsFull(item: FurnitureItem): FurnPart[] {
         const y = -hh + (i + 0.5) * (h / steps);
         parts.push(box(0, y, w * 0.9, (h / steps) * 0.92, 0, 0.45 + i * 0.55, i % 2 ? WOOD : WOOD_LT));
       }
-      parts.push(box(-hw + 0.12, 0, 0.16, h, 0.5, 4.4, WOOD_DK));
-      parts.push(box(hw - 0.12, 0, 0.16, h, 0.5, 4.4, WOOD_DK));
+      parts.push(box(0, 0, w * 0.28, h * 0.92, 0.2, 3.5, RUG));
+      parts.push(box(-hw + 0.12, 0, 0.18, h, 0.4, 4.6, WOOD_DK));
+      parts.push(box(hw - 0.12, 0, 0.18, h, 0.4, 4.6, WOOD_DK));
+      parts.push(cyl(-hw + 0.12, -hh + 0.2, 0.42, 0, 4.9, WOOD));
+      parts.push(cyl(hw - 0.12, -hh + 0.2, 0.42, 0, 4.9, WOOD));
       return parts;
     }
     case 'banister':

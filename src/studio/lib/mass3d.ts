@@ -177,7 +177,7 @@ export function defaultCam(floor: Floor, walk: boolean): Cam3 {
     target: { x: cx, y: cy, z: 3.6 },
     yaw: Math.PI * 0.22,
     pitch: 0.38,
-    dist: Math.max(14, span * 0.7 + 4),
+    dist: Math.max(14, span * (span > 40 ? 0.95 : 0.7) + 4),
     walk: false,
   };
 }
@@ -410,8 +410,9 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
     const cap = FURN_CAP[lod];
     const budget = FACE_BUDGET[lod];
     for (const item of (floor.furniture ?? []).slice(0, cap)) {
+      if (faces.length > budget - 280) break;
       faces.push(...furnBox(item, opts.blocky, lod));
-      if (faces.length > budget) break;
+      if (faces.length > budget - 280) break;
     }
   }
 
@@ -726,14 +727,20 @@ function plantFaces(item: LandscapeItem, site: SiteFinish, blocky: boolean, lod:
     return out;
   }
   if (item.kind === 'hedge') {
-    return boxFaces(
-      item.x - item.w / 2, item.y - item.h / 2, item.x + item.w / 2, item.y + item.h / 2,
-      0, 3.2, '#2F6B3A', stroke, 'tree',
-    );
+    const x0 = item.x - item.w / 2;
+    const y0 = item.y - item.h / 2;
+    const x1 = item.x + item.w / 2;
+    const y1 = item.y + item.h / 2;
+    const base = boxFaces(x0, y0, x1, y1, 0, 1.6, '#1E4A28', stroke, 'tree');
+    const inset = Math.min(item.w, item.h) * 0.12;
+    base.push(...boxFaces(x0 + inset, y0 + inset * 0.4, x1 - inset, y1 - inset * 0.4, 1.45, 3.35, '#3D8A4E', stroke, 'tree'));
+    return base;
   }
   if (item.kind === 'lamp') {
-    const post = boxFaces(item.x - 0.12, item.y - 0.12, item.x + 0.12, item.y + 0.12, 0, 6.2, '#3A3A40', stroke, 'tree');
-    post.push(...boxFaces(item.x - 0.45, item.y - 0.45, item.x + 0.45, item.y + 0.45, 6.1, 7.1, '#F3E2A8', '#C4A35A', 'tree'));
+    const post = boxFaces(item.x - 0.28, item.y - 0.28, item.x + 0.28, item.y + 0.28, 0, 0.28, '#2A2A2E', stroke, 'tree');
+    post.push(...boxFaces(item.x - 0.08, item.y - 0.08, item.x + 0.08, item.y + 0.08, 0.2, 6.15, '#3A3A40', stroke, 'tree'));
+    post.push(...boxFaces(item.x - 0.42, item.y - 0.42, item.x + 0.42, item.y + 0.42, 6.05, 7.15, '#F3E2A8', '#C4A35A', 'tree'));
+    post.push(...boxFaces(item.x - 0.16, item.y - 0.16, item.x + 0.16, item.y + 0.16, 7.1, 7.45, '#C4A35A', stroke, 'tree'));
     return post;
   }
   if (item.kind === 'path') {

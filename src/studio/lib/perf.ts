@@ -8,7 +8,7 @@ export function furnitureLod(opts: {
   dragging?: boolean;
 }): FurnLod {
   if (opts.dragging) return 'simple';
-  if ((opts.count ?? 0) >= 24) return 'simple';
+  if ((opts.count ?? 0) >= 40) return 'simple';
   if (opts.zoom != null && opts.zoom < 10) return 'simple';
   if (opts.dist != null && opts.dist > 52) return 'simple';
   return 'full';
