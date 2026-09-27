@@ -27,7 +27,7 @@ const TOOLS: { id: Tool; label: string; tip: string; icon: IconName }[] = [
   { id: 'select', label: 'Select', tip: 'Click something to move it (V)', icon: 'select' },
   { id: 'sketch', label: 'Sketch', tip: 'Drag like a pencil, then Trace into walls (S)', icon: 'sketch' },
   { id: 'wall', label: 'Wall', tip: 'Click start, then click end (W)', icon: 'wall' },
-  { id: 'box', label: 'Box', tip: 'Two clicks: opposite corners of a room (B)', icon: 'box' },
+  { id: 'box', label: 'Box', tip: 'Drag from one corner to the other (B)', icon: 'box' },
   { id: 'door', label: 'Door', tip: 'Click on a wall (D)', icon: 'door' },
   { id: 'window', label: 'Window', tip: 'Click on a wall (N)', icon: 'window' },
   { id: 'furniture', label: 'Furn.', tip: 'Pick an item, then click the plan (F)', icon: 'furniture' },

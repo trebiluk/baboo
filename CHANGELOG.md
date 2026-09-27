@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.4.3 — 2026-09-27 — Box rubber-band
+- Box rubber-bands as you drag. The preview is the room. Release, and it becomes solid walls
+
 ## 2.4.2 — 2026-09-27 — Dollhouse, less junk
 - Dollhouse: the dashed roof box is gone. The door is a slab, not a spike
 - The tool list stays icons in the dollhouse, so it does not cover the turn buttons

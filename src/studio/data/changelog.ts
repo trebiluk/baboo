@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.4.3',
+    date: '2026-09-27',
+    bullets: [
+      'Box rubber-bands as you drag. The preview is the room. Release, and it becomes solid walls',
+    ],
+  },
+  {
     version: '2.4.2',
     date: '2026-09-27',
     bullets: [

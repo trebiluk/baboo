@@ -105,6 +105,7 @@ export function PlanCanvas() {
     mid: { x: number; y: number };
   } | null>(null);
   const gripDrag = useRef<{ wallId: string; end: 'a' | 'b' } | null>(null);
+  const boxDrag = useRef<{ x: number; y: number } | null>(null);
   const debugOpen = useProjectStore((s) => s.debugOpen);
   const toolsPocket = useCanvasToolsPocket();
 
@@ -236,6 +237,19 @@ export function PlanCanvas() {
     gridSize: settings.gridSize || 1,
   });
 
+  /** A box uses both axes. Wall ortho would squash it into a line. */
+  const resolveBox = (cursor: { x: number; y: number }): Resolved => resolveDrawPoint(cursor, {
+    segs,
+    nodes: anchors,
+    tol: PULL_PX / liveZoom.current,
+    osnap: useOsnap,
+    from: null,
+    ortho: false,
+    forceOrtho: false,
+    snap: !!settings.snap,
+    gridSize: settings.gridSize || 1,
+  });
+
   const onPointerDown = (e: Konva.KonvaEventObject<PointerEvent>) => {
     const stage = e.target.getStage();
     if (!stage) return;
@@ -300,8 +314,14 @@ export function PlanCanvas() {
       return;
     }
     if (tool === 'box') {
-      if (!store.wallDraft) store.beginWall(resolveAt(world, null, shift).p, true);
-      else store.commitBox(resolveAt(world, store.wallDraft, shift).p, true);
+      const at = resolveBox(world).p;
+      if (!store.wallDraft) {
+        store.beginWall(at, true);
+        boxDrag.current = { x: pos.x, y: pos.y };
+      } else {
+        store.commitBox(at, true);
+        boxDrag.current = null;
+      }
       return;
     }
     if (tool === 'dim') {
@@ -428,7 +448,7 @@ export function PlanCanvas() {
       }
       return;
     }
-    if (tool === 'select' || tool === 'wall' || tool === 'door' || tool === 'window' || tool === 'room' || tool === 'dim') {
+    if (tool === 'select' || tool === 'wall' || tool === 'box' || tool === 'door' || tool === 'window' || tool === 'room' || tool === 'dim') {
       setHover(world);
     }
 
@@ -475,6 +495,17 @@ export function PlanCanvas() {
       if (pts) useProjectStore.getState().addSketch(pts);
       lastRef.current = null;
       return;
+    }
+    if (boxDrag.current && useProjectStore.getState().tool === 'box') {
+      const start = boxDrag.current;
+      boxDrag.current = null;
+      const pos = e?.target.getStage()?.getPointerPosition();
+      if (pos && Math.hypot(pos.x - start.x, pos.y - start.y) > 14) {
+        const world = toWorld(pos.x, pos.y);
+        const store = useProjectStore.getState();
+        const end = resolveBox(world).p;
+        if (store.wallDraft && boxCorners(store.wallDraft, end)) store.commitBox(end, true);
+      }
     }
     if (pendingTap.current) {
       useProjectStore.getState().selectAt(pendingTap.current.world);
@@ -552,10 +583,13 @@ export function PlanCanvas() {
     return findEnclosedFace(floor.nodes, floor.walls, hover);
   }, [tool, hover, floor.nodes, floor.walls]);
 
+  const wallThickness = useProjectStore((s) => s.wallThickness);
   /* Ghost and marker both read the same resolve the click will use. */
-  const aim: Resolved | null = hover && (tool === 'wall' || tool === 'box' || tool === 'dim')
-    ? resolveAt(hover, tool === 'dim' ? dimDraft : wallDraft, shiftHeld)
-    : null;
+  const aim: Resolved | null = hover && tool === 'box'
+    ? resolveBox(hover)
+    : hover && (tool === 'wall' || tool === 'dim')
+      ? resolveAt(hover, tool === 'dim' ? dimDraft : wallDraft, shiftHeld)
+      : null;
   const drawAim = tool === 'wall' && wallMode === 'clip' ? null : aim;
   const wallPreview = wallDraft && drawAim ? drawAim.p : null;
   const dimPreview = dimDraft && drawAim ? drawAim.p : null;
@@ -969,9 +1003,9 @@ export function PlanCanvas() {
               y={Math.min(wallDraft.y, wallPreview.y)}
               width={Math.abs(wallPreview.x - wallDraft.x)}
               height={Math.abs(wallPreview.y - wallDraft.y)}
+              fill="rgba(110,114,245,0.14)"
               stroke={accent}
-              strokeWidth={3 / zoom}
-              dash={[0.45, 0.28]}
+              strokeWidth={Math.max(wallThickness, 0.4)}
               listening={false}
             />
           )}
