@@ -181,13 +181,11 @@ export function View3DStub() {
       data-aw3d-walk={walk ? '1' : '0'}
       data-aw3d-lod={lod}
     >
-      <div className="view3d-banner">
-        <span>{t(loc, walk ? '3d.drag.walk' : '3d.drag')}</span>
-      </div>
       <div className="solid-preview" aria-label="Solid 3D preview with site and sky" ref={wrapRef}>
         <svg
           className="solid-preview-svg"
           viewBox={`0 0 ${size.w} ${size.h}`}
+          preserveAspectRatio="none"
           width="100%"
           height="100%"
           onPointerDown={onPointerDown}
@@ -227,7 +225,6 @@ export function View3DStub() {
             height={size.h * 2}
             fill={materials && lod === 'full' ? 'url(#aw3d-grass)' : site.ground}
           />
-          <rect x="0" y={size.h * 0.52} width={size.w} height={size.h * 0.16} fill={sky.fog} opacity="0.28" />
           {painted.map((p, i) => (
             <path
               key={i}
@@ -245,6 +242,7 @@ export function View3DStub() {
           )}
         </svg>
         <div className="view3d-hud">
+          <p className="view3d-hint">{t(loc, walk ? '3d.drag.walk' : '3d.drag')}</p>
           <div className="view3d-hud-btns">
             {walk ? (
               <>

@@ -174,10 +174,10 @@ export function defaultCam(floor: Floor, walk: boolean): Cam3 {
     };
   }
   return {
-    target: { x: cx, y: cy, z: 5.2 },
-    yaw: Math.PI * 0.28,
-    pitch: 0.5,
-    dist: Math.max(16, span * 0.92 + 6),
+    target: { x: cx, y: cy, z: 3.6 },
+    yaw: Math.PI * 0.22,
+    pitch: 0.38,
+    dist: Math.max(14, span * 0.7 + 4),
     walk: false,
   };
 }

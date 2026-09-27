@@ -58,7 +58,7 @@ export const SKY_PALETTE: Record<SkyPreset, {
 };
 
 export const SITE_PALETTE: Record<SiteFinish, { ground: string; deep: string; edge: string }> = {
-  grass: { ground: '#5F6F52', deep: '#4A5642', edge: '#6D7A62' },
+  grass: { ground: '#6E8F5A', deep: '#4F6B40', edge: '#8FB57A' },
   gravel: { ground: '#8A8680', deep: '#6E6A64', edge: '#A09B94' },
   pad: { ground: '#9CA3AF', deep: '#787F8B', edge: '#B0B6C0' },
   dirt: { ground: '#6B5344', deep: '#534032', edge: '#8A6A54' },

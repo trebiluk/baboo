@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.5.2',
+    date: '2026-09-27',
+    bullets: [
+      '3D fills the screen. The house is closer. The fog stripe across the middle is gone',
+      'The drag hint sits with the buttons, not on the toolbar',
+    ],
+  },
+  {
     version: '2.5.1',
     date: '2026-09-27',
     bullets: [
