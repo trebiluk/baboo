@@ -35,7 +35,7 @@ export const SKILL_LEVELS: {
   },
 ];
 
-export const DEFAULT_SKILL_LEVEL: SkillLevel = 'beginner';
+export const DEFAULT_SKILL_LEVEL: SkillLevel = 'novice';
 const SKILL_PREF_KEY = 'baboo-skill-level';
 
 const RANK: Record<SkillLevel, number> = {
@@ -49,7 +49,7 @@ const TOOL_MIN_RANK: Record<Tool, number> = {
   select: 0,
   sketch: 0,
   wall: 0,
-  box: 0,
+  box: 1,
   door: 0,
   pan: 0,
   window: 1,
@@ -253,7 +253,7 @@ export function nextCoach(level: SkillLevel, floor: Floor, styleId?: string): Co
       id: 'close',
       title: 'Close the box',
       body: 'Keep going until the walls meet. That’s when it becomes a room.',
-      tool: 'box',
+      tool: 'wall',
     };
   }
   if (doors === 0) {
@@ -292,6 +292,26 @@ export function nextCoach(level: SkillLevel, floor: Floor, styleId?: string): Co
     title: 'You have a plan',
     body: 'Walk the walls. Open Teach for the next step, or switch to Beginner in Settings for windows and names.',
   };
+}
+
+/** One posted job. Null when this skill level is done for now. */
+export function currentJob(level: SkillLevel, floor: Floor, roofNamed = false): string | null {
+  const rank = skillRank(level);
+  if (rank > 1) return null;
+  const doors = floor.openings.filter((o: Opening) => o.type === 'door').length;
+  const windows = floor.openings.filter((o: Opening) => o.type === 'window').length;
+  const rooms = (floor.rooms ?? []).length;
+  const closed = floor.walls.length > 2 && listInteriorFaces(floor.nodes, floor.walls).length > 0;
+  if (!closed || doors === 0) return "Draw a 16' by 24' box. Put a door on the long wall.";
+  if (rank < 1) return null;
+  if (windows < 1) return 'Add two windows. Then name the room.';
+  if (rooms === 0) return 'Name the room. Pick Room, then click inside.';
+  if (!roofNamed) return 'Pick a roof name. Look in 3D. Come back to the plan.';
+  return null;
+}
+
+export function planIsClosed(floor: Floor): boolean {
+  return floor.walls.length > 2 && listInteriorFaces(floor.nodes, floor.walls).length > 0;
 }
 
 export const NOVICE_UNIT_STEPS = [

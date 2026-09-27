@@ -18,7 +18,7 @@ import { ChangelogModal } from './components/ChangelogModal';
 import { Toast } from './components/Toast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToolRail } from './components/ToolRail';
-import { CoachBanner } from './components/CoachBanner';
+import { CoachBanner, JobChip } from './components/CoachBanner';
 import { VersionChip } from './components/VersionChip';
 import { ObjectMenu } from './components/ObjectMenu';
 import { usePhoneChrome } from './hooks/usePhoneChrome';
@@ -45,6 +45,17 @@ export default function App() {
   useEffect(() => {
     void init();
   }, [init]);
+
+  useEffect(() => {
+    const onLeave = (e: BeforeUnloadEvent) => {
+      if (useProjectStore.getState().saveStatus === 'unsaved') {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', onLeave);
+    return () => window.removeEventListener('beforeunload', onLeave);
+  }, []);
 
   const guiTheme = useProjectStore((s) => s.doc.settings.guiTheme);
   const tipsLocale = tipLoc(useProjectStore((s) => s.doc.settings));
@@ -166,6 +177,7 @@ export default function App() {
               <View3DStub />
             )}
             {(viewMode === 'plan' || viewMode === 'dollhouse') && <CoachBanner />}
+            {viewMode === 'plan' && <JobChip />}
             {demoMode && <div className="demo-watermark">DEMO</div>}
           </main>
           <ObjectMenu />

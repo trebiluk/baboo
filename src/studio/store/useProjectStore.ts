@@ -127,6 +127,8 @@ interface Store {
   saveStatus: SaveStatus;
   toast: ToastPlate | null;
   lastSaveAt: string | null;
+  saveCard: string | null;
+  clearSaveCard: () => void;
   floor: () => Floor;
   init: () => Promise<void>;
   setTool: (t: Tool) => void;
@@ -184,6 +186,7 @@ interface Store {
   flushSave: () => Promise<void>;
   newFromTemplate: (styleId: StyleId) => void;
   exportJson: () => void;
+  demoRectangle: () => void;
   exportGalleryCard: (opts?: GalleryCardOptions) => void;
   importJson: (file: File) => Promise<void>;
   clearSelection: () => void;
@@ -345,6 +348,7 @@ export const useProjectStore = create<Store>((set, get) => ({
   saveStatus: 'saved',
   toast: null,
   lastSaveAt: null,
+  saveCard: null,
 
   floor: () => get().doc.floors[0],
 
@@ -901,7 +905,44 @@ export const useProjectStore = create<Store>((set, get) => ({
   exportJson: () => {
     exportProjectFile(get().doc);
     void get().flushSave();
-    get().showToast(t(tip(get), 'toast.saved'), 2400, 'ok');
+    set({ saveCard: get().doc.meta.title || 'Untitled Plan' });
+  },
+  clearSaveCard: () => set({ saveCard: null }),
+  demoRectangle: () => {
+    if (get().floor().walls.length > 0) {
+      set({ tool: 'door', wallDraft: null });
+      return;
+    }
+    get().pushHistory();
+    const kind = get().wallKind;
+    const thick = get().wallThickness;
+    const style = get().wallDrawStyle;
+    const corners = [
+      { id: uid('n'), x: 4, y: 4 },
+      { id: uid('n'), x: 20, y: 4 },
+      { id: uid('n'), x: 20, y: 28 },
+      { id: uid('n'), x: 4, y: 28 },
+    ];
+    const walls = corners.map((n, i) => ({
+      id: uid('w'),
+      a: n.id,
+      b: corners[(i + 1) % 4].id,
+      kind,
+      thickness: thick,
+      drawStyle: style,
+    }));
+    set({
+      doc: withFloor(get().doc, (f) => refreshRoof(
+        withFirstRoom({ ...f, nodes: [...f.nodes, ...corners], walls: [...f.walls, ...walls] }),
+        get().doc.settings.roofStyleId ?? null,
+        get().doc.settings.wallHeight,
+      )),
+      wallDraft: null,
+      tool: 'door',
+      viewMode: 'plan',
+    });
+    get().markDirty();
+    get().fitPlan();
   },
   exportGalleryCard: (opts) => {
     exportGalleryCardFile(get().doc, opts);

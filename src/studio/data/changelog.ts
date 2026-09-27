@@ -11,6 +11,15 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.8.0',
+    date: '2026-09-27',
+    bullets: [
+      'Day one is the grid, Sketch, Wall, and Door, plus one job',
+      'Show me draws a 16 by 24 box. Save stays on screen until you tap OK',
+      '3D and the dollhouse wait until the walls close. The hello card is gone',
+    ],
+  },
+  {
     version: '2.7.0',
     date: '2026-09-27',
     bullets: [

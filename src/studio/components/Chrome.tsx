@@ -5,6 +5,7 @@ import { Icon } from '../icons';
 import { ClassShareModal } from './ClassShareModal';
 import { VersionChip } from './VersionChip';
 import { t, tipLoc } from '../data/i18n';
+import { planIsClosed } from '../data/skill';
 
 export function Chrome() {
   const title = useProjectStore((s) => s.doc.meta.title);
@@ -29,6 +30,10 @@ export function Chrome() {
   const setViewMode = useProjectStore((s) => s.setViewMode);
   const setRenderTier = useProjectStore((s) => s.setRenderTier);
   const viewMode = useProjectStore((s) => s.viewMode);
+  const floor = useProjectStore((s) => s.doc.floors[0]);
+  const saveCard = useProjectStore((s) => s.saveCard);
+  const clearSaveCard = useProjectStore((s) => s.clearSaveCard);
+  const closed = planIsClosed(floor);
   const teachingOpen = useProjectStore((s) => s.teachingOpen);
   const helpOpen = useProjectStore((s) => s.helpOpen);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -156,9 +161,10 @@ export function Chrome() {
             type="button"
             className={`ghost-btn aw-pressable chrome-ico ${viewMode === 'dollhouse' ? 'active' : ''}`}
             onClick={() => setViewMode('dollhouse')}
-            title={t(locale, 'chrome.dollhouse')}
+            title={closed ? t(locale, 'chrome.dollhouse') : 'Close the walls first'}
             aria-label={t(locale, 'chrome.dollhouse')}
             aria-pressed={viewMode === 'dollhouse'}
+            disabled={!closed}
           >
             <Icon name="room" />
           </button>
@@ -166,9 +172,10 @@ export function Chrome() {
             type="button"
             className={`ghost-btn aw-pressable chrome-ico ${viewMode !== 'plan' && viewMode !== 'dollhouse' ? 'active' : ''}`}
             onClick={() => { setRenderTier(3); setViewMode('solid3d'); }}
-            title={t(locale, 'chrome.view3d')}
+            title={closed ? t(locale, 'chrome.view3d') : 'Close the walls first'}
             aria-label={t(locale, 'chrome.view3d')}
             aria-pressed={viewMode !== 'plan' && viewMode !== 'dollhouse'}
+            disabled={!closed}
           >
             <Icon name="view3d" />
           </button>
@@ -177,6 +184,9 @@ export function Chrome() {
 
         <button type="button" className="ghost-btn aw-pressable chrome-primary chrome-ico chrome-ess" onClick={exportJson} title={t(locale, 'chrome.save')} aria-label={t(locale, 'chrome.save')}>
           <Icon name="save" />
+        </button>
+        <button type="button" className="ghost-btn aw-pressable chrome-ico chrome-ess" onClick={() => fileRef.current?.click()} title={t(locale, 'chrome.import')} aria-label={t(locale, 'chrome.import')}>
+          <Icon name="import" />
         </button>
         <button
           type="button"
@@ -254,6 +264,13 @@ export function Chrome() {
       </button>
     ) : null}
     {classShareOpen ? <ClassShareModal onClose={() => setClassShareOpen(false)} /> : null}
+    {saveCard ? (
+      <aside className="save-proof" role="status">
+        <strong>Saved on this Chromebook.</strong>
+        <span>Name: {saveCard}</span>
+        <button type="button" className="primary-btn aw-pressable" onClick={clearSaveCard}>OK</button>
+      </aside>
+    ) : null}
     </>
   );
 }

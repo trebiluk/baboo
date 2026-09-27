@@ -33,7 +33,7 @@ import {
 import { FurnitureSymbol } from './FurnitureSymbol';
 import { asFloorFinish, asFloorGrain, floorFinish, floorTileCanvas } from '../data/flooring';
 import { DEFAULT_GUI_THEME } from '../data/themes';
-import { DEFAULT_SKILL_LEVEL, skillRank } from '../data/skill';
+import { DEFAULT_SKILL_LEVEL, planIsClosed, skillRank } from '../data/skill';
 import { furnitureLod } from '../lib/perf';
 import { useCanvasToolsPocket } from '../hooks/useCanvasToolsPocket';
 
@@ -1112,6 +1112,7 @@ export function PlanCanvas() {
         </div>
       )}
       <div className="plan-taps aw-ribbon" role="toolbar" aria-label="Plan taps">
+        {(skillRank(skillLevel) >= 1 || planIsClosed(floor)) && (
         <div className="plan-roof" ref={roofRef}>
           <button
             type="button"
@@ -1154,6 +1155,7 @@ export function PlanCanvas() {
             </div>
           )}
         </div>
+        )}
         <button
           type="button"
           className="plan-tap aw-pressable"

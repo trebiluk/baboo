@@ -3,12 +3,8 @@ import { useProjectStore } from '../store/useProjectStore';
 import type { PlantKind, Tool } from '../types';
 import {
   DEFAULT_SKILL_LEVEL,
-  isToolUnlocked,
-  levelRequiredFor,
-  skillInfo,
   skillRank,
   toolsForLevel,
-  upcomingTools,
 } from '../data/skill';
 import { PLANT_CATALOG } from '../data/landscape';
 import { Icon, type IconName } from '../icons';
@@ -83,7 +79,6 @@ export function ToolRail() {
   const rotateSelected = useProjectStore((s) => s.rotateSelected);
   const sketches = useProjectStore((s) => s.doc.floors[0].sketches);
   const traceSketch = useProjectStore((s) => s.traceSketch);
-  const showToast = useProjectStore((s) => s.showToast);
   const accessOpen = useProjectStore((s) => s.accessOpen);
   const teachingOpen = useProjectStore((s) => s.teachingOpen);
   const contestOpen = useProjectStore((s) => s.contestOpen);
@@ -114,7 +109,6 @@ export function ToolRail() {
 
   const allowed = toolsForLevel(skillLevel);
   const visible = TOOLS.filter((t) => allowed.includes(t.id) && (!isDollhouse || DOLLHOUSE_TOOLS.has(t.id)));
-  const later = isDollhouse ? [] : TOOLS.filter((t) => upcomingTools(skillLevel).includes(t.id));
   const expert = skillRank(skillLevel) >= 3;
   const showList = allowed.includes('furniture') || (!isDollhouse && allowed.includes('room'));
   const quickSet = isDollhouse ? QUICK_DOLL : QUICK;
@@ -156,11 +150,6 @@ export function ToolRail() {
     }
     if (quickSet.has(id)) return;
     setToolsPinned(true);
-  };
-
-  const lockedTip = (id: Tool) => {
-    const need = skillInfo(levelRequiredFor(id)).label;
-    return tx(locale, 'toast.locked', { level: tx(locale, `skill.${levelRequiredFor(id)}`) || need });
   };
 
   return (
@@ -292,30 +281,6 @@ export function ToolRail() {
           <Icon name="list" />
           <ToolWord k={catalogOpen ? 'tool.hide' : 'tool.list'} />
         </button>
-      )}
-      {later.length > 0 && (
-        <>
-          <span className="tool-rail-soon" hidden={!expanded}>Later</span>
-          {later.map((t) => (
-            <button
-              key={`lock-${t.id}`}
-              type="button"
-              className="tool-rail-btn is-locked aw-pressable"
-              onClick={() => {
-                if (!isToolUnlocked(t.id, skillLevel)) {
-                  showToast(lockedTip(t.id), 2800);
-                }
-              }}
-              title={lockedTip(t.id)}
-              aria-disabled="true"
-              tabIndex={expanded ? 0 : -1}
-              aria-hidden={!expanded}
-            >
-              <Icon name={t.icon} />
-              <ToolWord k={`tool.${t.id}`} />
-            </button>
-          ))}
-        </>
       )}
       {!expanded && (
         <button

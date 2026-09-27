@@ -50,7 +50,7 @@ function closedBox(): Floor {
 
 describe('skill levels', () => {
   it('unlocks tools in order', () => {
-    assert.deepEqual(toolsForLevel('novice'), ['select', 'sketch', 'wall', 'box', 'door', 'pan']);
+    assert.deepEqual(toolsForLevel('novice'), ['select', 'sketch', 'wall', 'door', 'pan']);
     assert.equal(isToolUnlocked('window', 'novice'), false);
     assert.ok(isToolUnlocked('sketch', 'novice'));
     assert.ok(isToolUnlocked('window', 'beginner'));
@@ -63,7 +63,7 @@ describe('skill levels', () => {
     assert.equal(skillRank('expert'), 3);
     assert.equal(levelRequiredFor('furniture'), 'moderate');
     assert.equal(levelRequiredFor('window'), 'beginner');
-    assert.deepEqual(upcomingTools('novice'), ['window', 'room', 'dim', 'note']);
+    assert.deepEqual(upcomingTools('novice'), ['box', 'window', 'room', 'dim', 'note']);
     assert.deepEqual(upcomingTools('beginner'), ['furniture', 'plant']);
     assert.deepEqual(upcomingTools('moderate'), []);
     assert.deepEqual(upcomingTools('expert'), []);

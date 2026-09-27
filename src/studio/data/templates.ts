@@ -413,7 +413,7 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
       units: 'ft',
       accent: '#6E72F5',
       guiTheme: 'stark',
-      skillLevel: 'beginner',
+      skillLevel: 'novice',
       viewMode: 'plan',
       renderTier: 0,
       styleId,

@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.8.0 — 2026-09-27 — Day one
+- Day one is the grid, Sketch, Wall, and Door, plus one job
+- Show me draws a 16 by 24 box. Save stays on screen until you tap OK
+- 3D and the dollhouse wait until the walls close. The hello card is gone
+
 ## 2.7.0 — 2026-09-27 — Objects with light
 - Furniture has a light top, darker sides, and a shadow on the floor
 - Sofas and chairs use a cushion, not a box. Round parts are smoother
