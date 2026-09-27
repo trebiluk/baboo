@@ -18,7 +18,7 @@ export function JobChip() {
   const demoRectangle = useProjectStore((s) => s.demoRectangle);
   const job = currentJob(skillLevel, floor, roofNamed);
   if (viewMode !== 'plan' || !job) return null;
-  const showDemo = floor.walls.length < 3;
+  const showDemo = floor.walls.length === 0;
   return (
     <aside className="job-chip" role="status">
       <strong>Job</strong>
@@ -57,6 +57,7 @@ export function CoachBanner() {
 
   if (off) return null;
   if (viewMode !== 'plan') return null;
+  if (skillRank(skillLevel) <= 1 && styleId !== 'dog-house') return null;
   if (job) return null;
   if (skillRank(skillLevel) > 1 && styleId !== 'dog-house') return null;
   if (teachingOpen || contestOpen || customizeOpen || helpOpen || newProjectOpen) return null;

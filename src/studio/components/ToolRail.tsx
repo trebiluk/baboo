@@ -3,6 +3,7 @@ import { useProjectStore } from '../store/useProjectStore';
 import type { PlantKind, Tool } from '../types';
 import {
   DEFAULT_SKILL_LEVEL,
+  planIsClosed,
   skillRank,
   toolsForLevel,
 } from '../data/skill';
@@ -36,6 +37,7 @@ const TOOLS: { id: Tool; label: string; tip: string; icon: IconName }[] = [
 
 /** Always one tap away — the den gets drawn with these. */
 const QUICK = new Set<Tool>(['select', 'sketch', 'wall', 'box', 'door']);
+const DAY_ONE = new Set<Tool>(['select', 'sketch', 'wall', 'door', 'pan']);
 const DOLLHOUSE_TOOLS = new Set<Tool>(['select', 'furniture', 'plant', 'pan']);
 const QUICK_DOLL = new Set<Tool>(['select', 'furniture']);
 
@@ -108,9 +110,10 @@ export function ToolRail() {
   if (!isPlan && !isDollhouse) return null;
 
   const allowed = toolsForLevel(skillLevel);
-  const visible = TOOLS.filter((t) => allowed.includes(t.id) && (!isDollhouse || DOLLHOUSE_TOOLS.has(t.id)));
+  const dayOne = isPlan && skillRank(skillLevel) < 2 && !planIsClosed(floor);
+  const visible = TOOLS.filter((t) => allowed.includes(t.id) && (!dayOne || DAY_ONE.has(t.id)) && (!isDollhouse || DOLLHOUSE_TOOLS.has(t.id)));
   const expert = skillRank(skillLevel) >= 3;
-  const showList = allowed.includes('furniture') || (!isDollhouse && allowed.includes('room'));
+  const showList = !dayOne && (allowed.includes('furniture') || (!isDollhouse && allowed.includes('room')));
   const quickSet = isDollhouse ? QUICK_DOLL : QUICK;
   const expanded = !isDollhouse && !sheetOpen && (
     toolsPinned

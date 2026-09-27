@@ -266,8 +266,7 @@ export function Chrome() {
     {classShareOpen ? <ClassShareModal onClose={() => setClassShareOpen(false)} /> : null}
     {saveCard ? (
       <aside className="save-proof" role="status">
-        <strong>Saved on this Chromebook.</strong>
-        <span>Name: {saveCard}</span>
+        <span>{saveCard}</span>
         <button type="button" className="primary-btn aw-pressable" onClick={clearSaveCard}>OK</button>
       </aside>
     ) : null}

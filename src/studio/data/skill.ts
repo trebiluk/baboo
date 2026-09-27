@@ -302,7 +302,8 @@ export function currentJob(level: SkillLevel, floor: Floor, roofNamed = false): 
   const windows = floor.openings.filter((o: Opening) => o.type === 'window').length;
   const rooms = (floor.rooms ?? []).length;
   const closed = floor.walls.length > 2 && listInteriorFaces(floor.nodes, floor.walls).length > 0;
-  if (!closed || doors === 0) return "Draw a 16' by 24' box. Put a door on the long wall.";
+  if (!closed) return "Draw a 16' by 24' box. Put a door on the long wall.";
+  if (doors === 0) return 'The box is there. Put a door on a long wall.';
   if (rank < 1) return null;
   if (windows < 1) return 'Add two windows. Then name the room.';
   if (rooms === 0) return 'Name the room. Pick Room, then click inside.';

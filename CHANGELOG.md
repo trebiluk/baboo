@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.8.1 — 2026-09-27 — Day one, checked
+- Until the walls close, the rail is Sketch, Wall, and Door even on Beginner
+- Show me only draws when the plan is empty. Save waits until the write finishes
+
 ## 2.8.0 — 2026-09-27 — Day one
 - Day one is the grid, Sketch, Wall, and Door, plus one job
 - Show me draws a 16 by 24 box. Save stays on screen until you tap OK

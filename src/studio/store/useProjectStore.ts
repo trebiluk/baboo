@@ -903,9 +903,15 @@ export const useProjectStore = create<Store>((set, get) => ({
     setTimeout(() => get().fitPlan(), 80);
   },
   exportJson: () => {
+    const title = get().doc.meta.title || 'Untitled Plan';
     exportProjectFile(get().doc);
-    void get().flushSave();
-    set({ saveCard: get().doc.meta.title || 'Untitled Plan' });
+    void get().flushSave().then(() => {
+      set({
+        saveCard: get().saveStatus === 'error'
+          ? 'Could not save on this Chromebook. Tap Save again.'
+          : `Saved on this Chromebook. Name: ${title}. A copy also downloaded.`,
+      });
+    });
   },
   clearSaveCard: () => set({ saveCard: null }),
   demoRectangle: () => {

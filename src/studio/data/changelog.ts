@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.8.1',
+    date: '2026-09-27',
+    bullets: [
+      'Until the walls close, the rail is Sketch, Wall, and Door even on Beginner',
+      'Show me only draws when the plan is empty. Save waits until the write finishes',
+    ],
+  },
+  {
     version: '2.8.0',
     date: '2026-09-27',
     bullets: [
