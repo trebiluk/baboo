@@ -612,17 +612,23 @@ export function DollhouseCanvas() {
           ))}
           {floor.rooms.map((r) => {
             const p = project(r.x, r.y, 0.2, spec);
+            const pick = (evt: { cancelBubble: boolean }) => {
+              evt.cancelBubble = true;
+              setSelected({ kind: 'room', id: r.id });
+            };
             return (
               <Text
                 key={r.id}
-                x={p.x - 24}
+                x={p.x - 28}
                 y={p.y}
-                width={48}
+                width={56}
                 align="center"
                 text={r.name}
                 fontSize={11 / Math.max(0.6, zoom)}
-                fill={light ? '#1a1a1a' : '#f4f4f5'}
-                listening={false}
+                fill={selected?.kind === 'room' && selected.id === r.id ? '#6e72f5' : (light ? '#1a1a1a' : '#f4f4f5')}
+                fontStyle="bold"
+                onClick={pick}
+                onTap={pick}
               />
             );
           })}

@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.6.0',
+    date: '2026-09-27',
+    bullets: [
+      'Click a room name to select the whole room: floor, walls, doors, and what is inside',
+      'That properties pane sits on the left. Teach stays on the right',
+    ],
+  },
+  {
     version: '2.5.3',
     date: '2026-09-27',
     bullets: [

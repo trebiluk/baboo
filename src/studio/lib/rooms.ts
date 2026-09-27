@@ -1,4 +1,4 @@
-import type { FloorFinishId, Node, Point, Room, Wall } from '../types';
+import type { FloorFinishId, FurnitureItem, Node, Opening, Point, Room, Wall } from '../types';
 import { dist } from './geometry';
 import { insetPoly, loopHalfWidth } from './wallJoin';
 
@@ -157,6 +157,47 @@ export function findEnclosedFace(nodes: Node[], walls: Wall[], p: Point): Point[
 
 export function roomPolygon(room: Room, nodes: Node[], walls: Wall[]): Point[] | null {
   return findEnclosedFace(nodes, walls, { x: room.x, y: room.y });
+}
+
+function nearEdge(p: Point, poly: Point[], tol: number) {
+  for (let i = 0; i < poly.length; i++) {
+    const a = poly[i];
+    const b = poly[(i + 1) % poly.length];
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const l2 = dx * dx + dy * dy || 1;
+    let t = ((p.x - a.x) * dx + (p.y - a.y) * dy) / l2;
+    t = Math.max(0, Math.min(1, t));
+    if (Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy)) <= tol) return true;
+  }
+  return false;
+}
+
+/** The walls, doors, and furniture that belong to one named room. */
+export function roomBundle(
+  room: Room,
+  nodes: Node[],
+  walls: Wall[],
+  openings: Opening[],
+  furniture: FurnitureItem[],
+) {
+  const poly = roomPolygon(room, nodes, walls);
+  if (!poly) {
+    return { poly: null, walls: [] as Wall[], openings: [] as Opening[], furniture: [] as FurnitureItem[] };
+  }
+  const bound = walls.filter((w) => {
+    const a = nodes.find((n) => n.id === w.a);
+    const b = nodes.find((n) => n.id === w.b);
+    if (!a || !b) return false;
+    return nearEdge({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, poly, 0.45);
+  });
+  const ids = new Set(bound.map((w) => w.id));
+  return {
+    poly,
+    walls: bound,
+    openings: openings.filter((o) => ids.has(o.wallId)),
+    furniture: furniture.filter((f) => pointInPoly({ x: f.x, y: f.y }, poly)),
+  };
 }
 
 export function hitRoom(

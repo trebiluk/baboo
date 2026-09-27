@@ -8,11 +8,14 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.5.3 dollhouse furniture', () => {
-  it('chips 2.5.3 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.5.3');
+describe('2.6.0 room entity', () => {
+  it('chips 2.6.0 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.6.0');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.6\.0'/);
     assert.match(changelog, /version:\s*'2\.5\.3'/);
+    const rooms = readFileSync(join(studio, 'lib/rooms.ts'), 'utf8');
+    assert.match(rooms, /export function roomBundle/);
     assert.match(changelog, /version:\s*'2\.5\.2'/);
     assert.match(changelog, /version:\s*'2\.5\.1'/);
     assert.match(changelog, /version:\s*'2\.5\.0'/);
@@ -53,6 +56,7 @@ describe('2.5.3 dollhouse furniture', () => {
     const doll = readFileSync(join(studio, 'components/DollhouseCanvas.tsx'), 'utf8');
     assert.match(doll, /function DollPlant/);
     const css = readFileSync(join(studio, 'index.css'), 'utf8');
+    assert.match(css, /\.inspect-dock \{[\s\S]*?left:\s*56px/);
     assert.match(css, /flex-wrap:nowrap/);
     assert.match(css, /:has\(\.coach-card\) \.plan-sheet/);
   });

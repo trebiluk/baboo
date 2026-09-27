@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
 import { formatLength, parseFeet, wallLength, dist } from '../lib/geometry';
 import { ROOM_CATALOG, roomType } from '../data/rooms';
-import { formatArea, polygonArea, roomPolygon } from '../lib/rooms';
+import { formatArea, polygonArea, roomBundle, roomPolygon } from '../lib/rooms';
 import { Icon } from '../icons';
 import { TEXTURE_PACKS } from '../data/textures';
 import { FLOOR_FINISHES, asFloorFinish } from '../data/flooring';
@@ -121,6 +121,8 @@ export function ObjectMenu() {
   const setWallLength = useProjectStore((s) => s.setWallLength);
   const patchRoom = useProjectStore((s) => s.patchRoom);
   const renameRoom = useProjectStore((s) => s.renameRoom);
+  const setRoomWallKind = useProjectStore((s) => s.setRoomWallKind);
+  const setSelected = useProjectStore((s) => s.setSelected);
   const renameNote = useProjectStore((s) => s.renameNote);
   const deleteSelected = useProjectStore((s) => s.deleteSelected);
   const traceSketch = useProjectStore((s) => s.traceSketch);
@@ -385,7 +387,7 @@ export function ObjectMenu() {
         const poly = roomPolygon(r, floor.nodes, floor.walls);
         return (
           <>
-            <DockHead title="Room" onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
+            <DockHead title={r.name || 'Room'} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
             <label className="object-menu-field">
               <span>Name</span>
               <input value={r.name} onChange={(e) => renameRoom(r.id, e.target.value)} aria-label="Room name" />
@@ -447,6 +449,43 @@ export function ObjectMenu() {
                 ) : null}
               </>
             ) : null}
+            {(() => {
+              const bundle = roomBundle(r, floor.nodes, floor.walls, floor.openings, floor.furniture);
+              const doors = bundle.openings.filter((o) => o.type === 'door');
+              const windows = bundle.openings.filter((o) => o.type !== 'door');
+              const exterior = bundle.walls.filter((w) => w.kind !== 'interior').length;
+              return (
+                <>
+                  <p className="object-menu-meta">
+                    {bundle.walls.length} walls · {exterior} exterior · {doors.length} doors · {windows.length} windows · {bundle.furniture.length} inside
+                  </p>
+                  <div className="object-menu-row">
+                    <button type="button" className="object-chip aw-pressable" onClick={() => setRoomWallKind(r.id, 'exterior')}>Exterior walls</button>
+                    <button type="button" className="object-chip aw-pressable" onClick={() => setRoomWallKind(r.id, 'interior')}>Interior walls</button>
+                  </div>
+                  {bundle.openings.map((o) => (
+                    <button
+                      key={o.id}
+                      type="button"
+                      className="object-chip aw-pressable"
+                      onClick={() => setSelected({ kind: 'opening', id: o.id })}
+                    >
+                      {o.type === 'door' ? 'Door' : 'Window'}
+                    </button>
+                  ))}
+                  {bundle.furniture.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className="object-chip aw-pressable"
+                      onClick={() => setSelected({ kind: 'furniture', id: item.id })}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </>
+              );
+            })()}
             <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
           </>
         );

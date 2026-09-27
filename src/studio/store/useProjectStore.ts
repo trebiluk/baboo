@@ -18,7 +18,7 @@ import {
 } from '../lib/geometry';
 import { chamferCorner, nearestChamferable } from '../lib/chamfer';
 import { boxCorners } from '../lib/boxWalls';
-import { findEnclosedFace, formatArea, hitRoom, polygonArea, listInteriorFaces } from '../lib/rooms';
+import { findEnclosedFace, formatArea, hitRoom, polygonArea, listInteriorFaces, roomBundle } from '../lib/rooms';
 import { DEFAULT_ROOM_KIND, roomType } from '../data/rooms';
 import { defaultFloorForKind } from '../data/flooring';
 import {
@@ -198,6 +198,7 @@ interface Store {
   placeOpening: (type: 'door' | 'window', p: Point) => void;
   patchOpening: (id: string, patch: Partial<Pick<Opening, 'width' | 'swing' | 'symbolKind' | 't'>>) => void;
   patchWall: (id: string, patch: Partial<Pick<Wall, 'kind' | 'finishId' | 'thickness' | 'drawStyle'>>) => void;
+  setRoomWallKind: (roomId: string, kind: 'interior' | 'exterior') => void;
   patchFurniture: (id: string, patch: Partial<Pick<FurnitureItem, 'color' | 'x' | 'y' | 'w' | 'h' | 'rot'>>) => void;
   patchLandscape: (id: string, patch: Partial<Pick<LandscapeItem, 'x' | 'y' | 'w' | 'h'>>) => void;
   moveWallEnd: (wallId: string, end: 'a' | 'b', p: Point, forceOrtho?: boolean) => void;
@@ -1194,6 +1195,26 @@ export const useProjectStore = create<Store>((set, get) => ({
         };
         return refreshRoof(next, get().doc.settings.roofStyleId ?? null, get().doc.settings.wallHeight);
       }),
+    });
+    get().markDirty();
+  },
+
+  setRoomWallKind: (roomId, kind) => {
+    const f = get().floor();
+    const room = (f.rooms ?? []).find((r) => r.id === roomId);
+    if (!room) return;
+    const ids = new Set(roomBundle(room, f.nodes, f.walls, f.openings, f.furniture).walls.map((w) => w.id));
+    if (!ids.size) return;
+    get().pushHistory();
+    set({
+      doc: withFloor(get().doc, (fl) => refreshRoof({
+        ...fl,
+        walls: fl.walls.map((w) => (ids.has(w.id) ? {
+          ...w,
+          kind,
+          thickness: kind === 'interior' ? 0.35 : 0.5,
+        } : w)),
+      }, get().doc.settings.roofStyleId ?? null, get().doc.settings.wallHeight)),
     });
     get().markDirty();
   },

@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.6.0 — 2026-09-27 — A room is one thing
+- Click a room name to select the whole room: floor, walls, doors, and what is inside
+- That properties pane sits on the left. Teach stays on the right
+
 ## 2.5.3 — 2026-09-27 — Furniture with height
 - Dollhouse furniture has height, and the floor keeps its wood grain
 - The coach card stays on the plan, so it does not cover the dollhouse

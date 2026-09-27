@@ -3155,15 +3155,16 @@ html.aw-teaching-open, body.aw-teaching-open {
 /* 1.0.39 inspect dock + dollhouse */
 .inspect-dock {
   z-index: var(--aw-z-floating);
-  right: var(--aw-rail-right);
+  left: 56px;
+  right: auto;
   top: 0;
   bottom: 0;
-  width: min(232px, calc(100% - var(--aw-rail-left) - var(--aw-rail-right)));
+  width: min(280px, calc(100% - 72px));
   max-height: none;
   height: 100%;
   background: var(--aw-elevated);
   border: none;
-  border-left: 1px solid var(--aw-border);
+  border-right: 1px solid var(--aw-border);
   border-radius: 0;
   box-shadow: none;
   pointer-events: auto;
@@ -3174,7 +3175,8 @@ html.aw-teaching-open, body.aw-teaching-open {
 }
 .inspect-dock.is-min {
   top: 8px;
-  right: calc(var(--aw-rail-right) + 8px);
+  left: 64px;
+  right: auto;
   bottom: auto;
   width: auto;
   height: auto;

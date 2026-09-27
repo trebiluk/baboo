@@ -850,6 +850,7 @@ export function PlanCanvas() {
               lightPlan={lightPlan}
               dimBg={planColors.dimBg}
               dimFg={planColors.dimFg}
+              onPick={() => useProjectStore.getState().setSelected({ kind: 'room', id: r.id })}
             />
           ))}
 
@@ -2224,7 +2225,7 @@ function RoomFill({
 }
 
 function RoomLabel({
-  room, poly, selected, zoom, units, lightPlan, dimBg, dimFg,
+  room, poly, selected, zoom, units, lightPlan, dimBg, dimFg, onPick,
 }: {
   room: Room;
   poly: { x: number; y: number }[] | null;
@@ -2234,13 +2235,18 @@ function RoomLabel({
   lightPlan: boolean;
   dimBg: string;
   dimFg: string;
+  onPick: () => void;
 }) {
   const area = poly ? formatArea(polygonArea(poly), units) : null;
   const w = Math.max(3.6, room.name.length * 0.32 + 1.4);
   const h = area ? 1.15 : 0.7;
   const font = Math.max(0.38, 11 / zoom);
+  const pick = (evt: { cancelBubble: boolean }) => {
+    evt.cancelBubble = true;
+    onPick();
+  };
   return (
-    <Group x={room.x} y={room.y} listening={false}>
+    <Group x={room.x} y={room.y}>
       <Rect
         x={-w / 2}
         y={-h / 2}
@@ -2251,6 +2257,8 @@ function RoomLabel({
         strokeWidth={1.5 / zoom}
         cornerRadius={0.12}
         opacity={0.94}
+        onClick={pick}
+        onTap={pick}
       />
       <Text
         text={room.name}
@@ -2261,6 +2269,7 @@ function RoomLabel({
         fontSize={font}
         fontStyle="bold"
         fill={dimFg}
+        listening={false}
       />
       {area && (
         <Text
@@ -2271,6 +2280,7 @@ function RoomLabel({
           align="center"
           fontSize={font * 0.85}
           fill={lightPlan ? '#52525B' : '#a8b6cc'}
+          listening={false}
         />
       )}
     </Group>
