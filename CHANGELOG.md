@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.5.1 — 2026-09-27 — Yard graphics
+- Trees are round canopies, the walk is stone pavers, and flower beds have blooms
+- The same yard drawing is on the plan, the dollhouse, and the 3D view
+
 ## 2.5.0 — 2026-09-27 — Inside and outside
 - Starter houses have a yard: a walk to the door, two trees, and flowers
 - Arts & Crafts living room has a bookcase instead of a washer

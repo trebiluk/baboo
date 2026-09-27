@@ -7,6 +7,7 @@ import { furnitureParts, partWorldCorners, partWorldRing, type FurnPart } from '
 import { floorFinish, asFloorFinish, type FloorFinishId, type FloorGrain } from '../data/flooring';
 import { listInteriorFaces, listInteriorFloors, roomPolygon } from './rooms';
 import { FACE_BUDGET, FURN_CAP, PLANT_CAP, type FurnLod } from './perf';
+import { bloomSpots } from '../data/landscape';
 import { wallFootprint, wallSidesAt } from './wallJoin';
 
 export const WALL_H = 9;
@@ -694,45 +695,65 @@ function plantFaces(item: LandscapeItem, site: SiteFinish, blocky: boolean, lod:
         'tree',
       );
     }
-    const out = boxFaces(item.x - trunk, item.y - trunk, item.x + trunk, item.y + trunk, 0, 3.2, '#6B5344', stroke, 'tree');
-    const peak = v3(item.x, item.y, 3.2 + r * 1.1);
-    const ring = 8;
-    for (let i = 0; i < ring; i++) {
-      const a0 = (Math.PI * 2 * i) / ring;
-      const a1 = (Math.PI * 2 * (i + 1)) / ring;
-      out.push({
-        pts: [
-          v3(item.x + Math.cos(a0) * r, item.y + Math.sin(a0) * r, 3.2),
-          v3(item.x + Math.cos(a1) * r, item.y + Math.sin(a1) * r, 3.2),
-          peak,
-        ],
-        fill: i % 2 === 0 ? '#3D7A4A' : '#2F6B3A',
-        stroke,
-        kind: 'tree',
-      });
-    }
+    const out = boxFaces(item.x - trunk, item.y - trunk, item.x + trunk, item.y + trunk, 0, 2.3, '#6B5344', stroke, 'tree');
+    const dome = (z0: number, radius: number, zPeak: number, fillA: string, fillB: string) => {
+      const peak = v3(item.x, item.y, zPeak);
+      const ring = 8;
+      for (let i = 0; i < ring; i++) {
+        const a0 = (Math.PI * 2 * i) / ring;
+        const a1 = (Math.PI * 2 * (i + 1)) / ring;
+        out.push({
+          pts: [
+            v3(item.x + Math.cos(a0) * radius, item.y + Math.sin(a0) * radius, z0),
+            v3(item.x + Math.cos(a1) * radius, item.y + Math.sin(a1) * radius, z0),
+            peak,
+          ],
+          fill: i % 2 === 0 ? fillA : fillB,
+          stroke,
+          kind: 'tree',
+        });
+      }
+    };
+    dome(2.15, r * 0.9, 3.7, '#2F6B3A', '#3D7A4A');
+    dome(3.15, r * 0.55, 4.85, '#3D8A4E', '#67B56A');
     return out;
   }
   if (item.kind === 'path') {
-    return [quad(
-      v3(item.x - item.w / 2, item.y - item.h / 2, 0.06),
-      v3(item.x + item.w / 2, item.y - item.h / 2, 0.06),
-      v3(item.x + item.w / 2, item.y + item.h / 2, 0.06),
-      v3(item.x - item.w / 2, item.y + item.h / 2, 0.06),
-      '#C4B59A',
-      '#A09078',
+    return boxFaces(
+      item.x - item.w / 2,
+      item.y - item.h / 2,
+      item.x + item.w / 2,
+      item.y + item.h / 2,
+      0.02,
+      0.22,
+      '#E7D3B0',
+      '#8C7356',
       'path',
-    )];
+    );
   }
-  return [quad(
-    v3(item.x - item.w / 2, item.y - item.h / 2, 0.08),
-    v3(item.x + item.w / 2, item.y - item.h / 2, 0.08),
-    v3(item.x + item.w / 2, item.y + item.h / 2, 0.08),
-    v3(item.x - item.w / 2, item.y + item.h / 2, 0.08),
-    SITE_PALETTE[site].edge,
+  const bed = boxFaces(
+    item.x - item.w / 2,
+    item.y - item.h / 2,
+    item.x + item.w / 2,
+    item.y + item.h / 2,
+    0.02,
+    0.18,
+    site === 'dirt' ? '#6B4A32' : '#3E6B3A',
     stroke,
     'bed',
-  )];
+  );
+  for (const b of bloomSpots(item.id, 6, item.w, item.h)) {
+    bed.push(quad(
+      v3(item.x + b.x - 0.18, item.y + b.y, 0.2),
+      v3(item.x + b.x + 0.18, item.y + b.y, 0.2),
+      v3(item.x + b.x + 0.1, item.y + b.y, 0.85),
+      v3(item.x + b.x - 0.1, item.y + b.y, 0.85),
+      b.color,
+      stroke,
+      'bed',
+    ));
+  }
+  return bed;
 }
 
 export function projectFaces(faces: MassFace[], cam: Cam3, w: number, h: number, opts: MassOpts): {

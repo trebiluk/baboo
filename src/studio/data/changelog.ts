@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.5.1',
+    date: '2026-09-27',
+    bullets: [
+      'Trees are round canopies, the walk is stone pavers, and flower beds have blooms',
+      'The same yard drawing is on the plan, the dollhouse, and the 3D view',
+    ],
+  },
+  {
     version: '2.5.0',
     date: '2026-09-27',
     bullets: [

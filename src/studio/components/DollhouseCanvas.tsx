@@ -22,6 +22,7 @@ import { furnitureParts, partWorldCorners, partWorldRing } from '../lib/furnShap
 import { footprintPad, wallCutFaces } from '../lib/dollWalls';
 import { FURN_CAP, furnitureLod } from '../lib/perf';
 import { asFloorFinish, asFloorGrain, floorFinish, floorTileCanvas } from '../data/flooring';
+import { bloomSpots } from '../data/landscape';
 import { listInteriorFloors, roomPolygon } from '../lib/rooms';
 import { DEFAULT_GUI_THEME } from '../data/themes';
 import { t } from '../data/i18n';
@@ -683,9 +684,9 @@ function DollPlant({
     onPick();
   };
   if (item.kind === 'tree') {
-    const r = Math.max(item.w, item.h) / 2;
-    const trunk = Math.min(0.4, r * 0.16);
-    const z1 = 3.2;
+    const r = Math.max(item.w, item.h) / 2 * 0.82;
+    const trunk = Math.min(0.35, r * 0.14);
+    const z1 = 2.3;
     const corners = [
       [item.x - trunk, item.y - trunk],
       [item.x + trunk, item.y - trunk],
@@ -701,25 +702,34 @@ function DollPlant({
         project(a[0], a[1], z1, spec),
       ]);
     });
-    const peak = project(item.x, item.y, z1 + r * 1.05, spec);
-    const ring = 7;
-    const canopy = Array.from({ length: ring }, (_, i) => {
-      const a0 = (Math.PI * 2 * i) / ring;
-      const a1 = (Math.PI * 2 * (i + 1)) / ring;
-      return dollPts([
-        project(item.x + Math.cos(a0) * r, item.y + Math.sin(a0) * r, z1, spec),
-        project(item.x + Math.cos(a1) * r, item.y + Math.sin(a1) * r, z1, spec),
-        peak,
-      ]);
-    });
-    const leaf = light ? '#4C9A5C' : '#3D7A4A';
+    const dome = (zBase: number, radius: number, peakZ: number, aFill: string, bFill: string) => {
+      const peak = project(item.x, item.y, peakZ, spec);
+      const ring = 8;
+      return Array.from({ length: ring }, (_, i) => {
+        const a0 = (Math.PI * 2 * i) / ring;
+        const a1 = (Math.PI * 2 * (i + 1)) / ring;
+        return {
+          pts: dollPts([
+            project(item.x + Math.cos(a0) * radius, item.y + Math.sin(a0) * radius, zBase, spec),
+            project(item.x + Math.cos(a1) * radius, item.y + Math.sin(a1) * radius, zBase, spec),
+            peak,
+          ]),
+          fill: i % 2 ? bFill : aFill,
+        };
+      });
+    };
+    const lower = dome(2.15, r, 3.7, '#2F6B3A', '#3D7A4A');
+    const upper = dome(3.15, r * 0.58, 4.85, light ? '#3D8A4E' : '#2A5A34', light ? '#67B56A' : '#3D7A4A');
     return (
       <>
         {trunkFaces.map((pts, i) => (
           <Line key={`${item.id}-t${i}`} name="doll-plant" points={pts} closed fill="#6B5344" stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
         ))}
-        {canopy.map((pts, i) => (
-          <Line key={`${item.id}-c${i}`} name="doll-plant" points={pts} closed fill={i % 2 ? '#2F6B3A' : leaf} stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
+        {lower.map((face, i) => (
+          <Line key={`${item.id}-l${i}`} name="doll-plant" points={face.pts} closed fill={face.fill} stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
+        ))}
+        {upper.map((face, i) => (
+          <Line key={`${item.id}-u${i}`} name="doll-plant" points={face.pts} closed fill={face.fill} stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
         ))}
       </>
     );
@@ -728,17 +738,50 @@ function DollPlant({
   const hh = item.h / 2;
   const c = Math.cos(item.rot);
   const s = Math.sin(item.rot);
-  const corner = (x: number, y: number) => {
+  const corner = (x: number, y: number, z: number) => {
     const rx = x * c - y * s;
     const ry = x * s + y * c;
-    return project(item.x + rx, item.y + ry, 0.08, spec);
+    return project(item.x + rx, item.y + ry, z, spec);
   };
-  const pts = dollPts([
-    corner(-hw, -hh), corner(hw, -hh), corner(hw, hh), corner(-hw, hh),
-  ]);
-  const fill = item.kind === 'path' ? '#C4B59A' : (light ? '#8FBF78' : '#3D7A4A');
+  if (item.kind === 'path') {
+    const top = dollPts([corner(-hw, -hh, 0.22), corner(hw, -hh, 0.22), corner(hw, hh, 0.22), corner(-hw, hh, 0.22)]);
+    const side = (x0: number, y0: number, x1: number, y1: number) => dollPts([
+      corner(x0, y0, 0.02), corner(x1, y1, 0.02), corner(x1, y1, 0.22), corner(x0, y0, 0.22),
+    ]);
+    return (
+      <>
+        <Line name="doll-plant" points={side(-hw, -hh, hw, -hh)} closed fill="#A89070" stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
+        <Line name="doll-plant" points={side(hw, -hh, hw, hh)} closed fill="#8C7356" stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
+        <Line name="doll-plant" points={side(hw, hh, -hw, hh)} closed fill="#A89070" stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
+        <Line name="doll-plant" points={side(-hw, hh, -hw, -hh)} closed fill="#8C7356" stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
+        <Line name="doll-plant" points={top} closed fill="#E7D3B0" stroke="#8C7356" strokeWidth={sw} onClick={pick} onTap={pick} />
+      </>
+    );
+  }
+  const blooms = bloomSpots(item.id, 7, item.w, item.h);
+  const bed = dollPts([corner(-hw, -hh, 0.16), corner(hw, -hh, 0.16), corner(hw, hh, 0.16), corner(-hw, hh, 0.16)]);
   return (
-    <Line name="doll-plant" points={pts} closed fill={fill} opacity={0.9} stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
+    <>
+      <Line name="doll-plant" points={bed} closed fill="#3E6B3A" stroke={stroke} strokeWidth={sw} onClick={pick} onTap={pick} />
+      {blooms.map((b, i) => (
+        <Line
+          key={`${item.id}-b${i}`}
+          name="doll-plant"
+          points={dollPts([
+            corner(b.x - 0.22, b.y, 0.2),
+            corner(b.x + 0.22, b.y, 0.2),
+            corner(b.x + 0.12, b.y, 0.85),
+            corner(b.x - 0.12, b.y, 0.85),
+          ])}
+          closed
+          fill={b.color}
+          stroke={stroke}
+          strokeWidth={sw * 0.6}
+          onClick={pick}
+          onTap={pick}
+        />
+      ))}
+    </>
   );
 }
 

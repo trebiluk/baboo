@@ -23,6 +23,7 @@ import { exteriorBounds, ROOF_STYLE_OPTIONS, roofStyleName } from '../lib/roof';
 import { roomType } from '../data/rooms';
 import type { FurnitureItem, Opening, Wall, Node, Room, DimItem, NoteItem, LandscapeItem, Locale } from '../types';
 import { t, tipLoc } from '../data/i18n';
+import { bloomSpots } from '../data/landscape';
 import {
   loadImportPattern,
   patternForPack,
@@ -1599,30 +1600,46 @@ function PlantMark({
   zoom: number;
 }) {
   const sw = (selected ? 2 : 1.25) / zoom;
-  const stroke = selected ? accent : '#2F5D3A';
   if (item.kind === 'tree') {
     const r = Math.min(item.w, item.h) / 2;
     return (
-      <Group
-        x={item.x}
-        y={item.y}
-        listening={false}
-        perfectDrawEnabled={false}
-        clipFunc={(ctx) => {
-          ctx.beginPath();
-          ctx.arc(0, 0, r, 0, Math.PI * 2);
-        }}
-      >
-        <Circle radius={r * 0.9} stroke={stroke} strokeWidth={sw} fill="rgba(61,122,74,0.16)" />
-        <Line points={[-r * 0.5, 0, r * 0.5, 0]} stroke={stroke} strokeWidth={sw} />
-        <Line points={[0, -r * 0.5, 0, r * 0.5]} stroke={stroke} strokeWidth={sw} />
-        <Circle radius={Math.max(0.18, r * 0.12)} fill="#6B5344" />
+      <Group x={item.x} y={item.y} listening={false} perfectDrawEnabled={false}>
+        <Circle radius={r * 0.92} fill="#1E4A28" opacity={0.18} />
+        <Circle x={r * 0.16} y={r * 0.1} radius={r * 0.62} fill="#245C34" />
+        <Circle x={-r * 0.2} y={r * 0.02} radius={r * 0.58} fill="#2F6B3A" />
+        <Circle x={-r * 0.02} y={-r * 0.2} radius={r * 0.5} fill="#3D8A4E" />
+        <Circle x={r * 0.12} y={-r * 0.08} radius={r * 0.34} fill="#67B56A" />
+        <Circle radius={Math.max(0.16, r * 0.1)} fill="#6B5344" stroke="#4A3424" strokeWidth={sw} />
+        {selected ? <Circle radius={r * 0.96} stroke={accent} strokeWidth={sw * 1.6} /> : null}
       </Group>
     );
   }
   if (item.kind === 'path') {
     const hw = item.w / 2;
     const hh = item.h / 2;
+    const cols = Math.max(1, Math.min(8, Math.round(item.w / 1.7)));
+    const rows = Math.max(1, Math.min(6, Math.round(item.h / 1.7)));
+    const gap = 0.1;
+    const pw = (item.w - gap * (cols + 1)) / cols;
+    const ph = (item.h - gap * (rows + 1)) / rows;
+    const stones = [];
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        stones.push(
+          <Rect
+            key={`${row}-${col}`}
+            x={-hw + gap + col * (pw + gap)}
+            y={-hh + gap + row * (ph + gap)}
+            width={pw}
+            height={ph}
+            cornerRadius={0.12}
+            fill={(row + col) % 2 ? '#E7D3B0' : '#CDB892'}
+            stroke="#8C7356"
+            strokeWidth={sw * 0.6}
+          />,
+        );
+      }
+    }
     return (
       <Group
         x={item.x}
@@ -1630,26 +1647,18 @@ function PlantMark({
         rotation={(item.rot * 180) / Math.PI}
         listening={false}
         perfectDrawEnabled={false}
-        clipFunc={(ctx) => {
-          ctx.beginPath();
-          ctx.rect(-hw, -hh, item.w, item.h);
-        }}
       >
-        <Rect
-          x={-hw}
-          y={-hh}
-          width={item.w}
-          height={item.h}
-          fill="#E7D7B8"
-          stroke={stroke}
-          strokeWidth={sw}
-        />
-        <Line points={[-hw * 0.7, 0, hw * 0.7, 0]} stroke="#A09078" strokeWidth={sw} dash={[0.35, 0.25]} />
+        <Rect x={-hw} y={-hh} width={item.w} height={item.h} fill="#B7A488" cornerRadius={0.16} />
+        {stones}
+        {selected ? (
+          <Rect x={-hw} y={-hh} width={item.w} height={item.h} stroke={accent} strokeWidth={sw * 1.4} />
+        ) : null}
       </Group>
     );
   }
   const hw = item.w / 2;
   const hh = item.h / 2;
+  const blooms = bloomSpots(item.id, 8, item.w, item.h);
   return (
     <Group
       x={item.x}
@@ -1657,15 +1666,15 @@ function PlantMark({
       rotation={(item.rot * 180) / Math.PI}
       listening={false}
       perfectDrawEnabled={false}
-      clipFunc={(ctx) => {
-        ctx.beginPath();
-        ctx.rect(-hw, -hh, item.w, item.h);
-      }}
     >
-      <Rect x={-hw} y={-hh} width={item.w} height={item.h} stroke={stroke} strokeWidth={sw} fill="rgba(124,181,106,0.28)" />
-      <Circle x={-hw * 0.35} radius={Math.min(hw, hh) * 0.22} fill="#3D7A4A" />
-      <Circle x={hw * 0.28} y={-hh * 0.15} radius={Math.min(hw, hh) * 0.18} fill="#5A8F4A" />
-      <Circle x={hw * 0.05} y={hh * 0.2} radius={Math.min(hw, hh) * 0.16} fill="#2F6B3A" />
+      <Rect x={-hw} y={-hh} width={item.w} height={item.h} cornerRadius={0.35} fill="#5C4632" />
+      <Rect x={-hw + 0.15} y={-hh + 0.15} width={item.w - 0.3} height={item.h - 0.3} cornerRadius={0.28} fill="#3E6B3A" />
+      {blooms.map((b, i) => (
+        <Circle key={i} x={b.x} y={b.y} radius={Math.min(hw, hh) * 0.16} fill={b.color} stroke="#2A3A22" strokeWidth={sw * 0.45} />
+      ))}
+      {selected ? (
+        <Rect x={-hw} y={-hh} width={item.w} height={item.h} stroke={accent} strokeWidth={sw * 1.4} />
+      ) : null}
     </Group>
   );
 }
