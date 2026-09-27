@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.4.1',
+    date: '2026-09-27',
+    bullets: [
+      '3D walls are solid. The sky no longer shows through them like glass',
+      'The sun disk is gone from the roof. The hint line no longer sits in a card',
+    ],
+  },
+  {
     version: '2.4.0',
     date: '2026-09-26',
     bullets: [

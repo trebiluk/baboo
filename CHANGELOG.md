@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.4.1 — 2026-09-27 — Solid walls
+- 3D walls are solid. The sky no longer shows through them like glass
+- The sun disk is gone from the roof. The hint line no longer sits in a card
+
 ## 2.4.0 — 2026-09-26 — The door opens
 - The dollhouse door swings open. You can see the jamb and the head of the hole
 - Closing a box names the room Living. Rename it whenever you want

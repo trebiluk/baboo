@@ -227,14 +227,6 @@ export function View3DStub() {
             height={size.h * 2}
             fill={materials && lod === 'full' ? 'url(#aw3d-grass)' : site.ground}
           />
-          {lighting && !walk && skyId === 'dusk' ? (
-            <circle cx={size.w * 0.78} cy={size.h * 0.18} r="22" fill="#E8B07A" opacity="0.85" />
-          ) : lighting && !walk && skyId === 'day' ? (
-            <>
-              <circle cx={size.w * 0.82} cy={size.h * 0.12} r="36" fill="#FFF6D0" opacity="0.28" />
-              <circle cx={size.w * 0.82} cy={size.h * 0.12} r="16" fill="#FFF4C8" opacity="0.92" />
-            </>
-          ) : null}
           <rect x="0" y={size.h * 0.52} width={size.w} height={size.h * 0.16} fill={sky.fog} opacity="0.28" />
           {painted.map((p, i) => (
             <path
@@ -243,7 +235,7 @@ export function View3DStub() {
               fill={p.kind === 'yard' && materials && lod === 'full' ? 'url(#aw3d-grass)' : p.kind === 'roof' && materials && lod === 'full' && roofStyleId !== 'grass' && roofStyleId !== 'conical' ? 'url(#aw3d-shingle)' : p.pattern && lod === 'full' ? `url(#aw3d-floor-${p.pattern})` : p.fill}
               stroke={p.stroke}
               strokeWidth={p.sw}
-              opacity={p.kind === 'glass' ? 0.92 : 1}
+              opacity={p.kind === 'glass' ? 0.8 : 1}
             />
           ))}
           {!floor.walls.length && (

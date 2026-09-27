@@ -205,15 +205,15 @@ function boxFaces(x0: number, y0: number, x1: number, y1: number, z0: number, z1
 
 function shade(hex: string, n: Vec3, sun: Vec3, opts: MassOpts): string {
   if (!opts.lighting) {
-    const lift = n.z > 0.7 ? 1 : n.z > 0.2 ? 0.92 : 0.82;
-    return hexAlpha(hex, opts.materials ? 0.96 : 0.9 * lift);
+    const lift = n.z > 0.7 ? 1.04 : n.z > 0.2 ? 1 : 0.86;
+    return shadeFill(hex, lift);
   }
-  const ambient = opts.sky === 'overcast' ? 0.62 : opts.sky === 'dusk' ? 0.38 : 0.42;
-  const sunAmt = opts.sky === 'overcast' ? 0.18 : opts.sky === 'dusk' ? 0.55 : 0.58;
+  const ambient = opts.sky === 'overcast' ? 0.78 : opts.sky === 'dusk' ? 0.5 : 0.62;
+  const sunAmt = opts.sky === 'overcast' ? 0.16 : opts.sky === 'dusk' ? 0.46 : 0.42;
   const ndl = Math.max(0, dot(n, sun));
-  const wrap = Math.max(0, n.z) * 0.12;
-  const lit = Math.min(1, ambient + ndl * sunAmt + wrap);
-  return hexAlpha(hex, 0.55 + lit * 0.44);
+  const wrap = Math.max(0, n.z) * 0.08;
+  const lit = Math.min(1.06, ambient + ndl * sunAmt + wrap);
+  return shadeFill(hex, lit);
 }
 
 export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
@@ -539,7 +539,7 @@ function roofFaces(roof: RoofGeometry, blocky: boolean, wallFill?: string): Mass
     const ocx = (p0.x + p1.x + p2.x + p3.x) / 4;
     const ocy = (p0.y + p1.y + p2.y + p3.y) / 4;
     const inside = v3(ocx, ocy, (eh + rh) * 0.5);
-    const gable = wallFill ?? mat.shade;
+    const gable = shadeFill(wallFill ?? mat.shade, 0.9);
     if (roof.longAxis === 'x') {
       out.push(quad(p0, p1, rb, ra, mat.fill, stroke, 'roof'));
       out.push(quad(p3, p2, rb, ra, mat.shade, stroke, 'roof'));
@@ -754,7 +754,7 @@ export function projectFaces(faces: MassFace[], cam: Cam3, w: number, h: number,
     const fill = f.kind === 'shadow'
       ? hexAlpha('#1A2018', opts.sky === 'dusk' ? 0.28 : 0.22)
       : f.kind === 'glass'
-        ? hexAlpha(f.fill, opts.sky === 'dusk' ? 0.85 : 0.55)
+        ? hexAlpha(f.fill, 0.72)
         : shade(f.fill, n, sun, opts);
     const sw = f.kind === 'shadow' ? 0 : opts.blocky ? 1.8 : f.kind === 'roof' ? 1.2 : 0.9;
     return {

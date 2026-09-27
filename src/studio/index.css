@@ -1350,13 +1350,13 @@ html[data-ell-english] {
   overflow:auto
 }
 .view3d-banner {
-  background:var(--aw-surface);
-  border:1px solid var(--aw-border);
-  border-radius:10px;
-  flex-direction:column;
-  gap:4px;
-  padding:10px 12px;
-  display:flex
+  background:transparent;
+  border:none;
+  border-radius:0;
+  padding:2px 8px 0;
+  color:var(--aw-muted);
+  font-size:12px;
+  font-weight:500
 }
 .tier-ladder {
   grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));
