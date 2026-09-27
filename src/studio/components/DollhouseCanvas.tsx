@@ -164,12 +164,6 @@ export function DollhouseCanvas() {
     }));
   }, [floor.nodes, floor.walls, floor.rooms, settings.floorFinishId, spec.kind, spec.yaw, spec.top]);
 
-  const lidPoly = useMemo(() => {
-    const outline = floor.roof?.outline;
-    if (outline && outline.length >= 3) return projectPoints(outline.map((p) => ({ x: p.x, y: p.y, z: wallH })), spec);
-    return [];
-  }, [floor.roof, spec.kind, spec.yaw, spec.top, wallH]);
-
   const padPoly = useMemo(() => {
     const pad = footprintPad(floor.nodes);
     if (!pad) return [];
@@ -198,9 +192,9 @@ export function DollhouseCanvas() {
     }
 
     const faces: SceneFace[] = [];
-    const ink = blocky ? '#1a1208' : (light ? '#2a2a32' : '#c5d0ea');
+    const ink = blocky ? '#1a1208' : (light ? '#3a342c' : '#c5d0ea');
     const furnInk = blocky ? '#1a1208' : '#3f3f46';
-    const swWall = (sel: boolean) => (sel ? 3 : (blocky ? 2.5 : 1.25)) / zoom;
+    const swWall = (sel: boolean) => (sel ? 3 : (blocky ? 2.5 : 1.75)) / zoom;
     const swFurn = (sel: boolean) => (sel ? 2 : (blocky ? 2 : 1)) / zoom;
 
     for (const w of floor.walls) {
@@ -575,17 +569,6 @@ export function DollhouseCanvas() {
               />
             );
           })}
-          {lidPoly.length >= 6 && !spec.top && (
-            <Line
-              points={lidPoly}
-              closed
-              dash={[6 / zoom, 5 / zoom]}
-              stroke={light ? '#8b8dff' : '#c5c7ff'}
-              strokeWidth={1.25 / zoom}
-              opacity={0.55}
-              listening={false}
-            />
-          )}
           {sceneFaces.map((face) => {
             const tile = face.pattern;
             return (

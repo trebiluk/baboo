@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.4.2',
+    date: '2026-09-27',
+    bullets: [
+      'Dollhouse: the dashed roof box is gone. The door is a slab, not a spike',
+      'The tool list stays icons in the dollhouse, so it does not cover the turn buttons',
+    ],
+  },
+  {
     version: '2.4.1',
     date: '2026-09-27',
     bullets: [

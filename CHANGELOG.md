@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.4.2 — 2026-09-27 — Dollhouse, less junk
+- Dollhouse: the dashed roof box is gone. The door is a slab, not a spike
+- The tool list stays icons in the dollhouse, so it does not cover the turn buttons
+
 ## 2.4.1 — 2026-09-27 — Solid walls
 - 3D walls are solid. The sky no longer shows through them like glass
 - The sun disk is gone from the roof. The hint line no longer sits in a card

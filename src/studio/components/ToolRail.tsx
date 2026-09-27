@@ -118,7 +118,7 @@ export function ToolRail() {
   const expert = skillRank(skillLevel) >= 3;
   const showList = allowed.includes('furniture') || (!isDollhouse && allowed.includes('room'));
   const quickSet = isDollhouse ? QUICK_DOLL : QUICK;
-  const expanded = !sheetOpen && (
+  const expanded = !isDollhouse && !sheetOpen && (
     toolsPinned
     || catalogOpen
     || (!phone && (hover || focus))

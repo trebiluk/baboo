@@ -87,12 +87,14 @@ export function wallCutFaces(
     .filter((c) => c.s1 - c.s0 > 0.4 && c.head > c.sill + 0.4)
     .sort((p, q) => p.s0 - q.s0);
 
+  const overlap = Math.min(0.28, half);
   let cursor = 0;
   for (const c of cuts) {
     const s0 = Math.max(c.s0, cursor);
     if (s0 >= c.s1 - 0.2) continue;
     if (s0 > cursor + 0.05) {
-      walls.push(panel(cursor, s0, 0, wallH, half), panel(cursor, s0, 0, wallH, -half));
+      const from = cursor < 0.02 ? -overlap : cursor;
+      walls.push(panel(from, s0, 0, wallH, half), panel(from, s0, 0, wallH, -half));
     }
     if (c.sill > 0.05) {
       walls.push(panel(s0, c.s1, 0, c.sill, half), panel(s0, c.s1, 0, c.sill, -half));
@@ -114,23 +116,28 @@ export function wallCutFaces(
       const hy = a.y + uy * hingeS;
       const tx = hx + ux * along * Math.cos(ang) * leaf + nx * side * Math.sin(ang) * leaf;
       const ty = hy + uy * along * Math.cos(ang) * leaf + ny * side * Math.sin(ang) * leaf;
-      holes.push({
-        kind: 'door',
-        ring: [
-          { x: hx, y: hy, z: 0.08 },
-          { x: tx, y: ty, z: 0.08 },
-          { x: tx, y: ty, z: c.head - 0.15 },
-          { x: hx, y: hy, z: c.head - 0.15 },
-        ],
-      });
+      const ldx = tx - hx;
+      const ldy = ty - hy;
+      const llen = Math.hypot(ldx, ldy) || 1;
+      const px = (-ldy / llen) * 0.09;
+      const py = (ldx / llen) * 0.09;
+      const slab = (ox: number, oy: number): Xyz[] => [
+        { x: hx + ox, y: hy + oy, z: 0.08 },
+        { x: tx + ox, y: ty + oy, z: 0.08 },
+        { x: tx + ox, y: ty + oy, z: c.head - 0.15 },
+        { x: hx + ox, y: hy + oy, z: c.head - 0.15 },
+      ];
+      holes.push({ kind: 'door', ring: slab(px, py) });
+      holes.push({ kind: 'door', ring: slab(-px, -py) });
     }
     cursor = Math.max(cursor, c.s1);
   }
   if (cursor < len - 0.05) {
-    walls.push(panel(cursor, len, 0, wallH, half), panel(cursor, len, 0, wallH, -half));
+    const from = cursor < 0.02 ? -overlap : cursor;
+    walls.push(panel(from, len + overlap, 0, wallH, half), panel(from, len + overlap, 0, wallH, -half));
   }
   if (!cuts.length) {
-    walls.push(panel(0, len, 0, wallH, half), panel(0, len, 0, wallH, -half));
+    walls.push(panel(-overlap, len + overlap, 0, wallH, half), panel(-overlap, len + overlap, 0, wallH, -half));
   }
   const cap = wallPrism(a, b, thick, wallH);
   walls.push(cap[2], cap[3], cap[4]);

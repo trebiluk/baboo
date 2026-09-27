@@ -417,13 +417,13 @@ export const STR: Record<string, Gloss> = {
     ti: 'ገረብ ንምትካል ኣብቲ ካብ ገዛ ወጻኢ ጠውቕ',
     fa: 'روی حیاط کلیک کن تا درخت بکاری',
   }),
-  'hint.doll.paper': g('Tap a wall to paper it · roof is off like a dollhouse', {
-    es: 'Toca un muro para empapelarlo · el techo está quitado',
-    cu: 'Toca una pared para empapelarla · el techo está quitado',
-    uk: 'Торкнись стіни, щоб обклеїти · дах знято, як у ляльковому домі',
-    ru: 'Нажми стену, чтобы оклеить · крыша снята, как у кукольного дома',
-    ti: 'ንምሽፋን መንደቕ ጠውቕ · ጣራ ከም ገዛ ዕሸል ተኣልዩ',
-    fa: 'دیوار را بزن تا کاغذدیواری شود · سقف مثل خانه عروسکی برداشته شده',
+  'hint.doll.paper': g('Turn the house. Tap a wall to pick it.', {
+    es: 'Gira la casa. Toca un muro para elegirlo.',
+    cu: 'Gira la casa. Toca una pared para elegirla.',
+    uk: 'Поверни будинок. Торкнись стіни, щоб вибрати.',
+    ru: 'Поверни дом. Нажми стену, чтобы выбрать.',
+    ti: 'ገዛ ምዝዋር። መንደቕ ንምምራጽ ጠውቕ።',
+    fa: 'خانه را بچرخان. برای انتخاب، دیوار را بزن.',
   }),
   'doll.proj': g('Drawing view', {
     es: 'Vista de dibujo', cu: 'Vista de dibujo', uk: 'Вид креслення', ru: 'Вид чертежа', ti: 'ትርኢት ስእሊ', fa: 'نمای رسم',

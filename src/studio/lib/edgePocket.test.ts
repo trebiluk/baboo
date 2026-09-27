@@ -8,10 +8,11 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.4.1 solid walls', () => {
-  it('chips 2.4.1 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.4.1');
+describe('2.4.2 dollhouse', () => {
+  it('chips 2.4.2 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.4.2');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.4\.2'/);
     assert.match(changelog, /version:\s*'2\.4\.1'/);
     assert.match(changelog, /version:\s*'2\.4\.0'/);
     assert.match(changelog, /version:\s*'2\.3\.2'/);
