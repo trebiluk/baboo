@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.5.0',
+    date: '2026-09-27',
+    bullets: [
+      'Starter houses have a yard: a walk to the door, two trees, and flowers',
+      'Arts & Crafts living room has a bookcase instead of a washer',
+    ],
+  },
+  {
     version: '2.4.3',
     date: '2026-09-27',
     bullets: [

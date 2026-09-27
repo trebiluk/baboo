@@ -8,11 +8,15 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.4.3 box rubber-band', () => {
-  it('chips 2.4.3 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.4.3');
+describe('2.5.0 yard', () => {
+  it('chips 2.5.0 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.5.0');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.5\.0'/);
     assert.match(changelog, /version:\s*'2\.4\.3'/);
+    const templates = readFileSync(join(studio, 'data/templates.ts'), 'utf8');
+    assert.match(templates, /function furnishYard/);
+    assert.match(templates, /Bookcase/);
     assert.match(changelog, /version:\s*'2\.4\.2'/);
     assert.match(changelog, /version:\s*'2\.4\.1'/);
     assert.match(changelog, /version:\s*'2\.4\.0'/);

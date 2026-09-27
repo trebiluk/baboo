@@ -1,6 +1,6 @@
-import type { Floor, Opening, ProjectDocument, StyleId, StyleTemplate, Wall, Node, FurnitureItem, Room, RoomKind } from '../types';
+import type { Floor, Opening, ProjectDocument, StyleId, StyleTemplate, Wall, Node, FurnitureItem, Room, RoomKind, LandscapeItem, PlantKind } from '../types';
 import { DEFAULT_ROOF_BY_STYLE, roofStyleName } from './roofs';
-import { generateRoof } from '../lib/roof';
+import { exteriorBounds, generateRoof } from '../lib/roof';
 import { APP_VERSION } from '../version';
 import { uid } from '../lib/geometry';
 import { defaultTinyHomeTypology } from './typology';
@@ -9,7 +9,7 @@ import { DEFAULT_WALL_HEIGHT_FT } from '../lib/wallDraft';
 export const STYLE_TEMPLATES: StyleTemplate[] = [
   { id: 'blank', name: 'Blank', blurb: 'Start empty · draw your own walls.' },
   { id: 'colonial', name: 'Colonial', blurb: 'Balanced house · doors in the middle · rooms left and right.' },
-  { id: 'arts-crafts', name: 'Arts & Crafts', blurb: 'Cozy porch house · simple roof · handmade feel.' },
+  { id: 'arts-crafts', name: 'Arts & Crafts', blurb: 'Cozy porch house · rooms inside · a walk and trees outside.' },
   { id: 'greek-revival', name: 'Greek Revival', blurb: 'Fancy front · tall entry · balanced sides.' },
   { id: 'hobbit', name: 'Hobbit', blurb: 'Storybook cottage · round door · green living roof.' },
   { id: 'ranch', name: 'Ranch', blurb: 'Long one-story · rooms in a line · yard all around.' },
@@ -120,6 +120,44 @@ function furn(catalogId: string, x: number, y: number, w: number, h: number, lab
   return { id: uid('f'), catalogId, x, y, w, h, rot: 0, zIndex: 1, label };
 }
 
+function plant(kind: PlantKind, x: number, y: number, w: number, h: number, label: string): LandscapeItem {
+  return { id: uid('p'), kind, x, y, w, h, rot: 0, label };
+}
+
+/** A walk to the front door, two trees, and a flower bed. Outside the walls. */
+function furnishYard(floor: Floor) {
+  const b = exteriorBounds(floor.nodes, floor.walls);
+  if (!b) return;
+  const door = floor.openings.find((o) => o.type === 'door');
+  let dx = (b.minX + b.maxX) / 2;
+  let dy = b.minY;
+  if (door) {
+    const wall = floor.walls.find((w) => w.id === door.wallId);
+    const a = floor.nodes.find((n) => n.id === wall?.a);
+    const c = floor.nodes.find((n) => n.id === wall?.b);
+    if (a && c) {
+      dx = a.x + (c.x - a.x) * (door.t ?? 0.5);
+      dy = a.y + (c.y - a.y) * (door.t ?? 0.5);
+    }
+  }
+  const cx = (b.minX + b.maxX) / 2;
+  const cy = (b.minY + b.maxY) / 2;
+  const vx = dx - cx;
+  const vy = dy - cy;
+  const len = Math.hypot(vx, vy) || 1;
+  const ux = vx / len;
+  const uy = vy / len;
+  const span = 10;
+  const wide = Math.abs(ux) > Math.abs(uy);
+  floor.landscape = [
+    plant('path', dx + ux * (span / 2 + 1.2), dy + uy * (span / 2 + 1.2), wide ? span : 3.2, wide ? 3.2 : span, 'Walk'),
+    plant('tree', b.minX - 5, b.minY - 3, 6, 6, 'Tree'),
+    plant('tree', b.maxX + 5, b.maxY + 3, 6, 6, 'Tree'),
+    plant('bed', dx + ux * 7 - uy * 5, dy + uy * 7 + ux * 5, 7, 3, 'Flowers'),
+  ];
+  floor.layers = { ...floor.layers, landscape: true };
+}
+
 function room(kind: RoomKind, x: number, y: number, name?: string): Room {
   const names: Record<RoomKind, string> = {
     entry: 'Entry', living: 'Living', kitchen: 'Kitchen', dining: 'Dining',
@@ -171,7 +209,7 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
       furn('sofa', 10, 14, 7, 3, 'Sofa'),
       furn('coffee-table', 10, 18, 4, 2, 'Coffee Table'),
       furn('chair', 22, 12, 2.5, 2.5, 'Armchair'),
-      furn('washer', 24, 20, 2.5, 2.5, 'Washer'),
+      furn('storage-shelf', 24, 20, 3, 1.5, 'Bookcase'),
     ];
     floor.rooms = [
       room('entry', 14, 2, 'Porch'),
@@ -343,6 +381,7 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
   }
 
   const roofStyleId = DEFAULT_ROOF_BY_STYLE[styleId] ?? null;
+  if (styleId !== 'dog-house' && styleId !== 'tiny-home' && floor.walls.length > 2) furnishYard(floor);
   floor.roof = generateRoof(floor.nodes, floor.walls, roofStyleId, DEFAULT_WALL_HEIGHT_FT);
 
   return {
