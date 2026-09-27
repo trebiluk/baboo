@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.7.0',
+    date: '2026-09-27',
+    bullets: [
+      'Furniture has a light top, darker sides, and a shadow on the floor',
+      'Sofas and chairs use a cushion, not a box. Round parts are smoother',
+    ],
+  },
+  {
     version: '2.6.0',
     date: '2026-09-27',
     bullets: [

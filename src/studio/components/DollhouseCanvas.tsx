@@ -18,7 +18,7 @@ import {
 } from '../lib/iso';
 import { asWallHeightFt } from '../lib/wallDraft';
 import { packTileCanvas, textureStrokeFallback } from '../lib/texturePattern';
-import { furnitureParts, partWorldCorners, partWorldRing } from '../lib/furnShape';
+import { furnitureParts, furnTone, partWorldCorners, partWorldRing } from '../lib/furnShape';
 import { footprintPad, wallCutFaces } from '../lib/dollWalls';
 import { FURN_CAP, furnitureLod } from '../lib/perf';
 import { asFloorFinish, asFloorGrain, floorFinish, floorTileCanvas } from '../data/flooring';
@@ -194,9 +194,8 @@ export function DollhouseCanvas() {
 
     const faces: SceneFace[] = [];
     const ink = blocky ? '#1a1208' : (light ? '#3a342c' : '#c5d0ea');
-    const furnInk = blocky ? '#1a1208' : '#3f3f46';
     const swWall = (sel: boolean) => (sel ? 2.5 : (blocky ? 2.5 : 1.05)) / zoom;
-    const swFurn = (sel: boolean) => (sel ? 2 : (blocky ? 2 : 1)) / zoom;
+    const swFurn = (sel: boolean) => (sel ? 1.6 : (blocky ? 1.4 : 0.35)) / zoom;
 
     for (const w of floor.walls) {
       const e = wallEnds(w, floor.nodes);
@@ -264,16 +263,34 @@ export function DollhouseCanvas() {
       const parts = furnitureParts(f, lod);
       let fi = 0;
       const pick = () => setSelected({ kind: 'furniture', id: f.id });
+      const shade = partWorldRing(f, {
+        lx: 0, ly: 0, lw: f.w * 0.9, lh: f.h * 0.9, z0: 0, z1: 0.02, fill: '#1a2018', shape: 'oval',
+      });
+      if (shade.length >= 3) {
+        const scx = shade.reduce((s, p) => s + p.x, 0) / shade.length;
+        const scy = shade.reduce((s, p) => s + p.y, 0) / shade.length;
+        faces.push({
+          key: `f-${f.id}-shade`,
+          pts: projectPoints(shade.map((c) => ({ x: c.x, y: c.y, z: 0.03 })), spec),
+          fill: 'rgba(26,32,24,0.28)',
+          stroke: 'transparent',
+          sw: 0,
+          depth: cameraDepth(scx, scy, spec) - 0.4,
+          name: 'doll-furn',
+          pick,
+        });
+      }
       for (const part of parts) {
         const ring = lod === 'simple' ? partWorldCorners(f, part) : partWorldRing(f, part);
         if (ring.length < 3) continue;
         const cx = ring.reduce((s, p) => s + p.x, 0) / ring.length;
         const cy = ring.reduce((s, p) => s + p.y, 0) / ring.length;
+        const edge = sel ? '#6e72f5' : (blocky ? '#1a1208' : furnTone(part.fill, 0.55));
         faces.push({
           key: `f-${f.id}-${fi++}`,
           pts: projectPoints(ring.map((c) => ({ x: c.x, y: c.y, z: part.z1 })), spec),
-          fill: sel ? '#c5c7ff' : part.fill,
-          stroke: sel ? '#6e72f5' : furnInk,
+          fill: sel ? '#c5c7ff' : furnTone(part.fill, 1.14),
+          stroke: edge,
           sw: swFurn(sel),
           depth: cameraDepth(cx, cy, spec) + part.z1 * 0.04,
           name: 'doll-furn',
@@ -293,8 +310,8 @@ export function DollhouseCanvas() {
               { x: b.x, y: b.y, z: part.z1 },
               { x: a.x, y: a.y, z: part.z1 },
             ], spec),
-            fill: sel ? '#c5c7ff' : part.fill,
-            stroke: sel ? '#6e72f5' : furnInk,
+            fill: sel ? '#c5c7ff' : furnTone(part.fill, i % 2 ? 0.62 : 0.78),
+            stroke: edge,
             sw: swFurn(sel),
             depth: cameraDepth((a.x + b.x) / 2, (a.y + b.y) / 2, spec) + (part.z0 + part.z1) * 0.02,
             name: 'doll-furn',

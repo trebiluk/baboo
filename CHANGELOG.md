@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.7.0 — 2026-09-27 — Objects with light
+- Furniture has a light top, darker sides, and a shadow on the floor
+- Sofas and chairs use a cushion, not a box. Round parts are smoother
+
 ## 2.6.0 — 2026-09-27 — A room is one thing
 - Click a room name to select the whole room: floor, walls, doors, and what is inside
 - That properties pane sits on the left. Teach stays on the right

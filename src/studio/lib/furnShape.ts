@@ -59,6 +59,11 @@ function shadeHex(hex: string, k: number): string {
   return rgbHex(r * k, g * k, b * k);
 }
 
+/** Lighten (k>1) or darken (k<1) a furniture color so a side is not the same as the top. */
+export function furnTone(hex: string, k: number): string {
+  return shadeHex(hex, k);
+}
+
 function paintFurnParts(parts: FurnPart[], color?: string | null): FurnPart[] {
   if (!color) return parts;
   const any = parts.some((p) => PAINTABLE.has(p.fill));
@@ -204,7 +209,7 @@ function furniturePartsFull(item: FurnitureItem): FurnPart[] {
     case 'sofa':
       return [
         ...legs(w * 0.9, h * 0.72, 0.22, 0.16, 0.22, WOOD_DK),
-        box(0, 0.18, w * 0.86, h * 0.62, 0.2, 1.12, UPH),
+        oval(0, 0.18, w * 0.86, h * 0.62, 0.2, 1.12, UPH),
         box(-w * 0.22, 0.12, w * 0.36, h * 0.48, 1.12, 1.32, UPH_LT),
         box(w * 0.22, 0.12, w * 0.36, h * 0.48, 1.12, 1.32, UPH_LT),
         box(0, -hh + 0.22, w * 0.92, 0.42, 1.12, 2.55, UPH_DK),
@@ -214,7 +219,7 @@ function furniturePartsFull(item: FurnitureItem): FurnPart[] {
     case 'chair':
       return [
         ...legs(w * 0.78, h * 0.7, 0.18, 0.14, 0.22, WOOD_DK),
-        box(0, 0.16, w * 0.7, h * 0.58, 0.2, 1.18, UPH),
+        oval(0, 0.16, w * 0.7, h * 0.58, 0.2, 1.18, UPH),
         box(0, -hh + 0.2, w * 0.78, 0.36, 1.18, 2.72, UPH_DK),
         oval(-hw + 0.2, 0.08, 0.32, h * 0.62, 1.18, 2.05, UPH_DK),
         oval(hw - 0.2, 0.08, 0.32, h * 0.62, 1.18, 2.05, UPH_DK),
@@ -388,8 +393,8 @@ function furnitureSilhouette(item: FurnitureItem): FurnPart[] {
 }
 
 export function partRingCount(part: FurnPart): number {
-  if (part.shape === 'cyl') return 8;
-  if (part.shape === 'oval') return 10;
+  if (part.shape === 'cyl') return 12;
+  if (part.shape === 'oval') return 12;
   return 4;
 }
 

@@ -3,7 +3,7 @@ import type { Floor, FurnitureItem, LandscapeItem, Opening, Point, RoofGeometry,
 import type { SiteFinish, SkyPreset, WallTintId } from '../data/scene3d';
 import { SITE_PALETTE, WALL_TINT, hexAlpha } from '../data/scene3d';
 import { exteriorBounds } from './roof';
-import { furnitureParts, partWorldCorners, partWorldRing, type FurnPart } from './furnShape';
+import { furnitureParts, furnTone, partWorldCorners, partWorldRing, type FurnPart } from './furnShape';
 import { floorFinish, asFloorFinish, type FloorFinishId, type FloorGrain } from '../data/flooring';
 import { listInteriorFaces, listInteriorFloors, roomPolygon } from './rooms';
 import { FACE_BUDGET, FURN_CAP, PLANT_CAP, type FurnLod } from './perf';
@@ -443,7 +443,7 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
         kind: 'shadow',
       });
     }
-    const extras = faces.filter((f) => f.kind === 'furn' || f.kind === 'tree').slice(0, 28);
+    const extras = faces.filter((f) => f.kind === 'tree').slice(0, 12);
     for (const f of extras) {
       const c = centroid3(f.pts);
       const ground = projectOntoGround(c, sun);
@@ -602,8 +602,14 @@ function roofFaces(roof: RoofGeometry, blocky: boolean, wallFill?: string): Mass
 }
 
 function furnBox(item: FurnitureItem, blocky: boolean, lod: FurnLod = 'full'): MassFace[] {
-  const stroke = blocky ? '#1a1208' : '#3f3f46';
+  const stroke = blocky ? '#1a1208' : 'none';
   const out: MassFace[] = [];
+  const shadow = partWorldRing(item, {
+    lx: 0, ly: 0, lw: item.w * 0.92, lh: item.h * 0.92, z0: 0, z1: 0.02, fill: '#1A2018', shape: 'oval',
+  });
+  if (shadow.length >= 3) {
+    out.push({ pts: shadow.map((c) => v3(c.x, c.y, 0.03)), fill: '#1A2018', stroke: 'none', kind: 'shadow' });
+  }
   const parts = furnitureParts(item, lod);
   let top: FurnPart | null = null;
   let topArea = 0;
@@ -614,7 +620,8 @@ function furnBox(item: FurnitureItem, blocky: boolean, lod: FurnLod = 'full'): M
     const z1 = part.z1;
     const T = ring.map((c) => v3(c.x, c.y, z1));
     const B = ring.map((c) => v3(c.x, c.y, z0));
-    out.push({ pts: T, fill: part.fill, stroke, kind: 'furn' });
+    const edge = blocky ? stroke : 'none';
+    out.push({ pts: T, fill: furnTone(part.fill, 1.08), stroke: edge, kind: 'furn' });
     const area = part.lw * part.lh;
     if (part.tex && area > topArea && z1 > 0.25) {
       top = part;
@@ -622,17 +629,17 @@ function furnBox(item: FurnitureItem, blocky: boolean, lod: FurnLod = 'full'): M
     }
     if (z1 - z0 < 0.1) continue;
     if (lod === 'simple' && ring.length >= 4) {
-      out.push(quad(B[1], B[2], T[2], T[1], part.fill, stroke, 'furn'));
-      out.push(quad(B[2], B[3], T[3], T[2], part.fill, stroke, 'furn'));
+      out.push(quad(B[1], B[2], T[2], T[1], furnTone(part.fill, 0.72), edge, 'furn'));
+      out.push(quad(B[2], B[3], T[3], T[2], furnTone(part.fill, 0.62), edge, 'furn'));
       continue;
     }
     const n = ring.length;
     for (let i = 0; i < n; i++) {
       const j = (i + 1) % n;
-      out.push(quad(B[i], B[j], T[j], T[i], part.fill, stroke, 'furn'));
+      out.push(quad(B[i], B[j], T[j], T[i], furnTone(part.fill, i % 2 ? 0.64 : 0.8), edge, 'furn'));
     }
   }
-  if (lod === 'full' && !blocky && top?.tex) out.push(...textureStripes(item, top, stroke));
+  if (lod === 'full' && !blocky && top?.tex) out.push(...textureStripes(item, top, 'none'));
   return out;
 }
 
