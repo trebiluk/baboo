@@ -29,6 +29,36 @@ type Cam = {
   eyePitch: number;
 };
 
+function skyDome(zenithHex: string): { mesh: THREE.Mesh; dispose: () => void } {
+  const canvas = document.createElement('canvas');
+  canvas.width = 4;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  const zenith = new THREE.Color(zenithHex);
+  const mid = zenith.clone().lerp(new THREE.Color('#d7e6f4'), 0.45);
+  const horizon = zenith.clone().lerp(new THREE.Color('#f4e2c8'), 0.72);
+  if (ctx) {
+    const g = ctx.createLinearGradient(0, 0, 0, 256);
+    g.addColorStop(0, `#${zenith.getHexString()}`);
+    g.addColorStop(0.42, `#${mid.getHexString()}`);
+    g.addColorStop(0.78, `#${horizon.getHexString()}`);
+    g.addColorStop(1, '#c5d4b0');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 4, 256);
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const geo = new THREE.SphereGeometry(360, 20, 12);
+  const mat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, depthWrite: false, fog: false });
+  return {
+    mesh: new THREE.Mesh(geo, mat),
+    dispose: () => {
+      geo.dispose();
+      mat.dispose();
+      tex.dispose();
+    },
+  };
+}
 function fitCam(root: THREE.Object3D): Cam {
   const box = new THREE.Box3();
   root.traverse((obj) => {
@@ -41,7 +71,7 @@ function fitCam(root: THREE.Object3D): Cam {
   }
   const c = box.getCenter(new THREE.Vector3());
   const s = box.getSize(new THREE.Vector3());
-  const dist = Math.max(18, Math.max(s.x, s.z) * 1.15);
+  const dist = Math.max(16, Math.max(s.x, s.z) * 0.98);
   return {
     yaw: 0.65,
     pitch: 0.48,
@@ -77,7 +107,7 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = 1.12;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
@@ -86,13 +116,17 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     wrap.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(sky);
-    scene.fog = new THREE.Fog(sky, 90, 260);
+    const zenith = new THREE.Color(sky);
+    const horizon = zenith.clone().lerp(new THREE.Color('#f4e2c8'), 0.62);
+    scene.background = horizon;
+    scene.fog = new THREE.Fog(horizon, 160, 440);
+    const skyMesh = skyDome(sky);
+    scene.add(skyMesh.mesh);
 
     const camera = new THREE.PerspectiveCamera(48, 1, 0.15, 500);
-    const hemi = new THREE.HemisphereLight(0xd6e6f5, look.ground, 0.7);
+    const hemi = new THREE.HemisphereLight(0xd6e6f5, look.ground, 0.82);
     scene.add(hemi);
-    const sun = new THREE.DirectionalLight(0xfff2d8, 1.45);
+    const sun = new THREE.DirectionalLight(0xfff2d8, 1.35);
     sun.position.set(48, 72, 28);
     sun.castShadow = true;
     sun.shadow.mapSize.set(512, 512);
@@ -102,7 +136,9 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     sun.shadow.normalBias = 0.05;
     scene.add(sun);
     scene.add(sun.target);
-    scene.add(new THREE.AmbientLight(0xffffff, 0.22));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.16));
+    const fill = new THREE.PointLight(0xfff4e0, 0, 18, 1.4);
+    scene.add(fill);
 
     const built = buildHouse(floor, look);
     scene.add(built.root);
@@ -131,22 +167,38 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     camRef.current = fitCam(built.root);
     const home = { ...camRef.current };
 
+    const desiredPos = new THREE.Vector3();
+    const desiredLook = new THREE.Vector3();
+    const smoothLook = new THREE.Vector3();
+    let snap = true;
     const apply = () => {
       const cam = camRef.current;
       if (!cam) return;
       if (walkRef.current) {
-        camera.position.set(cam.eyeX, 5.2, cam.eyeZ);
-        camera.lookAt(
+        desiredPos.set(cam.eyeX, 5.2, cam.eyeZ);
+        desiredLook.set(
           cam.eyeX + Math.sin(cam.eyeYaw) * Math.cos(cam.eyePitch),
           5.2 + Math.sin(cam.eyePitch),
           cam.eyeZ + Math.cos(cam.eyeYaw) * Math.cos(cam.eyePitch),
         );
+        fill.position.copy(desiredPos);
+        fill.intensity = 0.9;
       } else {
         const cy = cam.ty + cam.dist * Math.sin(cam.pitch);
         const flat = cam.dist * Math.cos(cam.pitch);
-        camera.position.set(cam.tx + flat * Math.sin(cam.yaw), cy, cam.tz + flat * Math.cos(cam.yaw));
-        camera.lookAt(cam.tx, cam.ty, cam.tz);
+        desiredPos.set(cam.tx + flat * Math.sin(cam.yaw), cy, cam.tz + flat * Math.cos(cam.yaw));
+        desiredLook.set(cam.tx, cam.ty, cam.tz);
+        fill.intensity = 0;
       }
+      if (snap) {
+        camera.position.copy(desiredPos);
+        smoothLook.copy(desiredLook);
+        snap = false;
+      } else {
+        camera.position.lerp(desiredPos, 0.34);
+        smoothLook.lerp(desiredLook, 0.34);
+      }
+      camera.lookAt(smoothLook);
     };
 
     let drag: { x: number; y: number; yaw: number; pitch: number; pan: boolean; tx: number; tz: number } | null = null;
@@ -207,6 +259,7 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
 
     const reset = () => {
       camRef.current = { ...home };
+      snap = true;
     };
     (wrap as HTMLDivElement & { __babooReset?: () => void }).__babooReset = reset;
 
@@ -243,8 +296,10 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
       renderer.domElement.removeEventListener('pointercancel', up);
       renderer.domElement.removeEventListener('wheel', wheel);
       built.dispose();
+      skyMesh.dispose();
       hemi.dispose();
       sun.dispose();
+      fill.dispose();
       renderer.dispose();
       renderer.domElement.remove();
     };

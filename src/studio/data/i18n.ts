@@ -1377,21 +1377,16 @@ export const STR: Record<string, Gloss> = {
   '3d.preview': g('3D preview', {
     es: 'Vista 3D', cu: 'Vista 3D', uk: 'Перегляд 3D', ru: 'Просмотр 3D', ti: 'ቅድመ ትርኢት 3D', fa: 'پیش‌نمایش سه‌بعدی',
   }),
-  '3d.drag': g('Drag to orbit · Shift-drag pans · scroll zooms. View only — edit in 2D Plan.', {
-    es: 'Arrastra para orbitar · Mayús-arrastrar mueve · rueda acerca. Solo mirar — edita en Plano 2D.',
-    cu: 'Arrastra para orbitar · Mayús-arrastrar mueve · rueda acerca. Solo mirar — edita en Plano 2D.',
-    uk: 'Тягни, щоб обертати · Shift тягне план · колесо зум. Лише дивитись — редагуй у Плані 2D.',
-    ru: 'Тяни, чтобы вращать · Shift двигает · колесо зум. Только смотреть — правь в Плане 2D.',
-    ti: 'ንምዝዋር ስሓብ · Shift ስሓብ የንቀሳቕስ · መንኰርኰር የቕርብ. ምርኣይ ጥራይ — ኣብ ትልሚ 2D ኣርም.',
-    fa: 'بکش تا بچرخد · شیفت+کشیدن جابه‌جا می‌کند · اسکرول زوم. فقط نگاه — در پلان ۲بعدی ویرایش کن.',
+  '3d.drag': g('Drag to look around', {
+    es: 'Arrastra para mirar', cu: 'Arrastra para mirar', uk: 'Тягни, щоб озирнутись', ru: 'Тяни, чтобы осмотреться', ti: 'ንምርኣይ ስሓብ', fa: 'بکش تا نگاه کنی',
   }),
-  '3d.drag.walk': g('Drag to look · scroll or buttons walk. Still view only.', {
-    es: 'Arrastra para mirar · rueda o botones caminan. Sigue solo mirar.',
-    cu: 'Arrastra para mirar · rueda o botones caminan. Sigue solo mirar.',
-    uk: 'Тягни, щоб дивитись · колесо або кнопки йдуть. Усе ще лише дивитись.',
-    ru: 'Тяни, чтобы смотреть · колесо или кнопки идут. Всё ещё только смотреть.',
-    ti: 'ንምርኣይ ስሓብ · መንኰርኰር ወይ መልጎማት የኸዱ. ገና ምርኣይ ጥራይ.',
-    fa: 'بکش تا نگاه کنی · اسکرول یا دکمه راه می‌روند. هنوز فقط نگاه.',
+  '3d.drag.walk': g('Drag to look · scroll to walk', {
+    es: 'Arrastra para mirar · rueda para caminar',
+    cu: 'Arrastra para mirar · rueda para caminar',
+    uk: 'Тягни, щоб дивитись · колесо йде',
+    ru: 'Тяни, чтобы смотреть · колесо идёт',
+    ti: 'ንምርኣይ ስሓብ · መንኰርኰር የኸይድ',
+    fa: 'بکش تا نگاه کنی · اسکرول راه می‌رود',
   }),
   '3d.reset': g('Reset view', {
     es: 'Reiniciar vista', cu: 'Reiniciar vista', uk: 'Скинути вигляд', ru: 'Сбросить вид', ti: 'ትርኢት ዳግም', fa: 'بازنشانی نما',

@@ -1436,41 +1436,65 @@ html[data-ell-english] {
 }
 .view3d-hud {
   position:absolute;
-  left:12px;
-  bottom:12px;
+  left:50%;
+  bottom:14px;
+  transform:translateX(-50%);
   z-index:3;
   display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  gap:6px;
-  padding:0;
+  flex-direction:row;
+  align-items:center;
+  gap:10px;
+  max-width:calc(100% - 24px);
+  padding:6px 8px 6px 14px;
+  border-radius:999px;
+  background:color-mix(in srgb, var(--aw-elevated, #fff) 88%, transparent);
+  box-shadow:0 10px 28px rgba(20, 24, 32, 0.16);
   pointer-events:none
 }
 .view3d-hint {
   margin:0;
   font-size:12px;
-  color:#1a1a1a;
-  background:#ffffffd4;
-  border-radius:8px;
-  padding:4px 8px;
-  max-width:min(420px, 70vw)
+  line-height:1.2;
+  color:var(--aw-fg, #1c2430);
+  background:none;
+  border-radius:0;
+  padding:0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis
 }
 .view3d-hud-btns {
   display:flex;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
   gap:6px;
   pointer-events:auto
 }
+.view3d-hud-btns .ghost-btn {
+  border:none;
+  border-radius:999px;
+  background:var(--aw-fg, #1c2430);
+  color:var(--aw-bg, #fff);
+  min-height:34px;
+  padding:4px 12px;
+  font-size:13px;
+  font-weight:700
+}
+.view3d-hud-btns .ghost-btn:hover {
+  background:color-mix(in srgb, var(--aw-fg, #1c2430) 82%, #fff)
+}
 @media (max-width: 800px) {
   .view3d-hud {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    bottom: 10px;
+    padding: 5px 6px 5px 12px;
   }
   .view3d-hint {
-    flex: none;
+    flex: 1 1 auto;
     text-align: start;
-    line-height: 1.35;
+    line-height: 1.2;
+    font-size: 12px;
   }
   .view3d-hud-btns {
     width: auto;

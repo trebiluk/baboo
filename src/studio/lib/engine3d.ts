@@ -162,6 +162,27 @@ function uvFeet(geo: THREE.BufferGeometry, fu: number, fv: number, useZ = false)
   geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
 }
 
+let shadeGeo: THREE.CircleGeometry | null = null;
+let shadeMat: THREE.MeshBasicMaterial | null = null;
+let hedgeGeo: THREE.SphereGeometry | null = null;
+
+function dropShadow(bag: Bag, x: number, z: number, w: number, h: number, rot: number) {
+  if (!shadeGeo) shadeGeo = new THREE.CircleGeometry(0.5, 12);
+  if (!shadeMat) {
+    shadeMat = new THREE.MeshBasicMaterial({
+      color: 0x1a2418,
+      transparent: true,
+      opacity: 0.2,
+      depthWrite: false,
+    });
+  }
+  const mesh = new THREE.Mesh(shadeGeo, shadeMat);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.rotation.z = -rot;
+  mesh.scale.set(Math.max(0.7, w * 0.52), Math.max(0.7, h * 0.52), 1);
+  mesh.position.set(x, 0.04, z);
+  bag.root.add(mesh);
+}
 function addMesh(
   bag: Bag,
   geo: THREE.BufferGeometry,
@@ -282,10 +303,25 @@ function placeOpening(
   const px = a.x + ux * cx;
   const pz = a.y + uy * cx;
   if (o.type === 'window') {
+    const fw = Math.max(0.4, (o.width || 3) * 0.92);
+    const fh = y1 - y0;
+    const wood = mat(bag, '#E4D2B8', 0.68);
+    const jamb = 0.1;
+    const trim = (lx: number, ly: number, sx: number, sy: number) => {
+      const mesh = addMesh(bag, new THREE.BoxGeometry(sx, sy, 0.16), wood, false, false);
+      mesh.position.set(a.x + ux * lx, ly, a.y + uy * lx);
+      mesh.rotation.y = ang;
+    };
+    trim(cx, y1 - jamb * 0.45, fw + jamb * 2, jamb);
+    trim(cx, y0 + jamb * 0.45, fw + jamb * 2, jamb);
+    trim(cx - fw / 2, (y0 + y1) / 2, jamb, fh);
+    trim(cx + fw / 2, (y0 + y1) / 2, jamb, fh);
+    trim(cx, (y0 + y1) / 2, jamb * 0.65, fh - jamb * 2);
+    trim(cx, y0 + fh * 0.62, fw - jamb, jamb * 0.55);
     const glass = addMesh(
       bag,
-      new THREE.PlaneGeometry(Math.max(0.4, (o.width || 3) * 0.92), y1 - y0),
-      mat(bag, '#B9D7EA', 0.08, { opacity: 0.38, metal: 0.04 }),
+      new THREE.PlaneGeometry(fw - jamb, fh - jamb * 1.4),
+      mat(bag, '#C5DFF0', 0.06, { opacity: 0.45, metal: 0.08 }),
       false,
     );
     glass.position.set(px, (y0 + y1) / 2, pz);
@@ -396,6 +432,7 @@ function addFurniture(bag: Bag, item: FurnitureItem) {
     g.add(mesh);
   }
   bag.root.add(g);
+  dropShadow(bag, item.x, item.y, item.w, item.h, item.rot);
 }
 
 function addLandscape(bag: Bag, floor: Floor) {
@@ -410,11 +447,26 @@ function addLandscape(bag: Bag, floor: Floor) {
       crown.position.set(x, r * 1.35, z);
       const crown2 = addMesh(bag, new THREE.SphereGeometry(r * 0.72, 8, 6), mat(bag, '#3D8A4E', 0.86), false, false);
       crown2.position.set(x + r * 0.25, r * 1.85, z + r * 0.1);
+      dropShadow(bag, x, z, r * 1.7, r * 1.7, 0);
     } else if (item.kind === 'hedge') {
-      const hedge = addMesh(bag, new THREE.BoxGeometry(item.w, 3.1, item.h), mat(bag, '#2F6B3A', 0.9), true, false);
-      hedge.position.set(x, 1.55, z);
-      const top = addMesh(bag, new THREE.BoxGeometry(item.w * 0.92, 0.7, item.h * 0.86), mat(bag, '#3D8A4E', 0.88), false, false);
-      top.position.set(x, 3.15, z);
+      if (!hedgeGeo) hedgeGeo = new THREE.SphereGeometry(1, 8, 6);
+      const alongX = item.w >= item.h;
+      const len = Math.max(item.w, item.h);
+      const thick = Math.max(0.8, Math.min(item.w, item.h));
+      const n = Math.max(2, Math.min(6, Math.round(len / Math.max(1.4, thick * 0.85))));
+      const leaf = mat(bag, '#2F6B3A', 0.9);
+      const leaf2 = mat(bag, '#3A8150', 0.88);
+      for (let i = 0; i < n; i++) {
+        const t = n === 1 ? 0.5 : i / (n - 1);
+        const ox = alongX ? (t - 0.5) * len * 0.86 : 0;
+        const oz = alongX ? 0 : (t - 0.5) * len * 0.86;
+        const ball = new THREE.Mesh(hedgeGeo, i % 2 ? leaf2 : leaf);
+        ball.scale.set(thick * 0.62, 1.55, thick * 0.62);
+        ball.position.set(x + ox, 1.45, z + oz);
+        ball.castShadow = i === 0;
+        bag.root.add(ball);
+      }
+      dropShadow(bag, x, z, len * 0.9, thick, 0);
     } else if (item.kind === 'lamp') {
       const post = addMesh(bag, new THREE.CylinderGeometry(0.08, 0.1, 6.2, 8), mat(bag, '#3A3A40', 0.4, { metal: 0.35 }));
       post.position.set(x, 3.1, z);
@@ -424,10 +476,15 @@ function addLandscape(bag: Bag, floor: Floor) {
       const path = addMesh(bag, new THREE.BoxGeometry(item.w, 0.08, item.h), mat(bag, '#C4B49A', 0.9), false);
       path.position.set(x, 0.05, z);
     } else {
-      const bed = addMesh(bag, new THREE.BoxGeometry(item.w, 0.28, item.h), mat(bag, '#3E6B3A', 0.92), false);
-      bed.position.set(x, 0.14, z);
-      const bloom = addMesh(bag, new THREE.SphereGeometry(Math.min(item.w, item.h) * 0.18, 8, 6), mat(bag, '#C45A6A', 0.7), false);
-      bloom.position.set(x, 0.45, z);
+      const bed = addMesh(bag, new THREE.BoxGeometry(item.w, 0.22, item.h), mat(bag, '#3E6B3A', 0.92), false);
+      bed.position.set(x, 0.12, z);
+      const bloom = mat(bag, '#C45A6A', 0.7);
+      const cream = mat(bag, '#F2E2A0', 0.65);
+      const spots: [number, number, THREE.Material][] = [[-0.28, -0.15, bloom], [0.26, 0.12, cream], [0.02, 0.22, bloom]];
+      for (const [ox, oz, col] of spots) {
+        const dot = addMesh(bag, new THREE.SphereGeometry(Math.min(item.w, item.h) * 0.14, 7, 5), col, false);
+        dot.position.set(x + ox * item.w, 0.36, z + oz * item.h);
+      }
     }
   }
 }

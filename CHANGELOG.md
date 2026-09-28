@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.12.0 — 2026-09-28 — Overall polish
+- The 3D view has a sky, window frames, and rounded hedges
+- Furniture sits on a soft shadow. The view controls are one quiet bar
+
 ## 2.11.1 — 2026-09-27 — Engine tuned
 - The 3D engine stays up when you walk in. Shadows cover the house, not the whole field
 - Brick, floors, and the roof pick up a light texture. A small screen draws fewer pixels

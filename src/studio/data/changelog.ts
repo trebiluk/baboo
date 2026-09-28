@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.12.0',
+    date: '2026-09-28',
+    bullets: [
+      'The 3D view has a sky, window frames, and rounded hedges',
+      'Furniture sits on a soft shadow. The view controls are one quiet bar',
+    ],
+  },
+  {
     version: '2.11.1',
     date: '2026-09-27',
     bullets: [
