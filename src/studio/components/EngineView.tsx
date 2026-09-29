@@ -2,7 +2,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import * as THREE from 'three';
 import type { Floor } from '../types';
 import type { FloorFinishId } from '../data/flooring';
-import { buildHouse, hitsWall, type HouseLook } from '../lib/engine3d';
+import { buildHouse, stepWalk, type HouseLook } from '../lib/engine3d';
 
 export type EngineHandle = {
   reset: () => void;
@@ -242,12 +242,9 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
       if (!cam) return;
       if (walkRef.current) {
         const steps = -Math.sign(e.deltaY) * 1.6;
-        const nx = cam.eyeX + Math.sin(cam.eyeYaw) * steps;
-        const nz = cam.eyeZ + Math.cos(cam.eyeYaw) * steps;
-        if (!hitsWall(floorRef.current, nx, nz)) {
-          cam.eyeX = nx;
-          cam.eyeZ = nz;
-        }
+        const next = stepWalk(floorRef.current, cam.eyeX, cam.eyeZ, cam.eyeYaw, steps);
+        cam.eyeX = next.x;
+        cam.eyeZ = next.z;
         return;
       }
       const factor = e.deltaY > 0 ? 1.08 : 0.92;
@@ -323,11 +320,9 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     walkBy: (steps: number) => {
       const cam = camRef.current;
       if (!cam) return;
-      const nx = cam.eyeX + Math.sin(cam.eyeYaw) * steps;
-      const nz = cam.eyeZ + Math.cos(cam.eyeYaw) * steps;
-      if (hitsWall(floorRef.current, nx, nz)) return;
-      cam.eyeX = nx;
-      cam.eyeZ = nz;
+      const next = stepWalk(floorRef.current, cam.eyeX, cam.eyeZ, cam.eyeYaw, steps);
+      cam.eyeX = next.x;
+      cam.eyeZ = next.z;
     },
   }), []);
 

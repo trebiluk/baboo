@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.12.2',
+    date: '2026-09-29',
+    bullets: [
+      'Walkthrough goes through doors. A wall still stops you. A doorway does not',
+    ],
+  },
+  {
     version: '2.12.1',
     date: '2026-09-29',
     bullets: [

@@ -35,10 +35,39 @@ export function hitsWall(floor: Floor, x: number, z: number): boolean {
     const a = nodes.get(w.a);
     const b = nodes.get(w.b);
     if (!a || !b) continue;
-    const pad = (w.thickness || 0.5) * 0.5 + 0.42;
-    if (segDist(x, z, a.x, a.y, b.x, b.y) < pad) return true;
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const len = Math.hypot(dx, dy);
+    if (len < 0.08) continue;
+    const pad = (w.thickness || 0.5) * 0.5 + 0.32;
+    if (segDist(x, z, a.x, a.y, b.x, b.y) >= pad) continue;
+    const along = Math.max(0, Math.min(len, ((x - a.x) * dx + (z - a.y) * dy) / len));
+    const throughDoor = (floor.openings ?? []).some((o) => {
+      if (o.wallId !== w.id || o.type !== 'door') return false;
+      const half = Math.min((o.width || 3) / 2, len * 0.46) + 0.45;
+      const cx = Math.max(half, Math.min(len - half, (o.t ?? 0.5) * len));
+      return Math.abs(along - cx) < half;
+    });
+    if (throughDoor) continue;
+    return true;
   }
   return false;
+}
+
+/** Move forward, taking a shorter step or a small slide so a doorway is not a wall. */
+export function stepWalk(floor: Floor, x: number, z: number, yaw: number, steps: number): { x: number; z: number } {
+  const sin = Math.sin(yaw);
+  const cos = Math.cos(yaw);
+  const attempt = (dist: number, strafe = 0) => {
+    const nx = x + sin * dist + cos * strafe;
+    const nz = z + cos * dist - sin * strafe;
+    return hitsWall(floor, nx, nz) ? null : { x: nx, z: nz };
+  };
+  return attempt(steps)
+    ?? attempt(steps * 0.45)
+    ?? attempt(steps * 0.45, 0.75)
+    ?? attempt(steps * 0.45, -0.75)
+    ?? { x, z };
 }
 
 type Bag = {

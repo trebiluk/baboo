@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.12.2 — 2026-09-29 — Walk through doors
+- Walkthrough goes through doors. A wall still stops you. A doorway does not
+
 ## 2.12.1 — 2026-09-29 — Roof and grounds
 - The roof lid sits on the shingles. Look straight down and the roof steps aside
 - Grass fades into the sky. Hedges are one trim, not a row of balls. Room names stay on one line
