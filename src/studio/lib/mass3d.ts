@@ -519,7 +519,6 @@ function roofFaces(roof: RoofGeometry, blocky: boolean, wallFill?: string): Mass
     const inner = roof.breaks.slice(0, 4).map((b) => b.a);
     const rise = Math.max(4.5, (rh - eh) * 0.78);
     const capZ = eh + rise;
-    const topZ = capZ + Math.max(0.55, (rh - eh) * 0.1);
     for (let i = 0; i < 4; i++) {
       const j = (i + 1) % 4;
       out.push(quad(
@@ -533,7 +532,7 @@ function roofFaces(roof: RoofGeometry, blocky: boolean, wallFill?: string): Mass
       ));
     }
     out.push({
-      pts: inner.map((p) => v3(p.x, p.y, topZ)),
+      pts: inner.map((p) => v3(p.x, p.y, capZ + 0.08)),
       fill: '#9AA3AE',
       stroke,
       kind: 'cap',

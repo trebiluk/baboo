@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.12.1',
+    date: '2026-09-29',
+    bullets: [
+      'The roof lid sits on the shingles. Look straight down and the roof steps aside',
+      'Grass fades into the sky. Hedges are one trim, not a row of balls. Room names stay on one line',
+    ],
+  },
+  {
     version: '2.12.0',
     date: '2026-09-28',
     bullets: [

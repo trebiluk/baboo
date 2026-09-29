@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.12.1 — 2026-09-29 — Roof and grounds
+- The roof lid sits on the shingles. Look straight down and the roof steps aside
+- Grass fades into the sky. Hedges are one trim, not a row of balls. Room names stay on one line
+
 ## 2.12.0 — 2026-09-28 — Overall polish
 - The 3D view has a sky, window frames, and rounded hedges
 - Furniture sits on a soft shadow. The view controls are one quiet bar

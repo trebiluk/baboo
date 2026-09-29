@@ -653,15 +653,17 @@ export function DollhouseCanvas() {
               evt.cancelBubble = true;
               setSelected({ kind: 'room', id: r.id });
             };
+            const labelW = Math.max(72, r.name.length * 7.4);
             return (
               <Text
                 key={r.id}
-                x={p.x - 28}
-                y={p.y}
-                width={56}
+                x={p.x - labelW / 2}
+                y={p.y - 7}
+                width={labelW}
                 align="center"
+                wrap="none"
                 text={r.name}
-                fontSize={11 / Math.max(0.6, zoom)}
+                fontSize={12 / Math.max(0.6, zoom)}
                 fill={selected?.kind === 'room' && selected.id === r.id ? '#6e72f5' : (light ? '#1a1a1a' : '#f4f4f5')}
                 fontStyle="bold"
                 onClick={pick}

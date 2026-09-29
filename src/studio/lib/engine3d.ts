@@ -164,7 +164,6 @@ function uvFeet(geo: THREE.BufferGeometry, fu: number, fv: number, useZ = false)
 
 let shadeGeo: THREE.CircleGeometry | null = null;
 let shadeMat: THREE.MeshBasicMaterial | null = null;
-let hedgeGeo: THREE.SphereGeometry | null = null;
 
 function dropShadow(bag: Bag, x: number, z: number, w: number, h: number, rot: number) {
   if (!shadeGeo) shadeGeo = new THREE.CircleGeometry(0.5, 12);
@@ -229,15 +228,29 @@ function pushQuad(out: number[], a: number[], b: number[], c: number[], d: numbe
   pushTri(out, a, c, d);
 }
 
-function meshFromPos(bag: Bag, pos: number[], material: THREE.Material): void {
+function meshFromPos(bag: Bag, pos: number[], material: THREE.Material, name?: string): void {
   if (pos.length < 9) return;
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   geo.computeVertexNormals();
+  const nrm = geo.getAttribute('normal');
+  let ny = 0;
+  for (let i = 0; i < nrm.count; i++) ny += nrm.getY(i);
+  if (ny < 0) {
+    const p = geo.getAttribute('position');
+    for (let i = 0; i < p.count; i += 3) {
+      const x = p.getX(i);
+      const y = p.getY(i);
+      const z = p.getZ(i);
+      p.setXYZ(i, p.getX(i + 1), p.getY(i + 1), p.getZ(i + 1));
+      p.setXYZ(i + 1, x, y, z);
+    }
+    p.needsUpdate = true;
+    geo.computeVertexNormals();
+  }
   uvFeet(geo, 3.2, 3.2, true);
   const mesh = addMesh(bag, geo, material, true, true);
-  const std = material as THREE.MeshStandardMaterial;
-  if (std.side !== undefined) std.side = THREE.DoubleSide;
+  if (name) mesh.name = name;
   void mesh;
 }
 
@@ -353,11 +366,9 @@ function addRoof(bag: Bag, roof: RoofGeometry) {
   const slate = roof.styleId === 'grass'
     ? mat(bag, '#3E6B3A', 0.8)
     : mat(bag, '#ffffff', 0.78, { map: slateMap() });
-  const capMat = mat(bag, '#9AA3AE', 0.55);
   if (roof.styleId === 'mansard' && o.length >= 4 && roof.breaks.length >= 4) {
     const inner = roof.breaks.slice(0, 4).map((b) => b.a);
     const capY = eh + Math.max(4.5, (rh - eh) * 0.78);
-    const topY = capY + Math.max(0.55, (rh - eh) * 0.1);
     const pos: number[] = [];
     for (let i = 0; i < 4; i++) {
       const j = (i + 1) % 4;
@@ -367,8 +378,8 @@ function addRoof(bag: Bag, roof: RoofGeometry) {
       const d = [inner[i].x, capY, inner[i].y];
       pushQuad(pos, a, b, c, d);
     }
-    meshFromPos(bag, pos, slate);
-    floorMesh(bag, inner, topY, capMat);
+    meshFromPos(bag, pos, slate, 'roof');
+    floorMesh(bag, inner, capY + 0.05, slate, 'roof');
     const dormer = (t: number) => {
       const mix = (p: { x: number; y: number }, q: { x: number; y: number }) => ({
         x: p.x + (q.x - p.x) * t,
@@ -381,8 +392,10 @@ function addRoof(bag: Bag, roof: RoofGeometry) {
       const y = eh * 0.4 + capY * 0.6;
       const win = addMesh(bag, new THREE.BoxGeometry(2.2, 2.4, 0.35), mat(bag, '#D5E8F4', 0.15, { opacity: 0.85 }), false);
       win.position.set(x, y + 1.2, z);
+      win.name = 'roof';
       const frame = addMesh(bag, new THREE.BoxGeometry(2.7, 3.2, 0.2), mat(bag, '#E7D7C1', 0.7), true);
       frame.position.set(x, y + 1.3, z + 0.15);
+      frame.name = 'roof';
     };
     dormer(0.34);
     dormer(0.66);
@@ -405,10 +418,10 @@ function addRoof(bag: Bag, roof: RoofGeometry) {
       pushTri(pos, p[0], p[1], ra);
       pushTri(pos, p[3], p[2], rb);
     }
-    meshFromPos(bag, pos, slate);
+    meshFromPos(bag, pos, slate, 'roof');
     return;
   }
-  floorMesh(bag, o, eh + 0.4, slate);
+  floorMesh(bag, o, eh + 0.4, slate, 'roof');
 }
 
 function addFurniture(bag: Bag, item: FurnitureItem) {
@@ -449,23 +462,23 @@ function addLandscape(bag: Bag, floor: Floor) {
       crown2.position.set(x + r * 0.25, r * 1.85, z + r * 0.1);
       dropShadow(bag, x, z, r * 1.7, r * 1.7, 0);
     } else if (item.kind === 'hedge') {
-      if (!hedgeGeo) hedgeGeo = new THREE.SphereGeometry(1, 8, 6);
       const alongX = item.w >= item.h;
       const len = Math.max(item.w, item.h);
-      const thick = Math.max(0.8, Math.min(item.w, item.h));
-      const n = Math.max(2, Math.min(6, Math.round(len / Math.max(1.4, thick * 0.85))));
-      const leaf = mat(bag, '#2F6B3A', 0.9);
-      const leaf2 = mat(bag, '#3A8150', 0.88);
-      for (let i = 0; i < n; i++) {
-        const t = n === 1 ? 0.5 : i / (n - 1);
-        const ox = alongX ? (t - 0.5) * len * 0.86 : 0;
-        const oz = alongX ? 0 : (t - 0.5) * len * 0.86;
-        const ball = new THREE.Mesh(hedgeGeo, i % 2 ? leaf2 : leaf);
-        ball.scale.set(thick * 0.62, 1.55, thick * 0.62);
-        ball.position.set(x + ox, 1.45, z + oz);
-        ball.castShadow = i === 0;
-        bag.root.add(ball);
-      }
+      const thick = Math.max(0.9, Math.min(item.w, item.h));
+      const leaf = mat(bag, '#2C6840', 0.9);
+      const leaf2 = mat(bag, '#3C8652', 0.86);
+      const body = addMesh(bag, new THREE.BoxGeometry(alongX ? len : thick, 2.05, alongX ? thick : len), leaf, true, false);
+      body.position.set(x, 1.15, z);
+      const cap = addMesh(
+        bag,
+        new THREE.CylinderGeometry(thick * 0.5, thick * 0.5, len, 8),
+        leaf2,
+        false,
+        false,
+      );
+      cap.rotation.z = alongX ? Math.PI / 2 : 0;
+      cap.rotation.x = alongX ? 0 : Math.PI / 2;
+      cap.position.set(x, 2.15, z);
       dropShadow(bag, x, z, len * 0.9, thick, 0);
     } else if (item.kind === 'lamp') {
       const post = addMesh(bag, new THREE.CylinderGeometry(0.08, 0.1, 6.2, 8), mat(bag, '#3A3A40', 0.4, { metal: 0.35 }));
@@ -491,11 +504,32 @@ function addLandscape(bag: Bag, floor: Floor) {
 
 export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
   const bag: Bag = { root: new THREE.Group(), geos: [], mats: [], shared: new Map() };
-  const pad = new THREE.CircleGeometry(140, 36);
-  uvFeet(pad, 6, 6);
-  const ground = addMesh(bag, pad, mat(bag, look.ground, 0.96, { map: grainMap() }), false, true);
+  let gx = 0;
+  let gz = 0;
+  if (floor.nodes.length) {
+    for (const n of floor.nodes) { gx += n.x; gz += n.y; }
+    gx /= floor.nodes.length;
+    gz /= floor.nodes.length;
+  }
+  const pad = new THREE.CircleGeometry(240, 48);
+  const pos = pad.getAttribute('position');
+  const colors = new Float32Array(pos.count * 3);
+  const grass = new THREE.Color(look.ground);
+  const skyEdge = new THREE.Color('#e4eaf0');
+  for (let i = 0; i < pos.count; i++) {
+    const d = Math.min(1, Math.hypot(pos.getX(i), pos.getY(i)) / 240);
+    const t = d < 0.62 ? 0 : (d - 0.62) / 0.38;
+    const c = grass.clone().lerp(skyEdge, t * t);
+    colors[i * 3] = c.r;
+    colors[i * 3 + 1] = c.g;
+    colors[i * 3 + 2] = c.b;
+  }
+  pad.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  const groundMat = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.96, vertexColors: true });
+  bag.mats.push(groundMat);
+  const ground = addMesh(bag, pad, groundMat, false, true);
   ground.rotation.x = -Math.PI / 2;
-  ground.position.y = -0.02;
+  ground.position.set(gx, -0.02, gz);
 
   const nodes = new Map(floor.nodes.map((n) => [n.id, n]));
   for (const wall of floor.walls) addWall(bag, floor, wall, look, nodes);
@@ -507,7 +541,7 @@ export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
     floors = [];
   }
   for (const face of floors) {
-    floorMesh(bag, face.poly, 0.03, mat(bag, floorFinish(face.finish).color, 0.64, { map: grainMap() }));
+    floorMesh(bag, face.poly, 0.03, mat(bag, floorFinish(face.finish).color, 0.72));
   }
   for (const face of floors) {
     floorMesh(bag, face.poly, look.wallH - 0.2, mat(bag, '#F7F3EC', 0.92), 'ceiling');

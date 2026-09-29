@@ -143,9 +143,11 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     const built = buildHouse(floor, look);
     scene.add(built.root);
     const ceilings: THREE.Object3D[] = [];
+    const roofs: THREE.Object3D[] = [];
     const shade = new THREE.Box3();
     built.root.traverse((obj) => {
       if (obj.name === 'ceiling') ceilings.push(obj);
+      if (obj.name === 'roof') roofs.push(obj);
       const mesh = obj as THREE.Mesh;
       if (!mesh.isMesh || mesh.geometry?.type === 'CircleGeometry' || obj.name === 'ceiling') return;
       shade.expandByObject(mesh);
@@ -281,6 +283,9 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
       frame = requestAnimationFrame(loop);
       if (hidden) return;
       for (const lid of ceilings) lid.visible = walkRef.current;
+      const camNow = camRef.current;
+      const hideRoof = !walkRef.current && !!camNow && camNow.pitch > 0.78;
+      for (const lid of roofs) lid.visible = !hideRoof;
       apply();
       renderer.render(scene, camera);
     };
