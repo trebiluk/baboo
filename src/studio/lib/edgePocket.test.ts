@@ -8,16 +8,17 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.12.2 walk through doors', () => {
-  it('chips 2.12.2 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.12.2');
+describe('2.13.0 second floor', () => {
+  it('chips 2.13.0 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.13.0');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.13\.0'/);
     assert.match(changelog, /version:\s*'2\.12\.2'/);
-    assert.match(changelog, /version:\s*'2\.12\.1'/);
     assert.match(changelog, /version:\s*'2\.10\.1'/);
     const engine = readFileSync(join(studio, 'lib/engine3d.ts'), 'utf8');
     assert.match(engine, /ExtrudeGeometry/);
     assert.match(engine, /type !== 'door'/);
+    assert.match(readFileSync(join(studio, 'lib/stories.ts'), 'utf8'), /houseHasUpper/);
     const view = readFileSync(join(studio, 'components/EngineView.tsx'), 'utf8');
     assert.match(view, /WebGLRenderer/);
     const stub = readFileSync(join(studio, 'components/View3DStub.tsx'), 'utf8');

@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.0',
+    date: '2026-09-29',
+    bullets: [
+      'The Mansion has a second floor. The porch stays one story, with its own roof',
+      'Upstairs windows replace the flat dormer squares. The stair runs up to the new floor',
+    ],
+  },
+  {
     version: '2.12.2',
     date: '2026-09-29',
     bullets: [

@@ -5,6 +5,7 @@ import type { FloorFinishId } from '../data/flooring';
 import { floorFinish } from '../data/flooring';
 import { listInteriorFloors } from './rooms';
 import { furnitureParts } from './furnShape';
+import { porchBounds, houseHasUpper, viewRoof, wallStories } from './stories';
 
 export type HouseLook = {
   wallH: number;
@@ -292,7 +293,8 @@ function addWall(bag: Bag, floor: Floor, wall: Wall, look: HouseLook, nodes: Map
   const len = Math.hypot(dx, dy);
   if (len < 0.08) return;
   const thick = Math.max(0.35, wall.thickness || 0.45);
-  const h = wall.kind === 'interior' ? Math.max(7, look.wallH - 0.35) : look.wallH;
+  const stories = wallStories(floor, wall);
+  const h = wall.kind === 'interior' ? Math.max(7, look.wallH - 0.35) : look.wallH * stories;
   const shape = new THREE.Shape();
   shape.moveTo(0, 0);
   shape.lineTo(len, 0);
@@ -308,17 +310,21 @@ function addWall(bag: Bag, floor: Floor, wall: Wall, look: HouseLook, nodes: Map
     const cx = Math.max(half + 0.05, Math.min(len - half - 0.05, (o.t ?? 0.5) * len));
     const x0 = cx - half;
     const x1 = cx + half;
-    const y0 = o.type === 'window' ? look.wallH * 0.28 : 0.02;
-    const y1 = o.type === 'window' ? look.wallH * 0.78 : look.wallH * 0.8;
-    if (x1 - x0 < 0.4 || y1 - y0 < 0.4 || y1 > h - 0.05) continue;
-    const hole = new THREE.Path();
-    hole.moveTo(x0, y0);
-    hole.lineTo(x1, y0);
-    hole.lineTo(x1, y1);
-    hole.lineTo(x0, y1);
-    hole.closePath();
-    shape.holes.push(hole);
-    placeOpening(bag, o, a, ux, uy, ang, cx, x0, y0, y1);
+    const bands = o.type === 'window' && stories >= 2 ? [0, look.wallH] : [0];
+    for (const base of bands) {
+      if (o.type !== 'window' && base > 0) continue;
+      const y0 = o.type === 'window' ? base + look.wallH * 0.28 : 0.02;
+      const y1 = o.type === 'window' ? base + look.wallH * 0.78 : look.wallH * 0.8;
+      if (x1 - x0 < 0.4 || y1 - y0 < 0.4 || y1 > h - 0.05) continue;
+      const hole = new THREE.Path();
+      hole.moveTo(x0, y0);
+      hole.lineTo(x1, y0);
+      hole.lineTo(x1, y1);
+      hole.lineTo(x0, y1);
+      hole.closePath();
+      shape.holes.push(hole);
+      placeOpening(bag, o, a, ux, uy, ang, cx, x0, y0, y1);
+    }
   }
   const geo = new THREE.ExtrudeGeometry(shape, { depth: thick, bevelEnabled: false });
   geo.translate(0, 0, -thick / 2);
@@ -409,25 +415,6 @@ function addRoof(bag: Bag, roof: RoofGeometry) {
     }
     meshFromPos(bag, pos, slate, 'roof');
     floorMesh(bag, inner, capY + 0.05, slate, 'roof');
-    const dormer = (t: number) => {
-      const mix = (p: { x: number; y: number }, q: { x: number; y: number }) => ({
-        x: p.x + (q.x - p.x) * t,
-        y: p.y + (q.y - p.y) * t,
-      });
-      const eave = mix(o[0], o[1]);
-      const top = mix(inner[0], inner[1]);
-      const x = eave.x * 0.4 + top.x * 0.6;
-      const z = eave.y * 0.4 + top.y * 0.6 - 0.4;
-      const y = eh * 0.4 + capY * 0.6;
-      const win = addMesh(bag, new THREE.BoxGeometry(2.2, 2.4, 0.35), mat(bag, '#D5E8F4', 0.15, { opacity: 0.85 }), false);
-      win.position.set(x, y + 1.2, z);
-      win.name = 'roof';
-      const frame = addMesh(bag, new THREE.BoxGeometry(2.7, 3.2, 0.2), mat(bag, '#E7D7C1', 0.7), true);
-      frame.position.set(x, y + 1.3, z + 0.15);
-      frame.name = 'roof';
-    };
-    dormer(0.34);
-    dormer(0.66);
     return;
   }
   if (roof.ridges.length && o.length >= 4) {
@@ -453,7 +440,11 @@ function addRoof(bag: Bag, roof: RoofGeometry) {
   floorMesh(bag, o, eh + 0.4, slate, 'roof');
 }
 
-function addFurniture(bag: Bag, item: FurnitureItem) {
+function addFurniture(bag: Bag, item: FurnitureItem, storyH = 0) {
+  if (item.catalogId === 'stairs' && storyH > 7) {
+    addFullStair(bag, item, storyH);
+    return;
+  }
   const parts = furnitureParts(item, 'full');
   const g = new THREE.Group();
   g.position.set(item.x, 0, item.y);
@@ -472,6 +463,32 @@ function addFurniture(bag: Bag, item: FurnitureItem) {
     mesh.castShadow = big;
     mesh.receiveShadow = false;
     g.add(mesh);
+  }
+  bag.root.add(g);
+  dropShadow(bag, item.x, item.y, item.w, item.h, item.rot);
+}
+
+function addFullStair(bag: Bag, item: FurnitureItem, top: number) {
+  const steps = 14;
+  const rise = top / steps;
+  const run = Math.max(item.h, 6) / steps;
+  const wood = mat(bag, '#8A6244', 0.72);
+  const rail = mat(bag, '#5C4030', 0.6);
+  const g = new THREE.Group();
+  g.position.set(item.x, 0, item.y);
+  g.rotation.y = -item.rot;
+  for (let i = 0; i < steps; i++) {
+    const tread = new THREE.Mesh(new THREE.BoxGeometry(item.w * 0.92, rise * 0.92, run * 0.96), wood);
+    bag.geos.push(tread.geometry);
+    tread.position.set(0, rise * (i + 0.5), -item.h / 2 + run * (i + 0.5));
+    tread.castShadow = i % 3 === 0;
+    g.add(tread);
+  }
+  for (const side of [-1, 1]) {
+    const post = new THREE.Mesh(new THREE.BoxGeometry(0.12, top, 0.12), rail);
+    bag.geos.push(post.geometry);
+    post.position.set(side * item.w * 0.42, top / 2, 0);
+    g.add(post);
   }
   bag.root.add(g);
   dropShadow(bag, item.x, item.y, item.w, item.h, item.rot);
@@ -569,16 +586,38 @@ export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
   } catch {
     floors = [];
   }
+  const upper = houseHasUpper(floor);
+  const porch = (floor.rooms ?? []).find((r) => r.kind === 'outdoor');
   for (const face of floors) {
     floorMesh(bag, face.poly, 0.03, mat(bag, floorFinish(face.finish).color, 0.72));
-  }
-  for (const face of floors) {
-    floorMesh(bag, face.poly, look.wallH - 0.2, mat(bag, '#F7F3EC', 0.92), 'ceiling');
+    if (!upper) {
+      floorMesh(bag, face.poly, look.wallH - 0.2, mat(bag, '#F7F3EC', 0.92), 'ceiling');
+      continue;
+    }
+    const cx = face.poly.reduce((s, p) => s + p.x, 0) / face.poly.length;
+    const cy = face.poly.reduce((s, p) => s + p.y, 0) / face.poly.length;
+    const onPorch = !!porch && Math.hypot(cx - porch.x, cy - porch.y) < 14 && cy < porch.y + 6;
+    if (onPorch) continue;
+    floorMesh(bag, face.poly, look.wallH + 0.08, mat(bag, '#D9CBB8', 0.7));
+    floorMesh(bag, face.poly, look.wallH * 2 - 0.25, mat(bag, '#F7F3EC', 0.92), 'ceiling');
   }
 
-  if (floor.roof) addRoof(bag, floor.roof);
+  const shown = viewRoof(floor, look.wallH);
+  if (shown) addRoof(bag, shown);
+  const porchPad = porchBounds(floor);
+  if (porchPad) {
+    const slab = addMesh(
+      bag,
+      new THREE.BoxGeometry(porchPad.maxX - porchPad.minX, 0.28, porchPad.maxY - porchPad.minY),
+      mat(bag, '#4E5968', 0.8),
+      true,
+      true,
+    );
+    slab.position.set((porchPad.minX + porchPad.maxX) / 2, look.wallH + 0.14, (porchPad.minY + porchPad.maxY) / 2);
+    slab.name = 'roof';
+  }
   if (look.showFurn) {
-    for (const item of floor.furniture) addFurniture(bag, item);
+    for (const item of floor.furniture) addFurniture(bag, item, upper ? look.wallH : 0);
   }
   addLandscape(bag, floor);
 

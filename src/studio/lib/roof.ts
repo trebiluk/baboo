@@ -12,7 +12,8 @@ export function exteriorBounds(nodes: Node[], walls: Wall[]): {
   cx: number; cy: number; w: number; h: number;
 } | null {
   const exterior = walls.filter((w) => w.kind === 'exterior');
-  const use = exterior.length ? exterior : walls;
+  const upper = exterior.filter((w) => (w.levels ?? 1) >= 2);
+  const use = upper.length >= 3 ? upper : exterior.length ? exterior : walls;
   const ids = new Set<string>();
   for (const w of use) { ids.add(w.a); ids.add(w.b); }
   const pts = nodes.filter((n) => (ids.size ? ids.has(n.id) : true));

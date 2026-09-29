@@ -9,6 +9,7 @@ import { listInteriorFaces, listInteriorFloors, roomPolygon } from './rooms';
 import { FACE_BUDGET, FURN_CAP, PLANT_CAP, type FurnLod } from './perf';
 import { bloomSpots } from '../data/landscape';
 import { wallFootprint, wallSidesAt } from './wallJoin';
+import { houseHasUpper, porchBounds, viewRoof, wallStories } from './stories';
 
 export const WALL_H = 9;
 export const EYE_Z = 5.5;
@@ -352,7 +353,8 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
     const brick = wall.drawStyle === 'brick' && wall.kind === 'exterior';
     const fill = brick ? '#A15A48' : (wall.kind === 'exterior' ? tint.fill : tint.fillShade);
     const cap = brick ? '#C47860' : tint.fillShade;
-    const h = wall.kind === 'interior' ? wallH - 0.4 : wallH;
+    const stories = wallStories(floor, wall);
+    const h = wall.kind === 'interior' ? wallH - 0.4 : wallH * stories;
     const ops = (byWall.get(wall.id) ?? []).slice().sort((p, q) => p.t - q.t);
     const foot = wallFootprint(wall, floor.nodes, floor.walls);
 
@@ -366,12 +368,19 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
       if (t0 > cursor + 0.008) spans.push({ t0: cursor, t1: t0, z0: 0, z1: h });
       if (o.type === 'window') {
         spans.push({ t0, t1, z0: 0, z1: sillZ });
-        spans.push({ t0, t1, z0: headZ, z1: h });
-        const g0 = along(a, ux, uy, nx, ny, len, t0, hw, sillZ + 0.05);
-        const g1 = along(a, ux, uy, nx, ny, len, t1, hw, sillZ + 0.05);
-        const g2 = along(a, ux, uy, nx, ny, len, t1, hw, headZ - 0.05);
-        const g3 = along(a, ux, uy, nx, ny, len, t0, hw, headZ - 0.05);
-        faces.push(quad(g0, g1, g2, g3, opts.sky === 'dusk' ? '#F3D9A4' : '#9EC4DC', '#6A8AA4', 'glass'));
+        let solidFrom = headZ;
+        if (stories >= 2) spans.push({ t0, t1, z0: headZ, z1: wallH + sillZ });
+        if (stories >= 2) solidFrom = wallH + headZ;
+        spans.push({ t0, t1, z0: solidFrom, z1: h });
+        const pane = (z0: number, z1: number) => {
+          const g0 = along(a, ux, uy, nx, ny, len, t0, hw, z0);
+          const g1 = along(a, ux, uy, nx, ny, len, t1, hw, z0);
+          const g2 = along(a, ux, uy, nx, ny, len, t1, hw, z1);
+          const g3 = along(a, ux, uy, nx, ny, len, t0, hw, z1);
+          faces.push(quad(g0, g1, g2, g3, opts.sky === 'dusk' ? '#F3D9A4' : '#9EC4DC', '#6A8AA4', 'glass'));
+        };
+        pane(sillZ + 0.05, headZ - 0.05);
+        if (stories >= 2) pane(wallH + sillZ + 0.05, wallH + headZ - 0.05);
       } else {
         spans.push({ t0, t1, z0: doorHeadZ, z1: h });
         const leaf = Math.min(0.85, (o.width || 3) * 0.55);
@@ -405,7 +414,37 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
     }
   }
 
-  if (floor.roof) faces.push(...roofFaces(floor.roof, opts.blocky, tint.fill));
+  const shown = viewRoof(floor, wallH);
+  if (shown) faces.push(...roofFaces(shown, opts.blocky, tint.fill));
+  if (houseHasUpper(floor)) {
+    const up = shown?.outline;
+    if (up && up.length >= 4) {
+      const pad = 1.3;
+      const xs = up.map((p) => p.x);
+      const ys = up.map((p) => p.y);
+      const plate = [
+        v3(Math.min(...xs) + pad, Math.min(...ys) + pad, wallH),
+        v3(Math.max(...xs) - pad, Math.min(...ys) + pad, wallH),
+        v3(Math.max(...xs) - pad, Math.max(...ys) - pad, wallH),
+        v3(Math.min(...xs) + pad, Math.max(...ys) - pad, wallH),
+      ];
+      faces.push({ pts: plate, fill: '#D9CBB8', stroke: '#B7A890', kind: 'floor' });
+    }
+    const porch = porchBounds(floor);
+    if (porch) {
+      faces.push({
+        pts: [
+          v3(porch.minX, porch.minY, wallH + 0.2),
+          v3(porch.maxX, porch.minY, wallH + 0.2),
+          v3(porch.maxX, porch.maxY, wallH + 0.2),
+          v3(porch.minX, porch.maxY, wallH + 0.2),
+        ],
+        fill: '#4E5968',
+        stroke: '#3A4250',
+        kind: 'roof',
+      });
+    }
+  }
 
   if (opts.showFurn) {
     const lod = opts.lod ?? 'full';
@@ -533,43 +572,10 @@ function roofFaces(roof: RoofGeometry, blocky: boolean, wallFill?: string): Mass
     }
     out.push({
       pts: inner.map((p) => v3(p.x, p.y, capZ + 0.08)),
-      fill: '#9AA3AE',
+      fill: '#6A7686',
       stroke,
       kind: 'cap',
     });
-    const dormer = (t: number) => {
-      const mix = (a: { x: number; y: number }, b: { x: number; y: number }, u: number) => ({
-        x: a.x + (b.x - a.x) * u,
-        y: a.y + (b.y - a.y) * u,
-      });
-      const eave = mix(o[0], o[1], t);
-      const top = mix(inner[0], inner[1], t);
-      const x = eave.x * 0.42 + top.x * 0.58;
-      const y = eave.y * 0.42 + top.y * 0.58 - 0.35;
-      const z = eh * 0.42 + capZ * 0.58;
-      const w = 2.4;
-      const h = 2.6;
-      out.push(quad(
-        v3(x - w / 2 - 0.25, y, z - 0.15),
-        v3(x + w / 2 + 0.25, y, z - 0.15),
-        v3(x + w / 2 + 0.25, y, z + h + 0.7),
-        v3(x - w / 2 - 0.25, y, z + h + 0.7),
-        '#E7D7C1',
-        stroke,
-        'roof',
-      ));
-      out.push(quad(
-        v3(x - w / 2, y - 0.05, z),
-        v3(x + w / 2, y - 0.05, z),
-        v3(x + w / 2, y - 0.05, z + h),
-        v3(x - w / 2, y - 0.05, z + h),
-        '#D5E8F4',
-        '#6A8AA4',
-        'roof',
-      ));
-    };
-    dormer(0.34);
-    dormer(0.66);
     return out;
   }
 

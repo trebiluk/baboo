@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.0 — 2026-09-29 — Second floor
+- The Mansion has a second floor. The porch stays one story, with its own roof
+- Upstairs windows replace the flat dormer squares. The stair runs up to the new floor
+
 ## 2.12.2 — 2026-09-29 — Walk through doors
 - Walkthrough goes through doors. A wall still stops you. A doorway does not
 

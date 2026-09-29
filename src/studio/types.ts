@@ -68,6 +68,8 @@ export interface Wall {
   finishId?: string | null;
   /** How the wall reads on the plan. Omit = outline. */
   drawStyle?: WallDrawStyle;
+  /** 1 = one story. 2 = this wall continues to a second floor. Omit = decided by the plan. */
+  levels?: number;
 }
 
 export interface Opening {

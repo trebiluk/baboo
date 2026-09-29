@@ -256,7 +256,9 @@ function toneForToast(msg: string, fallback: ToastTone): ToastTone {
 
 
 function refreshRoof(f: Floor, roofStyleId: RoofStyleId | null, eavesHeight?: number): Floor {
-  return { ...f, roof: generateRoof(f.nodes, f.walls, roofStyleId, eavesHeight) };
+  const stories = f.walls.some((w) => (w.levels ?? 1) >= 2) ? 2 : 1;
+  const base = eavesHeight && eavesHeight > 0 ? eavesHeight : 9;
+  return { ...f, roof: generateRoof(f.nodes, f.walls, roofStyleId, base * stories) };
 }
 
 function isClosedBox(floor: Floor): boolean {

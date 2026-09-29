@@ -192,18 +192,19 @@ function buildMansion(floor: Floor) {
   const bHR = N(34, 40);
   const bBath = N(46, 40);
   const bR = N(56, 40);
-  const W = (a: Node, b: Node, kind: Wall['kind'] = 'exterior'): Wall => ({
+  const W = (a: Node, b: Node, kind: Wall['kind'] = 'exterior', levels?: number): Wall => ({
     id: uid('w'), a: a.id, b: b.id, kind,
     thickness: kind === 'exterior' ? 0.55 : 0.35,
     drawStyle: kind === 'exterior' ? 'brick' : 'outline',
+    ...(kind === 'exterior' ? { levels: levels ?? 2 } : {}),
   });
   const bayA = N(3, 8);
   const bayB = N(3, 4.2);
   const bayC = N(15, 4.2);
   const bayD = N(15, 8);
-  const porchFront = W(pFL, pFR);
-  const porchLeft = W(pFL, hL);
-  const porchRight = W(pFR, hR);
+  const porchFront = W(pFL, pFR, 'exterior', 1);
+  const porchLeft = W(pFL, hL, 'exterior', 1);
+  const porchRight = W(pFR, hR, 'exterior', 1);
   const frontFar = W(fL, bayA);
   const baySideL = W(bayA, bayB);
   const bayFront = W(bayB, bayC);
