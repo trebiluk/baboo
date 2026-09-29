@@ -8,12 +8,12 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.13.0 second floor', () => {
-  it('chips 2.13.0 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.13.0');
+describe('2.13.1 upstairs floor', () => {
+  it('chips 2.13.1 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.13.1');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.13\.1'/);
     assert.match(changelog, /version:\s*'2\.13\.0'/);
-    assert.match(changelog, /version:\s*'2\.12\.2'/);
     assert.match(changelog, /version:\s*'2\.10\.1'/);
     const engine = readFileSync(join(studio, 'lib/engine3d.ts'), 'utf8');
     assert.match(engine, /ExtrudeGeometry/);

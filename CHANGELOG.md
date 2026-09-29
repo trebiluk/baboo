@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.1 — 2026-09-29 — Close the upstairs
+- The upstairs floor is solid, with a hole only at the stair
+- The roof has a finished underside, so it no longer reads as a white wing
+
 ## 2.13.0 — 2026-09-29 — Second floor
 - The Mansion has a second floor. The porch stays one story, with its own roof
 - Upstairs windows replace the flat dormer squares. The stair runs up to the new floor

@@ -5,7 +5,7 @@ import type { FloorFinishId } from '../data/flooring';
 import { floorFinish } from '../data/flooring';
 import { listInteriorFloors } from './rooms';
 import { furnitureParts } from './furnShape';
-import { porchBounds, houseHasUpper, viewRoof, wallStories } from './stories';
+import { houseHasUpper, porchBounds, upperOutline, viewRoof, wallStories } from './stories';
 
 export type HouseLook = {
   wallH: number;
@@ -294,7 +294,8 @@ function addWall(bag: Bag, floor: Floor, wall: Wall, look: HouseLook, nodes: Map
   if (len < 0.08) return;
   const thick = Math.max(0.35, wall.thickness || 0.45);
   const stories = wallStories(floor, wall);
-  const h = wall.kind === 'interior' ? Math.max(7, look.wallH - 0.35) : look.wallH * stories;
+  const upper = houseHasUpper(floor);
+  const h = wall.kind === 'interior' ? (upper ? look.wallH : Math.max(7, look.wallH - 0.35)) : look.wallH * stories;
   const shape = new THREE.Shape();
   shape.moveTo(0, 0);
   shape.lineTo(len, 0);
@@ -414,6 +415,16 @@ function addRoof(bag: Bag, roof: RoofGeometry) {
       pushQuad(pos, a, b, c, d);
     }
     meshFromPos(bag, pos, slate, 'roof');
+    const soffit: number[] = [];
+    for (let i = 0; i < 4; i++) {
+      const j = (i + 1) % 4;
+      const a = [o[i].x, eh - 0.02, o[i].y];
+      const b = [o[j].x, eh - 0.02, o[j].y];
+      const c = [inner[j].x, capY - 0.02, inner[j].y];
+      const d = [inner[i].x, capY - 0.02, inner[i].y];
+      pushQuad(soffit, a, d, c, b);
+    }
+    meshFromPos(bag, soffit, mat(bag, '#E7E2DA', 0.94), 'roof');
     floorMesh(bag, inner, capY + 0.05, slate, 'roof');
     return;
   }
@@ -441,6 +452,7 @@ function addRoof(bag: Bag, roof: RoofGeometry) {
 }
 
 function addFurniture(bag: Bag, item: FurnitureItem, storyH = 0) {
+  if (item.catalogId === 'banister' && storyH > 7) return;
   if (item.catalogId === 'stairs' && storyH > 7) {
     addFullStair(bag, item, storyH);
     return;
@@ -473,7 +485,7 @@ function addFullStair(bag: Bag, item: FurnitureItem, top: number) {
   const rise = top / steps;
   const run = Math.max(item.h, 6) / steps;
   const wood = mat(bag, '#8A6244', 0.72);
-  const rail = mat(bag, '#5C4030', 0.6);
+  const railMat = mat(bag, '#5C4030', 0.55);
   const g = new THREE.Group();
   g.position.set(item.x, 0, item.y);
   g.rotation.y = -item.rot;
@@ -484,11 +496,21 @@ function addFullStair(bag: Bag, item: FurnitureItem, top: number) {
     tread.castShadow = i % 3 === 0;
     g.add(tread);
   }
+  const climb = Math.atan2(top, Math.max(item.h, 6));
+  const railLen = Math.hypot(item.h, top);
   for (const side of [-1, 1]) {
-    const post = new THREE.Mesh(new THREE.BoxGeometry(0.12, top, 0.12), rail);
-    bag.geos.push(post.geometry);
-    post.position.set(side * item.w * 0.42, top / 2, 0);
-    g.add(post);
+    const x = side * item.w * 0.46;
+    for (const end of [0, 1]) {
+      const post = new THREE.Mesh(new THREE.BoxGeometry(0.16, 3.1, 0.16), railMat);
+      bag.geos.push(post.geometry);
+      post.position.set(x, (end === 0 ? 0 : top) + 1.55, -item.h / 2 + end * item.h);
+      g.add(post);
+    }
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.1, railLen), railMat);
+    bag.geos.push(rail.geometry);
+    rail.rotation.x = -climb;
+    rail.position.set(x, top / 2 + 2.85, 0);
+    g.add(rail);
   }
   bag.root.add(g);
   dropShadow(bag, item.x, item.y, item.w, item.h, item.rot);
@@ -548,6 +570,46 @@ function addLandscape(bag: Bag, floor: Floor) {
   }
 }
 
+function addUpperDeck(bag: Bag, floor: Floor, y: number) {
+  const o = upperOutline(floor);
+  if (!o || o.length < 4) return;
+  const pad = 1.55;
+  const minX = Math.min(...o.map((p) => p.x)) + pad;
+  const maxX = Math.max(...o.map((p) => p.x)) - pad;
+  const minY = Math.min(...o.map((p) => p.y)) + pad;
+  const maxY = Math.max(...o.map((p) => p.y)) - pad;
+  if (maxX - minX < 4 || maxY - minY < 4) return;
+  const shape = shapeOnGround([
+    { x: minX, y: minY },
+    { x: maxX, y: minY },
+    { x: maxX, y: maxY },
+    { x: minX, y: maxY },
+  ]);
+  const stair = (floor.furniture ?? []).find((f) => f.catalogId === 'stairs');
+  if (stair) {
+    const hw = stair.w / 2 + 0.4;
+    const hh = stair.h / 2 + 0.4;
+    const c = Math.cos(stair.rot);
+    const s = Math.sin(stair.rot);
+    const corners = [[-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh]].map(([lx, ly]) => ({
+      x: stair.x + lx * c - ly * s,
+      y: stair.y + lx * s + ly * c,
+    })).reverse();
+    const hole = new THREE.Path();
+    hole.moveTo(corners[0].x, -corners[0].y);
+    for (let i = 1; i < corners.length; i++) hole.lineTo(corners[i].x, -corners[i].y);
+    hole.closePath();
+    shape.holes.push(hole);
+  }
+  const geo = new THREE.ShapeGeometry(shape);
+  geo.rotateX(-Math.PI / 2);
+  uvFeet(geo, 2.6, 2.6, true);
+  const material = new THREE.MeshStandardMaterial({ color: '#D7CBBA', roughness: 0.8, side: THREE.DoubleSide });
+  bag.mats.push(material);
+  const mesh = addMesh(bag, geo, material, false, true);
+  mesh.position.y = y;
+}
+
 export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
   const bag: Bag = { root: new THREE.Group(), geos: [], mats: [], shared: new Map() };
   let gx = 0;
@@ -597,10 +659,10 @@ export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
     const cx = face.poly.reduce((s, p) => s + p.x, 0) / face.poly.length;
     const cy = face.poly.reduce((s, p) => s + p.y, 0) / face.poly.length;
     const onPorch = !!porch && Math.hypot(cx - porch.x, cy - porch.y) < 14 && cy < porch.y + 6;
-    if (onPorch) continue;
-    floorMesh(bag, face.poly, look.wallH + 0.08, mat(bag, '#D9CBB8', 0.7));
-    floorMesh(bag, face.poly, look.wallH * 2 - 0.25, mat(bag, '#F7F3EC', 0.92), 'ceiling');
+    if (onPorch || upper) continue;
+    floorMesh(bag, face.poly, look.wallH - 0.2, mat(bag, '#F7F3EC', 0.92), 'ceiling');
   }
+  if (upper) addUpperDeck(bag, floor, look.wallH);
 
   const shown = viewRoof(floor, look.wallH);
   if (shown) addRoof(bag, shown);

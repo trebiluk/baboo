@@ -354,7 +354,7 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
     const fill = brick ? '#A15A48' : (wall.kind === 'exterior' ? tint.fill : tint.fillShade);
     const cap = brick ? '#C47860' : tint.fillShade;
     const stories = wallStories(floor, wall);
-    const h = wall.kind === 'interior' ? wallH - 0.4 : wallH * stories;
+    const h = wall.kind === 'interior' ? (houseHasUpper(floor) ? wallH : wallH - 0.4) : wallH * stories;
     const ops = (byWall.get(wall.id) ?? []).slice().sort((p, q) => p.t - q.t);
     const foot = wallFootprint(wall, floor.nodes, floor.walls);
 

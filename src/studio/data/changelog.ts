@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.1',
+    date: '2026-09-29',
+    bullets: [
+      'The upstairs floor is solid, with a hole only at the stair',
+      'The roof has a finished underside, so it no longer reads as a white wing',
+    ],
+  },
+  {
     version: '2.13.0',
     date: '2026-09-29',
     bullets: [

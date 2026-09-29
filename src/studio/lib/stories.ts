@@ -42,7 +42,7 @@ export function upperOutline(floor: Floor): Point[] | null {
     maxY = Math.max(maxY, a.y, b.y);
   }
   if (n < 3 || maxX - minX < 4 || maxY - minY < 4) return null;
-  const oh = 1;
+  const oh = 0.75;
   return [
     { x: minX - oh, y: minY - oh },
     { x: maxX + oh, y: minY - oh },
@@ -84,7 +84,7 @@ function rectBreaks(outline: Point[]): RoofGeometry['breaks'] {
   const maxX = Math.max(...xs);
   const minY = Math.min(...ys);
   const maxY = Math.max(...ys);
-  const inset = Math.min(maxX - minX, maxY - minY) * 0.18 + 0.4;
+  const inset = Math.min(6.5, Math.max(3.2, Math.min(maxX - minX, maxY - minY) * 0.12));
   const inner = [
     { x: minX + inset, y: minY + inset },
     { x: maxX - inset, y: minY + inset },
