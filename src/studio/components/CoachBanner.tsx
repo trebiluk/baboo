@@ -1,33 +1,103 @@
-import { useState } from 'react';
-import { DEFAULT_SKILL_LEVEL, currentJob, nextCoach, skillRank } from '../data/skill';
+import { useEffect, useRef, useState } from 'react';
+import { DEFAULT_SKILL_LEVEL, currentJob, gradeBoxJob, nextCoach, skillRank } from '../data/skill';
 import { BABOO_LOGO } from '../logo';
 import { useProjectStore } from '../store/useProjectStore';
 import { t, tt, tipLoc } from '../data/i18n';
+import { APP_VERSION } from '../version';
 
 const COACH_OFF = 'baboo-coach-off';
+const JOB_LINE = 'Draw a 16 by 24 box. Put a door on the long wall.';
+const RECORDED = 'baboo-job-16x24';
 
 function coachIsOff() {
   try { return localStorage.getItem(COACH_OFF) === '1'; } catch { return false; }
 }
 
+type WhoRecord = (row: Record<string, unknown>) => unknown;
+
+function whoRecord(): WhoRecord | null {
+  const who = (window as unknown as { KulibertWho?: { record?: WhoRecord } }).KulibertWho;
+  return who && typeof who.record === 'function' ? who.record : null;
+}
+
 export function JobChip() {
   const floor = useProjectStore((s) => s.doc.floors[0]);
   const skillLevel = useProjectStore((s) => s.doc.settings.skillLevel) ?? DEFAULT_SKILL_LEVEL;
-  const roofNamed = !!useProjectStore((s) => s.doc.settings.roofStyleId);
   const viewMode = useProjectStore((s) => s.viewMode);
-  const demoRectangle = useProjectStore((s) => s.demoRectangle);
-  const job = currentJob(skillLevel, floor, roofNamed);
-  if (viewMode !== 'plan' || !job) return null;
-  const showDemo = floor.walls.length === 0;
+  const setTool = useProjectStore((s) => s.setTool);
+  const setViewMode = useProjectStore((s) => s.setViewMode);
+  const toggleHelp = useProjectStore((s) => s.toggleHelp);
+  const showToast = useProjectStore((s) => s.showToast);
+  const started = useRef(Date.now());
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    try { setSaved(sessionStorage.getItem(RECORDED) === '1'); } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => {
+    if (!floor || viewMode !== 'plan' || skillRank(skillLevel) > 1) return;
+    let stop = false;
+    const trySave = () => {
+      if (stop) return;
+      let already = false;
+      try { already = sessionStorage.getItem(RECORDED) === '1'; } catch { /* ignore */ }
+      if (already) { setSaved(true); return; }
+      const grade = gradeBoxJob(floor);
+      if (grade.score < 3) return;
+      const record = whoRecord();
+      if (!record) return;
+      const row = record({
+        app: 'baboo',
+        version: `v${APP_VERSION}`,
+        event: 'job',
+        level: 'job-16x24',
+        score: grade.score,
+        max: 3,
+        stars: grade.stars,
+        xp: 10,
+        skill: 'drafting',
+        ms: Math.max(0, Date.now() - started.current),
+      });
+      if (!row) return;
+      try { sessionStorage.setItem(RECORDED, '1'); } catch { /* ignore */ }
+      setSaved(true);
+      const bar = (window as unknown as { KulibertBar?: { toast?: (text: string) => void } }).KulibertBar;
+      if (bar && typeof bar.toast === 'function') bar.toast('3 stars! Saved');
+      else showToast('3 stars! Saved', 4000, 'ok');
+    };
+    trySave();
+    const timer = window.setInterval(trySave, 700);
+    window.addEventListener('message', trySave);
+    return () => {
+      stop = true;
+      window.clearInterval(timer);
+      window.removeEventListener('message', trySave);
+    };
+  }, [floor, skillLevel, viewMode, showToast]);
+
+  if (viewMode !== 'plan' || skillRank(skillLevel) > 1) return null;
+
   return (
-    <aside className="job-chip" role="status">
-      <strong>Job</strong>
-      <span>{job}</span>
-      {showDemo ? (
-        <button type="button" className="primary-btn aw-pressable" onClick={() => demoRectangle()}>
-          Show me
-        </button>
-      ) : null}
+    <aside className="job-chip" role="status" aria-label="Job">
+      <p>{saved ? '3 stars! Saved' : JOB_LINE}</p>
+      <button
+        type="button"
+        className="primary-btn aw-pressable job-start"
+        onClick={() => { started.current = Date.now(); setViewMode('plan'); setTool('wall'); }}
+      >
+        Start the job
+      </button>
+      <button
+        type="button"
+        id="baboo-help"
+        className="ghost-btn aw-pressable job-help"
+        aria-label="Show me"
+        title="Show me"
+        onClick={toggleHelp}
+      >
+        ?
+      </button>
     </aside>
   );
 }

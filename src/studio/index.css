@@ -78,7 +78,7 @@
   color-scheme:only light;
   color:var(--aw-fg);
   background:var(--aw-bg);
-  font-family:Archivo, "Noto Sans", "Noto Sans Ethiopic", "Noto Sans Arabic", Segoe UI, system-ui, -apple-system, sans-serif;
+  font-family:Outfit, Archivo, "Noto Sans", "Noto Sans Ethiopic", "Noto Sans Arabic", Segoe UI, system-ui, -apple-system, sans-serif;
   line-height:1.4
 }
 html[data-gui-theme=stark] {
@@ -804,6 +804,7 @@ button {
   padding:0;
   width:44px
 }
+.app-shell:has(.job-chip) .plan-taps { top:78px }
 .plan-roof {
   position:relative;
   pointer-events:auto;
@@ -4746,8 +4747,8 @@ html:not([data-gui-theme="ink"]) {
   left:max(8px, env(safe-area-inset-left, 0px))
 }
 .plan-tap {
-  min-height:40px;
-  min-width:40px;
+  min-height:44px;
+  min-width:44px;
   padding:0 12px
 }
 .tool-rail.edge-pocket.is-fancy .edge-pocket-col {
@@ -4757,34 +4758,61 @@ html:not([data-gui-theme="ink"]) {
 
 .job-chip {
   position:absolute;
-  left:64px;
-  bottom:16px;
-  z-index:30;
+  top:8px;
+  left:calc(var(--aw-rail-left, 56px) + 8px);
+  right:12px;
+  z-index:35;
   display:flex;
   align-items:center;
-  gap:10px;
-  max-width:min(640px, calc(100% - 88px));
+  gap:12px;
+  max-width:none;
   background:#fff;
   color:#1a1a1a;
   border:1px solid var(--aw-border);
-  border-radius:12px;
-  padding:8px 10px;
-  box-shadow:0 6px 18px #0a0a0a18
+  border-radius:14px;
+  padding:8px 10px 8px 16px;
+  box-shadow:0 6px 18px #0a0a0a18;
+  font-family:Outfit, system-ui, sans-serif
 }
-.job-chip strong {
-  font-size:12px;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  color:#3a3fbf
+.job-chip p {
+  margin:0;
+  flex:1 1 auto;
+  font-size:18px;
+  font-weight:650;
+  line-height:1.25
 }
-.job-chip span { font-size:15px; line-height:1.3 }
-.job-chip .primary-btn { min-height:44px }
+.job-chip .job-start {
+  min-height:48px;
+  min-width:148px;
+  padding:0 18px;
+  font-size:18px;
+  font-weight:700;
+  border-radius:12px
+}
+.job-chip .job-help {
+  min-width:44px;
+  min-height:44px;
+  width:44px;
+  padding:0;
+  font-size:22px;
+  font-weight:700;
+  border-radius:12px
+}
 .app-shell.is-phone .job-chip {
-  left:12px;
-  right:12px;
-  bottom:12px;
+  left:8px;
+  right:8px;
+  top:8px;
+  bottom:auto;
   max-width:none;
   flex-wrap:wrap
+}
+.app-shell.is-phone .job-chip p { font-size:16px }
+.app-shell.is-phone:has(.job-chip) .plan-taps,
+.app-shell.is-phone:has(.job-chip) .plan-taps.aw-ribbon {
+  top:124px
+}
+.chrome, .tool-rail, .plan-tap, .ghost-btn, .primary-btn {
+  font-family:Outfit, system-ui, sans-serif
 }
 .save-proof {
   position:fixed;

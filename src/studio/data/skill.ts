@@ -311,6 +311,48 @@ export function currentJob(level: SkillLevel, floor: Floor, roofNamed = false): 
   return null;
 }
 
+const JOB_SHORT = 16;
+const JOB_LONG = 24;
+const JOB_SLACK = 0.5;
+
+/** Three checks: size within 6 inches, a door, and that door on a long wall. */
+export function gradeBoxJob(floor: Floor): { size: boolean; door: boolean; long: boolean; score: number; stars: number } {
+  const nodes = new Map(floor.nodes.map((n) => [n.id, n]));
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  let used = 0;
+  for (const w of floor.walls) {
+    const a = nodes.get(w.a);
+    const b = nodes.get(w.b);
+    if (!a || !b) continue;
+    used += 1;
+    minX = Math.min(minX, a.x, b.x);
+    minY = Math.min(minY, a.y, b.y);
+    maxX = Math.max(maxX, a.x, b.x);
+    maxY = Math.max(maxY, a.y, b.y);
+  }
+  const width = used ? maxX - minX : 0;
+  const depth = used ? maxY - minY : 0;
+  const short = Math.min(width, depth);
+  const longSide = Math.max(width, depth);
+  const size = used >= 4 && Math.abs(short - JOB_SHORT) <= JOB_SLACK && Math.abs(longSide - JOB_LONG) <= JOB_SLACK;
+  const doors = (floor.openings ?? []).filter((o) => o.type === 'door');
+  const door = doors.length > 0;
+  const onLong = doors.some((o) => {
+    const wall = floor.walls.find((w) => w.id === o.wallId);
+    if (!wall) return false;
+    const a = nodes.get(wall.a);
+    const b = nodes.get(wall.b);
+    if (!a || !b) return false;
+    const len = Math.hypot(b.x - a.x, b.y - a.y);
+    return Math.abs(len - longSide) <= JOB_SLACK + 0.25 && longSide > short + 0.5;
+  });
+  const score = (size ? 1 : 0) + (door ? 1 : 0) + (onLong ? 1 : 0);
+  return { size, door, long: onLong, score, stars: score };
+}
+
 export function planIsClosed(floor: Floor): boolean {
   return floor.walls.length > 2 && listInteriorFaces(floor.nodes, floor.walls).length > 0;
 }

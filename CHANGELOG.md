@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.2 — 2026-10-01 — Tech Room job
+- The first job sits at the top: draw a 16 by 24 box and put a door on the long wall
+- A passing job saves 3 stars to the Tech Room
+
 ## 2.13.1 — 2026-09-29 — Close the upstairs
 - The upstairs floor is solid, with a hole only at the stair
 - The roof has a finished underside, so it no longer reads as a white wing
