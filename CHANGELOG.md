@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.3 — 2026-10-01 — Phone job
+- On a phone the job sentence sits beside the tools, not under them
+
 ## 2.13.2 — 2026-10-01 — Tech Room job
 - The first job sits at the top: draw a 16 by 24 box and put a door on the long wall
 - A passing job saves 3 stars to the Tech Room

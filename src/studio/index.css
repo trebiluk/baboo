@@ -4799,17 +4799,20 @@ html:not([data-gui-theme="ink"]) {
   border-radius:12px
 }
 .app-shell.is-phone .job-chip {
-  left:8px;
+  left:64px;
   right:8px;
-  top:8px;
+  top:56px;
   bottom:auto;
   max-width:none;
   flex-wrap:wrap
 }
-.app-shell.is-phone .job-chip p { font-size:16px }
+.app-shell.is-phone .job-chip p {
+  flex:1 1 100%;
+  font-size:15px
+}
 .app-shell.is-phone:has(.job-chip) .plan-taps,
 .app-shell.is-phone:has(.job-chip) .plan-taps.aw-ribbon {
-  top:124px
+  top:176px
 }
 .chrome, .tool-rail, .plan-tap, .ghost-btn, .primary-btn {
   font-family:Outfit, system-ui, sans-serif

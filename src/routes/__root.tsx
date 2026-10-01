@@ -36,7 +36,7 @@ export const Route = createRootRoute({
         <script
           src="https://apps.kulibert.net/shared/kulibert-bar.js"
           data-app="baboo"
-          data-version="v2.13.2"
+          data-version="v2.13.3"
           data-help="#baboo-help"
           defer
         />
