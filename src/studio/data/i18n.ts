@@ -2151,28 +2151,10 @@ export function readHubLocale(): Locale | null {
   return null;
 }
 
-const SHARED_CHROME: Record<string, string> = {
-  'chrome.settings': 'settings',
-  'chrome.help': 'help',
-  'chrome.whatsNew': 'whatsNew',
-};
-
-function sharedChrome(key: string, loc: Locale): string | null {
-  const sharedKey = SHARED_CHROME[key];
-  if (!sharedKey || typeof window === 'undefined') return null;
-  const use = loc === 'fa' ? 'fa-AF' : loc;
-  const known = ['en', 'simple', 'uk', 'ru', 'es', 'ar', 'fa-AF', 'rw', 'ti'];
-  if (!known.includes(use)) return null;
-  const api = (window as unknown as { KulibertI18n?: { t?: (k: string, l?: string) => string } }).KulibertI18n;
-  if (!api || typeof api.t !== 'function') return null;
-  const word = api.t(sharedKey, use);
-  return word || null;
-}
-
 export function t(locale: Locale | null | undefined, key: string, vars?: Record<string, string>): string {
   const loc = asLocale(locale);
   const row = STR[key];
-  let out = sharedChrome(key, loc) || (row ? row[loc] || row.en : '') || key;
+  let out = (row ? row[loc] || row.en : '') || key;
   if (!out) out = key;
   if (vars) {
     for (const [k, v] of Object.entries(vars)) out = out.replaceAll(`{${k}}`, v);
@@ -2187,9 +2169,12 @@ export function publishHubLocale(locale: Locale | null | undefined): void {
   const loc = asLocale(locale);
   if (!HUB_LANGS.has(loc)) return;
   const dir = loc === 'ar' || loc === 'fa-AF' ? 'rtl' : 'ltr';
-  const prefs = (window as unknown as { KulibertPrefs?: { lang?: string; set?: (p: { lang: string }) => void } }).KulibertPrefs;
+  const prefs = (window as unknown as {
+    KulibertPrefs?: { lang?: string; set?: (p: { lang: string }) => void; acceptLang?: (lang: string) => void };
+  }).KulibertPrefs;
   try {
-    if (prefs && typeof prefs.set === 'function' && prefs.lang !== loc) prefs.set({ lang: loc });
+    if (prefs && typeof prefs.acceptLang === 'function') prefs.acceptLang(loc);
+    else if (prefs && typeof prefs.set === 'function' && prefs.lang !== loc) prefs.set({ lang: loc });
   } catch { /* ignore */ }
   try {
     if (window.parent && window.parent !== window) {

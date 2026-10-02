@@ -60,12 +60,14 @@ export default function App() {
     };
     const onMsg = (ev: MessageEvent) => {
       const data = ev.data as { type?: string; lang?: string } | null;
-      if (!data || data.type !== 'kulibert-lang' || !data.lang) return;
+      if (!data || !data.lang || (data.type !== 'kulibert-lang' && data.type !== 'kp-lang')) return;
       let host = '';
       try { host = new URL(ev.origin).hostname; } catch { return; }
       const local = location.hostname;
       const school = host === local || host === 'kulibert.net' || host.endsWith('.kulibert.net');
       if (!school) return;
+      const prefs = (window as unknown as { KulibertPrefs?: { lang?: string; acceptLang?: (lang: string) => void } }).KulibertPrefs;
+      if (prefs && typeof prefs.acceptLang === 'function' && prefs.lang !== data.lang) prefs.acceptLang(data.lang);
       apply(data.lang);
     };
     window.addEventListener('kulibert-lang', onLang);
