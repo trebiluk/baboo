@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.4 — 2026-10-02 — Hub languages
+- Baboo follows the Hub language. Arabic and Kinyarwanda added. Farsi is now Dari.
+
 ## 2.13.3 — 2026-10-01 — Phone job
 - On a phone the job sentence sits beside the tools, not under them
 

@@ -7,6 +7,7 @@ import { APP_VERSION } from '../version';
 
 const COACH_OFF = 'baboo-coach-off';
 const JOB_LINE = 'Draw a 16 by 24 box. Put a door on the long wall.';
+const JOB_START_EN = 'Start the job';
 const RECORDED = 'baboo-job-16x24';
 
 function coachIsOff() {
@@ -23,6 +24,7 @@ function whoRecord(): WhoRecord | null {
 export function JobChip() {
   const floor = useProjectStore((s) => s.doc.floors[0]);
   const skillLevel = useProjectStore((s) => s.doc.settings.skillLevel) ?? DEFAULT_SKILL_LEVEL;
+  const locale = tipLoc(useProjectStore((s) => s.doc.settings));
   const viewMode = useProjectStore((s) => s.viewMode);
   const setTool = useProjectStore((s) => s.setTool);
   const setViewMode = useProjectStore((s) => s.setViewMode);
@@ -63,8 +65,9 @@ export function JobChip() {
       try { sessionStorage.setItem(RECORDED, '1'); } catch { /* ignore */ }
       setSaved(true);
       const bar = (window as unknown as { KulibertBar?: { toast?: (text: string) => void } }).KulibertBar;
-      if (bar && typeof bar.toast === 'function') bar.toast('3 stars! Saved');
-      else showToast('3 stars! Saved', 4000, 'ok');
+      const savedLine = t(useProjectStore.getState().doc.settings.locale, 'job.saved');
+      if (bar && typeof bar.toast === 'function') bar.toast(savedLine);
+      else showToast(savedLine, 4000, 'ok');
     };
     trySave();
     const timer = window.setInterval(trySave, 700);
@@ -80,13 +83,13 @@ export function JobChip() {
 
   return (
     <aside className="job-chip" role="status" aria-label="Job">
-      <p>{saved ? '3 stars! Saved' : JOB_LINE}</p>
+      <p>{saved ? t(locale, 'job.saved') : tt(locale, 'job.line', JOB_LINE)}</p>
       <button
         type="button"
         className="primary-btn aw-pressable job-start"
         onClick={() => { started.current = Date.now(); setViewMode('plan'); setTool('wall'); }}
       >
-        Start the job
+        {tt(locale, 'job.start', JOB_START_EN)}
       </button>
       <button
         type="button"

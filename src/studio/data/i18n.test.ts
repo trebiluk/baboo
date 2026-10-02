@@ -14,7 +14,11 @@ describe('i18n', () => {
     assert.equal(asLocale('es'), 'es');
     assert.equal(asLocale('en'), 'en');
     assert.equal(asLocale('uk'), 'uk');
-    assert.equal(asLocale('fa'), 'fa');
+    assert.equal(asLocale('fa'), 'fa-AF');
+    assert.equal(asLocale('fa-AF'), 'fa-AF');
+    assert.equal(asLocale('ar'), 'ar');
+    assert.equal(asLocale('rw'), 'rw');
+    assert.equal(asLocale('simple'), 'simple');
     assert.equal(asLocale('ti'), 'ti');
     assert.equal(asLocale('cu'), 'cu');
     assert.equal(asLocale('fr'), 'en');
@@ -31,7 +35,7 @@ describe('i18n', () => {
   });
 
   it('new packs keep English CAD terms in parentheses', () => {
-    for (const loc of LOCALES.filter((l) => l !== 'en')) {
+    for (const loc of LOCALES.filter((l) => l !== 'en' && l !== 'simple')) {
       assert.match(t(loc, 'tool.wall'), /\(Wall\)/, loc);
       assert.match(t(loc, 'tool.door'), /\(Door\)/, loc);
       assert.match(t(loc, 'tool.window'), /\(Window\)/, loc);
@@ -54,7 +58,7 @@ describe('i18n', () => {
   it('Tigrigna and Farsi use native script', () => {
     assert.match(t('ti', 'tool.wall'), /መንደቕ/);
     assert.match(t('fa', 'tool.wall'), /دیوار/);
-    assert.match(t('fa', 'chrome.settings'), /تنظیمات/);
+    assert.match(t('fa', 'chrome.settings'), /تنظیم/);
   });
 
   it('interpolates vars and falls back missing keys', () => {
@@ -63,6 +67,20 @@ describe('i18n', () => {
     assert.equal(t('en', 'no.such.key'), 'no.such.key');
     assert.equal(tt('es', 'no.such.key', 'fallback'), 'fallback');
     assert.equal(tt('es', 'chrome.close', 'nope'), 'Cerrar');
+  });
+
+  it('Arabic, Dari, and Kinyarwanda change the words kids see', () => {
+    const keys = ['tool.wall', 'tool.door', 'chrome.settings', 'chrome.help', 'job.line', 'job.start', 'lang.title', 'help.lead', 'set.look'];
+    for (const loc of ['ar', 'rw', 'fa-AF', 'uk', 'ru', 'es', 'ti'] as const) {
+      for (const key of keys) {
+        const word = t(loc, key);
+        assert.notEqual(word, key, `${loc}:${key}`);
+        assert.notEqual(word, t('en', key), `${loc}:${key}`);
+        assert.ok(!word.includes('undefined'), word);
+      }
+    }
+    assert.match(t('fa-AF', 'tool.wall'), /دیوار/);
+    assert.equal(t('fa-AF', 'chrome.settings'), 'تنظیم');
   });
 
   it('fills every locale for every chrome key', () => {

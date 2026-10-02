@@ -105,7 +105,7 @@ export function CustomizePanel() {
         </section>
 
         <label className="field">
-          <span>Grid size ({settings.units === 'm' ? 'ft world' : 'ft'})</span>
+          <span>{t(settings.locale, 'set.grid')}</span>
           <input
             type="number"
             min={0.5}
@@ -121,7 +121,7 @@ export function CustomizePanel() {
             checked={settings.snap}
             onChange={(e) => setSettings({ snap: e.target.checked })}
           />
-          <span>Snap to grid <em>(optional — turn off for free drag)</em></span>
+          <span>{t(settings.locale, 'set.snap')} <em>{t(settings.locale, 'set.snap.hint')}</em></span>
         </label>
         <label className="field check">
           <input
@@ -129,7 +129,7 @@ export function CustomizePanel() {
             checked={settings.ortho !== false}
             onChange={(e) => setSettings({ ortho: e.target.checked })}
           />
-          <span>Straight walls (90° and 45° corners) <em>hold Shift for 90° only</em></span>
+          <span>{t(settings.locale, 'set.ortho')} <em>{t(settings.locale, 'set.ortho.hint')}</em></span>
         </label>
         <label className="field check">
           <input
@@ -137,10 +137,10 @@ export function CustomizePanel() {
             checked={settings.osnap !== false}
             onChange={(e) => setSettings({ osnap: e.target.checked })}
           />
-          <span>{t(settings.locale, 'set.osnap')} <em>lands exactly on what you already drew</em></span>
+          <span>{t(settings.locale, 'set.osnap')} <em>{t(settings.locale, 'set.osnap.hint')}</em></span>
         </label>
         <label className="field">
-          <span>Units (dimension labels)</span>
+          <span>{t(settings.locale, 'set.units')}</span>
           <select
             value={settings.units}
             onChange={(e) => setSettings({ units: e.target.value as 'ft' | 'm' })}

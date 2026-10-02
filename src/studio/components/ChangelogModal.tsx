@@ -1,9 +1,11 @@
 import { useProjectStore } from '../store/useProjectStore';
 import { APP_VERSION, CHANGELOG_ENTRIES } from '../data/changelog';
+import { t, tipLoc } from '../data/i18n';
 
 export function ChangelogModal() {
   const open = useProjectStore((s) => s.changelogOpen);
   const toggle = useProjectStore((s) => s.toggleChangelog);
+  const locale = tipLoc(useProjectStore((s) => s.doc.settings));
   if (!open) return null;
   return (
     <div className="modal-backdrop" onClick={toggle}>
@@ -14,8 +16,8 @@ export function ChangelogModal() {
         aria-labelledby="changelog-title"
       >
         <div className="drawer-head">
-          <h2 id="changelog-title">What's new · v{APP_VERSION}</h2>
-          <button type="button" className="ghost-btn secondary-btn aw-pressable" onClick={toggle}>Close</button>
+          <h2 id="changelog-title">{t(locale, 'chrome.whatsNew')} · v{APP_VERSION}</h2>
+          <button type="button" className="ghost-btn secondary-btn aw-pressable" onClick={toggle}>{t(locale, 'chrome.close')}</button>
         </div>
         <p className="muted">Baboo keeps the grid big. Here's what changed.</p>
         {CHANGELOG_ENTRIES.map((n) => (

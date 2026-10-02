@@ -17,8 +17,7 @@ export const Route = createRootRoute({
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "stylesheet", href: appCss },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&display=swap" },
+      { rel: "stylesheet", href: "https://apps.kulibert.net/fonts/room.css?v=2026-10-02-lang" },
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
     ],
@@ -33,10 +32,12 @@ export const Route = createRootRoute({
         <AuthProvider>
           <Outlet />
         </AuthProvider>
+        <script src="https://apps.kulibert.net/shared/kulibert-prefs.js?v=2026-10-02-lang" defer />
+        <script src="https://apps.kulibert.net/shared/i18n.js?v=2026-10-02-lang" defer />
         <script
-          src="https://apps.kulibert.net/shared/kulibert-bar.js"
+          src="https://apps.kulibert.net/shared/kulibert-bar.js?v=2026-10-02-lang"
           data-app="baboo"
-          data-version="v2.13.3"
+          data-version="v2.13.4"
           data-help="#baboo-help"
           defer
         />

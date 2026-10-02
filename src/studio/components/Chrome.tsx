@@ -124,7 +124,7 @@ export function Chrome() {
             height={32}
             decoding="async"
           />
-          <span className="brand-name">Baboo</span>
+          <span className="brand-name"><bdi>Baboo</bdi></span>
           <VersionChip onTeacher={() => setTeacherChrome(true)} />
           {fileShare ? (
             <span className="save-chip" title="Opened from a class folder — no server">Class share</span>

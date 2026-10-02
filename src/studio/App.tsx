@@ -24,7 +24,7 @@ import { ObjectMenu } from './components/ObjectMenu';
 import { usePhoneChrome } from './hooks/usePhoneChrome';
 import { useProjectStore } from './store/useProjectStore';
 import { applyGuiTheme, DEFAULT_GUI_THEME } from './data/themes';
-import { applyDocumentLocale, localeOption, tipLoc } from './data/i18n';
+import { applyDocumentLocale, asLocale, localeOption, readHubLocale, tipLoc } from './data/i18n';
 
 export default function App() {
   const init = useProjectStore((s) => s.init);
@@ -45,6 +45,36 @@ export default function App() {
   useEffect(() => {
     void init();
   }, [init]);
+
+  useEffect(() => {
+    const apply = (lang?: string) => {
+      const next = lang ? asLocale(lang === 'fa' ? 'fa-AF' : lang) : readHubLocale();
+      if (!next) return;
+      const cur = useProjectStore.getState().doc.settings;
+      if (asLocale(cur.tipsLocale ?? cur.locale) === next && asLocale(cur.locale) === next) return;
+      useProjectStore.getState().setSettings({ tipsLocale: next, locale: next }, { quiet: true });
+    };
+    const onLang = (ev: Event) => {
+      const detail = (ev as CustomEvent<{ lang?: string }>).detail;
+      apply(detail?.lang);
+    };
+    const onMsg = (ev: MessageEvent) => {
+      const data = ev.data as { type?: string; lang?: string } | null;
+      if (!data || data.type !== 'kulibert-lang' || !data.lang) return;
+      let host = '';
+      try { host = new URL(ev.origin).hostname; } catch { return; }
+      const local = location.hostname;
+      const school = host === local || host === 'kulibert.net' || host.endsWith('.kulibert.net');
+      if (!school) return;
+      apply(data.lang);
+    };
+    window.addEventListener('kulibert-lang', onLang);
+    window.addEventListener('message', onMsg);
+    return () => {
+      window.removeEventListener('kulibert-lang', onLang);
+      window.removeEventListener('message', onMsg);
+    };
+  }, []);
 
   useEffect(() => {
     const onLeave = (e: BeforeUnloadEvent) => {
@@ -168,7 +198,7 @@ export default function App() {
       <Chrome />
       <div className={`workspace${viewMode !== 'plan' && viewMode !== 'dollhouse' ? ' workspace-3d' : ''}`}>
         <div className="stage-stack">
-          <main className="stage-area">
+          <main className="stage-area" dir="ltr">
             {viewMode === 'plan' ? (
               <ErrorBoundary label="plan"><PlanCanvas /></ErrorBoundary>
             ) : viewMode === 'dollhouse' ? (

@@ -440,18 +440,45 @@ export const VOCAB_FA: Record<string, VocabGloss> = {
   'Body heat': { term: 'گرمای بدن (Body heat)', def: 'لانهٔ درست‌اندازه گرم می‌ماند. خیلی بزرگ — سگ گرمش نمی‌کند.' },
 };
 
-export const VOCAB_PACKS: Record<Exclude<Locale, 'en'>, Record<string, VocabGloss>> = {
+export const VOCAB_PACKS: Record<Exclude<Locale, 'en' | 'simple'>, Record<string, VocabGloss>> = {
   es: VOCAB_ES,
   cu: VOCAB_CU,
   uk: VOCAB_UK,
   ru: VOCAB_RU,
   ti: VOCAB_TI,
   fa: VOCAB_FA,
+  'fa-AF': VOCAB_FA,
+  ar: Object.fromEntries(VOCAB.map((entry) => {
+    const ar: Record<string, VocabGloss> = {
+      Wall: { term: 'جدار (Wall)', def: 'الخط السميك الذي يبني الغرفة.' },
+      Door: { term: 'باب (Door)', def: 'فتحة تمشي منها. اضغط على الجدار.' },
+      Window: { term: 'شباك (Window)', def: 'فتحة يدخل منها الضوء.' },
+      Room: { term: 'غرفة (Room)', def: 'مكان مغلق له اسم.' },
+      Sketch: { term: 'رسم (Sketch)', def: 'خط خفيف قبل الجدار.' },
+      Grid: { term: 'شبكة (Grid)', def: 'مربعات تساعدك على القياس.' },
+      Scale: { term: 'مقياس (Scale)', def: 'حجم الرسم مقابل الحجم الحقيقي.' },
+      Dimension: { term: 'قياس (Dimension)', def: 'رقم الحجم على الجدار.' },
+    };
+    return [entry.term, ar[entry.term] || entry];
+  })),
+  rw: Object.fromEntries(VOCAB.map((entry) => {
+    const rw: Record<string, VocabGloss> = {
+      Wall: { term: 'Urukuta (Wall)', def: 'Umurongo ukomeye wubaka icyumba.' },
+      Door: { term: 'Urugi (Door)', def: 'Umwobo winjiramo. Kanda ku rukuta.' },
+      Window: { term: 'Idirishya (Window)', def: 'Umwobo winjiramo urumuri.' },
+      Room: { term: 'Icyumba (Room)', def: 'Ahantu hafunze gifite izina.' },
+      Sketch: { term: 'Shushanya (Sketch)', def: 'Umurongo woroshye imbere y’urukuta.' },
+      Grid: { term: 'Urusobe (Grid)', def: 'Udusanduku tugufasha gupima.' },
+      Scale: { term: 'Igipimo (Scale)', def: 'Ingano y’igishushanyo igereranywa n’inyayo.' },
+      Dimension: { term: 'Igipimo (Dimension)', def: 'Umubare w’ubugari ku rukuta.' },
+    };
+    return [entry.term, rw[entry.term] || entry];
+  })),
 };
 
 export function vocabGloss(locale: Locale | null | undefined, entry: VocabGloss): VocabGloss {
   const loc = asLocale(locale);
-  if (loc === 'en') return entry;
+  if (loc === 'en' || loc === 'simple') return entry;
   return VOCAB_PACKS[loc]?.[entry.term] ?? entry;
 }
 
@@ -470,12 +497,12 @@ export type EllVocabCard = {
 export function ellVocabCard(locale: Locale | null | undefined, entry: VocabGloss): EllVocabCard {
   const loc = asLocale(locale);
   const gloss = vocabGloss(loc, entry);
-  const home = loc === 'en' ? null : vocabHomeWord(loc, entry);
+  const home = loc === 'en' || loc === 'simple' ? null : vocabHomeWord(loc, entry);
   return {
     en: entry.term,
     home: home && home !== entry.term ? home : null,
     defEn: entry.def,
-    defHome: loc === 'en' || gloss.def === entry.def ? null : gloss.def,
+    defHome: loc === 'en' || loc === 'simple' || gloss.def === entry.def ? null : gloss.def,
   };
 }
 

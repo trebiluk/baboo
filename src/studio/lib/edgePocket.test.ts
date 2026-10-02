@@ -8,10 +8,12 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.13.3 tech room job', () => {
-  it('chips 2.13.3 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.13.3');
+describe('2.13.4 hub languages', () => {
+  it('chips 2.13.4 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.13.4');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.13\.4'/);
+    assert.match(changelog, /Baboo follows the Hub language/);
     assert.match(changelog, /version:\s*'2\.13\.3'/);
     assert.match(changelog, /version:\s*'2\.13\.2'/);
     assert.match(changelog, /version:\s*'2\.13\.1'/);
@@ -188,7 +190,7 @@ describe('2.13.3 tech room job', () => {
     assert.doesNotMatch(t('es', 'help.chrome'), /van a la derecha/);
     for (const loc of LOCALES) {
       const line = t(loc, 'help.chrome');
-      assert.match(line, /Teach|Enseñar|Навчан|Урок|ምምሃር|آموزش/i);
+      assert.match(line, /Teach|Enseñar|Навчан|Урок|ምምሃር|آموزش|تعلّم|Kwiga/i);
     }
   });
 });

@@ -25,6 +25,7 @@ import {
   t, tipLoc, readLocalePref, readTipsLocalePref, readUdlFatPref, readUdlTypePref,
   readUdlContrastPref, readEllEnglishPref, writeLocalePref, writeTipsLocalePref,
   writeUdlFatPref, writeUdlTypePref, writeUdlContrastPref, writeEllEnglishPref,
+  readHubLocale, publishHubLocale,
 } from '../data/i18n';
 import { exteriorBounds, generateRoof, roofStyleName } from '../lib/roof';
 import { textureName } from '../data/textures';
@@ -145,7 +146,7 @@ interface Store {
   duplicateSelected: () => void;
   rotateSelected: (dir: 1 | -1) => void;
   setTitle: (title: string) => void;
-  setSettings: (partial: Partial<ProjectSettings>) => void;
+  setSettings: (partial: Partial<ProjectSettings>, opts?: { quiet?: boolean }) => void;
   setRoofStyle: (roofStyleId: RoofStyleId | null) => void;
   setRoofLabel: (roofLabel: string) => void;
   setTexture: (textureId: string | null, textureLabel?: string, imageBlobRef?: string | null) => void;
@@ -369,6 +370,11 @@ export const useProjectStore = create<Store>((set, get) => ({
         imageBlobRef: loaded.settings.imageBlobRef ?? null,
         ...(typology ? { typology } : {}),
       };
+      const hubLoc = readHubLocale();
+      if (hubLoc) {
+        settings.locale = hubLoc;
+        settings.tipsLocale = hubLoc;
+      }
       const doc = { ...loaded, settings };
       set({
         doc,
@@ -381,6 +387,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     } else {
       const skill = readSkillPref();
       const doc = get().doc;
+      const hubLoc = readHubLocale();
       set({
         saveStatus: 'saved',
         doc: {
@@ -388,8 +395,8 @@ export const useProjectStore = create<Store>((set, get) => ({
           settings: {
             ...doc.settings,
             skillLevel: skill,
-            locale: readLocalePref(),
-            tipsLocale: readTipsLocalePref(),
+            locale: hubLoc ?? readLocalePref(),
+            tipsLocale: hubLoc ?? readTipsLocalePref(),
             udlFat: readUdlFatPref(),
             udlType: readUdlTypePref(),
             udlContrast: readUdlContrastPref(),
@@ -520,7 +527,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     set({ doc: { ...get().doc, meta: { ...get().doc.meta, title } } });
     get().markDirty();
   },
-  setSettings: (partial) => {
+  setSettings: (partial, opts) => {
     const doc = get().doc;
     const settings = { ...doc.settings, ...partial };
     const meta = partial.units
@@ -542,7 +549,12 @@ export const useProjectStore = create<Store>((set, get) => ({
     if (partial.udlContrast != null) writeUdlContrastPref(!!partial.udlContrast);
     if (partial.ellEnglish != null) writeEllEnglishPref(!!partial.ellEnglish);
     set({ doc: { ...doc, settings, meta } });
-    get().markDirty();
+    if (!opts?.quiet) {
+      get().markDirty();
+      if (partial.tipsLocale != null || partial.locale != null) {
+        publishHubLocale(settings.tipsLocale ?? settings.locale);
+      }
+    }
   },
   setRoofStyle: (roofStyleId) => {
     const doc = get().doc;

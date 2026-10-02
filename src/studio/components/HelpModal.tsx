@@ -36,7 +36,19 @@ export function HelpModal() {
           </div>
           <button type="button" className="ghost-btn secondary-btn aw-pressable" onClick={toggle}>{t(locale, 'chrome.close')}</button>
         </div>
-        <p className="muted">Baboo {APP_VERSION} — {t(locale, 'help.lead')}</p>
+        <p className="muted"><bdi>Baboo</bdi> {APP_VERSION} — {t(locale, 'help.lead')}</p>
+        <button
+          type="button"
+          className="ghost-btn aw-pressable"
+          onClick={() => {
+            const words = t(locale, 'help.lead');
+            const prefs = (window as unknown as { KulibertPrefs?: { say?: (text: string, lang?: string) => void } }).KulibertPrefs;
+            const sayLang = locale === 'fa' ? 'fa-AF' : locale;
+            if (prefs && typeof prefs.say === 'function') prefs.say(words, sayLang);
+          }}
+        >
+          {t(locale, 'help.readAloud')}
+        </button>
 
         <section className="help-include" aria-labelledby="udl-title">
           <h3 id="udl-title">{t(locale, 'udl.title')}</h3>

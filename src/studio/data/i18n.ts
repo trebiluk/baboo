@@ -1,9 +1,10 @@
 /** Classroom language packs. Academic CAD terms stay in English inside ( ). */
 import type { Locale } from '../types';
+import { HUB_EXTRA } from './i18n-hub.ts';
 
 export type { Locale };
 
-export const LOCALES: Locale[] = ['en', 'es', 'cu', 'uk', 'ru', 'ti', 'fa'];
+export const LOCALES: Locale[] = ['en', 'simple', 'es', 'cu', 'uk', 'ru', 'ti', 'fa', 'fa-AF', 'ar', 'rw'];
 
 export const LOCALE_OPTIONS: {
   id: Locale;
@@ -13,20 +14,38 @@ export const LOCALE_OPTIONS: {
   dir: 'ltr' | 'rtl';
 }[] = [
   { id: 'en', label: 'English', blurb: 'Classroom English', htmlLang: 'en', dir: 'ltr' },
+  { id: 'simple', label: 'Simple', blurb: 'Short English', htmlLang: 'en', dir: 'ltr' },
   { id: 'es', label: 'Español', blurb: 'Spanish · English words in ( )', htmlLang: 'es', dir: 'ltr' },
   { id: 'cu', label: 'Cubano', blurb: 'Cuban Spanish · English words in ( )', htmlLang: 'es-CU', dir: 'ltr' },
   { id: 'uk', label: 'Українська', blurb: 'Ukrainian · English words in ( )', htmlLang: 'uk', dir: 'ltr' },
   { id: 'ru', label: 'Русский', blurb: 'Russian · English words in ( )', htmlLang: 'ru', dir: 'ltr' },
+  { id: 'ar', label: 'العربية', blurb: 'Arabic · English words in ( )', htmlLang: 'ar', dir: 'rtl' },
+  { id: 'fa-AF', label: 'دری', blurb: 'Dari · English words in ( )', htmlLang: 'fa-AF', dir: 'rtl' },
+  { id: 'rw', label: 'Ikinyarwanda', blurb: 'Kinyarwanda · English words in ( )', htmlLang: 'rw', dir: 'ltr' },
   { id: 'ti', label: 'ትግርኛ', blurb: 'Tigrigna · English words in ( )', htmlLang: 'ti', dir: 'ltr' },
-  { id: 'fa', label: 'فارسی', blurb: 'Farsi · English words in ( )', htmlLang: 'fa', dir: 'rtl' },
 ];
 
 export const DEFAULT_LOCALE: Locale = 'en';
 
 type Gloss = Record<Locale, string>;
 
-function g(en: string, rest: Omit<Gloss, 'en'>): Gloss {
-  return { en, ...rest };
+function g(
+  en: string,
+  rest: { es: string; cu: string; uk: string; ru: string; ti: string; fa: string } & Partial<Pick<Gloss, 'simple' | 'fa-AF' | 'ar' | 'rw'>>,
+): Gloss {
+  return {
+    en,
+    simple: rest.simple || en,
+    es: rest.es,
+    cu: rest.cu,
+    uk: rest.uk,
+    ru: rest.ru,
+    ti: rest.ti,
+    fa: rest.fa,
+    'fa-AF': rest['fa-AF'] || rest.fa,
+    ar: rest.ar || en,
+    rw: rest.rw || en,
+  };
 }
 
 export const STR: Record<string, Gloss> = {
@@ -2063,11 +2082,32 @@ export const STR: Record<string, Gloss> = {
   }),
 };
 
+for (const [key, extra] of Object.entries(HUB_EXTRA)) {
+  if (!STR[key]) {
+    const en = extra.en || key;
+    STR[key] = g(en, {
+      es: extra.es || en,
+      cu: extra.cu || extra.es || en,
+      uk: extra.uk || en,
+      ru: extra.ru || en,
+      ti: extra.ti || en,
+      fa: extra.fa || en,
+      simple: extra.simple,
+      ar: extra.ar,
+      rw: extra.rw,
+      'fa-AF': extra['fa-AF'],
+    });
+  } else {
+    Object.assign(STR[key], extra);
+  }
+}
+
 export function isLocale(v: unknown): v is Locale {
   return typeof v === 'string' && (LOCALES as string[]).includes(v);
 }
 
 export function asLocale(v: unknown): Locale {
+  if (v === 'fa') return 'fa-AF';
   return isLocale(v) ? v : DEFAULT_LOCALE;
 }
 
@@ -2082,18 +2122,80 @@ export function applyDocumentLocale(locale: Locale | null | undefined): void {
   root.lang = opt.htmlLang;
   root.setAttribute('data-locale', opt.id);
   root.setAttribute('data-dir', opt.dir);
-  // Plan grid + tool rails stay LTR so drawings do not mirror.
-  root.dir = 'ltr';
+  root.dir = opt.dir;
+}
+
+export function classicTheme(): boolean {
+  try {
+    const q = new URLSearchParams(location.search);
+    if (q.get('theme') === 'classic' || q.get('hub') === 'classic') return true;
+    if (localStorage.getItem('tech-room-hub') === 'classic') return true;
+  } catch { /* ignore */ }
+  return false;
+}
+
+/** Hub language on this door: ?lang= or the 7th field of #kp=. Null means keep the saved language. */
+export function readHubLocale(): Locale | null {
+  if (classicTheme()) return 'en';
+  try {
+    const q = new URLSearchParams(location.search).get('lang');
+    if (q) return asLocale(q === 'fa' ? 'fa-AF' : q);
+  } catch { /* ignore */ }
+  try {
+    const m = (location.hash || '').match(/(?:^#|&)kp=([^&]+)/);
+    if (m) {
+      const parts = decodeURIComponent(m[1]).split('.');
+      if (parts.length >= 7 && parts[6]) return asLocale(parts[6]);
+    }
+  } catch { /* ignore */ }
+  return null;
+}
+
+const SHARED_CHROME: Record<string, string> = {
+  'chrome.settings': 'settings',
+  'chrome.help': 'help',
+  'chrome.whatsNew': 'whatsNew',
+};
+
+function sharedChrome(key: string, loc: Locale): string | null {
+  const sharedKey = SHARED_CHROME[key];
+  if (!sharedKey || typeof window === 'undefined') return null;
+  const use = loc === 'fa' ? 'fa-AF' : loc;
+  const known = ['en', 'simple', 'uk', 'ru', 'es', 'ar', 'fa-AF', 'rw', 'ti'];
+  if (!known.includes(use)) return null;
+  const api = (window as unknown as { KulibertI18n?: { t?: (k: string, l?: string) => string } }).KulibertI18n;
+  if (!api || typeof api.t !== 'function') return null;
+  const word = api.t(sharedKey, use);
+  return word || null;
 }
 
 export function t(locale: Locale | null | undefined, key: string, vars?: Record<string, string>): string {
   const loc = asLocale(locale);
   const row = STR[key];
-  let out = row ? row[loc] || row.en : key;
+  let out = sharedChrome(key, loc) || (row ? row[loc] || row.en : '') || key;
+  if (!out) out = key;
   if (vars) {
     for (const [k, v] of Object.entries(vars)) out = out.replaceAll(`{${k}}`, v);
   }
   return out;
+}
+
+const HUB_LANGS = new Set(['en', 'uk', 'ru', 'es', 'ar', 'fa-AF', 'rw', 'ti']);
+
+/** Tell the Hub this language. Cubano and Simple stay inside Baboo. */
+export function publishHubLocale(locale: Locale | null | undefined): void {
+  const loc = asLocale(locale);
+  if (!HUB_LANGS.has(loc)) return;
+  const dir = loc === 'ar' || loc === 'fa-AF' ? 'rtl' : 'ltr';
+  const prefs = (window as unknown as { KulibertPrefs?: { lang?: string; set?: (p: { lang: string }) => void } }).KulibertPrefs;
+  try {
+    if (prefs && typeof prefs.set === 'function' && prefs.lang !== loc) prefs.set({ lang: loc });
+  } catch { /* ignore */ }
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'kulibert-lang', lang: loc, dir }, '*');
+    }
+  } catch { /* ignore */ }
 }
 
 export function tt(
@@ -2126,7 +2228,7 @@ export function ellToolParts(
 ): { en: string; home: string | null } {
   const en = t('en', key);
   const loc = asLocale(locale);
-  if (loc === 'en') return { en, home: null };
+  if (loc === 'en' || loc === 'simple') return { en, home: null };
   const home = homePhrase(t(loc, key), en);
   if (!home || home === en) return { en, home: null };
   return { en, home };

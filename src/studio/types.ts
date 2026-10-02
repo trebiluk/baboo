@@ -231,7 +231,7 @@ export type WallTintId =
   | 'cream' | 'blush' | 'navy' | 'charcoal' | 'butter' | 'mint' | 'terra';
 
 /** Classroom UI language. Cubano is Cuban Spanish, distinct from Español. */
-export type Locale = 'en' | 'es' | 'cu' | 'uk' | 'ru' | 'ti' | 'fa';
+export type Locale = 'en' | 'simple' | 'es' | 'cu' | 'uk' | 'ru' | 'ti' | 'fa' | 'fa-AF' | 'ar' | 'rw';
 
 /** How much help vs how many tools — Settings and New project. */
 export type SkillLevel = 'novice' | 'beginner' | 'moderate' | 'expert';
