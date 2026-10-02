@@ -172,6 +172,17 @@ export const STR: Record<string, Gloss> = {
     ar: 'لم يعد شيء مقطوعًا في أسفل الشاشة.',
     rw: 'Nta kintu kigicibwa hasi kuri ecran.',
   }),
+  'news.menu': g('One Menu button, at the top left. Nothing covers Select.', {
+    es: 'Un solo botón de Menú, arriba a la izquierda. Nada tapa Elegir (Select).',
+    cu: 'Un solo botón de Menú, arriba a la izquierda. Nada tapa Escoger (Select).',
+    uk: 'Одна кнопка Меню, вгорі ліворуч. Ніщо не закриває Обрати (Select).',
+    ru: 'Одна кнопка Меню, вверху слева. Ничто не закрывает Выбрать (Select).',
+    ti: 'ሓደ ናይ ምናሌ መጠወቒ ኣብ ላዕሊ ጸጋም። ንምረጽ (Select) ዝሽፍኖ ነገር የለን።',
+    fa: 'فقط یک دکمه منو، بالا سمت چپ. هیچ چیز روی انتخاب (Select) را نمی‌پوشاند.',
+    'fa-AF': 'تنها یک دکمهٔ منو، بالا طرف چپ. هیچ چیزی روی انتخاب (Select) را نمی‌پوشاند.',
+    ar: 'زر قائمة واحد، في أعلى اليسار. لا شيء يغطي تحديد (Select).',
+    rw: "Buto imwe y'Ibikubiyemo, hejuru ibumoso. Nta kintu gipfuka Hitamo (Select).",
+  }),
   'chrome.help': g('Help', {
     es: 'Ayuda', cu: 'Ayuda', uk: 'Допомога', ru: 'Помощь', ti: 'ሓገዝ', fa: 'راهنما',
   }),

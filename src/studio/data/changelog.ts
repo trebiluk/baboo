@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.9',
+    date: '2026-10-02',
+    bullets: [
+      'One Menu button, at the top left. Nothing covers Select.',
+    ],
+  },
+  {
     version: '2.13.8',
     date: '2026-10-02',
     bullets: [

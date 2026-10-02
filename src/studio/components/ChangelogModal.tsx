@@ -23,7 +23,7 @@ export function ChangelogModal() {
         {CHANGELOG_ENTRIES.map((n) => (
           <article key={n.version} className="change-block">
             <h3>{n.version} <span className="muted">{n.date}</span></h3>
-            <ul>{n.bullets.map((i) => <li key={i}>{i === t('en', 'news.line') ? t(locale, 'news.line') : i === t('en', 'news.fit') ? t(locale, 'news.fit') : i}</li>)}</ul>
+            <ul>{n.bullets.map((i) => <li key={i}>{i === t('en', 'news.line') ? t(locale, 'news.line') : i === t('en', 'news.fit') ? t(locale, 'news.fit') : i === t('en', 'news.menu') ? t(locale, 'news.menu') : i}</li>)}</ul>
           </article>
         ))}
       </div>

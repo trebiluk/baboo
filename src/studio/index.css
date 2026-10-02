@@ -4683,6 +4683,11 @@ html:not([data-gui-theme="ink"]) {
 .app-shell.is-phone .tool-rail {
   top:max(4px, env(safe-area-inset-top, 0px))
 }
+/* 2.13.9 — the phone chrome is a 48px row laid over the stage, so the
+   rail starts under it (like .plan-taps) and Select is not covered. */
+.app-shell.is-phone:has(.chrome:not(.is-hidden)) .tool-rail {
+  top:52px
+}
 .app-shell.is-phone .plan-taps {
   top:52px;
   left:64px;
@@ -5177,7 +5182,9 @@ html[dir="rtl"] canvas {
 .app-shell.is-phone .chrome-left > .save-chip {
   display: none !important;
 }
-.app-shell.is-phone .menu-btn {
+/* 2.13.9 — when the Hub bar hides Baboo's Menu as a duplicate
+   (.kb-menu-dupe), it stays hidden: the Hub ☰ opens Baboo's menu. */
+.app-shell.is-phone .menu-btn:not(.kb-menu-dupe) {
   display: inline-flex !important;
 }
 body.kb-on .app-shell.is-phone .chrome {

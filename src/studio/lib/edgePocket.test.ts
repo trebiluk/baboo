@@ -8,10 +8,15 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
-  it('chips 2.13.8 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.13.8');
+describe('2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
+  it('chips 2.13.9 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.13.9');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.13\.9'/);
+    assert.match(changelog, /One Menu button, at the top left/);
+    for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) assert.notEqual(t(l, 'news.menu'), t('en', 'news.menu'));
+    const menuCss = readFileSync(join(studio, 'index.css'), 'utf8');
+    assert.match(menuCss, /\.app-shell\.is-phone \.menu-btn:not\(\.kb-menu-dupe\)/);
     assert.match(changelog, /version:\s*'2\.13\.8'/);
     assert.match(changelog, /Nothing is cut off at the bottom of the screen/);
     for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) assert.notEqual(t(l, 'news.fit'), t('en', 'news.fit'));
