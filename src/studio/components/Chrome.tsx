@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
 import { BABOO_LOGO } from '../logo';
 import { Icon } from '../icons';
 import { ClassShareModal } from './ClassShareModal';
 import { VersionChip } from './VersionChip';
 import { t, tipLoc } from '../data/i18n';
-import { planIsClosed } from '../data/skill';
 
 export function Chrome() {
   const title = useProjectStore((s) => s.doc.meta.title);
@@ -32,15 +31,15 @@ export function Chrome() {
   const setViewMode = useProjectStore((s) => s.setViewMode);
   const setRenderTier = useProjectStore((s) => s.setRenderTier);
   const viewMode = useProjectStore((s) => s.viewMode);
-  const floor = useProjectStore((s) => s.doc.floors[0]);
   const saveCard = useProjectStore((s) => s.saveCard);
   const clearSaveCard = useProjectStore((s) => s.clearSaveCard);
-  const closed = planIsClosed(floor);
   const teachingOpen = useProjectStore((s) => s.teachingOpen);
   const helpOpen = useProjectStore((s) => s.helpOpen);
   const fileRef = useRef<HTMLInputElement>(null);
   const moreRef = useRef<HTMLDivElement>(null);
   const [moreOpen, setMoreOpen] = useState(false);
+  const moreBtnRef = useRef<HTMLButtonElement>(null);
+  const [morePlace, setMorePlace] = useState<CSSProperties | undefined>(undefined);
   const [menuOpen, setMenuOpen] = useState(false);
   const [teacherChrome, setTeacherChrome] = useState(false);
   const [classShareOpen, setClassShareOpen] = useState(false);
@@ -56,6 +55,27 @@ export function Chrome() {
     };
     document.addEventListener('mousedown', onDoc);
     return () => document.removeEventListener('mousedown', onDoc);
+  }, [moreOpen]);
+
+  /* The bar clips its children (overflow hidden on narrow and touch layouts),
+     so the More menu is fixed to the screen, hung under the More button. */
+  useEffect(() => {
+    if (!moreOpen) return;
+    const place = () => {
+      const btn = moreBtnRef.current;
+      if (!btn) return;
+      const r = btn.getBoundingClientRect();
+      const top = Math.round(r.bottom + 6);
+      const right = Math.max(8, Math.round(window.innerWidth - r.right));
+      setMorePlace({
+        '--more-top': `${top}px`,
+        '--more-right': `${right}px`,
+        '--more-max-h': `${Math.max(160, window.innerHeight - top - 8)}px`,
+      } as CSSProperties);
+    };
+    place();
+    window.addEventListener('resize', place);
+    return () => window.removeEventListener('resize', place);
   }, [moreOpen]);
 
   useEffect(() => {
@@ -183,10 +203,9 @@ export function Chrome() {
             type="button"
             className={`ghost-btn aw-pressable chrome-ico ${viewMode === 'dollhouse' ? 'active' : ''}`}
             onClick={() => setViewMode('dollhouse')}
-            title={closed ? t(locale, 'chrome.dollhouse') : 'Close the walls first'}
+            title={t(locale, 'chrome.dollhouse')}
             aria-label={t(locale, 'chrome.dollhouse')}
             aria-pressed={viewMode === 'dollhouse'}
-            disabled={!closed}
           >
             <Icon name="room" />
             <span className="chrome-label">{t(locale, 'chrome.dollhouse')}</span>
@@ -195,10 +214,9 @@ export function Chrome() {
             type="button"
             className={`ghost-btn aw-pressable chrome-ico ${viewMode !== 'plan' && viewMode !== 'dollhouse' ? 'active' : ''}`}
             onClick={() => { setRenderTier(3); setViewMode('solid3d'); }}
-            title={closed ? t(locale, 'chrome.view3d') : 'Close the walls first'}
+            title={t(locale, 'chrome.view3d')}
             aria-label={t(locale, 'chrome.view3d')}
             aria-pressed={viewMode !== 'plan' && viewMode !== 'dollhouse'}
-            disabled={!closed}
           >
             <Icon name="view3d" />
             <span className="chrome-label">{t(locale, 'chrome.view3d')}</span>
@@ -229,6 +247,7 @@ export function Chrome() {
         <div className="chrome-more" ref={moreRef}>
           <button
             type="button"
+            ref={moreBtnRef}
             className={`ghost-btn aw-pressable chrome-more-btn chrome-ico chrome-hamburger${moreOpen ? ' active' : ''}`}
             aria-expanded={moreOpen}
             aria-haspopup="menu"
@@ -240,7 +259,7 @@ export function Chrome() {
             <span className="chrome-label">{t(locale, 'chrome.more')}</span>
           </button>
           {moreOpen && (
-            <div className="chrome-more-menu" role="menu">
+            <div className="chrome-more-menu" role="menu" style={morePlace}>
               <div className="chrome-menu-id">
                 <img className="brand-logo" src={BABOO_LOGO} alt="" width={28} height={28} decoding="async" />
                 <VersionChip onTeacher={() => setTeacherChrome(true)} />
@@ -256,7 +275,7 @@ export function Chrome() {
               <button type="button" role="menuitem" className={`ghost-btn aw-pressable chrome-ico${teachingOpen ? ' active' : ''}`} onClick={runAndClose(toggleTeaching)} aria-pressed={teachingOpen}><Icon name="teach" /> {t(locale, 'chrome.teach')}</button>
               <button type="button" role="menuitem" className={`ghost-btn aw-pressable chrome-ico${helpOpen ? ' active' : ''}`} onClick={runAndClose(toggleHelp)} aria-pressed={helpOpen}><Icon name="help" /> {t(locale, 'chrome.help')}</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(fitPlan)} disabled={!canEdit}><Icon name="fit" /> {t(locale, 'chrome.fit')}</button>
-              <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => newFromTemplate('mansion'))}><Icon name="room" /> The Mansion</button>
+              <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => newFromTemplate('mansion'))}><Icon name="room" /> {t(locale, 'chrome.mansion')}</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => openNewProject(true))}><Icon name="new" /> {t(locale, 'chrome.new')}</button>
               <button type="button" role="menuitem" className="ghost-btn aw-pressable chrome-ico" onClick={runAndClose(() => fileRef.current?.click())}><Icon name="import" /> {t(locale, 'chrome.import')}</button>
               {teacherChrome && (
@@ -307,15 +326,15 @@ export function Chrome() {
           <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(() => fileRef.current?.click())}>{t(locale, 'chrome.import')}</button>
           <h3 className="menu-kicker">{t(locale, 'chrome.view')}</h3>
           <button type="button" className={`ghost-btn aw-pressable${viewMode === 'plan' ? ' active' : ''}`} aria-pressed={viewMode === 'plan'} onClick={runAndClose(() => { setRenderTier(0); setViewMode('plan'); })}>{t(locale, 'chrome.plan')}</button>
-          <button type="button" className={`ghost-btn aw-pressable${isDollhouse ? ' active' : ''}`} aria-pressed={isDollhouse} disabled={!closed} onClick={runAndClose(() => setViewMode('dollhouse'))}>{t(locale, 'chrome.dollhouse')}</button>
-          <button type="button" className={`ghost-btn aw-pressable${viewMode !== 'plan' && !isDollhouse ? ' active' : ''}`} aria-pressed={viewMode !== 'plan' && !isDollhouse} disabled={!closed} onClick={runAndClose(() => { setRenderTier(3); setViewMode('solid3d'); })}>{t(locale, 'chrome.view3d')}</button>
+          <button type="button" className={`ghost-btn aw-pressable${isDollhouse ? ' active' : ''}`} aria-pressed={isDollhouse} onClick={runAndClose(() => setViewMode('dollhouse'))}>{t(locale, 'chrome.dollhouse')}</button>
+          <button type="button" className={`ghost-btn aw-pressable${viewMode !== 'plan' && !isDollhouse ? ' active' : ''}`} aria-pressed={viewMode !== 'plan' && !isDollhouse} onClick={runAndClose(() => { setRenderTier(3); setViewMode('solid3d'); })}>{t(locale, 'chrome.view3d')}</button>
           <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(undo)} disabled={!canEdit}>{t(locale, 'chrome.undo')}</button>
           <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(redo)} disabled={!canEdit}>{t(locale, 'chrome.redo')}</button>
           <button type="button" className={`ghost-btn aw-pressable${helpOpen ? ' active' : ''}`} aria-pressed={helpOpen} onClick={runAndClose(toggleHelp)}>{t(locale, 'chrome.help')}</button>
           <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(focus ? exitFocus : enterFocus)}>{t(locale, focus ? 'chrome.exitFull' : 'chrome.full')}</button>
           <button type="button" className={`ghost-btn aw-pressable${teachingOpen ? ' active' : ''}`} aria-pressed={teachingOpen} onClick={runAndClose(toggleTeaching)}>{t(locale, 'chrome.teach')}</button>
           <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(fitPlan)} disabled={!canEdit}>{t(locale, 'chrome.fit')}</button>
-          <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(() => newFromTemplate('mansion'))}>The Mansion</button>
+          <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(() => newFromTemplate('mansion'))}>{t(locale, 'chrome.mansion')}</button>
           <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(() => openNewProject(true))}>{t(locale, 'chrome.new')}</button>
           {teacherChrome ? (
             <>

@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.7',
+    date: '2026-10-02',
+    bullets: [
+      '3D View and Dollhouse open every time. More shows whole words. Ink is easy to read.',
+    ],
+  },
+  {
     version: '2.13.6',
     date: '2026-10-02',
     bullets: [

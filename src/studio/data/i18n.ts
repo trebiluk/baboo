@@ -1497,6 +1497,10 @@ export const STR: Record<string, Gloss> = {
   'chrome.more': g('More', {
     es: 'Más', cu: 'Más', uk: 'Ще', ru: 'Ещё', ti: 'ተወሳኺ', fa: 'بیشتر',
   }),
+  'chrome.mansion': g('The Mansion', {
+    es: 'La mansión', cu: 'La mansión', uk: 'Особняк', ru: 'Особняк', ti: 'ዓቢ ገዛ', fa: 'عمارت',
+    'fa-AF': 'عمارت', ar: 'القصر', rw: 'Inzu nini',
+  }),
   'chrome.full': g('Full screen', {
     es: 'Pantalla completa', cu: 'Pantalla completa', uk: 'На весь екран', ru: 'На весь экран', ti: 'ምሉእ ስክሪን', fa: 'تمام‌صفحه',
   }),

@@ -8,10 +8,14 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.13.6 safety update', () => {
-  it('chips 2.13.6 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.13.6');
+describe('2.13.7 view buttons, More menu, Ink', () => {
+  it('chips 2.13.7 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.13.7');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.13\.7'/);
+    assert.match(changelog, /3D View and Dollhouse open every time/);
+    const chrome = readFileSync(join(studio, 'components/Chrome.tsx'), 'utf8');
+    assert.doesNotMatch(chrome, /disabled=\{!closed\}/);
     assert.match(changelog, /version:\s*'2\.13\.6'/);
     assert.match(changelog, /Safety update to the app engine/);
     assert.match(changelog, /version:\s*'2\.13\.5'/);

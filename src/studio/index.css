@@ -221,6 +221,66 @@ html[data-gui-theme=blocky] {
   --lightningcss-dark: ;
   color-scheme:only light
 }
+/* 2.13.7 — one set of surface, fill and icon tokens per theme.
+   Bars, drawers, menus and cards read these, so Ink is never light-on-white
+   and no text drops under 4.5:1 (icons under 3:1). */
+:root,
+html[data-gui-theme=stark] {
+  --aw-panel:#fff;
+  --aw-fill:#5b5fe8;
+  --aw-fill-hover:var(--aw-deep);
+  --aw-on-fill:#fff;
+  --aw-active-soft:color-mix(in srgb, var(--aw-royal) 12%, var(--aw-panel));
+  --aw-active-fg:var(--aw-deep);
+  --aw-icon-ink:brightness(0);
+  --aw-icon-on-fill:brightness(0) invert(1);
+  --aw-icon-opacity:.78;
+  --aw-check:#3f3db8;
+  --aw-icon-base:none;
+  --aw-subtle:#63636b
+}
+html[data-gui-theme=ink] {
+  --aw-panel:#121a2b;
+  --aw-fill:#2563eb;
+  --aw-fill-hover:#1d4ed8;
+  --aw-on-fill:#fff;
+  --aw-active-soft:color-mix(in srgb, var(--aw-royal) 24%, var(--aw-panel));
+  --aw-active-fg:#bfdbfe;
+  --aw-icon-ink:brightness(0) invert(1);
+  --aw-icon-on-fill:brightness(0) invert(1);
+  --aw-icon-opacity:.9;
+  --aw-check:#60a5fa;
+  --aw-icon-base:brightness(0) invert(1);
+  --aw-subtle:#8b9ab3
+}
+html[data-gui-theme=projector] {
+  --aw-panel:#fff;
+  --aw-fill:#1d4ed8;
+  --aw-fill-hover:#172554;
+  --aw-on-fill:#fff;
+  --aw-active-soft:color-mix(in srgb, var(--aw-royal) 12%, var(--aw-panel));
+  --aw-active-fg:var(--aw-deep);
+  --aw-icon-ink:brightness(0);
+  --aw-icon-on-fill:brightness(0) invert(1);
+  --aw-icon-opacity:.85;
+  --aw-check:#1d4ed8
+}
+html[data-gui-theme=blocky] {
+  --aw-panel:#fff;
+  --aw-fill:#3d6e28;
+  --aw-fill-hover:#2c5220;
+  --aw-on-fill:#fff8e7;
+  --aw-active-soft:color-mix(in srgb, var(--aw-royal) 14%, var(--aw-panel));
+  --aw-active-fg:#2c5220;
+  --aw-icon-ink:brightness(0);
+  --aw-icon-on-fill:brightness(0) invert(1);
+  --aw-icon-opacity:.85;
+  --aw-check:#3d6e28
+}
+input[type=checkbox],
+input[type=radio] {
+  accent-color:var(--aw-check)
+}
 * {
   box-sizing:border-box
 }
@@ -2616,6 +2676,7 @@ html.aw-teaching-open, body.aw-teaching-open {
   border-color:var(--aw-due)
 }
 .tool-icon {
+  filter:var(--aw-icon-base);
   object-fit:contain;
   pointer-events:none;
   flex-shrink:0;
@@ -3468,8 +3529,8 @@ html[data-gui-theme=blocky] .tool-rail-label {
 html[data-gui-theme=blocky] .tool-rail-btn.active,
 html[data-gui-theme=blocky] .chrome-ico.active,
 html[data-gui-theme=blocky] .aw-shell-chip.active {
-  background: #8bc34a;
-  color: #1a1208;
+  background: var(--aw-fill);
+  color: var(--aw-on-fill);
   box-shadow: 2px 2px 0 #1a1208;
   transform: translate(2px, 2px);
 }
@@ -3888,11 +3949,11 @@ html[data-udl-contrast] .dyn-go {
 .tool-rail.is-fancy .tool-rail-btn.active.is-current {
   background:color-mix(in srgb, var(--aw-royal) 16%, var(--aw-elevated));
   border-color:color-mix(in srgb, var(--aw-royal) 50%, var(--aw-border));
-  color:var(--aw-deep);
+  color:var(--aw-active-fg);
   text-decoration:none
 }
 .tool-rail.is-fancy .tool-rail-btn.active .tool-icon {
-  filter:none
+  filter:var(--aw-icon-base)
 }
 .tool-rail.is-fancy .tool-rail-label {
   width:auto;
@@ -4079,7 +4140,7 @@ html[data-ell-english] {
 
 /* 2.2.3 — one desk. Stark stays. Touch targets stay at least 44px. */
 .chrome {
-  background:#fff;
+  background:var(--aw-panel);
   border-bottom:1px solid var(--aw-border);
   box-shadow:none;
   gap:8px;
@@ -4144,7 +4205,7 @@ html[data-ell-english] {
   background:var(--aw-hover)
 }
 .title-input:focus {
-  background:#fff;
+  background:var(--aw-panel);
   border-color:var(--aw-royal)
 }
 .save-chip {
@@ -4184,16 +4245,16 @@ html[data-ell-english] {
   background:var(--aw-hover)
 }
 .chrome .tool-icon {
-  filter:brightness(0);
-  opacity:.78
+  filter:var(--aw-icon-ink);
+  opacity:var(--aw-icon-opacity)
 }
 .chrome .ghost-btn.active {
-  background:color-mix(in srgb, var(--aw-royal) 12%, #fff);
+  background:var(--aw-active-soft);
   border-color:transparent;
-  color:var(--aw-deep)
+  color:var(--aw-active-fg)
 }
 .chrome .ghost-btn.active .tool-icon {
-  filter:brightness(0);
+  filter:var(--aw-icon-ink);
   opacity:1
 }
 .chrome-view {
@@ -4209,26 +4270,27 @@ html[data-ell-english] {
   padding:0 10px
 }
 .chrome-view .ghost-btn.active {
-  background:var(--aw-royal);
-  color:#fff
+  background:var(--aw-fill);
+  color:var(--aw-on-fill)
 }
 .chrome-view .ghost-btn.active .tool-icon,
 .chrome .chrome-primary .tool-icon {
-  filter:brightness(0) invert(1);
+  filter:var(--aw-icon-on-fill);
   opacity:1
 }
 .chrome .chrome-primary {
-  background:var(--aw-royal);
+  background:var(--aw-fill);
   border-color:transparent;
-  color:#fff;
+  color:var(--aw-on-fill);
   border-radius:10px
 }
 .chrome .chrome-primary:hover {
-  background:var(--aw-deep);
-  color:#fff
+  background:var(--aw-fill-hover);
+  color:var(--aw-on-fill)
 }
 .chrome-more-menu {
-  background:#fff;
+  background:var(--aw-panel);
+  color:var(--aw-fg);
   border-radius:12px;
   min-width:220px;
   padding:6px;
@@ -4240,8 +4302,8 @@ html[data-ell-english] {
   border-radius:8px
 }
 .chrome-more-menu .tool-icon {
-  filter:brightness(0);
-  opacity:.78
+  filter:var(--aw-icon-ink);
+  opacity:var(--aw-icon-opacity)
 }
 
 .tool-rail.edge-pocket.is-fancy {
@@ -4250,7 +4312,7 @@ html[data-ell-english] {
 .edge-pocket-col {
   gap:2px;
   padding:4px;
-  background:#fff;
+  background:var(--aw-panel);
   border:1px solid var(--aw-border);
   border-radius:14px;
   box-shadow:0 1px 2px #0a0a0a0d, 0 10px 28px #0a0a0a14
@@ -4318,7 +4380,7 @@ html[data-ell-english] {
   max-width:calc(100% - 92px);
   gap:2px;
   padding:3px;
-  background:#fff;
+  background:var(--aw-panel);
   border:1px solid var(--aw-border);
   border-radius:12px;
   box-shadow:0 1px 2px #0a0a0a0c, 0 6px 16px #0a0a0a10
@@ -4333,8 +4395,8 @@ html[data-ell-english] {
   font-weight:600
 }
 .plan-tap[aria-pressed="true"] {
-  background:color-mix(in srgb, var(--aw-royal) 14%, #fff);
-  color:var(--aw-deep);
+  background:var(--aw-active-soft);
+  color:var(--aw-active-fg);
   border-color:transparent
 }
 .stage-stack:has(.edge-pocket.is-open) .plan-taps,
@@ -4357,10 +4419,10 @@ html[data-ell-english] {
   box-shadow:none;
   color:var(--aw-muted);
   font-weight:500;
-  text-shadow:0 1px 0 #fff, 0 0 2px #fff
+  text-shadow:0 1px 0 var(--aw-panel), 0 0 2px var(--aw-panel)
 }
 .plan-sheet {
-  background:#fff;
+  background:var(--aw-panel);
   border-radius:0 8px 8px 0;
   left:68px;
   box-shadow:0 1px 2px #0a0a0a0a
@@ -4473,7 +4535,7 @@ html:not([data-gui-theme="ink"]) {
   min-height:64px;
   text-align:left;
   border:1px solid var(--aw-border);
-  background:#fff;
+  background:var(--aw-panel);
   border-radius:12px;
   padding:10px 12px;
   display:flex;
@@ -4494,7 +4556,7 @@ html:not([data-gui-theme="ink"]) {
 }
 .look-chip.active {
   border-color:var(--aw-royal);
-  background:color-mix(in srgb, var(--aw-royal) 12%, #fff);
+  background:var(--aw-active-soft);
   box-shadow:inset 3px 0 0 var(--aw-royal)
 }
 .look-chip:focus-visible {
@@ -4517,7 +4579,7 @@ html:not([data-gui-theme="ink"]) {
   padding:2px 4px!important;
   padding-top:max(2px, env(safe-area-inset-top, 0px))!important;
   gap:2px!important;
-  background:color-mix(in srgb, #fff 94%, transparent);
+  background:color-mix(in srgb, var(--aw-panel) 94%, transparent);
   border-bottom:none;
   box-shadow:0 1px 0 var(--aw-border);
   overflow:hidden
@@ -4550,7 +4612,7 @@ html:not([data-gui-theme="ink"]) {
   place-items:center;
   border:1px solid var(--aw-border);
   border-radius:12px;
-  background:#fff;
+  background:var(--aw-panel);
   box-shadow:0 6px 18px #0a0a0a22
 }
 .chrome-restore img {
@@ -4788,8 +4850,8 @@ html:not([data-gui-theme="ink"]) {
   align-items:center;
   gap:12px;
   max-width:none;
-  background:#fff;
-  color:#1a1a1a;
+  background:var(--aw-panel);
+  color:var(--aw-fg);
   border:1px solid var(--aw-border);
   border-radius:14px;
   padding:8px 10px 8px 16px;
@@ -4848,8 +4910,8 @@ html:not([data-gui-theme="ink"]) {
   display:flex;
   align-items:center;
   gap:12px;
-  background:#fff;
-  color:#1a1a1a;
+  background:var(--aw-panel);
+  color:var(--aw-fg);
   border:1px solid var(--aw-border);
   border-radius:12px;
   padding:12px 14px;
@@ -4988,6 +5050,52 @@ html:not([data-gui-theme="ink"]) {
     text-align: center;
   }
 }
+/* 2.13.7 — More menu items are rows. The 68px bar-tile rule above matched
+   them too (they carry .chrome-ico), so long words were cut ("Full screer").
+   The menu hangs from the More button and never leaves the screen. */
+@media (min-width: 641px) {
+  .chrome-right .chrome-more-menu {
+    position:fixed;
+    top:var(--more-top, 64px);
+    right:var(--more-right, 8px);
+    left:auto;
+    bottom:auto;
+    width:max-content;
+    min-width:220px;
+    max-width:min(320px, calc(100vw - 16px));
+    max-height:var(--more-max-h, calc(100dvh - 80px));
+    overflow-y:auto;
+    overflow-x:hidden;
+    z-index:calc(var(--aw-z-modals) + 4)
+  }
+}
+.chrome-right .chrome-more-menu {
+  color-scheme:inherit
+}
+.chrome-right .chrome-more-menu .chrome-ico,
+.chrome-right .chrome-more-menu [role=menuitem] {
+  flex:0 0 auto;
+  flex-direction:row;
+  justify-content:flex-start;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  min-width:0;
+  max-width:none;
+  min-height:44px;
+  height:auto;
+  padding:6px 12px;
+  overflow:visible;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  text-align:start;
+  font-size:14px;
+  line-height:1.25
+}
+html[dir="rtl"] .chrome-right .chrome-more-menu,
+html[data-dir="rtl"] .chrome-right .chrome-more-menu {
+  direction:rtl
+}
 @media (max-width: 914px) {
   .chrome-right .chrome-ico,
   .chrome-right .chrome-view,
@@ -5016,7 +5124,7 @@ html:not([data-gui-theme="ink"]) {
     border-top: 0 !important;
     border-radius: 0 !important;
     z-index: 100;
-    background: #fff !important;
+    background: var(--aw-panel) !important;
   }
 }
 html[dir="rtl"] .menu-drawer,
