@@ -2772,14 +2772,21 @@ html.aw-teaching-open, body.aw-teaching-open {
   }
 }
 @media (width<=1100px) {
-  html, body, #root, #app, .app-shell {
+  html, body, #root, #app {
     height:100svh;
     height:100dvh;
     max-height:100svh;
     max-height:100dvh;
     overflow:hidden
   }
+  /* 2.13.8 — the shell fills the body's content box. With the Hub bar on,
+     body.kb-on has padding-top:48px, so a 100dvh shell ran 48px past the
+     bottom of the screen and hid What's new. Inside the Hub (kb-framed) the
+     padding is 0, so this is still the full screen there. */
   .app-shell {
+    height:100%;
+    max-height:100%;
+    overflow:hidden;
     padding-left:env(safe-area-inset-left, 0px);
     padding-right:env(safe-area-inset-right, 0px)
   }

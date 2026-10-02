@@ -161,6 +161,17 @@ export const STR: Record<string, Gloss> = {
     ar: 'يتبع Baboo لغة المنصة. الإعدادات والقائمة تفتح على اليسار.',
     rw: 'Baboo ikurikira ururimi rwa Hub. Igenamiterere n\'ibikubiyemo bifunguka ibumoso.',
   }),
+  'news.fit': g('Nothing is cut off at the bottom of the screen.', {
+    es: 'Ya no se corta nada en la parte de abajo de la pantalla.',
+    cu: 'Ya no se corta nada en la parte de abajo de la pantalla.',
+    uk: 'Унизу екрана більше нічого не обрізано.',
+    ru: 'Внизу экрана больше ничего не обрезано.',
+    ti: 'ኣብ ታሕቲ ስክሪን ሕጂ ዝቑረጽ ነገር የለን።',
+    fa: 'دیگر چیزی در پایین صفحه بریده نمی‌شود.',
+    'fa-AF': 'دیگر هیچ چیزی در پایین صفحه بریده نمی‌شود.',
+    ar: 'لم يعد شيء مقطوعًا في أسفل الشاشة.',
+    rw: 'Nta kintu kigicibwa hasi kuri ecran.',
+  }),
   'chrome.help': g('Help', {
     es: 'Ayuda', cu: 'Ayuda', uk: 'Допомога', ru: 'Помощь', ti: 'ሓገዝ', fa: 'راهنما',
   }),
