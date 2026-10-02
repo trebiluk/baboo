@@ -4978,6 +4978,12 @@ html:not([data-gui-theme="ink"]) {
   align-items: stretch;
   gap: 8px;
 }
+/* 2.13.10 — on a direct load the Hub bar (fixed, 48px, z 90) sits over the
+   top of the drawer, so its Close was under the bar. Start the drawer under
+   it. Inside the Hub (kb-framed) there is no bar in the frame. */
+html:not(.kb-framed) body.kb-on .menu-drawer {
+  top: 48px;
+}
 .menu-drawer .ghost-btn {
   width: 100%;
   min-height: 44px;

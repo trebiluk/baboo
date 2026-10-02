@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.10 — 2026-10-02 — Menu Close
+- The Menu starts under the top bar, so Close is easy to tap.
+
 ## 2.13.9 — 2026-10-02 — One Menu
 - One Menu button, at the top left. Nothing covers Select.
 

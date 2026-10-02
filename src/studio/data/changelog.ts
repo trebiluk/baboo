@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.10',
+    date: '2026-10-02',
+    bullets: [
+      'The Menu starts under the top bar, so Close is easy to tap.',
+    ],
+  },
+  {
     version: '2.13.9',
     date: '2026-10-02',
     bullets: [

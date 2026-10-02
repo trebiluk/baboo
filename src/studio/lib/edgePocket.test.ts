@@ -8,10 +8,15 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
-  it('chips 2.13.9 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.13.9');
+describe('2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
+  it('chips 2.13.10 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.13.10');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.13\.10'/);
+    assert.match(changelog, /The Menu starts under the top bar/);
+    for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) assert.notEqual(t(l, 'news.close'), t('en', 'news.close'));
+    const closeCss = readFileSync(join(studio, 'index.css'), 'utf8');
+    assert.match(closeCss, /html:not\(\.kb-framed\) body\.kb-on \.menu-drawer \{\s*top: 48px;/);
     assert.match(changelog, /version:\s*'2\.13\.9'/);
     assert.match(changelog, /One Menu button, at the top left/);
     for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) assert.notEqual(t(l, 'news.menu'), t('en', 'news.menu'));

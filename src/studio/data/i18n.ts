@@ -183,6 +183,17 @@ export const STR: Record<string, Gloss> = {
     ar: 'زر قائمة واحد، في أعلى اليسار. لا شيء يغطي تحديد (Select).',
     rw: "Buto imwe y'Ibikubiyemo, hejuru ibumoso. Nta kintu gipfuka Hitamo (Select).",
   }),
+  'news.close': g('The Menu starts under the top bar, so Close is easy to tap.', {
+    es: 'El Menú empieza debajo de la barra de arriba, así que Cerrar es fácil de tocar.',
+    cu: 'El Menú empieza debajo de la barra de arriba, así que Cerrar es fácil de tocar.',
+    uk: 'Меню починається під верхньою панеллю, тож «Закрити» легко натиснути.',
+    ru: 'Меню начинается под верхней панелью, поэтому «Закрыть» легко нажать.',
+    ti: 'ምናሌ ትሕቲ እቲ ላዕለዋይ መስመር ይጅምር፣ ስለዚ ዕጸው ብቐሊሉ ይጥወቕ።',
+    fa: 'منو زیر نوار بالا شروع می‌شود، پس زدن بستن آسان است.',
+    'fa-AF': 'منو زیر نوار بالا شروع می‌شود، پس زدن بستن آسان است.',
+    ar: 'تبدأ القائمة تحت الشريط العلوي، لذا يسهل الضغط على إغلاق.',
+    rw: "Ibikubiyemo bitangirira munsi y'umurongo wo hejuru, bityo Funga ikandika byoroshye.",
+  }),
   'chrome.help': g('Help', {
     es: 'Ayuda', cu: 'Ayuda', uk: 'Допомога', ru: 'Помощь', ti: 'ሓገዝ', fa: 'راهنما',
   }),
