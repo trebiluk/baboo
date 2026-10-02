@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.6',
+    date: '2026-10-02',
+    bullets: [
+      'Safety update to the app engine.',
+    ],
+  },
+  {
     version: '2.13.5',
     date: '2026-10-02',
     bullets: [
