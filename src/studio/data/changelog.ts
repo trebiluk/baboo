@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.5',
+    date: '2026-10-02',
+    bullets: [
+      'Baboo follows your Hub language. Settings and the menu open on the left.',
+    ],
+  },
+  {
     version: '2.13.4',
     date: '2026-10-02',
     bullets: [

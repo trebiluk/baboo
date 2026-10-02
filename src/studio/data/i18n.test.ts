@@ -81,6 +81,11 @@ describe('i18n', () => {
     }
     assert.match(t('fa-AF', 'tool.wall'), /دیوار/);
     assert.equal(t('fa-AF', 'chrome.settings'), 'تنظیم');
+    assert.notEqual(t('ar', 'news.line'), t('en', 'news.line'));
+    assert.notEqual(t('uk', 'news.line'), t('en', 'news.line'));
+    assert.notEqual(t('ti', 'news.line'), t('en', 'news.line'));
+    assert.notEqual(t('fa-AF', 'news.line'), t('en', 'news.line'));
+    assert.match(t('en', 'news.line'), /Settings and the menu open on the left/);
   });
 
   it('fills every locale for every chrome key', () => {

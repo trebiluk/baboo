@@ -8,10 +8,12 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.13.4 hub languages', () => {
-  it('chips 2.13.4 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.13.4');
+describe('2.13.5 left menu', () => {
+  it('chips 2.13.5 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.13.5');
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    assert.match(changelog, /version:\s*'2\.13\.5'/);
+    assert.match(changelog, /Baboo follows your Hub language/);
     assert.match(changelog, /version:\s*'2\.13\.4'/);
     assert.match(changelog, /Baboo follows the Hub language/);
     assert.match(changelog, /version:\s*'2\.13\.3'/);

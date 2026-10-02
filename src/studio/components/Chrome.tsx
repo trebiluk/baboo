@@ -21,6 +21,7 @@ export function Chrome() {
   const newFromTemplate = useProjectStore((s) => s.newFromTemplate);
   const toggleCustomize = useProjectStore((s) => s.toggleCustomize);
   const customizeOpen = useProjectStore((s) => s.customizeOpen);
+  const toggleChangelog = useProjectStore((s) => s.toggleChangelog);
   const toggleTeaching = useProjectStore((s) => s.toggleTeaching);
   const toggleHelp = useProjectStore((s) => s.toggleHelp);
   const toggleDebug = useProjectStore((s) => s.toggleDebug);
@@ -40,6 +41,7 @@ export function Chrome() {
   const fileRef = useRef<HTMLInputElement>(null);
   const moreRef = useRef<HTMLDivElement>(null);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [teacherChrome, setTeacherChrome] = useState(false);
   const [classShareOpen, setClassShareOpen] = useState(false);
   const [focus, setFocus] = useState(false);
@@ -52,16 +54,21 @@ export function Chrome() {
         setMoreOpen(false);
       }
     };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMoreOpen(false);
-    };
     document.addEventListener('mousedown', onDoc);
-    window.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDoc);
-      window.removeEventListener('keydown', onKey);
-    };
+    return () => document.removeEventListener('mousedown', onDoc);
   }, [moreOpen]);
+
+  useEffect(() => {
+    if (!menuOpen && !moreOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMenuOpen(false);
+        setMoreOpen(false);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [menuOpen, moreOpen]);
 
   useEffect(() => {
     try {
@@ -104,6 +111,7 @@ export function Chrome() {
 
   const runAndClose = (fn: () => void) => () => {
     setMoreOpen(false);
+    setMenuOpen(false);
     fn();
   };
 
@@ -115,6 +123,16 @@ export function Chrome() {
     <>
     <header className={`chrome${focus ? ' is-hidden' : ''}`} data-baboo-chrome="top">
       <div className="chrome-left">
+        <button
+          type="button"
+          className={`ghost-btn aw-pressable menu-btn${menuOpen ? ' active' : ''}`}
+          aria-expanded={menuOpen}
+          aria-controls="baboo-menu"
+          onClick={() => setMenuOpen((v) => !v)}
+        >
+          <span className="menu-mark" aria-hidden="true">☰</span>
+          <span className="menu-btn-label">{t(locale, 'chrome.menu')}</span>
+        </button>
         <div className="brand">
           <img
             className="brand-logo"
@@ -142,9 +160,11 @@ export function Chrome() {
       <div className="chrome-right">
         <button type="button" className="ghost-btn aw-pressable chrome-ico chrome-undo" onClick={undo} title={t(locale, 'chrome.undo')} aria-label={t(locale, 'chrome.undo')} disabled={!canEdit}>
           <Icon name="undo" />
+          <span className="chrome-label">{t(locale, 'chrome.undo')}</span>
         </button>
         <button type="button" className="ghost-btn aw-pressable chrome-ico chrome-wide" onClick={redo} title={t(locale, 'chrome.redo')} aria-label={t(locale, 'chrome.redo')} disabled={!canEdit}>
           <Icon name="redo" />
+          <span className="chrome-label">{t(locale, 'chrome.redo')}</span>
         </button>
 
         <div className="chrome-view" role="group" aria-label="Viewport">
@@ -157,6 +177,7 @@ export function Chrome() {
             aria-pressed={viewMode === 'plan'}
           >
             <Icon name="plan" />
+            <span className="chrome-label">{t(locale, 'chrome.plan')}</span>
           </button>
           <button
             type="button"
@@ -168,6 +189,7 @@ export function Chrome() {
             disabled={!closed}
           >
             <Icon name="room" />
+            <span className="chrome-label">{t(locale, 'chrome.dollhouse')}</span>
           </button>
           <button
             type="button"
@@ -179,15 +201,18 @@ export function Chrome() {
             disabled={!closed}
           >
             <Icon name="view3d" />
+            <span className="chrome-label">{t(locale, 'chrome.view3d')}</span>
           </button>
           <span className="view-only-chip" hidden={canEdit} title={t(locale, 'chrome.viewonly')}>{t(locale, 'chrome.viewonly')}</span>
         </div>
 
         <button type="button" className="ghost-btn aw-pressable chrome-primary chrome-ico chrome-ess" onClick={exportJson} title={t(locale, 'chrome.save')} aria-label={t(locale, 'chrome.save')}>
           <Icon name="save" />
+          <span className="chrome-label">{t(locale, 'chrome.save')}</span>
         </button>
         <button type="button" className="ghost-btn aw-pressable chrome-ico chrome-ess" onClick={() => fileRef.current?.click()} title={t(locale, 'chrome.import')} aria-label={t(locale, 'chrome.import')}>
           <Icon name="import" />
+          <span className="chrome-label">{t(locale, 'chrome.import')}</span>
         </button>
         <button
           type="button"
@@ -198,6 +223,7 @@ export function Chrome() {
           aria-pressed={customizeOpen}
         >
           <Icon name="settings" />
+          <span className="chrome-label">{t(locale, 'chrome.settings')}</span>
         </button>
 
         <div className="chrome-more" ref={moreRef}>
@@ -211,6 +237,7 @@ export function Chrome() {
             aria-label={t(locale, 'chrome.more')}
           >
             <Icon name="more" />
+            <span className="chrome-label">{t(locale, 'chrome.more')}</span>
           </button>
           {moreOpen && (
             <div className="chrome-more-menu" role="menu">
@@ -260,6 +287,50 @@ export function Chrome() {
         />
       </div>
     </header>
+    {menuOpen ? (
+      <>
+        <button type="button" className="menu-backdrop" aria-label={t(locale, 'chrome.close')} onClick={() => setMenuOpen(false)} />
+        <aside id="baboo-menu" className="menu-drawer" role="dialog" aria-labelledby="baboo-menu-title">
+          <div className="drawer-head">
+            <h2 id="baboo-menu-title">{t(locale, 'chrome.menu')}</h2>
+            <button type="button" className="ghost-btn secondary-btn aw-pressable" onClick={() => setMenuOpen(false)}>{t(locale, 'chrome.close')}</button>
+          </div>
+          <input
+            className="title-input menu-title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            aria-label={t(locale, 'chrome.projectName')}
+          />
+          <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(toggleChangelog)}>{t(locale, 'chrome.whatsNew')}</button>
+          <button type="button" className="ghost-btn aw-pressable" onClick={() => { setMenuOpen(false); setMoreOpen(false); if (!customizeOpen) toggleCustomize(); }}>{t(locale, 'chrome.settings')}</button>
+          <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(exportJson)}>{t(locale, 'chrome.save')}</button>
+          <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(() => fileRef.current?.click())}>{t(locale, 'chrome.import')}</button>
+          <h3 className="menu-kicker">{t(locale, 'chrome.view')}</h3>
+          <button type="button" className={`ghost-btn aw-pressable${viewMode === 'plan' ? ' active' : ''}`} aria-pressed={viewMode === 'plan'} onClick={runAndClose(() => { setRenderTier(0); setViewMode('plan'); })}>{t(locale, 'chrome.plan')}</button>
+          <button type="button" className={`ghost-btn aw-pressable${isDollhouse ? ' active' : ''}`} aria-pressed={isDollhouse} disabled={!closed} onClick={runAndClose(() => setViewMode('dollhouse'))}>{t(locale, 'chrome.dollhouse')}</button>
+          <button type="button" className={`ghost-btn aw-pressable${viewMode !== 'plan' && !isDollhouse ? ' active' : ''}`} aria-pressed={viewMode !== 'plan' && !isDollhouse} disabled={!closed} onClick={runAndClose(() => { setRenderTier(3); setViewMode('solid3d'); })}>{t(locale, 'chrome.view3d')}</button>
+          <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(undo)} disabled={!canEdit}>{t(locale, 'chrome.undo')}</button>
+          <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(redo)} disabled={!canEdit}>{t(locale, 'chrome.redo')}</button>
+          <button type="button" className={`ghost-btn aw-pressable${helpOpen ? ' active' : ''}`} aria-pressed={helpOpen} onClick={runAndClose(toggleHelp)}>{t(locale, 'chrome.help')}</button>
+          <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(focus ? exitFocus : enterFocus)}>{t(locale, focus ? 'chrome.exitFull' : 'chrome.full')}</button>
+          <button type="button" className={`ghost-btn aw-pressable${teachingOpen ? ' active' : ''}`} aria-pressed={teachingOpen} onClick={runAndClose(toggleTeaching)}>{t(locale, 'chrome.teach')}</button>
+          <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(fitPlan)} disabled={!canEdit}>{t(locale, 'chrome.fit')}</button>
+          <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(() => newFromTemplate('mansion'))}>The Mansion</button>
+          <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(() => openNewProject(true))}>{t(locale, 'chrome.new')}</button>
+          {teacherChrome ? (
+            <>
+              <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(() => exportGalleryCard())}>{t(locale, 'chrome.classCard')}</button>
+              <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(() => toggleContest())}>{t(locale, 'chrome.contestBaboo')}</button>
+              <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(() => toggleAccess())}>{t(locale, 'chrome.accessCheck')}</button>
+              <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(() => openDriveWizard(true))}>{t(locale, 'chrome.drive')}</button>
+              <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(() => setClassShareOpen(true))}>{t(locale, 'chrome.classFolder')}</button>
+              <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(() => seedCrowd(250))}>Crowd test · 250</button>
+              <button type="button" className="ghost-btn aw-pressable" onClick={runAndClose(toggleDebug)}>{t(locale, 'chrome.teacher')}</button>
+            </>
+          ) : null}
+        </aside>
+      </>
+    ) : null}
     {focus ? (
       <button type="button" className="chrome-restore aw-pressable" onClick={exitFocus} aria-label={t(locale, 'chrome.showBar')}>
         <img src={BABOO_LOGO} alt="" width={28} height={28} decoding="async" />

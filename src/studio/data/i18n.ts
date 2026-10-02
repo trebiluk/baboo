@@ -142,6 +142,25 @@ export const STR: Record<string, Gloss> = {
   'chrome.settings': g('Settings', {
     es: 'Ajustes', cu: 'Ajustes', uk: 'Налаштування', ru: 'Настройки', ti: 'ቅጥዕታት', fa: 'تنظیمات',
   }),
+  'chrome.menu': g('Menu', {
+    es: 'Menú', cu: 'Menú', uk: 'Меню', ru: 'Меню', ti: 'ምናሌ', fa: 'منو',
+    'fa-AF': 'منو', ar: 'القائمة', rw: 'Ibikubiyemo',
+  }),
+  'chrome.view': g('View', {
+    es: 'Vista', cu: 'Vista', uk: 'Вигляд', ru: 'Вид', ti: 'ትርኢት', fa: 'نما',
+    'fa-AF': 'نما', ar: 'عرض', rw: 'Reba',
+  }),
+  'news.line': g('Baboo follows your Hub language. Settings and the menu open on the left.', {
+    es: 'Baboo sigue el idioma del Hub. Ajustes y el menú se abren a la izquierda.',
+    cu: 'Baboo sigue el idioma del Hub. Ajustes y el menú se abren a la izquierda.',
+    uk: 'Baboo бере мову Хаба. Налаштування й меню відкриваються зліва.',
+    ru: 'Baboo берёт язык Хаба. Настройки и меню открываются слева.',
+    ti: 'Baboo ናይ ሃብ ቋንቋ ይከተል። ቅጥዕታትን ምናሌን ኣብ ጸጋም ይኽፈቱ።',
+    fa: 'Baboo زبان هاب را دنبال می‌کند. تنظیمات و منو از چپ باز می‌شوند.',
+    'fa-AF': 'Baboo زبان هاب را می‌گیرد. تنظیم و منو از دست چپ باز می‌شوند.',
+    ar: 'يتبع Baboo لغة المنصة. الإعدادات والقائمة تفتح على اليسار.',
+    rw: 'Baboo ikurikira ururimi rwa Hub. Igenamiterere n\'ibikubiyemo bifunguka ibumoso.',
+  }),
   'chrome.help': g('Help', {
     es: 'Ayuda', cu: 'Ayuda', uk: 'Допомога', ru: 'Помощь', ti: 'ሓገዝ', fa: 'راهنما',
   }),

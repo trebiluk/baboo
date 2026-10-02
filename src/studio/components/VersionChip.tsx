@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { APP_VERSION } from '../version';
 import { useProjectStore } from '../store/useProjectStore';
+import { t, tipLoc } from '../data/i18n';
 
 /** Tap = what's new. Hold = Teacher. Floating copy is the one kids can actually find on a phone. */
 export function VersionChip({
@@ -12,6 +13,8 @@ export function VersionChip({
 }) {
   const toggleChangelog = useProjectStore((s) => s.toggleChangelog);
   const toggleDebug = useProjectStore((s) => s.toggleDebug);
+  const locale = tipLoc(useProjectStore((s) => s.doc.settings));
+  const whats = t(locale, 'chrome.whatsNew');
   const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearPress = () => {
@@ -40,10 +43,10 @@ export function VersionChip({
       onPointerUp={clearPress}
       onPointerLeave={clearPress}
       onPointerCancel={clearPress}
-      title="What's new · long-press for Teacher"
-      aria-label={`Baboo version ${APP_VERSION}. Tap for what's new.`}
+      title={`${whats} · long-press for Teacher`}
+      aria-label={`Baboo v${APP_VERSION}. ${whats}`}
     >
-      v{APP_VERSION}
+      v{APP_VERSION} · {whats}
     </button>
   );
 }

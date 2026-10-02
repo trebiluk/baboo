@@ -4857,5 +4857,227 @@ html:not([data-gui-theme="ink"]) {
 }
 .save-proof .primary-btn { min-height:44px }
 
+/* 2.13.5 — left menu, labelled toolbar, drawers from the physical left */
+.menu-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 4px 10px;
+  font-weight: 700;
+}
+.menu-mark {
+  font-size: 18px;
+  line-height: 1;
+}
+.menu-btn-label {
+  font-size: 14px;
+  font-weight: 700;
+}
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 79;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: color-mix(in srgb, var(--aw-bg) 45%, transparent);
+  cursor: pointer;
+}
+.menu-drawer {
+  position: fixed;
+  z-index: 80;
+  top: 0;
+  left: 0;
+  right: auto;
+  bottom: 0;
+  width: min(320px, calc(100vw - 16px));
+  background: var(--aw-elevated);
+  border-right: 1px solid var(--aw-border);
+  box-shadow: 8px 0 24px #0a0a0a22;
+  padding: 12px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+.menu-drawer .ghost-btn {
+  width: 100%;
+  min-height: 44px;
+  justify-content: flex-start;
+  text-align: start;
+}
+.menu-drawer .drawer-head {
+  align-items: center;
+  gap: 8px;
+}
+.menu-drawer .drawer-head h2 {
+  min-width: 0;
+  flex: 1 1 auto;
+  margin: 0;
+}
+.menu-drawer .drawer-head .ghost-btn {
+  width: auto;
+  flex: 0 0 auto;
+}
+.menu-kicker {
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--aw-muted);
+}
+.chrome .title-input {
+  min-height: 44px;
+  box-sizing: border-box;
+}
+.job-chip .job-start {
+  background: #3f3db8;
+  color: #fff;
+  border-color: #2e2c8a;
+  font-size: 19px;
+  font-weight: 700;
+}
+@media (min-width: 915px) {
+  .chrome {
+    height: auto !important;
+    max-height: none !important;
+    min-height: 64px;
+    align-items: center;
+  }
+  .chrome-right .chrome-view,
+  .chrome-right .chrome-more {
+    flex: 0 0 auto;
+  }
+  .chrome-right .chrome-ico,
+  .chrome-right .chrome-more-btn {
+    flex: 0 0 auto;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1px;
+    width: 68px;
+    min-width: 52px;
+    max-width: 76px;
+    min-height: 44px;
+    height: auto;
+    padding: 4px 4px;
+    overflow: hidden;
+  }
+  .chrome-left .ver-chip,
+  .ver-chip-header {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .chrome-label,
+  .chrome-view .chrome-label,
+  .chrome-ess .chrome-label {
+    display: block !important;
+    width: 100%;
+    max-width: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.05;
+    text-align: center;
+  }
+}
+@media (max-width: 914px) {
+  .chrome-right .chrome-ico,
+  .chrome-right .chrome-view,
+  .chrome-right .chrome-more {
+    display: none !important;
+  }
+}
+@media (min-width: 641px) {
+  .drawer,
+  .teaching-drawer,
+  .help-drawer,
+  .customize-drawer,
+  .debug-drawer,
+  .contest-drawer,
+  .access-drawer {
+    position: fixed !important;
+    left: 0 !important;
+    right: auto !important;
+    top: 0;
+    bottom: 0;
+    width: min(320px, calc(100vw - 16px)) !important;
+    max-height: none !important;
+    height: auto;
+    border-left: 0 !important;
+    border-right: 1px solid var(--aw-border) !important;
+    border-top: 0 !important;
+    border-radius: 0 !important;
+    z-index: 100;
+    background: #fff !important;
+  }
+}
+html[dir="rtl"] .menu-drawer,
+html[dir="rtl"] .drawer,
+html[dir="rtl"] .customize-drawer,
+html[dir="rtl"] .help-drawer,
+html[dir="rtl"] .teaching-drawer,
+html[data-dir="rtl"] .menu-drawer,
+html[data-dir="rtl"] .customize-drawer {
+  left: 0 !important;
+  right: auto !important;
+  direction: rtl;
+  text-align: start;
+}
+html[dir="rtl"] .chrome,
+html[dir="rtl"] .menu-btn,
+html[dir="rtl"] .chrome-right,
+html[dir="rtl"] .stage-area,
+html[dir="rtl"] .workspace,
+html[dir="rtl"] .plan-canvas,
+html[dir="rtl"] .tool-rail,
+html[dir="rtl"] canvas {
+  direction: ltr;
+}
+.app-shell {
+  overflow-x: hidden;
+}
+
+/* Phones hide the old left cluster. Keep the menu button. */
+.app-shell.is-phone .chrome {
+  left: 0 !important;
+  z-index: 80 !important;
+}
+.app-shell.is-phone .chrome-left {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+}
+.app-shell.is-phone .brand,
+.app-shell.is-phone .chrome-left > .title-input,
+.app-shell.is-phone .chrome-left > .save-chip {
+  display: none !important;
+}
+.app-shell.is-phone .menu-btn {
+  display: inline-flex !important;
+}
+body.kb-on .app-shell.is-phone .chrome {
+  top: 48px !important;
+}
+html.kb-framed body.kb-on .app-shell.is-phone .chrome {
+  top: 0 !important;
+}
+.menu-drawer .menu-title {
+  width: 100%;
+  max-width: none;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+
 
 
