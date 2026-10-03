@@ -8,9 +8,18 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
-  it('chips 2.13.10 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.13.10');
+describe('2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
+  it('chips 2.13.11 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.13.11');
+    assert.match(readFileSync(join(studio, 'data/changelog.ts'), 'utf8'), /version:\s*'2\.13\.11'/);
+    for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) assert.notEqual(t(l, 'news.decoders'), t('en', 'news.decoders'));
+    const peek = readFileSync(join(studio, 'components/ModelPeek.tsx'), 'utf8');
+    assert.match(peek, /dracoDecoderLocation: DRACO_DECODER_PATH/);
+    assert.match(peek, /ktx2TranscoderLocation: KTX2_TRANSCODER_PATH/);
+    assert.ok(peek.indexOf('g.ModelViewerElement = {') < peek.indexOf("import('@google/model-viewer')"));
+    const pub = join(studio, '../../public/vendor');
+    for (const f of ['draco/1.5.6/draco_decoder.js', 'draco/1.5.6/draco_decoder.wasm', 'draco/1.5.6/draco_wasm_wrapper.js', 'basis/2021-04-15-ba1c3e4/basis_transcoder.js', 'basis/2021-04-15-ba1c3e4/basis_transcoder.wasm']) assert.ok(readFileSync(join(pub, f)).length > 50000, f);
+    assert.doesNotMatch(readFileSync(join(studio, '../styles.css'), 'utf8'), /fonts\.googleapis/);
     const changelog = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
     assert.match(changelog, /version:\s*'2\.13\.10'/);
     assert.match(changelog, /The Menu starts under the top bar/);

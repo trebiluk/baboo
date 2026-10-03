@@ -3,6 +3,10 @@ import { peekFor } from '../data/objectPeek';
 
 type Which = 'kenney' | 'quaternius';
 
+/** Self-hosted copies of the files model-viewer would fetch from Google's CDN (same versions). */
+export const DRACO_DECODER_PATH = '/vendor/draco/1.5.6/';
+export const KTX2_TRANSCODER_PATH = '/vendor/basis/2021-04-15-ba1c3e4/';
+
 /** Apache-2.0 model-viewer. Loaded only when a piece is selected. Not the class canvas. */
 export function ModelPeek({ catalogId, name }: { catalogId: string; name: string }) {
   const peek = peekFor(catalogId);
@@ -14,8 +18,19 @@ export function ModelPeek({ catalogId, name }: { catalogId: string; name: string
 
   useEffect(() => {
     let live = true;
+    // 2.13.11: decoders come from Baboo itself (public/vendor/), never www.gstatic.com,
+    // so compressed models still open on filtered school wifi or offline.
+    // model-viewer reads this global config in every element's constructor, so set it first.
+    const g = globalThis as unknown as { ModelViewerElement?: Record<string, string> };
+    g.ModelViewerElement = {
+      ...(g.ModelViewerElement ?? {}),
+      dracoDecoderLocation: DRACO_DECODER_PATH,
+      ktx2TranscoderLocation: KTX2_TRANSCODER_PATH,
+    };
     void import('@google/model-viewer')
-      .then(() => { if (live) setPhase('ready'); })
+      .then(() => {
+        if (live) setPhase('ready');
+      })
       .catch(() => { if (live) setPhase('miss'); });
     return () => { live = false; };
   }, []);

@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.11',
+    date: '2026-10-02',
+    bullets: [
+      '3D models no longer need outside sites, so they open on school wifi.',
+    ],
+  },
+  {
     version: '2.13.10',
     date: '2026-10-02',
     bullets: [

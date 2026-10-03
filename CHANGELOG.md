@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.11 — 2026-10-02 — Own 3D decoders
+- 3D models no longer need outside sites, so they open on school wifi.
+
 ## 2.13.10 — 2026-10-02 — Menu Close
 - The Menu starts under the top bar, so Close is easy to tap.
 

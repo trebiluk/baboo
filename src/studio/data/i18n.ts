@@ -194,6 +194,17 @@ export const STR: Record<string, Gloss> = {
     ar: 'تبدأ القائمة تحت الشريط العلوي، لذا يسهل الضغط على إغلاق.',
     rw: "Ibikubiyemo bitangirira munsi y'umurongo wo hejuru, bityo Funga ikandika byoroshye.",
   }),
+  'news.decoders': g('3D models no longer need outside sites, so they open on school wifi.', {
+    es: 'Los modelos 3D ya no necesitan sitios de afuera, así que abren en el wifi de la escuela.',
+    cu: 'Los modelos 3D ya no necesitan sitios de afuera, así que abren en el wifi de la escuela.',
+    uk: '3D-моделям більше не потрібні сторонні сайти, тож вони відкриваються в шкільному Wi-Fi.',
+    ru: '3D-моделям больше не нужны сторонние сайты, поэтому они открываются в школьном Wi-Fi.',
+    ti: 'ናይ 3D ሞዴላት ደጊም ካልኦት መርበባት ኣየድልዮምን፣ ስለዚ ኣብ ዋይፋይ ቤት ትምህርቲ ይኽፈቱ።',
+    fa: 'مدل‌های سه‌بعدی دیگر به سایت‌های بیرونی نیاز ندارند، پس با وای‌فای مدرسه باز می‌شوند.',
+    'fa-AF': 'مدل‌های سه‌بعدی دیگر به سایت‌های بیرونی نیاز ندارند، پس با وای‌فای مکتب باز می‌شوند.',
+    ar: 'لم تعد النماذج ثلاثية الأبعاد تحتاج إلى مواقع خارجية، لذا تفتح على شبكة المدرسة.',
+    rw: "Moderi za 3D ntizigikeneye imbuga zo hanze, bityo zifunguka kuri wifi y'ishuri.",
+  }),
   'chrome.help': g('Help', {
     es: 'Ayuda', cu: 'Ayuda', uk: 'Допомога', ru: 'Помощь', ti: 'ሓገዝ', fa: 'راهنما',
   }),
