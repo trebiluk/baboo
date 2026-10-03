@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.13 — 2026-10-03 — 3D viewer update
+- The 3D viewer is updated. 3D View and the 3D peek look the same.
+
 ## 2.13.12 — 2026-10-02 — Drawing engine update
 - The plan drawing engine is updated. Drawing, moving and deleting walls work the same.
 

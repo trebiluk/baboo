@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.13',
+    date: '2026-10-03',
+    bullets: [
+      'The 3D viewer is updated. 3D View and the 3D peek look the same.',
+    ],
+  },
+  {
     version: '2.13.12',
     date: '2026-10-02',
     bullets: [

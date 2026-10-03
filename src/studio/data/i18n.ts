@@ -216,6 +216,17 @@ export const STR: Record<string, Gloss> = {
     ar: 'تم تحديث محرك رسم المخطط. رسم الجدران ونقلها وحذفها يعمل كما كان.',
     rw: 'Moteri ishushanya igishushanyo yavuguruwe. Gushushanya, kwimura no gusiba inkuta bikora nka mbere.',
   }),
+  'news.modelviewer': g('The 3D viewer is updated. 3D View and the 3D peek look the same.', {
+    es: 'El visor 3D está actualizado. La Vista 3D y la vista previa 3D se ven igual.',
+    cu: 'El visor 3D está actualizado. La Vista 3D y la vista previa 3D se ven igual.',
+    uk: '3D-переглядач оновлено. 3D-вигляд і 3D-перегляд виглядають так само.',
+    ru: '3D-просмотрщик обновлён. 3D-вид и 3D-просмотр выглядят так же.',
+    ti: 'ናይ 3D ተዓዛቢ ተሓዲሱ። 3D ትርኢትን 3D ቅልጽምታን ከም ቀደም እዮም ዝረኣዩ።',
+    fa: 'نمایشگر سه‌بعدی به‌روز شد. نمای سه‌بعدی و پیش‌نمایش سه‌بعدی مثل قبل دیده می‌شوند.',
+    'fa-AF': 'نمایشگر سه‌بعدی به‌روز شد. نمای سه‌بعدی و پیش‌نمایش سه‌بعدی مثل قبل دیده می‌شوند.',
+    ar: 'تم تحديث عارض ثلاثي الأبعاد. العرض ثلاثي الأبعاد والمعاينة ثلاثية الأبعاد تبدو كما كانت.',
+    rw: "Imashini yerekana 3D yavuguruwe. Kureba muri 3D n'ishusho ya 3D bigaragara nka mbere.",
+  }),
   'chrome.help': g('Help', {
     es: 'Ayuda', cu: 'Ayuda', uk: 'Допомога', ru: 'Помощь', ti: 'ሓገዝ', fa: 'راهنما',
   }),

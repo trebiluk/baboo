@@ -71,6 +71,9 @@ export function ModelPeek({ catalogId, name }: { catalogId: string; name: string
               'camera-controls': true,
               'touch-action': 'pan-y',
               exposure: '1.05',
+              // 2.13.13: model-viewer 4 changed its default tone mapping to Neutral (more saturated).
+              // ACES keeps the 3D peek looking exactly like 3.5 did.
+              'tone-mapping': 'aces',
               'shadow-intensity': '0.4',
               style: { width: '100%', height: '200px', background: '#fff', display: 'block' },
             })
