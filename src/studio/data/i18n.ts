@@ -205,6 +205,17 @@ export const STR: Record<string, Gloss> = {
     ar: 'لم تعد النماذج ثلاثية الأبعاد تحتاج إلى مواقع خارجية، لذا تفتح على شبكة المدرسة.',
     rw: "Moderi za 3D ntizigikeneye imbuga zo hanze, bityo zifunguka kuri wifi y'ishuri.",
   }),
+  'news.konva': g('The plan drawing engine is updated. Drawing, moving and deleting walls work the same.', {
+    es: 'El motor de dibujo del plano está actualizado. Dibujar, mover y borrar paredes funciona igual.',
+    cu: 'El motor de dibujo del plano está actualizado. Dibujar, mover y borrar paredes funciona igual.',
+    uk: 'Рушій креслення плану оновлено. Малювати, переміщати й видаляти стіни можна так само.',
+    ru: 'Движок рисования плана обновлён. Рисовать, двигать и удалять стены можно так же.',
+    ti: 'ሞተር ስእሊ ፕላን ተሓዲሱ። መናድቕ ምስኣል፣ ምንቃልን ምድምሳስን ከም ቀደም ይሰርሕ።',
+    fa: 'موتور رسم نقشه به‌روز شد. کشیدن، جابه‌جا کردن و پاک کردن دیوارها مثل قبل کار می‌کند.',
+    'fa-AF': 'موتور رسم نقشه به‌روز شد. کشیدن، جابه‌جا کردن و پاک کردن دیوارها مثل قبل کار می‌کند.',
+    ar: 'تم تحديث محرك رسم المخطط. رسم الجدران ونقلها وحذفها يعمل كما كان.',
+    rw: 'Moteri ishushanya igishushanyo yavuguruwe. Gushushanya, kwimura no gusiba inkuta bikora nka mbere.',
+  }),
   'chrome.help': g('Help', {
     es: 'Ayuda', cu: 'Ayuda', uk: 'Допомога', ru: 'Помощь', ti: 'ሓገዝ', fa: 'راهنما',
   }),

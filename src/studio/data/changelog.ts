@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.12',
+    date: '2026-10-02',
+    bullets: [
+      'The plan drawing engine is updated. Drawing, moving and deleting walls work the same.',
+    ],
+  },
+  {
     version: '2.13.11',
     date: '2026-10-02',
     bullets: [

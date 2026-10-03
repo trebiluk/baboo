@@ -8,9 +8,14 @@ import { LOCALES, t } from '../data/i18n.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
-  it('chips 2.13.11 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.13.11');
+describe('2.13.12 drawing engine update, 2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
+  it('chips 2.13.12 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.13.12');
+    assert.match(readFileSync(join(studio, 'data/changelog.ts'), 'utf8'), /version:\s*'2\.13\.12'/);
+    for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) assert.notEqual(t(l, 'news.konva'), t('en', 'news.konva'));
+    const pkg = JSON.parse(readFileSync(join(studio, '../../package.json'), 'utf8'));
+    assert.equal(pkg.dependencies.konva, '^10.7.0');
+    assert.equal(pkg.dependencies['react-konva'], '^19.3.0');
     assert.match(readFileSync(join(studio, 'data/changelog.ts'), 'utf8'), /version:\s*'2\.13\.11'/);
     for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) assert.notEqual(t(l, 'news.decoders'), t('en', 'news.decoders'));
     const peek = readFileSync(join(studio, 'components/ModelPeek.tsx'), 'utf8');

@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.12 — 2026-10-02 — Drawing engine update
+- The plan drawing engine is updated. Drawing, moving and deleting walls work the same.
+
 ## 2.13.11 — 2026-10-02 — Own 3D decoders
 - 3D models no longer need outside sites, so they open on school wifi.
 
