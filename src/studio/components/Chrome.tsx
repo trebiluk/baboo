@@ -6,10 +6,51 @@ import { ClassShareModal } from './ClassShareModal';
 import { VersionChip } from './VersionChip';
 import { t, tipLoc } from '../data/i18n';
 
+type SavePhase = 'saved' | 'saving' | 'offline' | 'error';
+
+function saveClock(iso: string | null): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
+function SaveGlyph({ phase }: { phase: SavePhase }) {
+  const p = {
+    width: 18,
+    height: 18,
+    viewBox: '0 0 24 24',
+    'aria-hidden': true as const,
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 2,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+  };
+  if (phase === 'saved') return <svg {...p}><path d="M5 12.5 9.5 17 19 7" /></svg>;
+  if (phase === 'saving') return <svg {...p}><circle cx="12" cy="12" r="7" /></svg>;
+  if (phase === 'offline') {
+    return (
+      <svg {...p}>
+        <path d="M7 18h9a4 4 0 0 0 .5-8 5.5 5.5 0 0 0-10.4 1.6A3.5 3.5 0 0 0 7 18z" />
+        <path d="M4 20 20 4" />
+      </svg>
+    );
+  }
+  return (
+    <svg {...p}>
+      <path d="M12 4 3 19h18L12 4z" />
+      <path d="M12 10v4" />
+      <path d="M12 16.5h.01" />
+    </svg>
+  );
+}
+
 export function Chrome() {
   const title = useProjectStore((s) => s.doc.meta.title);
   const setTitle = useProjectStore((s) => s.setTitle);
   const saveStatus = useProjectStore((s) => s.saveStatus);
+  const lastSaveAt = useProjectStore((s) => s.lastSaveAt);
   const undo = useProjectStore((s) => s.undo);
   const redo = useProjectStore((s) => s.redo);
   const fitPlan = useProjectStore((s) => s.fitPlan);
@@ -45,6 +86,18 @@ export function Chrome() {
   const [classShareOpen, setClassShareOpen] = useState(false);
   const [focus, setFocus] = useState(false);
   const fileShare = typeof window !== 'undefined' && window.location.protocol === 'file:';
+  const [online, setOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine));
+
+  useEffect(() => {
+    const on = () => setOnline(true);
+    const off = () => setOnline(false);
+    window.addEventListener('online', on);
+    window.addEventListener('offline', off);
+    return () => {
+      window.removeEventListener('online', on);
+      window.removeEventListener('offline', off);
+    };
+  }, []);
 
   useEffect(() => {
     if (!moreOpen) return;
@@ -124,10 +177,16 @@ export function Chrome() {
   };
 
   const locale = tipLoc(useProjectStore((s) => s.doc.settings));
-  const statusLabel =
-    saveStatus === 'saved' ? t(locale, 'chrome.saved') :
-    saveStatus === 'saving' ? t(locale, 'chrome.saving') :
-    saveStatus === 'unsaved' ? t(locale, 'chrome.unsaved') : t(locale, 'chrome.saveError');
+  const savePhase: SavePhase =
+    saveStatus === 'error' ? 'error' :
+    saveStatus === 'saving' ? 'saving' :
+    online ? 'saved' : 'offline';
+  const saveTime = saveClock(lastSaveAt);
+  const saveLabel =
+    savePhase === 'error' ? t(locale, 'save.error') :
+    savePhase === 'saving' ? t(locale, 'save.saving') :
+    savePhase === 'offline' ? t(locale, 'save.offline') :
+    saveTime ? t(locale, 'save.savedAt', { time: saveTime }) : t(locale, 'save.saved');
 
   const runAndClose = (fn: () => void) => () => {
     setMoreOpen(false);
@@ -174,7 +233,6 @@ export function Chrome() {
           onChange={(e) => setTitle(e.target.value)}
           aria-label={t(locale, 'chrome.projectName')}
         />
-        <span className={`save-chip save-${saveStatus}`}>{statusLabel}</span>
       </div>
 
       <div className="chrome-right">
@@ -224,10 +282,20 @@ export function Chrome() {
           <span className="view-only-chip" hidden={canEdit} title={t(locale, 'chrome.viewonly')}>{t(locale, 'chrome.viewonly')}</span>
         </div>
 
-        <button type="button" className="ghost-btn aw-pressable chrome-primary chrome-ico chrome-ess" onClick={exportJson} title={t(locale, 'chrome.save')} aria-label={t(locale, 'chrome.save')}>
-          <Icon name="save" />
-          <span className="chrome-label">{t(locale, 'chrome.save')}</span>
-        </button>
+        <div className="save-export">
+          <div
+            className={`save-status save-chip save-${saveStatus} is-${savePhase}`}
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <SaveGlyph phase={savePhase} />
+            <span className="save-status-text">{saveLabel}</span>
+          </div>
+          <button type="button" className="ghost-btn aw-pressable chrome-primary chrome-ico chrome-ess" onClick={exportJson} title={t(locale, 'chrome.save')} aria-label={t(locale, 'chrome.save')}>
+            <Icon name="save" />
+            <span className="chrome-label">{t(locale, 'chrome.save')}</span>
+          </button>
+        </div>
         <button type="button" className="ghost-btn aw-pressable chrome-ico chrome-ess" onClick={() => fileRef.current?.click()} title={t(locale, 'chrome.import')} aria-label={t(locale, 'chrome.import')}>
           <Icon name="import" />
           <span className="chrome-label">{t(locale, 'chrome.import')}</span>

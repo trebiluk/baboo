@@ -227,6 +227,17 @@ export const STR: Record<string, Gloss> = {
     ar: 'تم تحديث عارض ثلاثي الأبعاد. العرض ثلاثي الأبعاد والمعاينة ثلاثية الأبعاد تبدو كما كانت.',
     rw: "Imashini yerekana 3D yavuguruwe. Kureba muri 3D n'ishusho ya 3D bigaragara nka mbere.",
   }),
+  'news.save': g('You can now see if your work is saved, next to Export.', {
+    es: 'Ahora puedes ver si tu trabajo está guardado, junto a Exportar.',
+    cu: 'Ahora puedes ver si tu trabajo está guardado, junto a Exportar.',
+    uk: 'Тепер видно, чи збережено твою роботу, поруч з Експорт.',
+    ru: 'Теперь видно, сохранена ли твоя работа, рядом с Экспорт.',
+    ti: 'ሕጂ ስራሕካ ተዓቂቡ እንተኾነ ኣብ ጥቓ Export ክትርኢ ትኽእል።',
+    fa: 'حالا می‌توانی ببینی کارت ذخیره شده، کنار خروجی.',
+    'fa-AF': 'حالا می‌توانی ببینی کارت ذخیره شده، کنار خروجی.',
+    ar: 'يمكنك الآن معرفة إن كان عملك محفوظًا، بجانب تصدير.',
+    rw: 'Ubu ushobora kubona niba akazi kawe kabitswe, iruhande rwa Export.',
+  }),
   'chrome.help': g('Help', {
     es: 'Ayuda', cu: 'Ayuda', uk: 'Допомога', ru: 'Помощь', ti: 'ሓገዝ', fa: 'راهنما',
   }),
@@ -242,8 +253,9 @@ export const STR: Record<string, Gloss> = {
   'chrome.new': g('New', {
     es: 'Nuevo', cu: 'Nuevo', uk: 'Новий', ru: 'Новый', ti: 'ሓድሽ', fa: 'جدید',
   }),
-  'chrome.save': g('Save', {
-    es: 'Guardar', cu: 'Guardar', uk: 'Зберегти', ru: 'Сохранить', ti: 'ዓቅብ', fa: 'ذخیره',
+  'chrome.save': g('Export', {
+    es: 'Exportar', cu: 'Exportar', uk: 'Експорт', ru: 'Экспорт', ti: 'ኣውጽእ', fa: 'خروجی',
+    'fa-AF': 'خروجی', ar: 'تصدير', rw: 'Kohereza',
   }),
   'chrome.plan': g('2D Plan', {
     es: 'Plano 2D', cu: 'Plano 2D', uk: 'План 2D', ru: 'План 2D', ti: 'ትልሚ 2D', fa: 'پلان ۲بعدی',
@@ -1628,6 +1640,33 @@ export const STR: Record<string, Gloss> = {
   }),
   'chrome.saveError': g('Save error', {
     es: 'Error al guardar', cu: 'Error al guardar', uk: 'Помилка збереження', ru: 'Ошибка сохранения', ti: 'ጌጋ ምዕቃብ', fa: 'خطای ذخیره',
+  }),
+  'save.saved': g('Saved', {
+    es: 'Guardado', cu: 'Guardado', uk: 'Збережено', ru: 'Сохранено', ti: 'ተዓቂቡ', fa: 'ذخیره شد',
+    'fa-AF': 'ذخیره شد', ar: 'تم الحفظ', rw: 'Byabitswe',
+  }),
+  'save.savedAt': g('Saved {time}', {
+    es: 'Guardado {time}', cu: 'Guardado {time}', uk: 'Збережено {time}', ru: 'Сохранено {time}', ti: 'ተዓቂቡ {time}', fa: 'ذخیره شد {time}',
+    'fa-AF': 'ذخیره شد {time}', ar: 'تم الحفظ {time}', rw: 'Byabitswe {time}',
+  }),
+  'save.saving': g('Saving...', {
+    es: 'Guardando...', cu: 'Guardando...', uk: 'Збереження...', ru: 'Сохранение...', ti: 'ይዕቀብ ኣሎ...', fa: 'در حال ذخیره...',
+    'fa-AF': 'در حال ذخیره...', ar: 'يحفظ...', rw: 'Birimo kubikwa...',
+  }),
+  'save.offline': g('Saved on this Chromebook', {
+    es: 'Guardado en esta Chromebook', cu: 'Guardado en esta Chromebook', uk: 'Збережено на цьому Chromebook', ru: 'Сохранено на этом Chromebook', ti: 'ኣብዚ Chromebook ተዓቂቡ', fa: 'روی همین کروم‌بوک ذخیره شد',
+    'fa-AF': 'روی همین کروم‌بوک ذخیره شد', ar: 'محفوظ على هذا Chromebook', rw: 'Byabitswe kuri iyi Chromebook',
+  }),
+  'save.error': g('Not saved. Tap Export to keep a copy.', {
+    es: 'No se guardó. Toca Exportar para guardar una copia.',
+    cu: 'No se guardó. Toca Exportar para guardar una copia.',
+    uk: 'Не збережено. Торкніться Експорт, щоб лишити копію.',
+    ru: 'Не сохранено. Нажмите Экспорт, чтобы оставить копию.',
+    ti: 'ኣይተዓቀበን። ኮፒ ንምዕቃብ Export ጠውቕ።',
+    fa: 'ذخیره نشد. برای نگه داشتن یک نسخه، خروجی را بزن.',
+    'fa-AF': 'ذخیره نشد. برای نگه داشتن یک نسخه، خروجی را بزن.',
+    ar: 'لم يُحفظ. اضغط تصدير لتحفظ نسخة.',
+    rw: 'Ntabwo byabitswe. Kanda Export kugira ngo ubike kopi.',
   }),
   'chrome.panels': g('Studio panels', {
     es: 'Paneles del estudio', cu: 'Paneles del estudio', uk: 'Панелі студії', ru: 'Панели студии', ti: 'ፓነላት ስቱድዮ', fa: 'پنل‌های استودیو',

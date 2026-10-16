@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.14',
+    date: '2026-10-15',
+    bullets: [
+      'You can now see if your work is saved, next to Export.',
+    ],
+  },
+  {
     version: '2.13.13',
     date: '2026-10-03',
     bullets: [
