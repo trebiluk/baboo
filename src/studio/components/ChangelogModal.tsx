@@ -2,11 +2,18 @@ import { useProjectStore } from '../store/useProjectStore';
 import { APP_VERSION, CHANGELOG_ENTRIES } from '../data/changelog';
 import { t, tipLoc } from '../data/i18n';
 
+/** What's new bullets that have a translated line. The bullet text must match the English exactly. */
+const NEWS_KEYS = ['news.words', 'news.save', 'news.line', 'news.fit', 'news.menu', 'news.close', 'news.decoders', 'news.konva', 'news.modelviewer'];
+
 export function ChangelogModal() {
   const open = useProjectStore((s) => s.changelogOpen);
   const toggle = useProjectStore((s) => s.toggleChangelog);
   const locale = tipLoc(useProjectStore((s) => s.doc.settings));
   if (!open) return null;
+  const localBullet = (line: string) => {
+    const key = NEWS_KEYS.find((k) => t('en', k) === line);
+    return key ? t(locale, key) : line;
+  };
   return (
     <div className="modal-backdrop" onClick={toggle}>
       <div
@@ -19,11 +26,11 @@ export function ChangelogModal() {
           <h2 id="changelog-title">{t(locale, 'chrome.whatsNew')} · v{APP_VERSION}</h2>
           <button type="button" className="ghost-btn secondary-btn aw-pressable" onClick={toggle}>{t(locale, 'chrome.close')}</button>
         </div>
-        <p className="muted">Baboo keeps the grid big. Here's what changed.</p>
+        <p className="muted">{t(locale, 'news.lead')}</p>
         {CHANGELOG_ENTRIES.map((n) => (
           <article key={n.version} className="change-block">
             <h3>{n.version} <span className="muted">{n.date}</span></h3>
-            <ul>{n.bullets.map((i) => <li key={i}>{i === t('en', 'news.save') ? t(locale, 'news.save') : i === t('en', 'news.line') ? t(locale, 'news.line') : i === t('en', 'news.fit') ? t(locale, 'news.fit') : i === t('en', 'news.menu') ? t(locale, 'news.menu') : i === t('en', 'news.close') ? t(locale, 'news.close') : i === t('en', 'news.decoders') ? t(locale, 'news.decoders') : i === t('en', 'news.konva') ? t(locale, 'news.konva') : i === t('en', 'news.modelviewer') ? t(locale, 'news.modelviewer') : i}</li>)}</ul>
+            <ul>{n.bullets.map((i) => <li key={i}>{localBullet(i)}</li>)}</ul>
           </article>
         ))}
       </div>

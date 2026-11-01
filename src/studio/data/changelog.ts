@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.15',
+    date: '2026-11-01',
+    bullets: [
+      'More words are now in Arabic, Kinyarwanda and Tigrinya.',
+    ],
+  },
+  {
     version: '2.13.14',
     date: '2026-10-15',
     bullets: [

@@ -238,6 +238,28 @@ export const STR: Record<string, Gloss> = {
     ar: 'يمكنك الآن معرفة إن كان عملك محفوظًا، بجانب تصدير.',
     rw: 'Ubu ushobora kubona niba akazi kawe kabitswe, iruhande rwa Export.',
   }),
+  'news.words': g('More words are now in Arabic, Kinyarwanda and Tigrinya.', {
+    es: 'Ahora hay más palabras en árabe, kinyarwanda y tigriña.',
+    cu: 'Ahora hay más palabras en árabe, kinyarwanda y tigriña.',
+    uk: 'Тепер більше слів арабською, кіньяруандою та тигринья.',
+    ru: 'Теперь больше слов на арабском, киньяруанда и тигринья.',
+    ti: 'ሕጂ ዝበዝሑ ቃላት ብዓረብ፣ ብኪንያርዋንዳን ብትግርኛን ኣለዉ።',
+    fa: 'حالا واژه‌های بیشتری به عربی، کینیارواندا و تیگرینیا هست.',
+    'fa-AF': 'حالا واژه‌های بیشتری به عربی، کینیارواندا و تیگرینیا هست.',
+    ar: 'الآن كلمات أكثر بالعربية والكينيارواندية والتغرينية.',
+    rw: "Ubu amagambo menshi ari mu Cyarabu, Ikinyarwanda n'Igitigirinya.",
+  }),
+  'news.lead': g("Baboo keeps the grid big. Here's what changed.", {
+    es: 'Baboo deja la cuadrícula grande. Esto es lo que cambió.',
+    cu: 'Baboo deja la cuadrícula grande. Esto es lo que cambió.',
+    uk: 'Baboo тримає сітку великою. Ось що змінилося.',
+    ru: 'Baboo держит сетку большой. Вот что изменилось.',
+    ti: 'Baboo ነቲ መርበብ ዓቢ ይገብሮ። እዚ እዩ ዝተቐየረ።',
+    fa: 'Baboo شبکه را بزرگ نگه می‌دارد. این‌ها تغییر کرده‌اند.',
+    'fa-AF': 'Baboo شبکه را بزرگ نگه می‌دارد. این‌ها تغییر کرده‌اند.',
+    ar: 'يُبقي Baboo الشبكة كبيرة. هذا ما تغيّر.',
+    rw: 'Baboo igumisha urusobe runini. Dore ibyahindutse.',
+  }),
   'chrome.help': g('Help', {
     es: 'Ayuda', cu: 'Ayuda', uk: 'Допомога', ru: 'Помощь', ti: 'ሓገዝ', fa: 'راهنما',
   }),
@@ -305,12 +327,13 @@ export const STR: Record<string, Gloss> = {
     es: 'Acceso', cu: 'Acceso', uk: 'Доступ', ru: 'Доступ', ti: 'መእተዊ', fa: 'دسترسی',
   }),
 
+  // Tigrinya (ti) strings fixed in 2.13.15 are UNCHECKED native copy.
   'cta.wall.title': g('Wall → click start → click end', {
     es: 'Muro → clic inicio → clic final',
     cu: 'Pared → toca inicio → toca final',
     uk: 'Стіна → клік початок → клік кінець',
     ru: 'Стена → клик начало → клик конец',
-    ti: 'Wall → click start → click end',
+    ti: 'መንደቕ → መጀመርታ ጠውቕ → መወዳእታ ጠውቕ',
     fa: 'دیوار → کلیک شروع → کلیک پایان',
   }),
   'cta.wall.sub': g('Two clicks: start, then the other end. Then a door.', {
@@ -338,7 +361,7 @@ export const STR: Record<string, Gloss> = {
     cu: 'Pared → toca inicio → toca fin',
     uk: 'Стіна → клік початок → клік кінець',
     ru: 'Стена → клик начало → клик конец',
-    ti: 'መንደቕ → ጠውቕ መጀመርታ → ጠውቕ መወዳእታ',
+    ti: 'መንደቕ → መጀመርታ ጠውቕ → መወዳእታ ጠውቕ',
     fa: 'دیوار → کلیک شروع → کلیک پایان',
   }),
   'hint.wall.end': g('Nice — now click where it ends', {
@@ -1303,21 +1326,21 @@ export const STR: Record<string, Gloss> = {
     cu: 'El alto contraste se queda en Stark blanco + azul. Letras más oscuras, líneas más gruesas.',
     uk: 'Високий контраст лишається на Stark білий + синій. Темніші слова, товстіші лінії.',
     ru: 'Высокий контраст остаётся на Stark белый + синий. Темнее слова, толще линии.',
-    ti: 'High contrast — Stark.',
+    ti: 'ልዑል ፍልልይ ኣብ Stark ጻዕዳ + ሰማያዊ ይጸንሕ። ዝጸልመቱ ቃላት፣ ዝረጎዱ መስመራት።',
     fa: 'کنتراست بالا روی Stark سفید + آبی می‌ماند. واژه‌های تیره‌تر، خط‌های ضخیم‌تر.',
   }),
   'udl.contrastOn': g('High contrast', {
-    es: 'Alto contraste', cu: 'Alto contraste', uk: 'Високий контраст', ru: 'Высокий контраст', ti: 'High contrast', fa: 'کنتراست بالا',
+    es: 'Alto contraste', cu: 'Alto contraste', uk: 'Високий контраст', ru: 'Высокий контраст', ti: 'ልዑል ፍልልይ', fa: 'کنتراست بالا',
   }),
   'lang.tips': g('Tip language', {
-    es: 'Idioma de consejos', cu: 'Idioma de consejos', uk: 'Мова підказок', ru: 'Язык подсказок', ti: 'Tip language', fa: 'زبان راهنما',
+    es: 'Idioma de consejos', cu: 'Idioma de consejos', uk: 'Мова підказок', ru: 'Язык подсказок', ti: 'ቋንቋ ምኽሪ', fa: 'زبان راهنما',
   }),
   'teach.spine': g('Class words stay in English. Tips are in {lang}.', {
     es: 'Las palabras de clase se quedan en inglés. Los consejos están en {lang}.',
     cu: 'Las palabras de clase se quedan en inglés. Los consejos están en {lang}.',
     uk: 'Класні слова лишаються англійською. Підказки — {lang}.',
     ru: 'Классные слова остаются по-английски. Подсказки — {lang}.',
-    ti: 'Class words English. Tips: {lang}.',
+    ti: 'ቃላት ክፍሊ ብእንግሊዝኛ ይጸንሑ። ምኽሪታት ብ{lang} እዮም።',
     fa: 'واژه‌های کلاس انگلیسی می‌مانند. راهنما به {lang} است.',
   }),
   'toast.wallIn': g('Wall is in — add a Door on a wall next', {
@@ -1341,7 +1364,7 @@ export const STR: Record<string, Gloss> = {
     cu: 'Haz la pared un poco más larga',
     uk: 'Зроби стіну трохи довшою',
     ru: 'Сделай стену чуть длиннее',
-    ti: 'Make the wall longer.',
+    ti: 'መንደቕ ቁሩብ ኣናውሕ',
     fa: 'دیوار را کمی بلندتر کن',
   }),
   'toast.plantIn': g('Plant is in — drag to move it', {
@@ -1365,7 +1388,7 @@ export const STR: Record<string, Gloss> = {
     cu: 'Límite de paredes · 40 máx',
     uk: 'Ліміт стін · макс. 40',
     ru: 'Лимит стен · макс. 40',
-    ti: 'Wall limit · 40',
+    ti: 'ደረት መናድቕ · ዝለዓለ 40',
     fa: 'حد دیوار · حداکثر ۴۰',
   }),
   'toast.capObjects': g('Object limit · 60 max', {
@@ -1373,7 +1396,7 @@ export const STR: Record<string, Gloss> = {
     cu: 'Límite de objetos · 60 máx',
     uk: 'Ліміт речей · макс. 60',
     ru: 'Лимит вещей · макс. 60',
-    ti: 'Object limit · 60',
+    ti: 'ደረት ኣቑሑ · ዝለዓለ 60',
     fa: 'حد وسیله · حداکثر ۶۰',
   }),
   'toast.capBody': g('Delete some to add more.', {
@@ -1381,20 +1404,20 @@ export const STR: Record<string, Gloss> = {
     cu: 'Borra algunos para añadir más.',
     uk: 'Видали дещо, щоб додати ще.',
     ru: 'Удали часть, чтобы добавить ещё.',
-    ti: 'Delete some to add more.',
+    ti: 'ተወሳኺ ንምውሳኽ ገለ ደምስስ።',
     fa: 'چند تا را پاک کن تا جای جدید باز شود.',
   }),
   'toast.mark.ok': g('Done', {
-    es: 'Listo', cu: 'Listo', uk: 'Готово', ru: 'Готово', ti: 'Done', fa: 'انجام شد',
+    es: 'Listo', cu: 'Listo', uk: 'Готово', ru: 'Готово', ti: 'ተወዲኡ', fa: 'انجام شد',
   }),
   'toast.mark.miss': g('Try again', {
-    es: 'Otra vez', cu: 'Otra vez', uk: 'Ще раз', ru: 'Ещё раз', ti: 'Try again', fa: 'دوباره',
+    es: 'Otra vez', cu: 'Otra vez', uk: 'Ще раз', ru: 'Ещё раз', ti: 'ደጊምካ ፈትን', fa: 'دوباره',
   }),
   'toast.mark.cap': g('Full', {
-    es: 'Lleno', cu: 'Lleno', uk: 'Повно', ru: 'Полно', ti: 'Full', fa: 'پر',
+    es: 'Lleno', cu: 'Lleno', uk: 'Повно', ru: 'Полно', ti: 'መሊኡ', fa: 'پر',
   }),
   'toast.mark.info': g('Tip', {
-    es: 'Consejo', cu: 'Consejo', uk: 'Підказка', ru: 'Подсказка', ti: 'Tip', fa: 'راهنما',
+    es: 'Consejo', cu: 'Consejo', uk: 'Підказка', ru: 'Подсказка', ti: 'ምኽሪ', fa: 'راهنما',
   }),
 
   'floor.title': g('Flooring', {

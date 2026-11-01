@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.15 — 2026-11-01 — More languages
+- More words are now in Arabic, Kinyarwanda and Tigrinya.
+
 ## 2.13.14 — 2026-10-15 — Save status
 - You can now see if your work is saved, next to Export.
 
