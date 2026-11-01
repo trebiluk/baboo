@@ -27,6 +27,7 @@ import { listInteriorFloors, roomPolygon } from '../lib/rooms';
 import { DEFAULT_GUI_THEME } from '../data/themes';
 import { t } from '../data/i18n';
 import { roomLabel } from '../data/rooms';
+import { houseHasUpper, wallStories } from '../lib/stories';
 import type { LandscapeItem } from '../types';
 import { useCanvasToolsPocket } from '../hooks/useCanvasToolsPocket';
 
@@ -227,6 +228,8 @@ export function DollhouseCanvas() {
     const swWall = (sel: boolean) => (sel ? 2.5 : (blocky ? 2.5 : 1.05)) / zoom;
     const swFurn = (sel: boolean) => (sel ? 1.6 : (blocky ? 1.4 : 0.35)) / zoom;
 
+    const upperHouse = houseHasUpper(floor);
+    const hasPorch = (floor.rooms ?? []).some((r) => r.kind === 'outdoor');
     for (const w of floor.walls) {
       const e = wallEnds(w, floor.nodes);
       if (!e) continue;
@@ -244,12 +247,14 @@ export function DollhouseCanvas() {
           : (light ? '#ece4d4' : '#4a4034'));
       const tile = useTex ? tiles.get(useTex) : undefined;
       const thick = Math.max(0.42, w.thickness || 0.5);
+      // the porch of a two-story house is an open rail in 3D: show it low here too (2.13.20)
+      const porchRail = upperHouse && hasPorch && w.kind === 'exterior' && wallStories(floor, w) === 1;
       const cuts = wallCutFaces(
         e.a,
         e.b,
-        thick,
-        wallH,
-        floor.openings
+        porchRail ? 0.35 : thick,
+        porchRail ? 3 : wallH,
+        porchRail ? [] : floor.openings
           .filter((o) => o.wallId === w.id)
           .map((o) => ({ t: o.t, width: o.width, kind: o.type, swing: o.swing })),
       );
@@ -265,8 +270,8 @@ export function DollhouseCanvas() {
         faces.push({
           key: `w-${w.id}-${i}`,
           pts: projectPoints(ring, spec),
-          fill: blocky ? (top ? '#c4a574' : '#d8c4a0') : (useTex && !top ? fill : shades[i % shades.length]),
-          pattern: useTex && !top ? tile : undefined,
+          fill: porchRail ? (top ? '#ffffff' : '#ece7dd') : blocky ? (top ? '#c4a574' : '#d8c4a0') : (useTex && !top ? fill : shades[i % shades.length]),
+          pattern: useTex && !top && !porchRail ? tile : undefined,
           stroke: sel ? '#6e72f5' : ink,
           sw: swWall(sel),
           depth: cameraDepth(mx, my, spec) + (top ? 0.2 : 0),
@@ -359,7 +364,7 @@ export function DollhouseCanvas() {
     faces.sort((a, b) => a.depth - b.depth);
     return faces;
   }, [
-    floor.walls, floor.nodes, floor.openings, floor.furniture, floor.roof,
+    floor.walls, floor.nodes, floor.openings, floor.furniture, floor.roof, floor.rooms,
     houseTex, tiles, spec.kind, spec.yaw, spec.top, selected, light, blocky, zoom, furnLod, setSelected, wallH,
   ]);
 

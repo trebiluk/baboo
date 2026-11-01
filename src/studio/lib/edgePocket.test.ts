@@ -9,9 +9,15 @@ import { upperBody } from './stories.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.13.19 2d tools, 2.13.18 richer 3d, 2.13.17 furniture list, 2.13.16 3d and dollhouse fixes, 2.13.15 more languages, 2.13.14 save status, 2.13.13 3d viewer update, 2.13.12 drawing engine update, 2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
-  it('chips 2.13.19 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.13.19');
+describe('2.13.20 grand mansion, 2.13.19 2d tools, 2.13.18 richer 3d, 2.13.17 furniture list, 2.13.16 3d and dollhouse fixes, 2.13.15 more languages, 2.13.14 save status, 2.13.13 3d viewer update, 2.13.12 drawing engine update, 2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
+  it('chips 2.13.20 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.13.20');
+    assert.match(readFileSync(join(studio, 'data/changelog.ts'), 'utf8'), /version:\s*'2\.13\.20'/);
+    for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) assert.notEqual(t(l, 'news.mansion'), t('en', 'news.mansion'));
+    const eng = readFileSync(join(studio, 'lib/engine3d.ts'), 'utf8');
+    for (const fn of ['addPorchRail', 'addPorchRoof', 'addChimneys', 'addDormers', 'dressOpening']) assert.match(eng, new RegExp(`function ${fn}\\(`));
+    const tpl = readFileSync(join(studio, 'data/templates.ts'), 'utf8');
+    assert.equal((tpl.match(/furn\('fireplace'/g) ?? []).length >= 2, true);
     assert.match(readFileSync(join(studio, 'data/changelog.ts'), 'utf8'), /version:\s*'2\.13\.19'/);
     for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) {
       for (const k of ['news.tools2d', 'obj.swingL', 'obj.outside', 'obj.wallpaper', 'rooms.lead', 'room.kind.living', 'room.blurb.kitchen', 'tex.pack.plain']) assert.notEqual(t(l, k), t('en', k), `${l} ${k}`);

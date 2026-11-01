@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.20 — 2026-11-01 — Grand Mansion
+- The Mansion looks grand in 3D: an open porch with columns, dormer windows, chimneys, shutters and stone trim.
+
 ## 2.13.19 — 2026-11-01 — 2D tools
 - Notes take your typing right away, tool panels are in your language, and room names move off furniture.
 

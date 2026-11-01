@@ -1,5 +1,6 @@
 /** WebGL house. Plan feet: world X = plan x, world Y = up, world Z = plan y. */
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { Floor, FurnitureItem, Opening, RoofGeometry, Wall } from '../types';
 import type { FloorFinishId } from '../data/flooring';
 import { floorTileCanvas } from '../data/flooring';
@@ -297,8 +298,48 @@ function addMesh(
   const mesh = new THREE.Mesh(geo, material);
   mesh.castShadow = cast;
   mesh.receiveShadow = receive;
+  mesh.userData.batch = true;
   bag.root.add(mesh);
   return mesh;
+}
+
+/**
+ * Merge the many small static pieces (rails, sills, shutters, trim, dormers) that share a material and a name into
+ * one mesh each, so a detailed house costs a few draw calls instead of hundreds (2.13.20).
+ */
+function flushBatches(bag: Bag) {
+  const groups = new Map<string, THREE.Mesh[]>();
+  for (const child of [...bag.root.children]) {
+    const m = child as THREE.Mesh;
+    if (!m.isMesh || !m.userData.batch) continue;
+    const key = `${(m.material as THREE.Material).uuid}|${m.name}|${m.castShadow ? 1 : 0}${m.receiveShadow ? 1 : 0}`;
+    const list = groups.get(key);
+    if (list) list.push(m);
+    else groups.set(key, [m]);
+  }
+  for (const list of groups.values()) {
+    if (list.length < 2) continue;
+    const parts: THREE.BufferGeometry[] = [];
+    for (const m of list) {
+      m.updateMatrix();
+      let g = m.geometry.clone();
+      if (g.index) g = g.toNonIndexed();
+      for (const name of Object.keys(g.attributes)) if (name !== 'position' && name !== 'normal' && name !== 'uv') g.deleteAttribute(name);
+      if (!g.getAttribute('uv')) g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(g.getAttribute('position').count * 2), 2));
+      g.applyMatrix4(m.matrix);
+      parts.push(g);
+    }
+    const merged = mergeGeometries(parts, false);
+    parts.forEach((g) => g.dispose());
+    if (!merged) continue;
+    const one = new THREE.Mesh(merged, list[0].material);
+    one.name = list[0].name;
+    one.castShadow = list[0].castShadow;
+    one.receiveShadow = list[0].receiveShadow;
+    bag.geos.push(merged);
+    for (const m of list) bag.root.remove(m);
+    bag.root.add(one);
+  }
 }
 
 function shapeOnGround(pts: { x: number; y: number }[]): THREE.Shape {
@@ -397,7 +438,7 @@ function meshFromPos(bag: Bag, pos: number[], material: THREE.Material, name?: s
   void mesh;
 }
 
-function addWall(bag: Bag, floor: Floor, wall: Wall, look: HouseLook, nodes: Map<string, { x: number; y: number }>) {
+function addWall(bag: Bag, floor: Floor, wall: Wall, look: HouseLook, nodes: Map<string, { x: number; y: number }>, center: { x: number; y: number }) {
   const a = nodes.get(wall.a);
   const b = nodes.get(wall.b);
   if (!a || !b) return;
@@ -408,6 +449,19 @@ function addWall(bag: Bag, floor: Floor, wall: Wall, look: HouseLook, nodes: Map
   const thick = Math.max(0.35, wall.thickness || 0.45);
   const stories = wallStories(floor, wall);
   const upper = houseHasUpper(floor);
+  // Which side is outside: away from the middle of the house (2.13.20).
+  const ux0 = dx / len;
+  const uy0 = dy / len;
+  const mx = (a.x + b.x) / 2;
+  const my = (a.y + b.y) / 2;
+  let out = { x: -uy0, y: ux0 };
+  if (out.x * (mx - center.x) + out.y * (my - center.y) < 0) out = { x: uy0, y: -ux0 };
+  // A one-story wall on a two-story house is the porch: draw it as an open rail between posts, so the porch
+  // reads as a porch (columns, light, steps) instead of a closed brick box (2.13.20).
+  if (upper && wall.kind === 'exterior' && stories === 1 && (floor.rooms ?? []).some((r) => r.kind === 'outdoor')) {
+    addPorchRail(bag, floor, wall, a, b, look);
+    return;
+  }
   const h = wall.kind === 'interior' ? (upper ? look.wallH : Math.max(7, look.wallH - 0.35)) : look.wallH * stories;
   const shape = new THREE.Shape();
   shape.moveTo(0, 0);
@@ -456,6 +510,133 @@ function addWall(bag: Bag, floor: Floor, wall: Wall, look: HouseLook, nodes: Map
   );
   mesh.position.set(a.x, 0, a.y);
   mesh.rotation.y = ang;
+  if (wall.kind === 'exterior') {
+    // Stone plinth at the base and a band between floors: the lines that make a facade look built (2.13.20).
+    const stone = mat(bag, '#D8CFC2', 0.85);
+    const band = (y: number, hgt: number, proud: number) => {
+      const m = addMesh(bag, new THREE.BoxGeometry(len + proud * 2, hgt, thick + proud * 2), stone, false, true);
+      m.position.set(mx, y, my);
+      m.rotation.y = ang;
+    };
+    band(0.55, 1.1, 0.08);
+    if (stories >= 2) band(look.wallH, 0.42, 0.1);
+  }
+  for (const o of ops) dressOpening(bag, o, a, ux, uy, ang, len, thick, out, stories, look, wall.drawStyle === 'brick');
+}
+
+/** Low rail with turned balusters, posts at the ends, and a gap where the door or opening is. */
+function addPorchRail(
+  bag: Bag,
+  floor: Floor,
+  wall: Wall,
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+  look: HouseLook,
+) {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const len = Math.hypot(dx, dy);
+  const ux = dx / len;
+  const uy = dy / len;
+  const ang = -Math.atan2(dy, dx);
+  const white = mat(bag, '#F4F0E8', 0.6);
+  const gaps = floor.openings.filter((o) => o.wallId === wall.id).map((o) => {
+    const half = Math.min((o.width || 3) / 2, len * 0.46);
+    const c = Math.max(half, Math.min(len - half, (o.t ?? 0.5) * len));
+    return [c - half, c + half] as const;
+  });
+  const inGap = (t: number) => gaps.some(([g0, g1]) => t > g0 - 0.05 && t < g1 + 0.05);
+  const at = (t: number) => ({ x: a.x + ux * t, z: a.y + uy * t });
+  // rails, broken at the gaps
+  const runs: [number, number][] = [];
+  let start = 0;
+  for (const [g0, g1] of [...gaps].sort((p, q) => p[0] - q[0])) {
+    if (g0 > start + 0.3) runs.push([start, g0]);
+    start = Math.max(start, g1);
+  }
+  if (len > start + 0.3) runs.push([start, len]);
+  for (const [r0, r1] of runs) {
+    const c = at((r0 + r1) / 2);
+    for (const [y, hgt] of [[3.0, 0.22], [0.45, 0.16]] as const) {
+      const rail = addMesh(bag, new THREE.BoxGeometry(r1 - r0, hgt, 0.34), white, true, true);
+      rail.position.set(c.x, y, c.z);
+      rail.rotation.y = ang;
+    }
+  }
+  const baluster = new THREE.CylinderGeometry(0.07, 0.09, 2.45, 6);
+  bag.geos.push(baluster);
+  for (let t = 0.35; t < len - 0.2; t += 0.55) {
+    if (inGap(t)) continue;
+    const p = at(t);
+    const m = new THREE.Mesh(baluster, white);
+    m.position.set(p.x, 1.75, p.z);
+    m.castShadow = true;
+    m.userData.batch = true;
+    bag.root.add(m);
+  }
+  // square posts at both ends carry the porch roof
+  for (const t of [0.2, len - 0.2]) {
+    const p = at(t);
+    const post = addMesh(bag, new THREE.BoxGeometry(0.62, look.wallH, 0.62), white, true, true);
+    post.position.set(p.x, look.wallH / 2, p.z);
+  }
+  // porch floor edge: a stone step under the opening
+  for (const [g0, g1] of gaps) {
+    const c = at((g0 + g1) / 2);
+    const step = addMesh(bag, new THREE.BoxGeometry(g1 - g0 + 1.2, 0.4, 1.4), mat(bag, '#CFC6B8', 0.85), false, true);
+    step.position.set(c.x, 0.2, c.z);
+    step.rotation.y = ang;
+  }
+}
+
+/** Sill, lintel and shutters on windows; a frame and a hood on outside doors (2.13.20). */
+function dressOpening(
+  bag: Bag,
+  o: Opening,
+  a: { x: number; y: number },
+  ux: number,
+  uy: number,
+  ang: number,
+  len: number,
+  thick: number,
+  out: { x: number; y: number },
+  stories: number,
+  look: HouseLook,
+  brick: boolean,
+) {
+  const half = Math.min((o.width || 3) / 2, len * 0.46);
+  const cx = Math.max(half + 0.05, Math.min(len - half - 0.05, (o.t ?? 0.5) * len));
+  const stone = mat(bag, '#E3DACB', 0.8);
+  const face = thick / 2 + 0.02;
+  const put = (geo: THREE.BufferGeometry, m: THREE.Material, along: number, y: number, outBy: number) => {
+    const mesh = addMesh(bag, geo, m, true, true);
+    mesh.position.set(a.x + ux * along + out.x * outBy, y, a.y + uy * along + out.y * outBy);
+    mesh.rotation.y = ang;
+    return mesh;
+  };
+  if (o.type === 'window') {
+    const bands = stories >= 2 ? [0, look.wallH] : [0];
+    for (const base of bands) {
+      const y0 = base + look.wallH * 0.28;
+      const y1 = base + look.wallH * 0.78;
+      const w = half * 2;
+      put(new THREE.BoxGeometry(w + 0.6, 0.2, thick + 0.36), stone, cx, y0 - 0.1, 0.06);
+      put(new THREE.BoxGeometry(w + 0.5, 0.42, thick + 0.1), stone, cx, y1 + 0.21, 0.02);
+      if (brick) {
+        const shutter = mat(bag, '#2F4A3A', 0.7);
+        for (const sgn of [-1, 1]) {
+          put(new THREE.BoxGeometry(Math.min(1.3, w * 0.42), y1 - y0, 0.1), shutter, cx + sgn * (half + Math.min(1.3, w * 0.42) / 2 + 0.12), (y0 + y1) / 2, face + 0.05);
+        }
+      }
+    }
+    return;
+  }
+  // outside door: casing on the outer face and a small hood above
+  if (o.symbolKind === 'slidingDoor') return;
+  const y1 = look.wallH * 0.8;
+  const casing = mat(bag, '#F2EDE3', 0.6);
+  for (const sgn of [-1, 1]) put(new THREE.BoxGeometry(0.32, y1 + 0.2, 0.14), casing, cx + sgn * (half + 0.16), (y1 + 0.2) / 2, face);
+  put(new THREE.BoxGeometry(half * 2 + 1.0, 0.32, 0.9), casing, cx, y1 + 0.42, face + 0.4);
 }
 
 function placeOpening(
@@ -520,6 +701,22 @@ function addRoof(bag: Bag, roof: RoofGeometry, rich = false) {
   if (o.length < 3) return;
   const eh = roof.eavesHeight;
   const rh = roof.ridgeHeight;
+  // Cornice: a deep trim band all round under the eaves, so the roof sits on the house instead of floating (2.13.20).
+  if (roof.styleId !== 'grass') {
+    const trim = mat(bag, '#EFE8DC', 0.7);
+    for (let i = 0; i < o.length; i++) {
+      const p = o[i];
+      const q = o[(i + 1) % o.length];
+      const L = Math.hypot(q.x - p.x, q.y - p.y);
+      if (L < 0.5) continue;
+      for (const [y, hgt, dep] of [[eh - 0.2, 0.4, 0.5], [eh - 0.58, 0.34, 0.22]] as const) {
+        const m = addMesh(bag, new THREE.BoxGeometry(L + dep * 2, hgt, dep * 2), trim, false, true);
+        m.position.set((p.x + q.x) / 2, y, (p.y + q.y) / 2);
+        m.rotation.y = -Math.atan2(q.y - p.y, q.x - p.x);
+        m.name = 'roof';
+      }
+    }
+  }
   const slate = roof.styleId === 'grass'
     ? mat(bag, '#3E6B3A', 0.8)
     : mat(bag, '#ffffff', 0.78, { map: slateMap(), bump: rich ? slateMap() : null, bumpScale: 2.5 });
@@ -547,6 +744,7 @@ function addRoof(bag: Bag, roof: RoofGeometry, rich = false) {
     }
     meshFromPos(bag, soffit, mat(bag, '#E7E2DA', 0.94), 'roof');
     floorMesh(bag, inner, capY + 0.05, slate, 'roof');
+    addDormers(bag, o.slice(0, 4), inner, eh, capY, slate);
     return;
   }
   if (roof.ridges.length && o.length >= 4) {
@@ -570,6 +768,143 @@ function addRoof(bag: Bag, roof: RoofGeometry, rich = false) {
     return;
   }
   floorMesh(bag, o, eh + 0.4, slate, 'roof');
+}
+
+/**
+ * Dormer windows along the two long sides of a mansard: a small gabled box with a window, every ~9 ft.
+ * They break up the big slate face, the way real mansard roofs do (2.13.20).
+ */
+function addDormers(
+  bag: Bag,
+  o: { x: number; y: number }[],
+  inner: { x: number; y: number }[],
+  eh: number,
+  capY: number,
+  slate: THREE.Material,
+) {
+  const white = mat(bag, '#F4F0E8', 0.6);
+  // dormer glass reads dark from outside (a small room behind it), with a white sash around it
+  const glass = mat(bag, '#3E5468', 0.12, { metal: 0.2, glass: true });
+  // the pane and the gable face are single planes: show both sides so they read from any angle
+  white.side = THREE.DoubleSide;
+  glass.side = THREE.DoubleSide;
+  const edges = [0, 1, 2, 3].map((i) => ({ i, L: Math.hypot(o[(i + 1) % 4].x - o[i].x, o[(i + 1) % 4].y - o[i].y) }));
+  const longest = Math.max(...edges.map((e) => e.L));
+  for (const { i, L } of edges) {
+    if (L < longest * 0.8 || L < 14) continue;
+    const p = o[i];
+    const q = o[(i + 1) % 4];
+    const pi = inner[i];
+    const ux = (q.x - p.x) / L;
+    const uy = (q.y - p.y) / L;
+    // outward = from the inner ring toward this edge
+    const mxE = (p.x + q.x) / 2;
+    const myE = (p.y + q.y) / 2;
+    const mxI = (pi.x + inner[(i + 1) % 4].x) / 2;
+    const myI = (pi.y + inner[(i + 1) % 4].y) / 2;
+    const run = Math.hypot(mxE - mxI, myE - myI) || 1;
+    const nx = (mxE - mxI) / run;
+    const ny = (myE - myI) / run;
+    const count = Math.max(2, Math.floor((L - 6) / 9));
+    const step = (L - 6) / (count - 1 || 1);
+    const ang = -Math.atan2(uy, ux);
+    const dw = 3.4;
+    const dh = Math.min(4.2, (capY - eh) * 0.62);
+    for (let k = 0; k < count; k++) {
+      const t = 3 + k * step;
+      // set the face 40% up the slope, pulled out to the eave line a little
+      const f = 0.38;
+      const fx = p.x + ux * t - nx * run * f;
+      const fz = p.y + uy * t - ny * run * f;
+      const baseY = eh + (capY - eh) * f - 0.2;
+      const depth = run * 0.7;
+      const body = addMesh(bag, new THREE.BoxGeometry(dw, dh, depth), white, true, true);
+      body.position.set(fx - nx * depth / 2, baseY + dh / 2, fz - ny * depth / 2);
+      body.rotation.y = ang;
+      body.name = 'roof';
+      const pane = addMesh(bag, new THREE.PlaneGeometry(dw - 0.9, dh - 1.0), glass, false, false);
+      pane.position.set(fx + nx * 0.03, baseY + dh / 2 - 0.1, fz + ny * 0.03);
+      const bar = addMesh(bag, new THREE.BoxGeometry(0.12, dh - 1.0, 0.06), white, false, false);
+      bar.position.set(fx + nx * 0.06, baseY + dh / 2 - 0.1, fz + ny * 0.06);
+      bar.rotation.y = ang;
+      bar.name = 'roof';
+      pane.rotation.y = ang;
+      pane.name = 'roof';
+      // little gable cap: two slopes over the body
+      const top = baseY + dh;
+      const peak = top + 1.4;
+      const hw = dw / 2 + 0.25;
+      const fwd = 0.3;
+      const back = depth + 0.2;
+      const P = (along: number, out: number, y: number) => [fx + ux * along + nx * out, y, fz + uy * along + ny * out];
+      const pos: number[] = [];
+      pushQuad(pos, P(-hw, fwd, top), P(-hw, -back, top), P(0, -back, peak), P(0, fwd, peak));
+      pushQuad(pos, P(hw, fwd, top), P(0, fwd, peak), P(0, -back, peak), P(hw, -back, top));
+      meshFromPos(bag, pos, slate, 'roof', true);
+      const gable: number[] = [];
+      pushTri(gable, P(-hw + 0.25, 0.01, top), P(hw - 0.25, 0.01, top), P(0, 0.01, peak - 0.15));
+      meshFromPos(bag, gable, white, 'roof');
+    }
+  }
+}
+
+/** A hipped porch roof on a beam, with a white ceiling underneath (2.13.20). */
+function addPorchRoof(bag: Bag, pad: { minX: number; minY: number; maxX: number; maxY: number }, look: HouseLook, rich: boolean) {
+  const eh = look.wallH + 0.15;
+  const w = pad.maxX - pad.minX;
+  const d = pad.maxY - pad.minY;
+  const rise = Math.min(3, Math.min(w, d) * 0.45);
+  const slate = mat(bag, '#ffffff', 0.78, { map: slateMap(), bump: rich ? slateMap() : null, bumpScale: 2.5 });
+  const c = [[pad.minX, eh, pad.minY], [pad.maxX, eh, pad.minY], [pad.maxX, eh, pad.maxY], [pad.minX, eh, pad.maxY]];
+  const pos: number[] = [];
+  if (w >= d) {
+    const ra = [pad.minX + d / 2, eh + rise, (pad.minY + pad.maxY) / 2];
+    const rb = [pad.maxX - d / 2, eh + rise, (pad.minY + pad.maxY) / 2];
+    pushQuad(pos, c[0], c[1], rb, ra);
+    pushQuad(pos, c[3], c[2], rb, ra);
+    pushTri(pos, c[0], c[3], ra);
+    pushTri(pos, c[1], c[2], rb);
+  } else {
+    const ra = [(pad.minX + pad.maxX) / 2, eh + rise, pad.minY + w / 2];
+    const rb = [(pad.minX + pad.maxX) / 2, eh + rise, pad.maxY - w / 2];
+    pushQuad(pos, c[0], c[3], rb, ra);
+    pushQuad(pos, c[1], c[2], rb, ra);
+    pushTri(pos, c[0], c[1], ra);
+    pushTri(pos, c[3], c[2], rb);
+  }
+  meshFromPos(bag, pos, slate, 'roof', true);
+  const white = mat(bag, '#F4F0E8', 0.6);
+  const beam = addMesh(bag, new THREE.BoxGeometry(w - 0.3, 0.7, d - 0.3), white, true, true);
+  beam.position.set((pad.minX + pad.maxX) / 2, eh - 0.35, (pad.minY + pad.maxY) / 2);
+  beam.name = 'roof';
+}
+
+/** Brick chimneys above every fireplace, with a stone cap and clay pots (2.13.20). */
+function addChimneys(bag: Bag, floor: Floor, roof: RoofGeometry, rich: boolean) {
+  const brick = mat(bag, '#ffffff', 0.92, { map: brickMap(), bump: rich ? brickMap() : null, bumpScale: 2.2 });
+  const cap = mat(bag, '#D8CFC2', 0.85);
+  const pot = mat(bag, '#B0603C', 0.7);
+  const top = roof.ridgeHeight + 2.6;
+  const base = roof.eavesHeight - 0.5;
+  for (const f of floor.furniture ?? []) {
+    if (f.catalogId !== 'fireplace') continue;
+    const w = Math.max(2.2, Math.min(4, f.w * 0.6));
+    const geo = new THREE.BoxGeometry(w, top - base, 1.8);
+    uvFeet(geo, 2.2, 1.15);
+    const stack = addMesh(bag, geo, brick, true, true);
+    stack.position.set(f.x, (top + base) / 2, f.y);
+    stack.rotation.y = -f.rot;
+    stack.name = 'roof';
+    const lid = addMesh(bag, new THREE.BoxGeometry(w + 0.5, 0.35, 2.3), cap, true, false);
+    lid.position.set(f.x, top + 0.17, f.y);
+    lid.rotation.y = -f.rot;
+    lid.name = 'roof';
+    for (const sgn of [-1, 1]) {
+      const p = addMesh(bag, new THREE.CylinderGeometry(0.28, 0.34, 0.9, 10), pot, true, false);
+      p.position.set(f.x + Math.cos(f.rot) * sgn * w * 0.25, top + 0.8, f.y - Math.sin(f.rot) * sgn * w * 0.25);
+      p.name = 'roof';
+    }
+  }
 }
 
 function addFurniture(bag: Bag, item: FurnitureItem, storyH = 0) {
@@ -766,7 +1101,14 @@ export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
   ground.position.set(gx, -0.02, gz);
 
   const nodes = new Map(floor.nodes.map((n) => [n.id, n]));
-  for (const wall of floor.walls) addWall(bag, floor, wall, look, nodes);
+  const houseCenter = (() => {
+    if (!floor.nodes.length) return { x: 0, y: 0 };
+    let sx = 0;
+    let sy = 0;
+    for (const n of floor.nodes) { sx += n.x; sy += n.y; }
+    return { x: sx / floor.nodes.length, y: sy / floor.nodes.length };
+  })();
+  for (const wall of floor.walls) addWall(bag, floor, wall, look, nodes, houseCenter);
 
   let floors: { poly: { x: number; y: number }[]; finish: FloorFinishId }[] = [];
   try {
@@ -793,21 +1135,13 @@ export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
   const shown = viewRoof(floor, look.wallH);
   if (shown) addRoof(bag, shown, !!look.rich);
   const porchPad = porchBounds(floor);
-  if (porchPad) {
-    const slab = addMesh(
-      bag,
-      new THREE.BoxGeometry(porchPad.maxX - porchPad.minX, 0.28, porchPad.maxY - porchPad.minY),
-      mat(bag, '#4E5968', 0.8),
-      true,
-      true,
-    );
-    slab.position.set((porchPad.minX + porchPad.maxX) / 2, look.wallH + 0.14, (porchPad.minY + porchPad.maxY) / 2);
-    slab.name = 'roof';
-  }
+  if (porchPad) addPorchRoof(bag, porchPad, look, !!look.rich);
+  if (shown) addChimneys(bag, floor, shown, !!look.rich);
   if (look.showFurn) {
     for (const item of floor.furniture) addFurniture(bag, item, upper ? look.wallH : 0);
   }
   addLandscape(bag, floor);
+  flushBatches(bag);
 
   return {
     root: bag.root,

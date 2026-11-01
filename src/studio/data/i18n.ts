@@ -238,6 +238,17 @@ export const STR: Record<string, Gloss> = {
     ar: 'يمكنك الآن معرفة إن كان عملك محفوظًا، بجانب تصدير.',
     rw: 'Ubu ushobora kubona niba akazi kawe kabitswe, iruhande rwa Export.',
   }),
+  'news.mansion': g('The Mansion looks grand in 3D: an open porch with columns, dormer windows, chimneys, shutters and stone trim.', {
+    es: 'La Mansión luce grandiosa en 3D: porche abierto con columnas, buhardillas, chimeneas, contraventanas y molduras de piedra.',
+    cu: 'La Mansión luce grandiosa en 3D: portal abierto con columnas, buhardillas, chimeneas, persianas y molduras de piedra.',
+    uk: 'Особняк у 3D виглядає велично: відкритий ґанок з колонами, мансардні вікна, димарі, віконниці й кам\'яне оздоблення.',
+    ru: 'Особняк в 3D выглядит величественно: открытое крыльцо с колоннами, слуховые окна, трубы, ставни и каменная отделка.',
+    ti: 'እቲ ዓቢ ገዛ ብ3D ግሩም ይመስል፦ ኣዕኑድ ዘለዎ ክፉት በረንዳ፣ መስኮታት ናሕሲ፣ ትኪ መውጽኢ፣ መዕጸዊ መስኮትን ናይ እምኒ ጌጽን።',
+    fa: 'قصر در نمای سه‌بعدی باشکوه است: برندهٔ باز با ستون، پنجره‌های بام، دودکش، دریچه‌های پنجره و تزئین سنگی.',
+    'fa-AF': 'قصر در نمای سه‌بعدی باشکوه است: برندهٔ باز با ستون، پنجره‌های بام، دودکش، دریچه‌های پنجره و تزئین سنگی.',
+    ar: 'القصر يبدو فخمًا في العرض ثلاثي الأبعاد: شرفة مفتوحة بأعمدة، ونوافذ في السقف، ومداخن، ومصاريع، وزخارف حجرية.',
+    rw: "Inzu nini isa neza muri 3D: ibaraza rifunguye rifite inkingi, amadirishya yo ku gisenge, chimine, inzugi z'amadirishya n'imitako y'amabuye.",
+  }),
   'news.tools2d': g('Notes take your typing right away, tool panels are in your language, and room names move off furniture.', {
     es: 'Las notas reciben lo que escribes al instante, los paneles están en tu idioma y los nombres de cuartos se apartan de los muebles.',
     cu: 'Las notas reciben lo que escribes al instante, los paneles están en tu idioma y los nombres de cuartos se apartan de los muebles.',

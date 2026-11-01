@@ -33,12 +33,12 @@ export const Route = createRootRoute({
         <AuthProvider>
           <Outlet />
         </AuthProvider>
-        <script src="https://apps.kulibert.net/shared/kulibert-i18n.js?v=2.13.19" defer />
-        <script src="https://apps.kulibert.net/shared/kulibert-prefs.js?v=2.13.19" defer />
+        <script src="https://apps.kulibert.net/shared/kulibert-i18n.js?v=2.13.20" defer />
+        <script src="https://apps.kulibert.net/shared/kulibert-prefs.js?v=2.13.20" defer />
         <script
-          src="https://apps.kulibert.net/shared/kulibert-bar.js?v=2.13.19"
+          src="https://apps.kulibert.net/shared/kulibert-bar.js?v=2.13.20"
           data-app="baboo"
-          data-version="v2.13.19"
+          data-version="v2.13.20"
           data-help="#baboo-help"
           defer
         />
