@@ -5,7 +5,7 @@ import type { FloorFinishId } from '../data/flooring';
 import { floorFinish } from '../data/flooring';
 import { listInteriorFloors } from './rooms';
 import { furnitureParts } from './furnShape';
-import { houseHasUpper, porchBounds, upperOutline, viewRoof, wallStories } from './stories';
+import { houseHasUpper, porchBounds, upperBody, viewRoof, wallStories } from './stories';
 
 export type HouseLook = {
   wallH: number;
@@ -258,15 +258,54 @@ function pushQuad(out: number[], a: number[], b: number[], c: number[], d: numbe
   pushTri(out, a, c, d);
 }
 
-function meshFromPos(bag: Bag, pos: number[], material: THREE.Material, name?: string): void {
+/** Turn every triangle so it faces away from the shell's centre. A gable's two slopes otherwise cancel out and one stays inside-out (2.13.16). */
+function faceOut(pos: number[]): void {
+  const n = pos.length / 3;
+  let cx = 0;
+  let cy = 0;
+  let cz = 0;
+  for (let i = 0; i < pos.length; i += 3) {
+    cx += pos[i];
+    cy += pos[i + 1];
+    cz += pos[i + 2];
+  }
+  cx /= n;
+  cy /= n;
+  cz /= n;
+  cy -= 1; // aim a little low so near-flat tops count as facing up
+  for (let i = 0; i + 8 < pos.length; i += 9) {
+    const ux = pos[i + 3] - pos[i];
+    const uy = pos[i + 4] - pos[i + 1];
+    const uz = pos[i + 5] - pos[i + 2];
+    const vx = pos[i + 6] - pos[i];
+    const vy = pos[i + 7] - pos[i + 1];
+    const vz = pos[i + 8] - pos[i + 2];
+    const nx = uy * vz - uz * vy;
+    const ny = uz * vx - ux * vz;
+    const nz = ux * vy - uy * vx;
+    const mx = (pos[i] + pos[i + 3] + pos[i + 6]) / 3 - cx;
+    const my = (pos[i + 1] + pos[i + 4] + pos[i + 7]) / 3 - cy;
+    const mz = (pos[i + 2] + pos[i + 5] + pos[i + 8]) / 3 - cz;
+    if (nx * mx + ny * my + nz * mz < 0) {
+      for (let k = 0; k < 3; k++) {
+        const t = pos[i + 3 + k];
+        pos[i + 3 + k] = pos[i + 6 + k];
+        pos[i + 6 + k] = t;
+      }
+    }
+  }
+}
+
+function meshFromPos(bag: Bag, pos: number[], material: THREE.Material, name?: string, outward = false): void {
   if (pos.length < 9) return;
+  if (outward) faceOut(pos);
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   geo.computeVertexNormals();
   const nrm = geo.getAttribute('normal');
   let ny = 0;
   for (let i = 0; i < nrm.count; i++) ny += nrm.getY(i);
-  if (ny < 0) {
+  if (!outward && ny < 0) {
     const p = geo.getAttribute('position');
     for (let i = 0; i < p.count; i += 3) {
       const x = p.getX(i);
@@ -414,7 +453,7 @@ function addRoof(bag: Bag, roof: RoofGeometry) {
       const d = [inner[i].x, capY, inner[i].y];
       pushQuad(pos, a, b, c, d);
     }
-    meshFromPos(bag, pos, slate, 'roof');
+    meshFromPos(bag, pos, slate, 'roof', true);
     const soffit: number[] = [];
     for (let i = 0; i < 4; i++) {
       const j = (i + 1) % 4;
@@ -445,7 +484,7 @@ function addRoof(bag: Bag, roof: RoofGeometry) {
       pushTri(pos, p[0], p[1], ra);
       pushTri(pos, p[3], p[2], rb);
     }
-    meshFromPos(bag, pos, slate, 'roof');
+    meshFromPos(bag, pos, slate, 'roof', true);
     return;
   }
   floorMesh(bag, o, eh + 0.4, slate, 'roof');
@@ -571,13 +610,13 @@ function addLandscape(bag: Bag, floor: Floor) {
 }
 
 function addUpperDeck(bag: Bag, floor: Floor, y: number) {
-  const o = upperOutline(floor);
-  if (!o || o.length < 4) return;
-  const pad = 1.55;
-  const minX = Math.min(...o.map((p) => p.x)) + pad;
-  const maxX = Math.max(...o.map((p) => p.x)) - pad;
-  const minY = Math.min(...o.map((p) => p.y)) + pad;
-  const maxY = Math.max(...o.map((p) => p.y)) - pad;
+  const body = upperBody(floor);
+  if (!body) return;
+  const pad = 0.3; // stop just inside the wall faces
+  const minX = body.minX + pad;
+  const maxX = body.maxX - pad;
+  const minY = body.minY + pad;
+  const maxY = body.maxY - pad;
   if (maxX - minX < 4 || maxY - minY < 4) return;
   const shape = shapeOnGround([
     { x: minX, y: minY },

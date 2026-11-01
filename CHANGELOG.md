@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.16 — 2026-11-01 — Dollhouse and 3D fixes
+- Dollhouse and 3D View are fixed: whole roofs, paths on the grass, no extra floors.
+
 ## 2.13.15 — 2026-11-01 — More languages
 - More words are now in Arabic, Kinyarwanda and Tigrinya.
 

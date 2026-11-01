@@ -41,6 +41,20 @@ type SceneFace = {
   pick?: () => void;
 };
 
+/** House corners plus every path, bed, hedge and tree, so the lawn reaches under all of them (2.13.16). */
+function groundPoints(nodes: { x: number; y: number }[], landscape: LandscapeItem[] | undefined): { x: number; y: number }[] {
+  const pts = nodes.map((n) => ({ x: n.x, y: n.y }));
+  if (!nodes.length) return pts;
+  for (const L of landscape ?? []) {
+    const c = Math.abs(Math.cos(L.rot ?? 0));
+    const sn = Math.abs(Math.sin(L.rot ?? 0));
+    const hx = (L.w / 2) * c + (L.h / 2) * sn;
+    const hy = (L.w / 2) * sn + (L.h / 2) * c;
+    pts.push({ x: L.x - hx, y: L.y - hy }, { x: L.x + hx, y: L.y + hy });
+  }
+  return pts;
+}
+
 export function DollhouseCanvas() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 800, h: 600 });
@@ -168,9 +182,9 @@ export function DollhouseCanvas() {
   const floorPoly = useMemo(() => {
     const outline = floor.roof?.outline;
     if (outline && outline.length >= 3) return projectPoints(outline.map((p) => ({ x: p.x, y: p.y, z: 0 })), spec);
-    if (floor.nodes.length < 3) return [];
-    return projectPoints(floor.nodes.map((n) => ({ x: n.x, y: n.y, z: 0 })), spec);
-  }, [floor.roof, floor.nodes, spec.kind, spec.yaw, spec.top]);
+    // No closed room yet: no floor. Joining every corner in draw order made a wedge (2.13.16), and 3D View shows none.
+    return [];
+  }, [floor.roof, spec.kind, spec.yaw, spec.top]);
 
   const interiorFloors = useMemo(() => {
     const house = asFloorFinish(settings.floorFinishId);
@@ -181,16 +195,16 @@ export function DollhouseCanvas() {
   }, [floor.nodes, floor.walls, floor.rooms, settings.floorFinishId, spec.kind, spec.yaw, spec.top]);
 
   const padPoly = useMemo(() => {
-    const pad = footprintPad(floor.nodes);
+    const pad = footprintPad(groundPoints(floor.nodes, floor.landscape), 3);
     if (!pad) return [];
     return projectPoints(pad.map((p) => ({ x: p.x, y: p.y, z: -0.12 })), spec);
-  }, [floor.nodes, spec.kind, spec.yaw, spec.top]);
+  }, [floor.nodes, floor.landscape, spec.kind, spec.yaw, spec.top]);
 
   const shadowPoly = useMemo(() => {
-    const pad = footprintPad(floor.nodes);
+    const pad = footprintPad(groundPoints(floor.nodes, floor.landscape), 3);
     if (!pad) return [];
     return projectPoints(pad.map((p) => ({ x: p.x + 1.1, y: p.y + 1.1, z: -0.4 })), spec);
-  }, [floor.nodes, spec.kind, spec.yaw, spec.top]);
+  }, [floor.nodes, floor.landscape, spec.kind, spec.yaw, spec.top]);
 
   const sceneFaces = useMemo(() => {
     const originPts = floor.roof?.outline && floor.roof.outline.length >= 3
@@ -347,6 +361,18 @@ export function DollhouseCanvas() {
     floor.walls, floor.nodes, floor.openings, floor.furniture, floor.roof,
     houseTex, tiles, spec.kind, spec.yaw, spec.top, selected, light, blocky, zoom, furnLod, setSelected, wallH,
   ]);
+
+  // Paths and beds lie on the ground, so they go under every wall. Trees, hedges and lamps stand up,
+  // so they sort in with the walls by camera depth instead of always painting on top (2.13.16).
+  const drawList = useMemo(() => {
+    type Entry = { t: 'face'; d: number; face: (typeof sceneFaces)[number] } | { t: 'plant'; d: number; item: LandscapeItem };
+    const list: Entry[] = sceneFaces.map((face) => ({ t: 'face', d: face.depth, face }));
+    for (const item of floor.landscape ?? []) {
+      const standing = item.kind === 'tree' || item.kind === 'hedge' || item.kind === 'lamp';
+      list.push({ t: 'plant', d: standing ? cameraDepth(item.x, item.y, spec) + 0.1 : -1e9, item });
+    }
+    return list.sort((a, b) => a.d - b.d);
+  }, [sceneFaces, floor.landscape, spec.kind, spec.yaw, spec.top]);
 
   const screenToWorld = (sx: number, sy: number) => {
     const ix = (sx - pan.x) / zoom;
@@ -607,7 +633,22 @@ export function DollhouseCanvas() {
               />
             );
           })}
-          {sceneFaces.map((face) => {
+          {drawList.map((entry) => {
+            if (entry.t === 'plant') {
+              const L = entry.item;
+              return (
+                <DollPlant
+                  key={L.id}
+                  item={L}
+                  spec={spec}
+                  selected={selected?.kind === 'landscape' && selected.id === L.id}
+                  light={light}
+                  zoom={zoom}
+                  onPick={() => setSelected({ kind: 'landscape', id: L.id })}
+                />
+              );
+            }
+            const face = entry.face;
             const tile = face.pattern;
             return (
               <Line
@@ -636,17 +677,6 @@ export function DollhouseCanvas() {
               />
             );
           })}
-          {(floor.landscape ?? []).map((L) => (
-            <DollPlant
-              key={L.id}
-              item={L}
-              spec={spec}
-              selected={selected?.kind === 'landscape' && selected.id === L.id}
-              light={light}
-              zoom={zoom}
-              onPick={() => setSelected({ kind: 'landscape', id: L.id })}
-            />
-          ))}
           {floor.rooms.map((r) => {
             const p = project(r.x, r.y, 0.2, spec);
             const pick = (evt: { cancelBubble: boolean }) => {

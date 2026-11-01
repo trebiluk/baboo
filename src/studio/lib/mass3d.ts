@@ -9,7 +9,7 @@ import { listInteriorFaces, listInteriorFloors, roomPolygon } from './rooms';
 import { FACE_BUDGET, FURN_CAP, PLANT_CAP, type FurnLod } from './perf';
 import { bloomSpots } from '../data/landscape';
 import { wallFootprint, wallSidesAt } from './wallJoin';
-import { houseHasUpper, porchBounds, viewRoof, wallStories } from './stories';
+import { houseHasUpper, porchBounds, upperBody, viewRoof, wallStories } from './stories';
 
 export const WALL_H = 9;
 export const EYE_Z = 5.5;
@@ -417,16 +417,14 @@ export function buildMass(floor: Floor, opts: MassOpts): MassFace[] {
   const shown = viewRoof(floor, wallH);
   if (shown) faces.push(...roofFaces(shown, opts.blocky, tint.fill));
   if (houseHasUpper(floor)) {
-    const up = shown?.outline;
-    if (up && up.length >= 4) {
-      const pad = 1.3;
-      const xs = up.map((p) => p.x);
-      const ys = up.map((p) => p.y);
+    const body = upperBody(floor);
+    if (body) {
+      const pad = 0.3;
       const plate = [
-        v3(Math.min(...xs) + pad, Math.min(...ys) + pad, wallH),
-        v3(Math.max(...xs) - pad, Math.min(...ys) + pad, wallH),
-        v3(Math.max(...xs) - pad, Math.max(...ys) - pad, wallH),
-        v3(Math.min(...xs) + pad, Math.max(...ys) - pad, wallH),
+        v3(body.minX + pad, body.minY + pad, wallH),
+        v3(body.maxX - pad, body.minY + pad, wallH),
+        v3(body.maxX - pad, body.maxY - pad, wallH),
+        v3(body.minX + pad, body.maxY - pad, wallH),
       ];
       faces.push({ pts: plate, fill: '#D9CBB8', stroke: '#B7A890', kind: 'floor' });
     }

@@ -22,6 +22,54 @@ export function wallStories(floor: Floor, wall: Wall): number {
   return 2;
 }
 
+/**
+ * The main box of the upstairs: each side sits where most of that side's two-story wall is,
+ * so a bay window or other small bump-out does not push the upstairs floor out past the wall (2.13.16).
+ */
+export function upperBody(floor: Floor): { minX: number; minY: number; maxX: number; maxY: number } | null {
+  if (!houseHasUpper(floor)) return null;
+  const nodes = new Map(floor.nodes.map((n) => [n.id, n]));
+  const across: { at: number; len: number }[] = [];
+  const along: { at: number; len: number }[] = [];
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const w of floor.walls) {
+    if (wallStories(floor, w) < 2) continue;
+    const a = nodes.get(w.a);
+    const b = nodes.get(w.b);
+    if (!a || !b) continue;
+    minX = Math.min(minX, a.x, b.x);
+    minY = Math.min(minY, a.y, b.y);
+    maxX = Math.max(maxX, a.x, b.x);
+    maxY = Math.max(maxY, a.y, b.y);
+    const dx = Math.abs(b.x - a.x);
+    const dy = Math.abs(b.y - a.y);
+    if (dy < 0.5 && dx > 0) across.push({ at: (a.y + b.y) / 2, len: dx });
+    if (dx < 0.5 && dy > 0) along.push({ at: (a.x + b.x) / 2, len: dy });
+  }
+  if (!Number.isFinite(minX) || maxX - minX < 4 || maxY - minY < 4) return null;
+  const side = (list: { at: number; len: number }[], span: number, fallback: number, low: boolean) => {
+    const byAt = new Map<number, number>();
+    for (const e of list) {
+      const k = Math.round(e.at * 4) / 4;
+      byAt.set(k, (byAt.get(k) ?? 0) + e.len);
+    }
+    const keys = [...byAt.keys()].sort((p, q) => (low ? p - q : q - p));
+    const hit = keys.find((k) => (byAt.get(k) ?? 0) >= span * 0.4);
+    return hit ?? fallback;
+  };
+  const body = {
+    minY: side(across, maxX - minX, minY, true),
+    maxY: side(across, maxX - minX, maxY, false),
+    minX: side(along, maxY - minY, minX, true),
+    maxX: side(along, maxY - minY, maxX, false),
+  };
+  if (body.maxX - body.minX < 4 || body.maxY - body.minY < 4) return { minX, minY, maxX, maxY };
+  return body;
+}
+
 export function upperOutline(floor: Floor): Point[] | null {
   if (!houseHasUpper(floor)) return null;
   const nodes = new Map(floor.nodes.map((n) => [n.id, n]));

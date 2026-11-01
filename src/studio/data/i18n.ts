@@ -238,6 +238,17 @@ export const STR: Record<string, Gloss> = {
     ar: 'يمكنك الآن معرفة إن كان عملك محفوظًا، بجانب تصدير.',
     rw: 'Ubu ushobora kubona niba akazi kawe kabitswe, iruhande rwa Export.',
   }),
+  'news.view3d': g('Dollhouse and 3D View are fixed: whole roofs, paths on the grass, no extra floors.', {
+    es: 'Casa de muñecas y Vista 3D arregladas: techos enteros, caminos sobre el césped, sin pisos de más.',
+    cu: 'Casa de muñecas y Vista 3D arregladas: techos enteros, caminos sobre el césped, sin pisos de más.',
+    uk: 'Ляльковий будинок і 3D-вигляд виправлено: цілі дахи, доріжки на траві, без зайвих підлог.',
+    ru: 'Кукольный дом и 3D-вид исправлены: целые крыши, дорожки на траве, без лишних полов.',
+    ti: 'ቤት ኣሻንጉሊትን 3D ትርኢትን ተዓሪዮም፦ ምሉእ ናሕሲ፣ መገዲ ኣብ ሳዕሪ፣ ተወሳኺ ባይታ የለን።',
+    fa: 'خانهٔ عروسکی و نمای سه‌بعدی درست شد: بام کامل، راه روی چمن، بی کف اضافه.',
+    'fa-AF': 'خانهٔ عروسکی و نمای سه‌بعدی درست شد: بام کامل، راه روی چمن، بی کف اضافه.',
+    ar: 'تم إصلاح بيت الدمى والعرض ثلاثي الأبعاد: سقوف كاملة، ممرات على العشب، بلا أرضيات زائدة.',
+    rw: "Inzu y'ibikinisho na 3D byakosowe: ibisenge byuzuye, inzira ku byatsi, nta hasi y'inyongera.",
+  }),
   'news.words': g('More words are now in Arabic, Kinyarwanda and Tigrinya.', {
     es: 'Ahora hay más palabras en árabe, kinyarwanda y tigriña.',
     cu: 'Ahora hay más palabras en árabe, kinyarwanda y tigriña.',

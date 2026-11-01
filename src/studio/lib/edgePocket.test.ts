@@ -5,12 +5,28 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { APP_VERSION } from '../version.ts';
 import { LOCALES, t } from '../data/i18n.ts';
+import { upperBody } from './stories.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.13.15 more languages, 2.13.14 save status, 2.13.13 3d viewer update, 2.13.12 drawing engine update, 2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
-  it('chips 2.13.15 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.13.15');
+describe('2.13.16 3d and dollhouse fixes, 2.13.15 more languages, 2.13.14 save status, 2.13.13 3d viewer update, 2.13.12 drawing engine update, 2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
+  it('chips 2.13.16 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.13.16');
+    assert.match(readFileSync(join(studio, 'data/changelog.ts'), 'utf8'), /version:\s*'2\.13\.16'/);
+    for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) assert.notEqual(t(l, 'news.view3d'), t('en', 'news.view3d'));
+    const dollSrc = readFileSync(join(studio, 'components/DollhouseCanvas.tsx'), 'utf8');
+    assert.doesNotMatch(dollSrc, /projectPoints\(floor\.nodes\.map/);
+    assert.match(dollSrc, /drawList\.map/);
+    assert.match(readFileSync(join(studio, 'lib/engine3d.ts'), 'utf8'), /meshFromPos\(bag, pos, slate, 'roof', true\)/);
+    // a two-story box with a 4 ft bay: the upstairs floor stops at the main wall, not the bay
+    const n = (id: string, x: number, y: number) => ({ id, x, y });
+    const w = (id: string, a: string, b: string) => ({ id, a, b, kind: 'exterior' as const, thickness: 0.55, levels: 2 });
+    const body = upperBody({
+      nodes: [n('a', 0, 8), n('b', 3, 8), n('c', 3, 4), n('d', 15, 4), n('e', 15, 8), n('f', 56, 8), n('g', 56, 40), n('h', 0, 40)],
+      walls: [w('1', 'a', 'b'), w('2', 'b', 'c'), w('3', 'c', 'd'), w('4', 'd', 'e'), w('5', 'e', 'f'), w('6', 'f', 'g'), w('7', 'g', 'h'), w('8', 'h', 'a')],
+      rooms: [], openings: [], furniture: [],
+    } as never);
+    assert.deepEqual(body, { minX: 0, minY: 8, maxX: 56, maxY: 40 });
     assert.match(readFileSync(join(studio, 'data/changelog.ts'), 'utf8'), /version:\s*'2\.13\.15'/);
     for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) assert.notEqual(t(l, 'news.words'), t('en', 'news.words'));
     for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) assert.notEqual(t(l, 'news.lead'), t('en', 'news.lead'));
