@@ -12,13 +12,22 @@ import { buildHouse, stepWalk, type HouseLook } from '../lib/engine3d';
 export type EngineHandle = {
   reset: () => void;
   walkBy: (steps: number) => void;
+  /** Turn: walking, the eye turns; orbiting, the camera goes round the house. -1 left, 1 right. */
+  turn: (dir: -1 | 1) => void;
+  /** Camera presets for the orbit view (2.13.21). */
+  preset: (kind: 'front' | 'top') => void;
 };
+
+/** Where the orbit camera was, per floor, so leaving 3D and coming back keeps your place (2.13.21). */
+let savedCam: { floorId: string; cam: Cam } | null = null;
 
 type Props = {
   floor: Floor;
   look: HouseLook;
   sky: string;
   walk: boolean;
+  /** Plan point to look at on opening (what was selected in 2D). */
+  focus?: { x: number; y: number } | null;
 };
 
 type Cam = {
@@ -156,13 +165,15 @@ function fitCam(root: THREE.Object3D): Cam {
   };
 }
 
-export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ floor, look, sky, walk }, ref) {
+export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ floor, look, sky, walk, focus }, ref) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const walkRef = useRef(walk);
   const camRef = useRef<Cam | null>(null);
   const floorRef = useRef(floor);
+  const focusRef = useRef(focus ?? null);
   walkRef.current = walk;
   floorRef.current = floor;
+  focusRef.current = focus ?? null;
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -254,8 +265,13 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
       cam.updateProjectionMatrix();
     }
     for (const lid of ceilings) lid.visible = walkRef.current;
-    camRef.current = fitCam(built.root);
-    const home = { ...camRef.current };
+    const fitted = fitCam(built.root);
+    const home = { ...fitted };
+    // Open where you left off, or aimed at what you picked in 2D; otherwise the whole house.
+    const f = focusRef.current;
+    if (f) camRef.current = { ...fitted, tx: f.x, tz: f.y, ty: 3, dist: Math.max(16, Math.min(fitted.dist, 26)), pitch: 0.6 };
+    else if (savedCam && savedCam.floorId === floor.id) camRef.current = { ...savedCam.cam };
+    else camRef.current = fitted;
 
     const desiredPos = new THREE.Vector3();
     const desiredLook = new THREE.Vector3();
@@ -344,10 +360,51 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     renderer.domElement.addEventListener('pointercancel', up);
     renderer.domElement.addEventListener('wheel', wheel, { passive: false });
 
+    // Keys: walking, arrows or W A S D step and turn; orbiting, arrows go round and tilt, + and - zoom (2.13.21).
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || e.altKey || e.ctrlKey || e.metaKey) return;
+      const cam = camRef.current;
+      if (!cam) return;
+      const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      let used = true;
+      if (walkRef.current) {
+        if (k === 'ArrowUp' || k === 'w' || k === 'ArrowDown' || k === 's') {
+          const next = stepWalk(floorRef.current, cam.eyeX, cam.eyeZ, cam.eyeYaw, (k === 'ArrowUp' || k === 'w') ? 1.2 : -1.2);
+          cam.eyeX = next.x;
+          cam.eyeZ = next.z;
+        } else if (k === 'ArrowLeft' || k === 'a') cam.eyeYaw += 0.14;
+        else if (k === 'ArrowRight' || k === 'd') cam.eyeYaw -= 0.14;
+        else used = false;
+      } else if (k === 'ArrowLeft') cam.yaw -= 0.14;
+      else if (k === 'ArrowRight') cam.yaw += 0.14;
+      else if (k === 'ArrowUp') cam.pitch = Math.min(1.15, cam.pitch + 0.06);
+      else if (k === 'ArrowDown') cam.pitch = Math.max(0.12, cam.pitch - 0.06);
+      else if (k === '+' || k === '=') cam.dist = Math.max(8, cam.dist * 0.9);
+      else if (k === '-' || k === '_') cam.dist = Math.min(180, cam.dist * 1.1);
+      else used = false;
+      if (used) e.preventDefault();
+    };
+    window.addEventListener('keydown', onKey);
+
     const reset = () => {
       camRef.current = { ...home };
       snap = true;
     };
+    const preset = (kind: 'front' | 'top') => {
+      const cam = camRef.current;
+      if (!cam) return;
+      if (kind === 'top') camRef.current = { ...cam, tx: home.tx, tz: home.tz, pitch: 1.15, yaw: Math.PI, dist: home.dist * 1.05 };
+      else camRef.current = { ...cam, tx: home.tx, tz: home.tz, pitch: 0.32, yaw: Math.PI, dist: home.dist * 0.95 };
+    };
+    const turn = (dir: -1 | 1) => {
+      const cam = camRef.current;
+      if (!cam) return;
+      if (walkRef.current) cam.eyeYaw -= dir * 0.35;
+      else cam.yaw += dir * (Math.PI / 4);
+    };
+    (wrap as HTMLDivElement & { __babooPreset?: typeof preset; __babooTurn?: typeof turn }).__babooPreset = preset;
+    (wrap as HTMLDivElement & { __babooPreset?: typeof preset; __babooTurn?: typeof turn }).__babooTurn = turn;
     (wrap as HTMLDivElement & { __babooReset?: () => void }).__babooReset = reset;
 
     const ro = new ResizeObserver(() => {
@@ -431,6 +488,8 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     loop();
 
     return () => {
+      window.removeEventListener('keydown', onKey);
+      if (camRef.current && !walkRef.current) savedCam = { floorId: floor.id, cam: { ...camRef.current } };
       document.removeEventListener('visibilitychange', onVis);
       cancelAnimationFrame(frame);
       ro.disconnect();
@@ -451,7 +510,11 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     };
   }, [floor, look, sky]);
 
+  // Switching between orbit and walking starts that mode fresh; the first render keeps the saved or aimed camera.
+  const walkSeen = useRef(walk);
   useEffect(() => {
+    if (walkSeen.current === walk) return;
+    walkSeen.current = walk;
     const wrap = wrapRef.current as (HTMLDivElement & { __babooReset?: () => void }) | null;
     wrap?.__babooReset?.();
   }, [walk]);
@@ -460,6 +523,14 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     reset: () => {
       const wrap = wrapRef.current as (HTMLDivElement & { __babooReset?: () => void }) | null;
       wrap?.__babooReset?.();
+    },
+    turn: (dir: -1 | 1) => {
+      const wrap = wrapRef.current as (HTMLDivElement & { __babooTurn?: (d: -1 | 1) => void }) | null;
+      wrap?.__babooTurn?.(dir);
+    },
+    preset: (kind: 'front' | 'top') => {
+      const wrap = wrapRef.current as (HTMLDivElement & { __babooPreset?: (k: 'front' | 'top') => void }) | null;
+      wrap?.__babooPreset?.(kind);
     },
     walkBy: (steps: number) => {
       const cam = camRef.current;

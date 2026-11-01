@@ -5298,3 +5298,9 @@ html.kb-framed body.kb-on .app-shell.is-phone .chrome {
 
 
 
+
+/* 2.13.21 — skill picker says what each level gives */
+.skill-what { margin-top: 10px; display: grid; gap: 4px; font-size: 14px; line-height: 1.4; }
+.skill-what p { margin: 0; }
+.skill-what .skill-help { font-weight: 600; }
+.view3d-keys { opacity: 0.85; }

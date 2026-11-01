@@ -164,6 +164,9 @@ export default function App() {
       } else if (e.altKey || e.metaKey || e.ctrlKey) {
         return;
       } else if (e.key.startsWith('Arrow')) {
+        // In 3D the arrows drive the camera (EngineView), not the selection (2.13.21).
+        const vm = useProjectStore.getState().viewMode;
+        if (vm === 'solid3d' || vm === 'walkthrough') return;
         if (!useProjectStore.getState().selected) return;
         e.preventDefault();
         const grid = useProjectStore.getState().doc.settings.gridSize || 1;

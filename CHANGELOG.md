@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.21 — 2026-11-01 — Modes
+- 3D remembers where you were, arrow keys walk and turn, Front and Top views, and each level shows what it gives you.
+
 ## 2.13.20 — 2026-11-01 — Grand Mansion
 - The Mansion looks grand in 3D: an open porch with columns, dormer windows, chimneys, shutters and stone trim.
 

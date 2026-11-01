@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.21',
+    date: '2026-11-01',
+    bullets: [
+      '3D remembers where you were, arrow keys walk and turn, Front and Top views, and each level shows what it gives you.',
+    ],
+  },
+  {
     version: '2.13.20',
     date: '2026-11-01',
     bullets: [
