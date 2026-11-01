@@ -2262,9 +2262,10 @@ function RoomLabel({
   const label = roomLabel(useProjectStore((st) => tipLoc(st.doc.settings)), room);
   const furniture = useProjectStore((st) => st.doc.floors[0]?.furniture);
   const area = poly ? formatArea(polygonArea(poly), units) : null;
-  const w = Math.max(3.6, label.length * 0.32 + 1.4);
-  const h = area ? 1.15 : 0.7;
   const font = Math.max(0.38, 11 / zoom);
+  // Size the tag from the letters at this zoom, so a name never breaks mid-word ("Kitch / en") when zoomed out (2.13.23).
+  const w = Math.max(3.6, label.length * font * 0.64 + font * 1.4, (area?.length ?? 0) * font * 0.52 + font * 1.2);
+  const h = area ? Math.max(1.15, font * 2.35) : Math.max(0.7, font * 1.45);
   const pick = (evt: { cancelBubble: boolean }) => {
     evt.cancelBubble = true;
     onPick();
@@ -2308,9 +2309,11 @@ function RoomLabel({
       <Text
         text={label}
         x={-w / 2}
-        y={area ? -h / 2 + 0.12 : -font * 0.45}
+        y={area ? -h / 2 + font * 0.22 : -font * 0.45}
         width={w}
         align="center"
+        wrap="none"
+        ellipsis
         fontSize={font}
         fontStyle="bold"
         fill={dimFg}
@@ -2320,9 +2323,10 @@ function RoomLabel({
         <Text
           text={area}
           x={-w / 2}
-          y={0.08}
+          y={h / 2 - font * 1.08}
           width={w}
           align="center"
+          wrap="none"
           fontSize={font * 0.85}
           fill={lightPlan ? '#52525B' : '#a8b6cc'}
           listening={false}

@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.23 — 2026-11-01 — Frames
+- Room names stay whole, doorways get painted frames, and things you pick in 2D show from above in 3D.
+
 ## 2.13.22 — 2026-11-01 — Inside 3D
 - Walk inside: painted walls, white trim, bright ceilings, glowing lamps and real furniture models.
 

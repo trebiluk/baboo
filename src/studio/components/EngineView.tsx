@@ -6,6 +6,7 @@ import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { peekFor } from '../data/objectPeek';
 import type { Floor } from '../types';
 import type { FloorFinishId } from '../data/flooring';
@@ -128,6 +129,47 @@ function skyDome(zenithHex: string): { mesh: THREE.Mesh; dispose: () => void } {
  * block shapes in 3D. They come "unlit", so they get lit materials here to take the sun, lamps and shadows (2.13.22).
  */
 const modelCache = new Map<string, Promise<THREE.Object3D | null>>();
+const litCache = new Map<string, THREE.MeshStandardMaterial>();
+function litFor(old: THREE.MeshBasicMaterial): THREE.MeshStandardMaterial {
+  const color = old.color ?? new THREE.Color('#cccccc');
+  const key = `${old.map?.uuid ?? '-'}|${color.getHexString()}`;
+  let lit = litCache.get(key);
+  if (!lit) {
+    lit = new THREE.MeshStandardMaterial({ color, map: old.map ?? null, roughness: 0.62, metalness: 0.05 });
+    litCache.set(key, lit);
+  }
+  return lit;
+}
+/**
+ * A model arrives as several small parts. Bake them into one mesh per material, so a room of chairs costs a few
+ * draws instead of dozens: this is what keeps the Mansion smooth on a school laptop (2.13.23).
+ */
+function flattenModel(scene: THREE.Object3D): THREE.Object3D {
+  scene.updateMatrixWorld(true);
+  const byMat = new Map<THREE.Material, THREE.BufferGeometry[]>();
+  scene.traverse((o) => {
+    const m = o as THREE.Mesh;
+    if (!m.isMesh || Array.isArray(m.material)) return;
+    const lit = litFor(m.material as THREE.MeshBasicMaterial);
+    let g = m.geometry.clone().applyMatrix4(m.matrixWorld);
+    if (g.index) g = g.toNonIndexed();
+    if (!g.getAttribute('normal')) g.computeVertexNormals();
+    for (const name of Object.keys(g.attributes)) if (!['position', 'normal', 'uv'].includes(name)) g.deleteAttribute(name);
+    const list = byMat.get(lit) ?? [];
+    list.push(g);
+    byMat.set(lit, list);
+  });
+  const out = new THREE.Group();
+  for (const [lit, geos] of byMat) {
+    const merged = mergeGeometries(geos, false);
+    if (!merged) return scene;
+    const mesh = new THREE.Mesh(merged, lit);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    out.add(mesh);
+  }
+  return out;
+}
 function loadModel(url: string): Promise<THREE.Object3D | null> {
   const hit = modelCache.get(url);
   if (hit) return hit;
@@ -135,14 +177,12 @@ function loadModel(url: string): Promise<THREE.Object3D | null> {
     gltf.scene.traverse((o) => {
       const m = o as THREE.Mesh;
       if (!m.isMesh) return;
-      const old = m.material as THREE.MeshBasicMaterial;
-      const lit = new THREE.MeshStandardMaterial({ color: old.color ?? new THREE.Color('#cccccc'), map: old.map ?? null, roughness: 0.62, metalness: 0.05 });
-      m.material = lit;
+      m.material = litFor(m.material as THREE.MeshBasicMaterial);
       m.castShadow = true;
       m.receiveShadow = true;
       if (!m.geometry.getAttribute('normal')) m.geometry.computeVertexNormals();
     });
-    return gltf.scene as THREE.Object3D;
+    try { return flattenModel(gltf.scene); } catch { return gltf.scene as THREE.Object3D; }
   }).catch(() => null);
   modelCache.set(url, p);
   return p;
@@ -343,7 +383,9 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     const home = { ...fitted };
     // Open where you left off, or aimed at what you picked in 2D; otherwise the whole house.
     const f = focusRef.current;
-    if (f) camRef.current = { ...fitted, tx: f.x, tz: f.y, ty: 3, dist: Math.max(16, Math.min(fitted.dist, 26)), pitch: 0.6 };
+    // Aim from high enough that the roof lifts off and you look down into the room it is in, not into an
+    // outside wall (2.13.23: a low aim used to park the camera among the porch posts).
+    if (f) camRef.current = { ...fitted, tx: f.x, tz: f.y, ty: 2, dist: Math.max(24, Math.min(fitted.dist * 0.75, 34)), pitch: 1.0 };
     else if (savedCam && savedCam.floorId === floor.id) camRef.current = { ...savedCam.cam };
     else camRef.current = fitted;
 
@@ -481,6 +523,8 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     };
     (wrap as HTMLDivElement & { __babooPreset?: typeof preset; __babooTurn?: typeof turn }).__babooPreset = preset;
     (wrap as HTMLDivElement & { __babooPreset?: typeof preset; __babooTurn?: typeof turn }).__babooTurn = turn;
+    // How much the last frame drew, for speed checks (draw calls and triangles).
+    (wrap as HTMLDivElement & { __babooDraws?: () => { calls: number; tris: number } }).__babooDraws = () => ({ calls: renderer.info.render.calls, tris: renderer.info.render.triangles });
     (wrap as HTMLDivElement & { __babooReset?: () => void }).__babooReset = reset;
 
     const ro = new ResizeObserver(() => {

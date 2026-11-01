@@ -650,12 +650,21 @@ function dressOpening(
     mesh.rotation.y = ang;
     return mesh;
   };
+  // Line the cut through the wall with painted wood, so a doorway or window frame is not raw brick inside (2.13.23).
+  const liner = mat(bag, '#F4EFE6', 0.7);
+  const lineHole = (yb: number, yt: number, bottom: boolean) => {
+    const deep = thick + 0.04;
+    for (const sgn of [-1, 1]) put(new THREE.BoxGeometry(0.08, yt - yb, deep), liner, cx + sgn * (half - 0.04), (yb + yt) / 2, 0);
+    put(new THREE.BoxGeometry(half * 2, 0.08, deep), liner, cx, yt - 0.04, 0);
+    if (bottom) put(new THREE.BoxGeometry(half * 2, 0.06, deep), liner, cx, yb + 0.03, 0);
+  };
   if (o.type === 'window') {
     const bands = stories >= 2 ? [0, look.wallH] : [0];
     for (const base of bands) {
       const y0 = base + look.wallH * 0.28;
       const y1 = base + look.wallH * 0.78;
       const w = half * 2;
+      lineHole(y0, y1, true);
       put(new THREE.BoxGeometry(w + 0.6, 0.2, thick + 0.36), stone, cx, y0 - 0.1, 0.06);
       put(new THREE.BoxGeometry(w + 0.5, 0.42, thick + 0.1), stone, cx, y1 + 0.21, 0.02);
       if (brick) {
@@ -668,8 +677,9 @@ function dressOpening(
     return;
   }
   // outside door: casing on the outer face and a small hood above
-  if (o.symbolKind === 'slidingDoor') return;
   const y1 = look.wallH * 0.8;
+  lineHole(0, y1, false);
+  if (o.symbolKind === 'slidingDoor') return;
   const casing = mat(bag, '#F2EDE3', 0.6);
   for (const sgn of [-1, 1]) put(new THREE.BoxGeometry(0.32, y1 + 0.2, 0.14), casing, cx + sgn * (half + 0.16), (y1 + 0.2) / 2, face);
   put(new THREE.BoxGeometry(half * 2 + 1.0, 0.32, 0.9), casing, cx, y1 + 0.42, face + 0.4);

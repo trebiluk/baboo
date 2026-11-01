@@ -238,6 +238,18 @@ export const STR: Record<string, Gloss> = {
     ar: 'يمكنك الآن معرفة إن كان عملك محفوظًا، بجانب تصدير.',
     rw: 'Ubu ushobora kubona niba akazi kawe kabitswe, iruhande rwa Export.',
   }),
+  // 2.13.23: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.frames': g('Room names stay whole, doorways get painted frames, and things you pick in 2D show from above in 3D.', {
+    es: 'Los nombres de las habitaciones no se cortan, las puertas tienen marcos pintados y lo que eliges en 2D se ve desde arriba en 3D.',
+    cu: 'Los nombres de los cuartos no se cortan, las puertas tienen marcos pintados y lo que eliges en 2D se ve desde arriba en 3D.',
+    uk: 'Назви кімнат не розриваються, дверні прорізи мають фарбовані рамки, а те, що ти вибрав у 2D, видно згори в 3D.',
+    ru: 'Названия комнат не разрываются, у дверных проёмов крашеные рамы, а то, что ты выбрал в 2D, видно сверху в 3D.',
+    ti: 'ኣስማት ክፍልታት ኣይቋረጹን፣ ኣፍደገታት ዝተቐብአ መቓን ኣለዎም፣ ኣብ 2D ዝመረጽካዮ ድማ ኣብ 3D ካብ ላዕሊ ይርአ።',
+    fa: 'نام اتاق‌ها نمی‌شکند، درگاه‌ها قاب رنگ‌شده دارند، و چیزی که در دوبعدی انتخاب کنی در سه‌بعدی از بالا دیده می‌شود.',
+    'fa-AF': 'نام اتاق‌ها نمی‌شکند، دروازه‌ها چوکات رنگ‌شده دارند، و چیزی که در دوبعدی انتخاب کنی در سه‌بعدی از بالا دیده می‌شود.',
+    ar: 'أسماء الغرف لا تنقطع، وللمداخل إطارات مدهونة، وما تختاره في الثنائي الأبعاد يظهر من الأعلى في الثلاثي الأبعاد.',
+    rw: "Amazina y'ibyumba ntacika, imiryango ifite amakadire asize irangi, kandi icyo uhisemo muri 2D kigaragara uturutse hejuru muri 3D.",
+  }),
   // 2.13.22: ti, fa-AF and rw are UNCHECKED native copy.
   'news.inside3d': g('Walk inside: painted walls, white trim, bright ceilings, glowing lamps and real furniture models.', {
     es: 'Entra a caminar: paredes pintadas, zócalos blancos, techos claros, lámparas que brillan y muebles de verdad.',
