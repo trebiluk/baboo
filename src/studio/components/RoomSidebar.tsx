@@ -2,6 +2,7 @@ import { ROOM_CATALOG } from '../data/rooms';
 import { useProjectStore } from '../store/useProjectStore';
 import { DEFAULT_SKILL_LEVEL, isToolUnlocked } from '../data/skill';
 import { formatArea, roomPolygon, polygonArea } from '../lib/rooms';
+import { t, tipLoc } from '../data/i18n';
 
 export function RoomSidebar() {
   const tool = useProjectStore((s) => s.tool);
@@ -14,6 +15,7 @@ export function RoomSidebar() {
   const doc = useProjectStore((s) => s.doc);
   const renameRoom = useProjectStore((s) => s.renameRoom);
   const units = doc.settings.units;
+  const locale = tipLoc(doc.settings);
   const skillLevel = doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
 
   if (viewMode !== 'plan' || !catalogOpen || tool !== 'room' || !isToolUnlocked('room', skillLevel)) return null;
@@ -26,33 +28,33 @@ export function RoomSidebar() {
   const editArea = editPoly ? polygonArea(editPoly) : null;
 
   return (
-    <aside className="side-panel furniture-side" aria-label="Room types">
+    <aside className="side-panel furniture-side" aria-label={t(locale, 'rooms.aria')}>
       <div className="drawer-head">
-        <h2>Rooms</h2>
+        <h2>{t(locale, 'rooms.title')}</h2>
         <button
           type="button"
           className="ghost-btn aw-pressable"
           onClick={() => setCatalogOpen(false)}
-          title="Hide list — grid stays full"
+          title={t(locale, 'rooms.hideTitle')}
         >
-          Hide
+          {t(locale, 'chrome.hide')}
         </button>
       </div>
       <p className="muted">
-        Pick a type, then click inside walls that close. Draw an interior wall to split rooms.
+        {t(locale, 'rooms.lead')}
       </p>
       {editing && (
         <div className="room-edit-block">
           <label className="field">
-            <span>Name this room</span>
+            <span>{t(locale, 'rooms.nameThis')}</span>
             <input
               value={editing.name}
               onChange={(e) => renameRoom(editing.id, e.target.value)}
-              aria-label="Room name"
+              aria-label={t(locale, 'obj.roomName')}
             />
           </label>
           <p className="muted">
-            {editArea != null ? formatArea(editArea, units) : 'Open space — close the walls to measure'}
+            {editArea != null ? formatArea(editArea, units) : t(locale, 'rooms.openSpace')}
           </p>
         </div>
       )}
@@ -65,8 +67,8 @@ export function RoomSidebar() {
             onClick={() => selectRoomKind(item.id)}
           >
             <span className="swatch" style={{ background: item.color }} />
-            <span>{item.name}</span>
-            <small>{item.blurb}</small>
+            <span>{t(locale, `room.kind.${item.id}`)}</span>
+            <small>{t(locale, `room.blurb.${item.id}`)}</small>
           </button>
         ))}
       </div>

@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { t, tipLoc } from '../data/i18n';
-import { FURNITURE_CATALOG } from '../data/furniture';
+import { furnLabel } from '../data/furniture';
 import { useProjectStore } from '../store/useProjectStore';
 import { formatLength, parseFeet, wallLength, dist } from '../lib/geometry';
-import { ROOM_CATALOG, roomType } from '../data/rooms';
+import { ROOM_CATALOG, roomLabel, roomType } from '../data/rooms';
 import { formatArea, polygonArea, roomBundle, roomPolygon } from '../lib/rooms';
 import { Icon } from '../icons';
 import { TEXTURE_PACKS } from '../data/textures';
@@ -96,15 +96,34 @@ function DegField({
   );
 }
 
+/**
+ * The note's text box. A new note grabs the keyboard with its text selected, so typing replaces "Note" instead of
+ * firing tool shortcuts (T, N, H...). It waits a moment: the click that made the note would otherwise take focus back (2.13.19).
+ */
+function NoteText({ value, fresh, onChange, label }: { value: string; fresh: boolean; onChange: (v: string) => void; label: string }) {
+  const ref = useRef<HTMLInputElement>(null);
+  const freshAtMount = useRef(fresh);
+  useEffect(() => {
+    if (!freshAtMount.current) return;
+    const id = window.setTimeout(() => {
+      ref.current?.focus();
+      ref.current?.select();
+    }, 120);
+    return () => window.clearTimeout(id);
+  }, []);
+  return <input ref={ref} value={value} onChange={(e) => onChange(e.target.value)} aria-label={label} />;
+}
+
 function DockHead({ title, onCollapse, onClose }: { title: string; onCollapse: () => void; onClose: () => void }) {
+  const locale = tipLoc(useProjectStore((s) => s.doc.settings));
   return (
     <div className="object-menu-head">
       <strong>{title}</strong>
       <span className="object-menu-actions">
-        <button type="button" className="inspect-collapse aw-pressable" onClick={onCollapse} title="Collapse" aria-label="Collapse edit panel">
+        <button type="button" className="inspect-collapse aw-pressable" onClick={onCollapse} title={t(locale, 'obj.collapse')} aria-label={t(locale, 'obj.collapseAria')}>
           <Icon name="min" />
         </button>
-        <button type="button" className="object-menu-x aw-pressable" aria-label="Close" onClick={onClose}>×</button>
+        <button type="button" className="object-menu-x aw-pressable" aria-label={t(locale, 'obj.close')} onClick={onClose}>×</button>
       </span>
     </div>
   );
@@ -116,10 +135,7 @@ export function ObjectMenu() {
   const units = useProjectStore((s) => s.doc.settings.units) || 'ft';
   const locale = tipLoc(useProjectStore((s) => s.doc.settings));
   // A piece still named like the catalog shows its name in the kid's language; a renamed piece keeps its name.
-  const furnName = (catalogId: string, label: string) => {
-    const cat = FURNITURE_CATALOG.find((c) => c.id === catalogId);
-    return cat && (!label || label === cat.name) ? t(locale, `furn.item.${catalogId}`) : label;
-  };
+  const furnName = (catalogId: string, label: string) => furnLabel(locale, catalogId, label);
   const houseFloor = useProjectStore((s) => asFloorFinish(s.doc.settings.floorFinishId));
   const styleId = useProjectStore((s) => s.doc.settings.styleId);
   const patchOpening = useProjectStore((s) => s.patchOpening);
@@ -146,15 +162,15 @@ export function ObjectMenu() {
   if (!selected) return null;
 
   const title =
-    selected.kind === 'opening' ? (floor.openings.find((x) => x.id === selected.id)?.type === 'window' ? 'Window' : 'Door')
-      : selected.kind === 'wall' ? 'Wall'
-        : selected.kind === 'furniture' ? (floor.furniture.find((x) => x.id === selected.id)?.label ?? 'Furniture')
-          : selected.kind === 'landscape' ? (floor.landscape.find((x) => x.id === selected.id)?.label ?? 'Plant')
-            : selected.kind === 'room' ? 'Room'
-              : selected.kind === 'note' ? 'Note'
-                : selected.kind === 'dim' ? 'Size'
-                  : selected.kind === 'sketch' ? 'Sketch'
-                    : 'Edit';
+    selected.kind === 'opening' ? (floor.openings.find((x) => x.id === selected.id)?.type === 'window' ? t(locale, 'tool.window') : t(locale, 'tool.door'))
+      : selected.kind === 'wall' ? t(locale, 'tool.wall')
+        : selected.kind === 'furniture' ? (floor.furniture.find((x) => x.id === selected.id)?.label ?? t(locale, 'furn.title'))
+          : selected.kind === 'landscape' ? (floor.landscape.find((x) => x.id === selected.id)?.label ?? t(locale, 'tool.plant'))
+            : selected.kind === 'room' ? t(locale, 'tool.room')
+              : selected.kind === 'note' ? t(locale, 'tool.note')
+                : selected.kind === 'dim' ? t(locale, 'tool.dim')
+                  : selected.kind === 'sketch' ? t(locale, 'tool.sketch')
+                    : t(locale, 'obj.edit');
 
   return (
     <aside
@@ -162,7 +178,7 @@ export function ObjectMenu() {
       onPointerDown={(e) => e.stopPropagation()}
       onPointerUp={(e) => e.stopPropagation()}
       role="dialog"
-      aria-label="Edit selection"
+      aria-label={t(locale, 'obj.editSel')}
       aria-expanded={!collapsed}
     >
       {collapsed ? (
@@ -170,7 +186,7 @@ export function ObjectMenu() {
           type="button"
           className="inspect-chip aw-pressable"
           onClick={() => setCollapsed(false)}
-          title="Open edit panel"
+          title={t(locale, 'obj.openPanel')}
         >
           <Icon name="list" />
           <span>{title}</span>
@@ -186,8 +202,8 @@ export function ObjectMenu() {
         const slide = o.symbolKind === 'slidingDoor';
         return (
           <>
-            <DockHead title={o.type === 'door' ? 'Door' : 'Window'} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
-            <div className="object-menu-row" role="group" aria-label="Width">
+            <DockHead title={o.type === 'door' ? t(locale, 'tool.door') : t(locale, 'tool.window')} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
+            <div className="object-menu-row" role="group" aria-label={t(locale, 'obj.width')}>
               {widths.map((w) => (
                 <button
                   key={w.label}
@@ -200,7 +216,7 @@ export function ObjectMenu() {
               ))}
             </div>
             {o.type === 'door' && styleId === 'dog-house' && (
-              <p className="object-menu-meta">Baboo wants 12" or 18", then slide it off-center.</p>
+              <p className="object-menu-meta">{t(locale, 'obj.dogDoor')}</p>
             )}
             {o.type === 'door' && (
               <div className="object-menu-row">
@@ -209,21 +225,21 @@ export function ObjectMenu() {
                   className={`object-chip aw-pressable${!slide && o.swing !== 'right' ? ' active' : ''}`}
                   onClick={() => patchOpening(o.id, { symbolKind: 'swingDoor', swing: 'left' })}
                 >
-                  Swing L
+                  {t(locale, 'obj.swingL')}
                 </button>
                 <button
                   type="button"
                   className={`object-chip aw-pressable${!slide && o.swing === 'right' ? ' active' : ''}`}
                   onClick={() => patchOpening(o.id, { symbolKind: 'swingDoor', swing: 'right' })}
                 >
-                  Swing R
+                  {t(locale, 'obj.swingR')}
                 </button>
                 <button
                   type="button"
                   className={`object-chip aw-pressable${slide ? ' active' : ''}`}
                   onClick={() => patchOpening(o.id, { symbolKind: 'slidingDoor' })}
                 >
-                  Slide
+                  {t(locale, 'obj.slide')}
                 </button>
               </div>
             )}
@@ -232,7 +248,7 @@ export function ObjectMenu() {
                 type="button"
                 className="object-chip aw-pressable"
                 onClick={() => patchOpening(o.id, { t: o.t - 0.06 })}
-                aria-label="Slide along wall"
+                aria-label={t(locale, 'obj.slideAlong')}
               >
                 ←
               </button>
@@ -240,16 +256,16 @@ export function ObjectMenu() {
                 type="button"
                 className="object-chip aw-pressable"
                 onClick={() => patchOpening(o.id, { t: o.t + 0.06 })}
-                aria-label="Slide the other way"
+                aria-label={t(locale, 'obj.slideBack')}
               >
                 →
               </button>
-              <span className="object-menu-meta">{formatLength(Math.min(o.width, len), units)} wide</span>
+              <span className="object-menu-meta">{t(locale, 'obj.wide', { w: formatLength(Math.min(o.width, len), units) })}</span>
             </div>
             <div className="object-menu-grid">
-              <FeetField label="Width" feet={o.width} units={units} onCommit={(n) => patchOpening(o.id, { width: n })} />
+              <FeetField label={t(locale, 'obj.width')} feet={o.width} units={units} onCommit={(n) => patchOpening(o.id, { width: n })} />
             </div>
-            <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
+            <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> {t(locale, 'obj.delete')}</button>
           </>
         );
       })()}
@@ -260,38 +276,38 @@ export function ObjectMenu() {
         const thickIn = Math.round((w.thickness || 0.5) * 12);
         return (
           <>
-            <DockHead title="Wall" onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
+            <DockHead title={t(locale, 'tool.wall')} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
             <div className="object-menu-row">
               <button
                 type="button"
                 className={`object-chip aw-pressable${w.kind === 'exterior' ? ' active' : ''}`}
                 onClick={() => patchWall(w.id, { kind: 'exterior' })}
               >
-                Outside
+                {t(locale, 'obj.outside')}
               </button>
               <button
                 type="button"
                 className={`object-chip aw-pressable${w.kind === 'interior' ? ' active' : ''}`}
                 onClick={() => patchWall(w.id, { kind: 'interior' })}
               >
-                Inside
+                {t(locale, 'obj.inside')}
               </button>
             </div>
             <div className="object-menu-grid">
               <FeetField
-                label="Length"
+                label={t(locale, 'obj.length')}
                 feet={wallLength(w, floor.nodes)}
                 units={units}
                 onCommit={(n) => setWallLength(w.id, n)}
               />
               <FeetField
-                label="Thick"
+                label={t(locale, 'obj.thick')}
                 feet={w.thickness || 0.5}
                 units={units}
                 onCommit={(n) => patchWall(w.id, { thickness: n })}
               />
             </div>
-            <div className="object-menu-row" role="group" aria-label="Thickness">
+            <div className="object-menu-row" role="group" aria-label={t(locale, 'wall.thickness')}>
               {[4, 6, 8].map((inch) => (
                 <button
                   key={inch}
@@ -302,10 +318,10 @@ export function ObjectMenu() {
                   {inch}"
                 </button>
               ))}
-              <span className="object-menu-meta">Drag the squares on the ends to stretch</span>
+              <span className="object-menu-meta">{t(locale, 'obj.stretch')}</span>
             </div>
-            <p className="object-menu-meta">Wallpaper</p>
-            <div className="object-menu-row" role="group" aria-label="Wallpaper">
+            <p className="object-menu-meta">{t(locale, 'obj.wallpaper')}</p>
+            <div className="object-menu-row" role="group" aria-label={t(locale, 'obj.wallpaper')}>
               {TEXTURE_PACKS.filter((p) => p.id !== 'import:local').map((p) => {
                 const on = (p.id === 'pack:plain' && !w.finishId) || w.finishId === p.id;
                 return (
@@ -314,15 +330,15 @@ export function ObjectMenu() {
                     type="button"
                     className={`object-chip tex-swatch aw-pressable${on ? ' active' : ''}`}
                     style={{ background: p.previewCss }}
-                    title={p.name}
+                    title={t(locale, `tex.${p.id.replace(':', '.')}`)}
                     onClick={() => patchWall(w.id, { finishId: p.id === 'pack:plain' ? null : p.id })}
                   >
-                    <span className="tex-swatch-label">{p.name}</span>
+                    <span className="tex-swatch-label">{t(locale, `tex.${p.id.replace(':', '.')}`)}</span>
                   </button>
                 );
               })}
             </div>
-            <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
+            <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> {t(locale, 'obj.delete')}</button>
           </>
         );
       })()}
@@ -395,33 +411,33 @@ export function ObjectMenu() {
         const poly = roomPolygon(r, floor.nodes, floor.walls);
         return (
           <>
-            <DockHead title={r.name || 'Room'} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
+            <DockHead title={roomLabel(locale, r)} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
             <label className="object-menu-field">
-              <span>Name</span>
-              <input value={r.name} onChange={(e) => renameRoom(r.id, e.target.value)} aria-label="Room name" />
+              <span>{t(locale, 'obj.name')}</span>
+              <input value={r.name} onChange={(e) => renameRoom(r.id, e.target.value)} aria-label={t(locale, 'obj.roomName')} />
             </label>
             <label className="object-menu-field">
-              <span>Type</span>
+              <span>{t(locale, 'obj.type')}</span>
               <select value={r.kind} onChange={(e) => patchRoom(r.id, { kind: e.target.value as typeof r.kind })}>
                 {ROOM_CATALOG.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
+                  <option key={c.id} value={c.id}>{t(locale, `room.kind.${c.id}`)}</option>
                 ))}
               </select>
             </label>
             <p className="object-menu-meta">
-              {poly ? formatArea(polygonArea(poly), units) : 'Open — close walls to measure'}
-              {' · '}{roomType(r.kind).blurb}
+              {poly ? formatArea(polygonArea(poly), units) : t(locale, 'obj.openArea')}
+              {' · '}{t(locale, `room.blurb.${r.kind}`)}
             </p>
             {r.kind !== 'outdoor' ? (
               <>
-                <p className="object-menu-meta">Flooring</p>
+                <p className="object-menu-meta">{t(locale, 'floor.title')}</p>
                 <div className="object-menu-row object-tex-row">
                   <button
                     type="button"
                     className={`object-chip aw-pressable${r.floorFinishId == null ? ' active' : ''}`}
                     onClick={() => patchRoom(r.id, { floorFinishId: null })}
                   >
-                    House
+                    {t(locale, 'obj.house')}
                   </button>
                   {FLOOR_FINISHES.map((p) => {
                     const current = r.floorFinishId ?? houseFloor;
@@ -432,10 +448,10 @@ export function ObjectMenu() {
                         type="button"
                         className={`object-chip tex-swatch aw-pressable${on ? ' active' : ''}`}
                         style={{ background: p.previewCss }}
-                        title={p.name}
+                        title={t(locale, `floor.${p.id}`)}
                         onClick={() => patchRoom(r.id, { floorFinishId: p.id })}
                       >
-                        <span className="tex-swatch-label">{p.name}</span>
+                        <span className="tex-swatch-label">{t(locale, `floor.${p.id}`)}</span>
                       </button>
                     );
                   })}
@@ -452,7 +468,7 @@ export function ObjectMenu() {
                       }
                     }}
                   >
-                    Same floor in every {roomType(r.kind).name.toLowerCase()}
+                    {t(locale, 'obj.sameFloor', { room: t(locale, `room.kind.${r.kind}`) })}
                   </button>
                 ) : null}
               </>
@@ -465,11 +481,11 @@ export function ObjectMenu() {
               return (
                 <>
                   <p className="object-menu-meta">
-                    {bundle.walls.length} walls · {exterior} exterior · {doors.length} doors · {windows.length} windows · {bundle.furniture.length} inside
+                    {t(locale, 'obj.roomCounts', { w: String(bundle.walls.length), e: String(exterior), d: String(doors.length), n: String(windows.length), f: String(bundle.furniture.length) })}
                   </p>
                   <div className="object-menu-row">
-                    <button type="button" className="object-chip aw-pressable" onClick={() => setRoomWallKind(r.id, 'exterior')}>Exterior walls</button>
-                    <button type="button" className="object-chip aw-pressable" onClick={() => setRoomWallKind(r.id, 'interior')}>Interior walls</button>
+                    <button type="button" className="object-chip aw-pressable" onClick={() => setRoomWallKind(r.id, 'exterior')}>{t(locale, 'obj.extWalls')}</button>
+                    <button type="button" className="object-chip aw-pressable" onClick={() => setRoomWallKind(r.id, 'interior')}>{t(locale, 'obj.intWalls')}</button>
                   </div>
                   {bundle.openings.map((o) => (
                     <button
@@ -478,7 +494,7 @@ export function ObjectMenu() {
                       className="object-chip aw-pressable"
                       onClick={() => setSelected({ kind: 'opening', id: o.id })}
                     >
-                      {o.type === 'door' ? 'Door' : 'Window'}
+                      {o.type === 'door' ? t(locale, 'tool.door') : t(locale, 'tool.window')}
                     </button>
                   ))}
                   {bundle.furniture.map((item) => (
@@ -488,13 +504,13 @@ export function ObjectMenu() {
                       className="object-chip aw-pressable"
                       onClick={() => setSelected({ kind: 'furniture', id: item.id })}
                     >
-                      {item.label}
+                      {furnName(item.catalogId, item.label)}
                     </button>
                   ))}
                 </>
               );
             })()}
-            <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
+            <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> {t(locale, 'obj.delete')}</button>
           </>
         );
       })()}
@@ -504,12 +520,20 @@ export function ObjectMenu() {
         if (!n) return null;
         return (
           <>
-            <DockHead title="Note" onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
+            <DockHead title={t(locale, 'tool.note')} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
             <label className="object-menu-field">
-              <span>Text</span>
-              <input value={n.text} onChange={(e) => renameNote(n.id, e.target.value)} aria-label="Note text" />
+              <span>{t(locale, 'obj.text')}</span>
+              {/* A new note ("Note") takes the keyboard right away, text selected, so typing replaces it
+                  instead of firing tool shortcuts (T, N, H...) (2.13.19). */}
+              <NoteText
+                key={n.id}
+                value={n.text}
+                fresh={n.text === 'Note'}
+                onChange={(v) => renameNote(n.id, v)}
+                label={t(locale, 'obj.noteText')}
+              />
             </label>
-            <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
+            <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> {t(locale, 'obj.delete')}</button>
           </>
         );
       })()}
@@ -519,23 +543,23 @@ export function ObjectMenu() {
         const len = d ? dist({ x: d.ax, y: d.ay }, { x: d.bx, y: d.by }) : 0;
         return (
           <>
-            <DockHead title="Size" onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
-            <p className="object-menu-meta">{formatLength(len, units)} · drag to move the label</p>
-            <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
+            <DockHead title={t(locale, 'tool.dim')} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
+            <p className="object-menu-meta">{t(locale, 'obj.sizeLead', { len: formatLength(len, units) })}</p>
+            <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> {t(locale, 'obj.delete')}</button>
           </>
         );
       })()}
 
       {selected.kind === 'sketch' && (
         <>
-          <DockHead title="Sketch" onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
-          <p className="object-menu-meta">Pencil underlay · drag to move</p>
+          <DockHead title={t(locale, 'tool.sketch')} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
+          <p className="object-menu-meta">{t(locale, 'obj.sketchLead')}</p>
           <div className="object-menu-row">
             <button type="button" className="object-chip aw-pressable" onClick={() => traceSketch()}>
-              Trace to walls
+              {t(locale, 'obj.trace')}
             </button>
           </div>
-          <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
+          <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> {t(locale, 'obj.delete')}</button>
         </>
       )}
         </div>

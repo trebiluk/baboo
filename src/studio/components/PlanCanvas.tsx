@@ -14,13 +14,14 @@ import {
   type OsnapKind,
   type Resolved,
 } from '../lib/osnap';
-import { centroid, findEnclosedFace, formatArea, polygonArea, polyPoints, roomPolygon } from '../lib/rooms';
+import { centroid, findEnclosedFace, formatArea, pointInPoly, polygonArea, polyPoints, roomPolygon } from '../lib/rooms';
 import { wallFootprintFlat } from '../lib/wallJoin';
 import { chamferPreview, nearestChamferable } from '../lib/chamfer';
 import { ADA, circleFitsInPoly } from '../lib/access';
 import { kitchenTriangle } from '../lib/architect';
 import { exteriorBounds, ROOF_STYLE_OPTIONS, roofStyleName } from '../lib/roof';
-import { roomType } from '../data/rooms';
+import { roomLabel, roomType } from '../data/rooms';
+import { furnLabel } from '../data/furniture';
 import type { FurnitureItem, Opening, Wall, Node, Room, DimItem, NoteItem, LandscapeItem, Locale } from '../types';
 import { t, tipLoc } from '../data/i18n';
 import { bloomSpots } from '../data/landscape';
@@ -1474,6 +1475,7 @@ const FurnitureMark = memo(function FurnitureMark({
   lightPlan: boolean;
   simple?: boolean;
 }) {
+  const locale = useProjectStore((s) => tipLoc(s.doc.settings));
   return (
     <Group
       x={item.x}
@@ -1493,7 +1495,7 @@ const FurnitureMark = memo(function FurnitureMark({
       />
       {showLabel ? (
         <Text
-          text={item.label}
+          text={furnLabel(locale, item.catalogId, item.label)}
           x={-item.w / 2}
           y={item.h / 2 + 0.08}
           width={item.w}
@@ -2257,16 +2259,39 @@ function RoomLabel({
   dimFg: string;
   onPick: () => void;
 }) {
+  const label = roomLabel(useProjectStore((st) => tipLoc(st.doc.settings)), room);
+  const furniture = useProjectStore((st) => st.doc.floors[0]?.furniture);
   const area = poly ? formatArea(polygonArea(poly), units) : null;
-  const w = Math.max(3.6, room.name.length * 0.32 + 1.4);
+  const w = Math.max(3.6, label.length * 0.32 + 1.4);
   const h = area ? 1.15 : 0.7;
   const font = Math.max(0.38, 11 / zoom);
   const pick = (evt: { cancelBubble: boolean }) => {
     evt.cancelBubble = true;
     onPick();
   };
+  // Furniture parked on the label (a sofa in the middle of the room) used to hide its own name under the room
+  // label. Step the label up or down to the first clear spot that is still inside the room (2.13.19).
+  const dy = useMemo(() => {
+    const boxes = (furniture ?? []).map((f) => {
+      const c = Math.abs(Math.cos(f.rot || 0));
+      const s = Math.abs(Math.sin(f.rot || 0));
+      const hx = (f.w / 2) * c + (f.h / 2) * s;
+      const hy = (f.w / 2) * s + (f.h / 2) * c + 0.7; // room for the piece's own name under it
+      return { x0: f.x - hx, x1: f.x + hx, y0: f.y - hy + 0.35, y1: f.y + hy };
+    });
+    const clear = (oy: number) => {
+      const x0 = room.x - w / 2;
+      const x1 = room.x + w / 2;
+      const y0 = room.y + oy - h / 2;
+      const y1 = room.y + oy + h / 2;
+      if (poly && !pointInPoly({ x: room.x, y: room.y + oy }, poly)) return false;
+      return !boxes.some((b) => b.x0 < x1 && b.x1 > x0 && b.y0 < y1 && b.y1 > y0);
+    };
+    for (const oy of [0, -1.6, 1.6, -3.2, 3.2, -4.8, 4.8, -6.4, 6.4]) if (clear(oy)) return oy;
+    return 0;
+  }, [furniture, poly, room.x, room.y, w, h]);
   return (
-    <Group x={room.x} y={room.y}>
+    <Group x={room.x} y={room.y + dy}>
       <Rect
         x={-w / 2}
         y={-h / 2}
@@ -2281,7 +2306,7 @@ function RoomLabel({
         onTap={pick}
       />
       <Text
-        text={room.name}
+        text={label}
         x={-w / 2}
         y={area ? -h / 2 + 0.12 : -font * 0.45}
         width={w}

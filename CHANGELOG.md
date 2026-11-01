@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.19 — 2026-11-01 — 2D tools
+- Notes take your typing right away, tool panels are in your language, and room names move off furniture.
+
 ## 2.13.18 — 2026-11-01 — Richer 3D
 - 3D View looks richer: a sunny sky, real floors, brick you can feel, and glowing lamps.
 

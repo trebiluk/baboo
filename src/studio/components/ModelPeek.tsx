@@ -1,5 +1,7 @@
 import { createElement, useEffect, useState } from 'react';
 import { peekFor } from '../data/objectPeek';
+import { t, tipLoc } from '../data/i18n';
+import { useProjectStore } from '../store/useProjectStore';
 
 type Which = 'kenney' | 'quaternius';
 
@@ -9,6 +11,7 @@ export const KTX2_TRANSCODER_PATH = '/vendor/basis/2021-04-15-ba1c3e4/';
 
 /** Apache-2.0 model-viewer. Loaded only when a piece is selected. Not the class canvas. */
 export function ModelPeek({ catalogId, name }: { catalogId: string; name: string }) {
+  const locale = tipLoc(useProjectStore((s) => s.doc.settings));
   const peek = peekFor(catalogId);
   const kenney = peek?.kenney;
   const quat = peek?.quaternius;
@@ -39,9 +42,9 @@ export function ModelPeek({ catalogId, name }: { catalogId: string; name: string
 
   return (
     <div className="model-peek">
-      <p className="object-menu-meta">3D peek — the plan stays the drawing</p>
+      <p className="object-menu-meta">{t(locale, 'peek.lead')}</p>
       {kenney && quat ? (
-        <div className="model-peek-row" role="group" aria-label="3D peek model">
+        <div className="model-peek-row" role="group" aria-label={t(locale, 'peek.aria')}>
           <button
             type="button"
             className={`object-chip aw-pressable${which === 'kenney' ? ' active' : ''}`}
@@ -78,7 +81,7 @@ export function ModelPeek({ catalogId, name }: { catalogId: string; name: string
               style: { width: '100%', height: '200px', background: '#fff', display: 'block' },
             })
           : (
-            <p className="object-menu-meta">{phase === 'miss' ? 'Peek did not load.' : 'Loading peek…'}</p>
+            <p className="object-menu-meta">{phase === 'miss' ? t(locale, 'peek.miss') : t(locale, 'peek.loading')}</p>
           )}
       </div>
     </div>

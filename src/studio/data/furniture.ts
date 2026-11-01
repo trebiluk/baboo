@@ -1,4 +1,5 @@
 import type { CatalogItem } from '../types';
+import { t } from './i18n';
 
 export const FURNITURE_CATALOG: CatalogItem[] = [
   { id: 'bed-twin', name: 'Twin Bed', category: 'Bedroom', w: 3.25, h: 6.25, color: '#3d5a80' },
@@ -35,3 +36,9 @@ export const FURNITURE_CATALOG: CatalogItem[] = [
   { id: 'window-seat', name: 'Window seat', category: 'Living', w: 6, h: 1.8, color: '#6E2E3A' },
   { id: 'painting', name: 'Painting', category: 'Living', w: 3, h: 0.3, color: '#C4A574' },
 ];
+
+/** A piece still named like the catalog shows its name in the kid's language; a renamed piece keeps its own name. */
+export function furnLabel(locale: Parameters<typeof t>[0], catalogId: string, label: string): string {
+  const cat = FURNITURE_CATALOG.find((c) => c.id === catalogId);
+  return cat && (!label || label === cat.name) ? t(locale, `furn.item.${catalogId}`) : label;
+}

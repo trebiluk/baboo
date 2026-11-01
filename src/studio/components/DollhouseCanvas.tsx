@@ -26,6 +26,7 @@ import { bloomSpots } from '../data/landscape';
 import { listInteriorFloors, roomPolygon } from '../lib/rooms';
 import { DEFAULT_GUI_THEME } from '../data/themes';
 import { t } from '../data/i18n';
+import { roomLabel } from '../data/rooms';
 import type { LandscapeItem } from '../types';
 import { useCanvasToolsPocket } from '../hooks/useCanvasToolsPocket';
 
@@ -683,7 +684,8 @@ export function DollhouseCanvas() {
               evt.cancelBubble = true;
               setSelected({ kind: 'room', id: r.id });
             };
-            const labelW = Math.max(72, r.name.length * 7.4);
+            const name = roomLabel(settings.locale, r);
+            const labelW = Math.max(72, name.length * 7.4);
             return (
               <Text
                 key={r.id}
@@ -692,7 +694,7 @@ export function DollhouseCanvas() {
                 width={labelW}
                 align="center"
                 wrap="none"
-                text={r.name}
+                text={name}
                 fontSize={12 / Math.max(0.6, zoom)}
                 fill={selected?.kind === 'room' && selected.id === r.id ? '#6e72f5' : (light ? '#1a1a1a' : '#f4f4f5')}
                 fontStyle="bold"
