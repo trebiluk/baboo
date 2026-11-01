@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4.28 -0.48 8.56 0.96" role="img" aria-label="Banister">
+<rect x="-4.28" y="-0.48" width="8.56" height="0.96" fill="#ffffff"/>
+<rect x="-4" y="-0.11" width="8" height="0.22" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-3.96" y="-0.1" width="0.16" height="0.2" rx="0.06" fill="#8B6914" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="3.8" y="-0.1" width="0.16" height="0.2" rx="0.06" fill="#8B6914" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-0.08" y="-0.1" width="0.16" height="0.2" rx="0.06" fill="#8B6914" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+</svg>

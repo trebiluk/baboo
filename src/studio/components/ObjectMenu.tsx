@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { t, tipLoc } from '../data/i18n';
+import { FURNITURE_CATALOG } from '../data/furniture';
 import { useProjectStore } from '../store/useProjectStore';
 import { formatLength, parseFeet, wallLength, dist } from '../lib/geometry';
 import { ROOM_CATALOG, roomType } from '../data/rooms';
@@ -112,6 +114,12 @@ export function ObjectMenu() {
   const selected = useProjectStore((s) => s.selected);
   const floor = useProjectStore((s) => s.doc.floors[0]);
   const units = useProjectStore((s) => s.doc.settings.units) || 'ft';
+  const locale = tipLoc(useProjectStore((s) => s.doc.settings));
+  // A piece still named like the catalog shows its name in the kid's language; a renamed piece keeps its name.
+  const furnName = (catalogId: string, label: string) => {
+    const cat = FURNITURE_CATALOG.find((c) => c.id === catalogId);
+    return cat && (!label || label === cat.name) ? t(locale, `furn.item.${catalogId}`) : label;
+  };
   const houseFloor = useProjectStore((s) => asFloorFinish(s.doc.settings.floorFinishId));
   const styleId = useProjectStore((s) => s.doc.settings.styleId);
   const patchOpening = useProjectStore((s) => s.patchOpening);
@@ -324,22 +332,22 @@ export function ObjectMenu() {
         if (!f) return null;
         return (
           <>
-            <DockHead title={f.label} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
+            <DockHead title={furnName(f.catalogId, f.label)} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
             <div className="object-menu-grid">
               <FeetField label="X" feet={f.x} units={units} allowZero onCommit={(n) => patchFurniture(f.id, { x: n })} />
               <FeetField label="Y" feet={f.y} units={units} allowZero onCommit={(n) => patchFurniture(f.id, { y: n })} />
-              <FeetField label="Width" feet={f.w} units={units} onCommit={(n) => patchFurniture(f.id, { w: n })} />
-              <FeetField label="Depth" feet={f.h} units={units} onCommit={(n) => patchFurniture(f.id, { h: n })} />
+              <FeetField label={t(locale, 'obj.width')} feet={f.w} units={units} onCommit={(n) => patchFurniture(f.id, { w: n })} />
+              <FeetField label={t(locale, 'obj.depth')} feet={f.h} units={units} onCommit={(n) => patchFurniture(f.id, { h: n })} />
             </div>
             <div className="object-menu-grid">
-              <DegField label="Angle °" rad={f.rot || 0} onCommit={(n) => patchFurniture(f.id, { rot: n })} />
+              <DegField label={t(locale, 'obj.angle')} rad={f.rot || 0} onCommit={(n) => patchFurniture(f.id, { rot: n })} />
             </div>
             <div className="object-menu-row">
-              <button type="button" className="object-chip aw-pressable" onClick={() => rotateSelected(1)}><Icon name="rotate" /> Rotate</button>
-              <button type="button" className="object-chip aw-pressable" onClick={duplicateSelected}><Icon name="copy" /> Copy</button>
+              <button type="button" className="object-chip aw-pressable" onClick={() => rotateSelected(1)}><Icon name="rotate" /> {t(locale, 'obj.rotate')}</button>
+              <button type="button" className="object-chip aw-pressable" onClick={duplicateSelected}><Icon name="copy" /> {t(locale, 'tool.copy')}</button>
             </div>
-            <p className="object-menu-meta">Paint</p>
-            <div className="object-menu-row object-tex-row" role="group" aria-label="Paint">
+            <p className="object-menu-meta">{t(locale, 'obj.paint')}</p>
+            <div className="object-menu-row object-tex-row" role="group" aria-label={t(locale, 'obj.paint')}>
               {FURN_PAINTS.map((p) => {
                 const on = samePaint(f.color, p.hex);
                 return (
@@ -348,17 +356,17 @@ export function ObjectMenu() {
                     type="button"
                     className={`object-chip tex-swatch aw-pressable${on ? ' active' : ''}`}
                     style={{ background: p.hex ?? 'linear-gradient(135deg,#C4A074,#8B6914)' }}
-                    title={p.label}
+                    title={t(locale, `paint.${p.id}`)}
                     onClick={() => patchFurniture(f.id, { color: p.hex })}
                   >
-                    <span className="tex-swatch-label">{p.label}</span>
+                    <span className="tex-swatch-label">{t(locale, `paint.${p.id}`)}</span>
                   </button>
                 );
               })}
             </div>
-            <p className="object-menu-meta">Drag to move</p>
-            <ModelPeek catalogId={f.catalogId} name={f.label} />
-            <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
+            <p className="object-menu-meta">{t(locale, 'obj.dragMove')}</p>
+            <ModelPeek catalogId={f.catalogId} name={furnName(f.catalogId, f.label)} />
+            <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> {t(locale, 'obj.delete')}</button>
           </>
         );
       })()}
@@ -372,11 +380,11 @@ export function ObjectMenu() {
             <div className="object-menu-grid">
               <FeetField label="X" feet={f.x} units={units} allowZero onCommit={(n) => patchLandscape(f.id, { x: n })} />
               <FeetField label="Y" feet={f.y} units={units} allowZero onCommit={(n) => patchLandscape(f.id, { y: n })} />
-              <FeetField label="Width" feet={f.w} units={units} onCommit={(n) => patchLandscape(f.id, { w: n })} />
-              <FeetField label="Depth" feet={f.h} units={units} onCommit={(n) => patchLandscape(f.id, { h: n })} />
+              <FeetField label={t(locale, 'obj.width')} feet={f.w} units={units} onCommit={(n) => patchLandscape(f.id, { w: n })} />
+              <FeetField label={t(locale, 'obj.depth')} feet={f.h} units={units} onCommit={(n) => patchLandscape(f.id, { h: n })} />
             </div>
-            <p className="object-menu-meta">Drag to move</p>
-            <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> Delete</button>
+            <p className="object-menu-meta">{t(locale, 'obj.dragMove')}</p>
+            <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> {t(locale, 'obj.delete')}</button>
           </>
         );
       })()}

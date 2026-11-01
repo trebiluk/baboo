@@ -2,6 +2,7 @@ import { FURNITURE_CATALOG } from '../data/furniture';
 import { useProjectStore } from '../store/useProjectStore';
 import { DEFAULT_SKILL_LEVEL, isToolUnlocked } from '../data/skill';
 import { FurnitureGlyph } from './FurnitureSymbol';
+import { t, tipLoc } from '../data/i18n';
 
 export function FurnitureSidebar() {
   const tool = useProjectStore((s) => s.tool);
@@ -13,6 +14,7 @@ export function FurnitureSidebar() {
   const setCatalogOpen = useProjectStore((s) => s.setCatalogOpen);
   const viewMode = useProjectStore((s) => s.viewMode);
   const skillLevel = useProjectStore((s) => s.doc.settings.skillLevel) ?? DEFAULT_SKILL_LEVEL;
+  const locale = tipLoc(useProjectStore((s) => s.doc.settings));
 
   if ((viewMode !== 'plan' && viewMode !== 'dollhouse') || !catalogOpen || tool === 'room' || !isToolUnlocked('furniture', skillLevel)) return null;
 
@@ -23,26 +25,26 @@ export function FurnitureSidebar() {
       : `${w}'×${h}'`;
 
   return (
-    <aside className="side-panel furniture-side" aria-label="Furniture catalog">
+    <aside className="side-panel furniture-side" aria-label={t(locale, 'furn.aria')}>
       <div className="drawer-head">
-        <h2>Furniture</h2>
+        <h2>{t(locale, 'furn.title')}</h2>
         <button
           type="button"
           className="ghost-btn aw-pressable"
           onClick={() => setCatalogOpen(false)}
-          title="Hide catalog — grid stays full"
+          title={t(locale, 'furn.hideTitle')}
         >
-          Hide
+          {t(locale, 'chrome.hide')}
         </button>
       </div>
       <p className="muted">
         {tool === 'furniture' || tool === 'select'
-          ? 'Click an item, then click the plan — or drag onto the canvas.'
-          : 'Pick an item to switch to Furniture.'}
+          ? t(locale, 'furn.hint.place')
+          : t(locale, 'furn.hint.pick')}
       </p>
       {cats.map((cat) => (
         <div key={cat} className="cat-block">
-          <h3>{cat}</h3>
+          <h3>{t(locale, `furn.cat.${cat.toLowerCase()}`)}</h3>
           <div className="catalog-grid">
             {FURNITURE_CATALOG.filter((c) => c.category === cat).map((item) => (
               <button
@@ -62,7 +64,7 @@ export function FurnitureSidebar() {
                 }}
               >
                 <FurnitureGlyph catalogId={item.id} />
-                <span>{item.name}</span>
+                <span>{t(locale, `furn.item.${item.id}`)}</span>
                 <small>{sizeLabel(item.w, item.h)}</small>
               </button>
             ))}

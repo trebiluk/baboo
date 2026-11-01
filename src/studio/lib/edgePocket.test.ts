@@ -9,9 +9,21 @@ import { upperBody } from './stories.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.13.16 3d and dollhouse fixes, 2.13.15 more languages, 2.13.14 save status, 2.13.13 3d viewer update, 2.13.12 drawing engine update, 2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
-  it('chips 2.13.16 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.13.16');
+describe('2.13.17 furniture list, 2.13.16 3d and dollhouse fixes, 2.13.15 more languages, 2.13.14 save status, 2.13.13 3d viewer update, 2.13.12 drawing engine update, 2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
+  it('chips 2.13.17 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.13.17');
+    assert.match(readFileSync(join(studio, 'data/changelog.ts'), 'utf8'), /version:\s*'2\.13\.17'/);
+    for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) {
+      assert.notEqual(t(l, 'news.furn'), t('en', 'news.furn'));
+      assert.notEqual(t(l, 'furn.item.bed-twin'), t('en', 'furn.item.bed-twin'));
+      assert.notEqual(t(l, 'furn.cat.kitchen'), t('en', 'furn.cat.kitchen'));
+      assert.notEqual(t(l, 'obj.delete'), t('en', 'obj.delete'));
+    }
+    const side = readFileSync(join(studio, 'components/FurnitureSidebar.tsx'), 'utf8');
+    assert.match(side, /furn\.item\./);
+    assert.doesNotMatch(side, /<h2>Furniture<\/h2>|>\s*Hide\s*</);
+    const cat = readFileSync(join(studio, 'data/furniture.ts'), 'utf8');
+    for (const m of cat.matchAll(/id: '([^']+)'/g)) assert.ok(existsSync(join(studio, '../../public/objects/baboo', `${m[1]}.svg`)), m[1]);
     assert.match(readFileSync(join(studio, 'data/changelog.ts'), 'utf8'), /version:\s*'2\.13\.16'/);
     for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) assert.notEqual(t(l, 'news.view3d'), t('en', 'news.view3d'));
     const dollSrc = readFileSync(join(studio, 'components/DollhouseCanvas.tsx'), 'utf8');

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4.28 -0.48 8.56 0.96" role="img" aria-label="Wall paneling">
+<rect x="-4.28" y="-0.48" width="8.56" height="0.96" fill="#ffffff"/>
+<rect x="-4" y="-0.2" width="8" height="0.4" rx="0.06" fill="#E7D7C1" stroke="#2a2e34" stroke-width="0.05"/>
+<rect x="-4" y="-0.09" width="8" height="0.18" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+</svg>

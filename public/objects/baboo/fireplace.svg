@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2.78 -0.98 5.56 1.96" role="img" aria-label="Fireplace">
+<rect x="-2.78" y="-0.98" width="5.56" height="1.96" fill="#ffffff"/>
+<rect x="-2.4" y="-0.7" width="4.8" height="0.868" rx="0.06" fill="#8C4A3A" stroke="#2a2e34" stroke-width="0.05"/>
+<rect x="-2.7" y="-0.73" width="5.4" height="0.928" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-1.2" y="-0.072" width="2.4" height="0.24" rx="0.06" fill="#1A1A1A" stroke="#2a2e34" stroke-width="0.05"/>
+<rect x="-1.75" y="0.168" width="3.5" height="0.532" rx="0.06" fill="#7A6E66" stroke="#2a2e34" stroke-width="0.05"/>
+<ellipse cx="0" cy="-0.012" rx="0.11" ry="0.11" fill="#C4703A" stroke="#2a2e34" stroke-width="0.05"/>
+</svg>

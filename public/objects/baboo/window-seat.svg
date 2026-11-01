@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-3.28 -1.18 6.56 2.36" role="img" aria-label="Window seat">
+<rect x="-3.28" y="-1.18" width="6.56" height="2.36" fill="#ffffff"/>
+<rect x="-3" y="-0.9" width="6" height="1.8" rx="0.06" fill="#8B6914" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-2.76" y="-0.72" width="5.52" height="1.44" rx="0.06" fill="#4A6741" stroke="#2a2e34" stroke-width="0.05" data-tex="fabric"/>
+<rect x="-2.1" y="-0.45" width="4.2" height="0.63" rx="0.06" fill="#F4EEE4" stroke="#2a2e34" stroke-width="0.05" data-tex="fabric"/>
+</svg>

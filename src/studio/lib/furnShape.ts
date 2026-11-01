@@ -235,9 +235,11 @@ function furniturePartsFull(item: FurnitureItem): FurnPart[] {
     case 'dining-table':
       return [
         ...legs(w * 0.86, h * 0.82, 0.16, 0.2, 2.28),
-        box(0, 0, w, h, 2.28, 2.52, WOOD_LT),
+        // apron under the top: listed first so the plan shows the tabletop, not a cross
         box(0, 0, w * 0.82, h * 0.08, 2.05, 2.28, WOOD_DK),
         box(0, 0, w * 0.08, h * 0.72, 2.05, 2.28, WOOD_DK),
+        box(0, 0, w, h, 2.28, 2.52, WOOD_LT),
+        box(0, 0, w * 0.9, h * 0.84, 2.52, 2.53, WOOD),
       ];
     case 'dining-chair':
       return [
@@ -288,14 +290,20 @@ function furniturePartsFull(item: FurnitureItem): FurnPart[] {
         box(0, -h * 0.18, 0.1, 0.42, 3.42, 3.55, CHROME),
       ];
     case 'toilet':
+    {
+      // the bowl starts at the tank, no gap (2.13.17)
+      const tankD = 0.56;
+      const bowlH = Math.min(h - tankD, h * 0.68);
+      const by = -hh + tankD - 0.06 + bowlH / 2;
       return [
         box(0, -hh + 0.28, w * 0.92, 0.52, 1.15, 2.35, WHITE),
-        box(0, -hh + 0.28, w * 0.96, 0.56, 2.35, 2.48, PORC),
-        oval(0, hh - 0.82, w * 0.82, h * 0.62, 0, 1.18, PORC),
-        oval(0, hh - 0.78, w * 0.7, h * 0.5, 1.18, 1.32, WHITE),
-        oval(0, hh - 0.74, w * 0.42, h * 0.32, 1.05, 1.22, WATER),
+        oval(0, by, w * 0.82, bowlH, 0, 1.18, PORC),
+        oval(0, by + 0.04, w * 0.7, bowlH * 0.82, 1.18, 1.32, WHITE),
+        oval(0, by + 0.08, w * 0.42, bowlH * 0.52, 1.05, 1.22, WATER),
+        box(0, -hh + 0.28, w * 0.96, tankD, 2.35, 2.48, PORC),
         cyl(w * 0.22, -hh + 0.22, 0.14, 2.48, 2.62, CHROME),
       ];
+    }
     case 'bathtub':
       return [
         oval(0, 0, w, h, 0, 1.55, WHITE),
@@ -304,12 +312,14 @@ function furniturePartsFull(item: FurnitureItem): FurnPart[] {
         box(-w * 0.28, -h * 0.22, 0.28, 0.1, 1.72, 1.85, CHROME),
       ];
     case 'desk':
+      // a full-depth top seen from above, a drawer stack on the right, paper on top (2.13.17)
       return [
-        box(-hw + 0.22, 0.08, 0.42, h * 0.82, 0, 2.28, WOOD_DK),
-        box(hw - 0.22, 0.08, 0.42, h * 0.82, 0, 2.28, WOOD_DK),
-        box(0, -hh + 0.22, w, 0.48, 2.28, 2.52, WOOD_LT),
-        box(-hw + 0.22, 0.08, 0.32, h * 0.28, 1.4, 1.52, WOOD),
-        box(w * 0.12, -hh + 0.18, w * 0.28, 0.22, 2.52, 2.58, '#E8E0D0'),
+        box(-hw + 0.12, 0, 0.18, h * 0.9, 0, 2.28, WOOD_DK),
+        box(hw - w * 0.16, 0, w * 0.3, h * 0.9, 0, 2.28, WOOD_DK),
+        box(0, -hh + 0.1, w * 0.9, 0.1, 0.9, 2.28, WOOD_DK),
+        box(0, 0, w, h, 2.28, 2.5, WOOD_LT),
+        box(hw - w * 0.16, hh - 0.14, w * 0.18, 0.06, 2.5, 2.52, WOOD_DK),
+        box(-w * 0.1, -h * 0.04, w * 0.3, h * 0.42, 2.5, 2.54, '#E8E0D0'),
       ];
     case 'water-heater':
       return [
@@ -339,13 +349,18 @@ function furniturePartsFull(item: FurnitureItem): FurnPart[] {
       ];
     }
     case 'fireplace':
+    {
+      // brick body and mantel at the back, firebox and stone hearth in front, so the plan reads as a fireplace (2.13.17)
+      const bodyD = h * 0.62;
+      const by = -hh + bodyD / 2;
       return [
-        box(0, 0.1, w, h, 0, 0.2, '#5C4030'),
-        box(0, 0, w * 0.96, h * 0.9, 0.2, 3.7, '#8C4A3A'),
-        box(0, 0.04, w * 0.48, h * 0.55, 0.45, 2.35, '#1A1A1A'),
-        box(0, 0, w * 1.08, h, 3.7, 4.05, WOOD_DK),
-        cyl(0, 0.02, 0.28, 2.4, 3.55, '#C4A35A'),
+        box(0, by, w * 0.96, bodyD, 0.2, 3.7, '#8C4A3A'),
+        box(0, by, w * 1.08, bodyD + 0.06, 3.7, 4.05, WOOD_DK),
+        box(0, -hh + bodyD - 0.12, w * 0.48, 0.24, 0.45, 2.35, '#1A1A1A'),
+        box(0, hh - (h - bodyD) / 2, w * 0.7, h - bodyD, 0, 0.2, '#7A6E66'),
+        cyl(0, -hh + bodyD - 0.18, 0.22, 0.45, 0.75, '#C4703A'),
       ];
+    }
     case 'rug':
       return [
         oval(0, 0, w, h, 0.02, 0.07, RUG),

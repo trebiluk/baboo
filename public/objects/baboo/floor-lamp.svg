@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.88 -0.88 1.76 1.76" role="img" aria-label="Floor lamp">
+<rect x="-0.88" y="-0.88" width="1.76" height="1.76" fill="#ffffff"/>
+<ellipse cx="0" cy="0" rx="0.2" ry="0.2" fill="#3A3A40" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<ellipse cx="0" cy="0" rx="0.05" ry="0.05" fill="#C4A35A" stroke="#2a2e34" stroke-width="0.05"/>
+<ellipse cx="0" cy="0" rx="0.525" ry="0.525" fill="#F3E2A8" stroke="#2a2e34" stroke-width="0.05"/>
+</svg>
