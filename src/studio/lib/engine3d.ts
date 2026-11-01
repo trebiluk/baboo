@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import type { Floor, FurnitureItem, Opening, RoofGeometry, Wall } from '../types';
 import type { FloorFinishId } from '../data/flooring';
-import { floorFinish } from '../data/flooring';
+import { floorTileCanvas } from '../data/flooring';
 import { listInteriorFloors } from './rooms';
 import { furnitureParts } from './furnShape';
 import { houseHasUpper, porchBounds, upperBody, viewRoof, wallStories } from './stories';
@@ -14,6 +14,8 @@ export type HouseLook = {
   showFurn: boolean;
   ceiling: boolean;
   houseFinish: FloorFinishId;
+  /** Bigger machines: glossy floors. Set by the 3D view, not saved (2.13.18). */
+  rich?: boolean;
 };
 
 export type BuiltHouse = {
@@ -82,17 +84,43 @@ function mat(
   bag: Bag,
   hex: string,
   rough = 0.82,
-  opts?: { metal?: number; opacity?: number; emissive?: string; map?: THREE.Texture | null },
+  opts?: {
+    metal?: number;
+    opacity?: number;
+    emissive?: string;
+    glow?: number;
+    map?: THREE.Texture | null;
+    bump?: THREE.Texture | null;
+    bumpScale?: number;
+    glass?: boolean;
+    sheen?: number;
+  },
 ): THREE.Material {
-  const key = `${hex}|${rough}|${opts?.metal ?? 0}|${opts?.opacity ?? 1}|${opts?.emissive ?? ''}|${opts?.map?.uuid ?? ''}`;
+  const key = `${hex}|${rough}|${opts?.metal ?? 0}|${opts?.opacity ?? 1}|${opts?.emissive ?? ''}|${opts?.glow ?? ''}|${opts?.map?.uuid ?? ''}|${opts?.bump?.uuid ?? ''}|${opts?.bumpScale ?? ''}|${opts?.glass ? 'g' : ''}|${opts?.sheen ?? ''}`;
   const hit = bag.shared.get(key);
   if (hit) return hit;
-  const m = new THREE.MeshStandardMaterial({
-    color: hex,
-    roughness: rough,
-    metalness: opts?.metal ?? 0,
-    map: opts?.map ?? null,
-  });
+  // Glass and polished floors use the physical material so they pick up the sky reflection (2.13.18).
+  const physical = !!opts?.glass || (opts?.sheen ?? 0) > 0;
+  const m = physical
+    ? new THREE.MeshPhysicalMaterial({
+      color: hex,
+      roughness: rough,
+      metalness: opts?.metal ?? 0,
+      map: opts?.map ?? null,
+      clearcoat: opts?.sheen ?? 0,
+      clearcoatRoughness: 0.35,
+      envMapIntensity: opts?.glass ? 1.6 : 1,
+    })
+    : new THREE.MeshStandardMaterial({
+      color: hex,
+      roughness: rough,
+      metalness: opts?.metal ?? 0,
+      map: opts?.map ?? null,
+    });
+  if (opts?.bump) {
+    m.bumpMap = opts.bump;
+    m.bumpScale = opts.bumpScale ?? 1;
+  }
   if (opts?.opacity != null && opts.opacity < 1) {
     m.transparent = true;
     m.opacity = opts.opacity;
@@ -100,7 +128,7 @@ function mat(
   }
   if (opts?.emissive) {
     m.emissive = new THREE.Color(opts.emissive);
-    m.emissiveIntensity = 0.85;
+    m.emissiveIntensity = opts.glow ?? 0.85;
   }
   bag.shared.set(key, m);
   bag.mats.push(m);
@@ -180,6 +208,52 @@ function slateMap(): THREE.CanvasTexture | null {
       }
     }
   });
+}
+
+function grassMap(): THREE.CanvasTexture | null {
+  return paintTex('grass', (ctx, s) => {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, s, s);
+    let n = 7;
+    for (let i = 0; i < 900; i++) {
+      n = (n * 73 + 41) % 1021;
+      const x = (n * 13) % s;
+      const y = (n * 29 + i) % s;
+      const v = 222 + (n % 33);
+      ctx.fillStyle = `rgb(${v - 10},${v},${v - 16})`;
+      ctx.fillRect(x, y, 2, 2);
+    }
+  }, 128);
+}
+
+function plasterMap(): THREE.CanvasTexture | null {
+  return paintTex('plaster', (ctx, s) => {
+    ctx.fillStyle = '#808080';
+    ctx.fillRect(0, 0, s, s);
+    let n = 3;
+    for (let i = 0; i < 700; i++) {
+      n = (n * 61 + 17) % 997;
+      const v = 110 + (n % 40);
+      ctx.fillStyle = `rgb(${v},${v},${v})`;
+      ctx.fillRect((n * 7) % s, (n * 11 + i) % s, 2, 2);
+    }
+  }, 96);
+}
+
+const floorTexCache = new Map<string, THREE.CanvasTexture>();
+
+/** The same tile picture Dollhouse paints, so 3D floors match it (2.13.18). */
+function floorTex(id: FloorFinishId): THREE.CanvasTexture | null {
+  if (typeof document === 'undefined') return null;
+  const hit = floorTexCache.get(id);
+  if (hit) return hit;
+  const tex = new THREE.CanvasTexture(floorTileCanvas(id));
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.anisotropy = 8;
+  floorTexCache.set(id, tex);
+  return tex;
 }
 
 function uvFeet(geo: THREE.BufferGeometry, fu: number, fv: number, useZ = false) {
@@ -371,7 +445,15 @@ function addWall(bag: Bag, floor: Floor, wall: Wall, look: HouseLook, nodes: Map
   const brick = wall.drawStyle === 'brick' && wall.kind === 'exterior';
   if (brick) uvFeet(geo, 2.2, 1.15);
   const color = brick ? '#ffffff' : wall.kind === 'exterior' ? look.tint : '#F4EFE6';
-  const mesh = addMesh(bag, geo, mat(bag, color, brick ? 0.92 : 0.8, brick ? { map: brickMap() } : undefined), true, true);
+  const mesh = addMesh(
+    bag,
+    geo,
+    mat(bag, color, brick ? 0.92 : 0.8, brick
+      ? { map: brickMap(), bump: look.rich ? brickMap() : null, bumpScale: 2.2 }
+      : { bump: look.rich ? plasterMap() : null, bumpScale: 0.35 }),
+    true,
+    true,
+  );
   mesh.position.set(a.x, 0, a.y);
   mesh.rotation.y = ang;
 }
@@ -409,7 +491,7 @@ function placeOpening(
     const glass = addMesh(
       bag,
       new THREE.PlaneGeometry(fw - jamb, fh - jamb * 1.4),
-      mat(bag, '#C5DFF0', 0.06, { opacity: 0.45, metal: 0.08 }),
+      mat(bag, '#C5DFF0', 0.04, { opacity: 0.38, metal: 0.1, glass: true }),
       false,
     );
     glass.position.set(px, (y0 + y1) / 2, pz);
@@ -433,14 +515,14 @@ function placeOpening(
   leaf.rotation.y = ang + swing * 0.7;
 }
 
-function addRoof(bag: Bag, roof: RoofGeometry) {
+function addRoof(bag: Bag, roof: RoofGeometry, rich = false) {
   const o = roof.outline;
   if (o.length < 3) return;
   const eh = roof.eavesHeight;
   const rh = roof.ridgeHeight;
   const slate = roof.styleId === 'grass'
     ? mat(bag, '#3E6B3A', 0.8)
-    : mat(bag, '#ffffff', 0.78, { map: slateMap() });
+    : mat(bag, '#ffffff', 0.78, { map: slateMap(), bump: rich ? slateMap() : null, bumpScale: 2.5 });
   if (roof.styleId === 'mansard' && o.length >= 4 && roof.breaks.length >= 4) {
     const inner = roof.breaks.slice(0, 4).map((b) => b.a);
     const capY = eh + Math.max(4.5, (rh - eh) * 0.78);
@@ -590,7 +672,7 @@ function addLandscape(bag: Bag, floor: Floor) {
     } else if (item.kind === 'lamp') {
       const post = addMesh(bag, new THREE.CylinderGeometry(0.08, 0.1, 6.2, 8), mat(bag, '#3A3A40', 0.4, { metal: 0.35 }));
       post.position.set(x, 3.1, z);
-      const globe = addMesh(bag, new THREE.SphereGeometry(0.42, 12, 8), mat(bag, '#F3E2A8', 0.35, { emissive: '#F3E2A8' }), false);
+      const globe = addMesh(bag, new THREE.SphereGeometry(0.42, 12, 8), mat(bag, '#F3E2A8', 0.35, { emissive: '#FFE7A8', glow: 2.4 }), false);
       globe.position.set(x, 6.55, z);
     } else if (item.kind === 'path') {
       const path = addMesh(bag, new THREE.BoxGeometry(item.w, 0.08, item.h), mat(bag, '#C4B49A', 0.9), false);
@@ -609,7 +691,7 @@ function addLandscape(bag: Bag, floor: Floor) {
   }
 }
 
-function addUpperDeck(bag: Bag, floor: Floor, y: number) {
+function addUpperDeck(bag: Bag, floor: Floor, y: number, finish: FloorFinishId) {
   const body = upperBody(floor);
   if (!body) return;
   const pad = 0.3; // stop just inside the wall faces
@@ -643,7 +725,7 @@ function addUpperDeck(bag: Bag, floor: Floor, y: number) {
   const geo = new THREE.ShapeGeometry(shape);
   geo.rotateX(-Math.PI / 2);
   uvFeet(geo, 2.6, 2.6, true);
-  const material = new THREE.MeshStandardMaterial({ color: '#D7CBBA', roughness: 0.8, side: THREE.DoubleSide });
+  const material = new THREE.MeshStandardMaterial({ color: '#ffffff', map: floorTex(finish), roughness: 0.6, side: THREE.DoubleSide });
   bag.mats.push(material);
   const mesh = addMesh(bag, geo, material, false, true);
   mesh.position.y = y;
@@ -672,7 +754,12 @@ export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
     colors[i * 3 + 2] = c.b;
   }
   pad.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  const groundMat = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.96, vertexColors: true });
+  const grassTex = grassMap();
+  if (grassTex) {
+    grassTex.repeat.set(90, 90);
+    grassTex.anisotropy = 1;
+  }
+  const groundMat = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.96, vertexColors: true, map: grassTex });
   bag.mats.push(groundMat);
   const ground = addMesh(bag, pad, groundMat, false, true);
   ground.rotation.x = -Math.PI / 2;
@@ -690,7 +777,7 @@ export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
   const upper = houseHasUpper(floor);
   const porch = (floor.rooms ?? []).find((r) => r.kind === 'outdoor');
   for (const face of floors) {
-    floorMesh(bag, face.poly, 0.03, mat(bag, floorFinish(face.finish).color, 0.72));
+    floorMesh(bag, face.poly, 0.03, mat(bag, '#ffffff', 0.55, { map: floorTex(face.finish), sheen: look.rich ? 0.35 : 0 }));
     if (!upper) {
       floorMesh(bag, face.poly, look.wallH - 0.2, mat(bag, '#F7F3EC', 0.92), 'ceiling');
       continue;
@@ -701,10 +788,10 @@ export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
     if (onPorch || upper) continue;
     floorMesh(bag, face.poly, look.wallH - 0.2, mat(bag, '#F7F3EC', 0.92), 'ceiling');
   }
-  if (upper) addUpperDeck(bag, floor, look.wallH);
+  if (upper) addUpperDeck(bag, floor, look.wallH, look.houseFinish);
 
   const shown = viewRoof(floor, look.wallH);
-  if (shown) addRoof(bag, shown);
+  if (shown) addRoof(bag, shown, !!look.rich);
   const porchPad = porchBounds(floor);
   if (porchPad) {
     const slab = addMesh(

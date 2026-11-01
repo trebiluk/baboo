@@ -238,6 +238,17 @@ export const STR: Record<string, Gloss> = {
     ar: 'يمكنك الآن معرفة إن كان عملك محفوظًا، بجانب تصدير.',
     rw: 'Ubu ushobora kubona niba akazi kawe kabitswe, iruhande rwa Export.',
   }),
+  'news.look3d': g('3D View looks richer: a sunny sky, real floors, brick you can feel, and glowing lamps.', {
+    es: 'La Vista 3D se ve mejor: cielo soleado, pisos de verdad, ladrillo con relieve y faroles que brillan.',
+    cu: 'La Vista 3D se ve mejor: cielo soleado, pisos de verdad, ladrillo con relieve y faroles que brillan.',
+    uk: '3D-вигляд став кращим: сонячне небо, справжня підлога, рельєфна цегла і ліхтарі, що світяться.',
+    ru: '3D-вид стал лучше: солнечное небо, настоящий пол, рельефный кирпич и светящиеся фонари.',
+    ti: '3D ትርኢት ዝሓሸ ኮይኑ፦ ጸሓያዊ ሰማይ፣ ሓቀኛ ባይታ፣ ዝድህሰስ ጡብን ዘብርሁ መብራህትን።',
+    fa: 'نمای سه‌بعدی زیباتر شد: آسمان آفتابی، کف واقعی، خشت برجسته و چراغ‌های روشن.',
+    'fa-AF': 'نمای سه‌بعدی زیباتر شد: آسمان آفتابی، کف واقعی، خشت برجسته و چراغ‌های روشن.',
+    ar: 'العرض ثلاثي الأبعاد أجمل: سماء مشمسة، أرضيات حقيقية، طوب بارز، ومصابيح تلمع.',
+    rw: "3D isa neza kurushaho: ikirere cy'izuba, hasi nyakuri, amatafari agaragara, n'amatara yaka.",
+  }),
   'news.furn': g('Furniture names are in your language, and the desk, table, toilet and fireplace look right.', {
     es: 'Los nombres de los muebles están en tu idioma, y el escritorio, la mesa, el inodoro y la chimenea se ven bien.',
     cu: 'Los nombres de los muebles están en tu idioma, y el buró, la mesa, la taza y la chimenea se ven bien.',
