@@ -22,6 +22,7 @@ export type HouseLook = {
 export type BuiltHouse = {
   root: THREE.Group;
   dispose: () => void;
+  lights: THREE.Vector3[];
 };
 
 function segDist(px: number, py: number, ax: number, ay: number, bx: number, by: number): number {
@@ -79,6 +80,8 @@ type Bag = {
   geos: THREE.BufferGeometry[];
   mats: THREE.Material[];
   shared: Map<string, THREE.Material>;
+  /** Where lamps, sconces and chandeliers glow: the view puts warm lights there (2.13.22). */
+  lights: THREE.Vector3[];
 };
 
 function mat(
@@ -95,9 +98,10 @@ function mat(
     bumpScale?: number;
     glass?: boolean;
     sheen?: number;
+    side2?: boolean;
   },
 ): THREE.Material {
-  const key = `${hex}|${rough}|${opts?.metal ?? 0}|${opts?.opacity ?? 1}|${opts?.emissive ?? ''}|${opts?.glow ?? ''}|${opts?.map?.uuid ?? ''}|${opts?.bump?.uuid ?? ''}|${opts?.bumpScale ?? ''}|${opts?.glass ? 'g' : ''}|${opts?.sheen ?? ''}`;
+  const key = `${hex}|${rough}|${opts?.metal ?? 0}|${opts?.opacity ?? 1}|${opts?.emissive ?? ''}|${opts?.glow ?? ''}|${opts?.map?.uuid ?? ''}|${opts?.bump?.uuid ?? ''}|${opts?.bumpScale ?? ''}|${opts?.glass ? 'g' : ''}|${opts?.sheen ?? ''}|${opts?.side2 ? 'd' : ''}`;
   const hit = bag.shared.get(key);
   if (hit) return hit;
   // Glass and polished floors use the physical material so they pick up the sky reflection (2.13.18).
@@ -118,6 +122,7 @@ function mat(
       metalness: opts?.metal ?? 0,
       map: opts?.map ?? null,
     });
+  if (opts?.side2) m.side = THREE.DoubleSide;
   if (opts?.bump) {
     m.bumpMap = opts.bump;
     m.bumpScale = opts.bumpScale ?? 1;
@@ -510,6 +515,37 @@ function addWall(bag: Bag, floor: Floor, wall: Wall, look: HouseLook, nodes: Map
   );
   mesh.position.set(a.x, 0, a.y);
   mesh.rotation.y = ang;
+  // Inside faces: an outside brick wall is plaster indoors, and every room gets a white baseboard (2.13.22).
+  const zOut = (-uy) * out.x + ux * out.y > 0 ? 1 : -1; // local +z points outside when 1
+  const insideSides = wall.kind === 'exterior' ? [-zOut] : [1, -1];
+  if (brick || wall.kind === 'exterior') {
+    const skinGeo = new THREE.ShapeGeometry(shape);
+    uvFeet(skinGeo, 3.2, 3.2);
+    const skin = addMesh(bag, skinGeo, mat(bag, '#EFE8DD', 0.9, { side2: true }), false, true);
+    skin.position.set(a.x, 0, a.y);
+    skin.rotation.y = ang;
+    skinGeo.translate(0, 0, -zOut * (thick / 2 + 0.012));
+  }
+  const doorRanges = ops.filter((o) => o.type === 'door').map((o) => {
+    const half = Math.min((o.width || 3) / 2, len * 0.46);
+    const c = Math.max(half + 0.05, Math.min(len - half - 0.05, (o.t ?? 0.5) * len));
+    return [c - half, c + half] as const;
+  }).sort((p, q) => p[0] - q[0]);
+  const runs: [number, number][] = [];
+  let from = 0;
+  for (const [d0, d1] of doorRanges) { if (d0 > from + 0.2) runs.push([from, d0]); from = Math.max(from, d1); }
+  if (len > from + 0.2) runs.push([from, len]);
+  const base = mat(bag, '#FBF8F2', 0.55);
+  for (const side of insideSides) {
+    for (const [r0, r1] of runs) {
+      const bb = addMesh(bag, new THREE.BoxGeometry(r1 - r0, 0.45, 0.06), base, false, true);
+      const along = (r0 + r1) / 2;
+      const off = side * (thick / 2 + 0.03);
+      // local z offset turned into plan coordinates: local +z is plan (-uy, ux)
+      bb.position.set(a.x + ux * along + (-uy) * off, 0.225, a.y + uy * along + ux * off);
+      bb.rotation.y = ang;
+    }
+  }
   if (wall.kind === 'exterior') {
     // Stone plinth at the base and a band between floors: the lines that make a facade look built (2.13.20).
     const stone = mat(bag, '#D8CFC2', 0.85);
@@ -917,6 +953,12 @@ function addFurniture(bag: Bag, item: FurnitureItem, storyH = 0) {
   const g = new THREE.Group();
   g.position.set(item.x, 0, item.y);
   g.rotation.y = -item.rot;
+  g.userData.furn = { catalogId: item.catalogId, w: item.w, h: item.h, color: item.color ?? null };
+  const lamp = item.catalogId === 'chandelier' || item.catalogId === 'floor-lamp' || item.catalogId === 'sconce';
+  if (lamp) {
+    const top = Math.max(...parts.map((p) => p.z1), 2);
+    bag.lights.push(new THREE.Vector3(item.x, Math.min(top, 8) - 0.3, item.y));
+  }
   for (const p of parts) {
     const tall = Math.max(0.04, p.z1 - p.z0);
     const geo = p.shape === 'cyl' || p.shape === 'oval'
@@ -925,7 +967,8 @@ function addFurniture(bag: Bag, item: FurnitureItem, storyH = 0) {
     const rough = p.tex === 'metal' ? 0.28 : p.tex === 'glass' ? 0.08 : p.tex === 'fabric' ? 0.9 : 0.72;
     const metal = p.tex === 'metal' ? 0.45 : 0;
     const big = p.lw * p.lh > 2.5 || tall > 2.2;
-    const mesh = new THREE.Mesh(geo, mat(bag, p.fill, rough, { metal }));
+    const bright = lamp && new THREE.Color(p.fill).getHSL({ h: 0, s: 0, l: 0 }).l > 0.55;
+    const mesh = new THREE.Mesh(geo, mat(bag, p.fill, rough, bright ? { metal, emissive: '#FFE2A8', glow: 1.6 } : { metal }));
     bag.geos.push(geo);
     mesh.position.set(p.lx, (p.z0 + p.z1) / 2, p.ly);
     mesh.castShadow = big;
@@ -1064,10 +1107,17 @@ function addUpperDeck(bag: Bag, floor: Floor, y: number, finish: FloorFinishId) 
   bag.mats.push(material);
   const mesh = addMesh(bag, geo, material, false, true);
   mesh.position.y = y;
+  // looking straight down, the upstairs floor lifts away with the roof so you see into the rooms (2.13.22)
+  mesh.name = 'roof';
+  // seen from below the upstairs floor is a white ceiling (shown when walking) (2.13.22)
+  material.side = THREE.FrontSide;
+  const ceil = addMesh(bag, geo, mat(bag, '#F7F3EC', 0.92, { side2: true, emissive: '#3A3226', glow: 0.6 }), false, false);
+  ceil.position.y = y - 0.08;
+  ceil.name = 'ceiling';
 }
 
 export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
-  const bag: Bag = { root: new THREE.Group(), geos: [], mats: [], shared: new Map() };
+  const bag: Bag = { root: new THREE.Group(), geos: [], mats: [], shared: new Map(), lights: [] };
   let gx = 0;
   let gz = 0;
   if (floor.nodes.length) {
@@ -1121,14 +1171,14 @@ export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
   for (const face of floors) {
     floorMesh(bag, face.poly, 0.03, mat(bag, '#ffffff', 0.55, { map: floorTex(face.finish), sheen: look.rich ? 0.35 : 0 }));
     if (!upper) {
-      floorMesh(bag, face.poly, look.wallH - 0.2, mat(bag, '#F7F3EC', 0.92), 'ceiling');
+      floorMesh(bag, face.poly, look.wallH - 0.2, mat(bag, '#F7F3EC', 0.92, { emissive: '#3A3226', glow: 0.6 }), 'ceiling');
       continue;
     }
     const cx = face.poly.reduce((s, p) => s + p.x, 0) / face.poly.length;
     const cy = face.poly.reduce((s, p) => s + p.y, 0) / face.poly.length;
     const onPorch = !!porch && Math.hypot(cx - porch.x, cy - porch.y) < 14 && cy < porch.y + 6;
     if (onPorch || upper) continue;
-    floorMesh(bag, face.poly, look.wallH - 0.2, mat(bag, '#F7F3EC', 0.92), 'ceiling');
+    floorMesh(bag, face.poly, look.wallH - 0.2, mat(bag, '#F7F3EC', 0.92, { emissive: '#3A3226', glow: 0.6 }), 'ceiling');
   }
   if (upper) addUpperDeck(bag, floor, look.wallH, look.houseFinish);
 
@@ -1145,6 +1195,7 @@ export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
 
   return {
     root: bag.root,
+    lights: bag.lights,
     dispose: () => {
       bag.geos.forEach((g) => g.dispose());
       bag.mats.forEach((m) => m.dispose());

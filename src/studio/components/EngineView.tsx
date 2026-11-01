@@ -5,6 +5,8 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { peekFor } from '../data/objectPeek';
 import type { Floor } from '../types';
 import type { FloorFinishId } from '../data/flooring';
 import { buildHouse, stepWalk, type HouseLook } from '../lib/engine3d';
@@ -119,6 +121,66 @@ function skyDome(zenithHex: string): { mesh: THREE.Mesh; dispose: () => void } {
       tex.dispose();
     },
   };
+}
+
+/**
+ * Real furniture: the Kenney CC0 models Baboo already ships (public/objects/kenney, no outside site) replace the
+ * block shapes in 3D. They come "unlit", so they get lit materials here to take the sun, lamps and shadows (2.13.22).
+ */
+const modelCache = new Map<string, Promise<THREE.Object3D | null>>();
+function loadModel(url: string): Promise<THREE.Object3D | null> {
+  const hit = modelCache.get(url);
+  if (hit) return hit;
+  const p = new GLTFLoader().loadAsync(url).then((gltf) => {
+    gltf.scene.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (!m.isMesh) return;
+      const old = m.material as THREE.MeshBasicMaterial;
+      const lit = new THREE.MeshStandardMaterial({ color: old.color ?? new THREE.Color('#cccccc'), map: old.map ?? null, roughness: 0.62, metalness: 0.05 });
+      m.material = lit;
+      m.castShadow = true;
+      m.receiveShadow = true;
+      if (!m.geometry.getAttribute('normal')) m.geometry.computeVertexNormals();
+    });
+    return gltf.scene as THREE.Object3D;
+  }).catch(() => null);
+  modelCache.set(url, p);
+  return p;
+}
+
+/** Swap each block-built piece for its model, fitted to the piece's width and depth on the plan. */
+async function dressFurniture(root: THREE.Object3D, alive: () => boolean, shadows: boolean) {
+  const groups: THREE.Group[] = [];
+  root.traverse((o) => { if ((o as THREE.Group).userData?.furn) groups.push(o as THREE.Group); });
+  for (const g of groups) {
+    const info = g.userData.furn as { catalogId: string; w: number; h: number };
+    const url = peekFor(info.catalogId)?.kenney;
+    if (!url) continue;
+    const src = await loadModel(url);
+    if (!src || !alive()) return;
+    const model = src.clone(true);
+    const box = new THREE.Box3().setFromObject(model);
+    const size = box.getSize(new THREE.Vector3());
+    if (size.x < 1e-3 || size.z < 1e-3) continue;
+    // a model that is long the other way turns a quarter, so its long side follows the piece's long side
+    const turn = (size.x >= size.z) !== (info.w >= info.h) && Math.abs(size.x - size.z) > 0.15 * Math.max(size.x, size.z);
+    const mx = turn ? size.z : size.x;
+    const mz = turn ? size.x : size.z;
+    const sx = info.w / mx;
+    const sz = info.h / mz;
+    const sy = (sx + sz) / 2;
+    const holder = new THREE.Group();
+    const center = box.getCenter(new THREE.Vector3());
+    model.position.set(-center.x, -box.min.y, -center.z);
+    const spin = new THREE.Group();
+    spin.add(model);
+    if (turn) spin.rotation.y = Math.PI / 2;
+    holder.add(spin);
+    holder.scale.set(sx, sy, sz);
+    if (!shadows) holder.traverse((o) => { (o as THREE.Mesh).castShadow = false; });
+    for (const child of [...g.children]) g.remove(child);
+    g.add(holder);
+  }
 }
 
 function forcedTier(): 'plain' | 'rich' | null {
@@ -240,6 +302,18 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
 
     const built = buildHouse(floor, { ...look, rich: tier === 'rich' });
     scene.add(built.root);
+    let alive = true;
+    // when the models land, check speed again (they add work after the first check)
+    let recheck: (() => void) | null = null;
+    if (look.showFurn) void dressFurniture(built.root, () => alive, tier === 'rich').then(() => { recheck?.(); renderer.shadowMap.needsUpdate = true; });
+    // Warm light from lamps and chandeliers: brighter when you walk in. Fewer on small machines (2.13.22).
+    const lampLights: THREE.PointLight[] = [];
+    for (const at of built.lights.slice(0, tier === 'rich' ? 6 : 2)) {
+      const l = new THREE.PointLight(0xffd59a, 0, 26, 1.6);
+      l.position.copy(at);
+      scene.add(l);
+      lampLights.push(l);
+    }
     const ceilings: THREE.Object3D[] = [];
     const roofs: THREE.Object3D[] = [];
     const shade = new THREE.Box3();
@@ -289,12 +363,14 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
         );
         fill.position.copy(desiredPos);
         fill.intensity = 0.9;
+        hemi.groundColor.set(0xe9dcc6); // indoors: warm bounce, not lawn green
       } else {
         const cy = cam.ty + cam.dist * Math.sin(cam.pitch);
         const flat = cam.dist * Math.cos(cam.pitch);
         desiredPos.set(cam.tx + flat * Math.sin(cam.yaw), cy, cam.tz + flat * Math.cos(cam.yaw));
         desiredLook.set(cam.tx, cam.ty, cam.tz);
         fill.intensity = 0;
+        hemi.groundColor.set(look.ground);
       }
       if (snap) {
         camera.position.copy(desiredPos);
@@ -447,29 +523,35 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     // Step 1 drops corner shading and glow. Step 2 uses smaller shadows and fewer pixels (2.13.18).
     let watchFrames = 0;
     let watchStart = 0;
-    let stepped = 0;
+    let reduced = false; // step 2 done: nothing left to drop
+    let watching = true;
+    recheck = () => {
+      if (reduced) return;
+      watchFrames = 0;
+      watching = true;
+    };
     const watch = (now: number) => {
-      if (stepped >= 2 || forcedTier()) return;
+      if (!watching || reduced || forcedTier()) return;
       watchFrames += 1;
       if (watchFrames === 8) watchStart = now;
       if (watchFrames <= 8 || now - watchStart < 1500) return;
       const avg = (now - watchStart) / (watchFrames - 8);
+      watchFrames = 0;
       if (avg > 40 && composer) {
         composer.dispose();
         composer = null;
         tier = 'plain';
-        stepped = 1;
-      } else if (avg > 55) {
+        return; // keep watching: step 2 may still be needed
+      }
+      if (avg > 55) {
         sun.shadow.mapSize.set(512, 512);
         sun.shadow.map?.dispose();
         sun.shadow.map = null;
         renderer.setPixelRatio(Math.min(1, window.devicePixelRatio || 1) * 0.8);
         renderer.setSize(wrap.clientWidth || 800, wrap.clientHeight || 480, false);
-        stepped = 2;
-      } else {
-        stepped = 2;
+        reduced = true;
       }
-      watchFrames = 0;
+      watching = false;
     };
 
     let frame = 0;
@@ -477,6 +559,11 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
       frame = requestAnimationFrame(loop);
       if (hidden) return;
       for (const lid of ceilings) lid.visible = walkRef.current;
+      // lamp lights only when you are inside walking; from outside the glowing shades are enough
+      for (const l of lampLights) {
+        l.visible = walkRef.current;
+        l.intensity = 9;
+      }
       const camNow = camRef.current;
       const hideRoof = !walkRef.current && !!camNow && camNow.pitch > 0.78;
       for (const lid of roofs) lid.visible = !hideRoof;
@@ -489,6 +576,8 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
 
     return () => {
       window.removeEventListener('keydown', onKey);
+      alive = false;
+      for (const l of lampLights) { scene.remove(l); l.dispose(); }
       if (camRef.current && !walkRef.current) savedCam = { floorId: floor.id, cam: { ...camRef.current } };
       document.removeEventListener('visibilitychange', onVis);
       cancelAnimationFrame(frame);

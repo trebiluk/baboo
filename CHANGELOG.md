@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.22 — 2026-11-01 — Inside 3D
+- Walk inside: painted walls, white trim, bright ceilings, glowing lamps and real furniture models.
+
 ## 2.13.21 — 2026-11-01 — Modes
 - 3D remembers where you were, arrow keys walk and turn, Front and Top views, and each level shows what it gives you.
 

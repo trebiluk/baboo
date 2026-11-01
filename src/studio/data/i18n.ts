@@ -238,6 +238,18 @@ export const STR: Record<string, Gloss> = {
     ar: 'يمكنك الآن معرفة إن كان عملك محفوظًا، بجانب تصدير.',
     rw: 'Ubu ushobora kubona niba akazi kawe kabitswe, iruhande rwa Export.',
   }),
+  // 2.13.22: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.inside3d': g('Walk inside: painted walls, white trim, bright ceilings, glowing lamps and real furniture models.', {
+    es: 'Entra a caminar: paredes pintadas, zócalos blancos, techos claros, lámparas que brillan y muebles de verdad.',
+    cu: 'Entra a caminar: paredes pintadas, zócalos blancos, techos claros, lámparas que brillan y muebles de verdad.',
+    uk: 'Заходь усередину: фарбовані стіни, білі плінтуси, світлі стелі, світні лампи й справжні моделі меблів.',
+    ru: 'Заходи внутрь: крашеные стены, белые плинтусы, светлые потолки, светящиеся лампы и настоящие модели мебели.',
+    ti: 'ናብ ውሽጢ ተመላለስ፦ ዝተቐብኡ መናድቕ፣ ጻዕዳ ጌጽ፣ ብሩህ ናሕሲ፣ ዝበርሃ መብራህቲን ሓቀኛ ኣቕሓ ገዛን።',
+    fa: 'داخل خانه قدم بزن: دیوارهای رنگ‌شده، قرنیز سفید، سقف روشن، چراغ‌های درخشان و مدل‌های واقعی مبلمان.',
+    'fa-AF': 'داخل خانه قدم بزن: دیوارهای رنگ‌شده، قرنیز سفید، سقف روشن، چراغ‌های درخشان و مدل‌های واقعی فرنیچر.',
+    ar: 'تجوّل في الداخل: جدران مدهونة، وحواف بيضاء، وأسقف فاتحة، ومصابيح متوهجة، ونماذج أثاث حقيقية.',
+    rw: "Injira imbere: inkuta zisize irangi, imirongo y'umweru, ibisenge byera, amatara yaka n'ibikoresho nyabyo.",
+  }),
   'news.modes': g('3D remembers where you were, arrow keys walk and turn, Front and Top views, and each level shows what it gives you.', {
     es: 'El 3D recuerda dónde estabas, las flechas caminan y giran, hay vistas de Frente y Arriba, y cada nivel muestra lo que te da.',
     cu: 'El 3D recuerda dónde estabas, las flechas caminan y giran, hay vistas de Frente y Arriba, y cada nivel muestra lo que te da.',
