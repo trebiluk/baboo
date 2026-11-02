@@ -188,13 +188,17 @@ function loadModel(url: string): Promise<THREE.Object3D | null> {
   return p;
 }
 
+/** Pieces where the bundled Quaternius model is clearly richer than Kenney's (curved arms, legs, pedestals) (2.13.34). */
+const RICHER = new Set(['bed-twin', 'bed-queen', 'nightstand', 'dresser', 'sofa', 'dining-table', 'dining-chair', 'fridge', 'toilet', 'bathtub']);
+
 /** Swap each block-built piece for its model, fitted to the piece's width and depth on the plan. */
 async function dressFurniture(root: THREE.Object3D, alive: () => boolean, shadows: boolean) {
   const groups: THREE.Group[] = [];
   root.traverse((o) => { if ((o as THREE.Group).userData?.furn) groups.push(o as THREE.Group); });
   for (const g of groups) {
     const info = g.userData.furn as { catalogId: string; w: number; h: number };
-    const url = peekFor(info.catalogId)?.kenney;
+    const peek = peekFor(info.catalogId);
+    const url = (RICHER.has(info.catalogId) ? peek?.quaternius : null) ?? peek?.kenney;
     if (!url) continue;
     const src = await loadModel(url);
     if (!src || !alive()) return;

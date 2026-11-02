@@ -1635,6 +1635,18 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.34: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.furniture3d': g("Nicer 3D furniture (tufted sofa, real beds, a pedestal dining table), and the Mansion's chairs face the table.", {
+    es: 'Muebles 3D más bonitos (sofá capitoné, camas de verdad, una mesa de comedor con pie), y las sillas de la Mansión miran a la mesa.',
+    cu: 'Muebles 3D más bonitos (sofá capitoné, camas de verdad, una mesa de comedor con pie), y las sillas de la Mansión miran a la mesa.',
+    uk: 'Гарніші 3D-меблі (стьобаний диван, справжні ліжка, обідній стіл на ніжці), а стільці в Особняку повернуті до столу.',
+    ru: 'Красивее 3D-мебель (стёганый диван, настоящие кровати, обеденный стол на ножке), а стулья в Особняке повёрнуты к столу.',
+    ti: 'ዝሓሸ 3D ኣቕሓ ገዛ (ዝተሰፍየ ሶፋ፣ ሓቀኛ ዓራታት፣ ብእግሪ ዝቐውም ጠረጴዛ መግቢ)፣ ኣኮፋት ናይቲ ዓቢ ገዛ ድማ ናብ ጠረጴዛ ይጥምቱ።',
+    fa: 'مبلمان سه‌بعدی زیباتر (مبل دکمه‌دار، تخت‌های واقعی، میز ناهارخوری پایه‌دار)، و صندلی‌های عمارت رو به میزند.',
+    'fa-AF': 'فرنیچر سه‌بعدی زیباتر (کوچ دکمه‌دار، چپرکت‌های واقعی، میز نان‌خوری پایه‌دار)، و چوکی‌های قصر رو به میز هستند.',
+    ar: 'أثاث ثلاثي الأبعاد أجمل (أريكة منجدة، أسرّة حقيقية، طاولة طعام بقاعدة)، وكراسي القصر تواجه الطاولة.',
+    rw: "Ibikoresho bya 3D byiza kurushaho (intebe ndende yoroshye, ibitanda nyabyo, ameza yo kuriraho afite ikirenge), kandi intebe z'Inzu nini zireba ameza.",
+  }),
   // 2.13.33: ti, fa-AF and rw are UNCHECKED native copy.
   'news.shade': g('On phones and Chromebooks, rooms get soft shade where walls meet the floor and ceiling, so they look deep, not flat.', {
     es: 'En teléfonos y Chromebooks, los cuartos tienen una sombra suave donde las paredes tocan el piso y el techo, y se ven profundos, no planos.',

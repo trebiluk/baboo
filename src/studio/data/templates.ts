@@ -265,8 +265,9 @@ function buildMansion(floor: Floor) {
   floor.furniture = [
     furn('rug', 11, 16, 12, 8, 'Parlor rug'),
     furn('sofa', 11, 12, 7, 3, 'Settee', 0, '#6E2E3A'),
-    furn('chair', 5, 18, 2.5, 2.5, 'Armchair', 0, '#6E2E3A'),
-    furn('chair', 17, 18, 2.5, 2.5, 'Armchair', 0, '#4A3A28'),
+    // armchairs turn in toward the coffee table (2.13.34)
+    furn('chair', 5, 18, 2.5, 2.5, 'Armchair', -Math.PI / 2, '#6E2E3A'),
+    furn('chair', 17, 18, 2.5, 2.5, 'Armchair', Math.PI / 2, '#4A3A28'),
     furn('coffee-table', 11, 15.2, 4, 2, 'Table'),
     furn('fireplace', 11, 22.3, 6, 1.2, 'Fireplace'),
     furn('fireplace', 45, 22.3, 6, 1.2, 'Fireplace'),
@@ -287,8 +288,9 @@ function buildMansion(floor: Floor) {
     furn('dining-table', 45, 15, 8, 3.6, 'Dining table'),
     furn('dining-chair', 42, 12.6, 1.5, 1.5, 'Chair'),
     furn('dining-chair', 48, 12.6, 1.5, 1.5, 'Chair'),
-    furn('dining-chair', 42, 17.4, 1.5, 1.5, 'Chair'),
-    furn('dining-chair', 48, 17.4, 1.5, 1.5, 'Chair'),
+    // the far-side chairs turn to face the table (2.13.34)
+    furn('dining-chair', 42, 17.4, 1.5, 1.5, 'Chair', Math.PI),
+    furn('dining-chair', 48, 17.4, 1.5, 1.5, 'Chair', Math.PI),
     furn('chandelier', 45, 15, 3.4, 3.4, 'Dining chandelier'),
     furn('wainscot', 45, 9.2, 14, 0.35, 'Paneling'),
     furn('stove', 38, 36.5, 2.5, 2.2, 'Range'),

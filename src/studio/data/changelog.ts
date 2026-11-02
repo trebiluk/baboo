@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.34',
+    date: '2026-11-02',
+    bullets: [
+      "Nicer 3D furniture (tufted sofa, real beds, a pedestal dining table), and the Mansion's chairs face the table.",
+    ],
+  },
+  {
     version: '2.13.33',
     date: '2026-11-02',
     bullets: [
