@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.28 — 2026-11-02 — Roof tag
+- The plan is less crowded: the roof is named on the plan card, not on top of the flower beds.
+
 ## 2.13.27 — 2026-11-01 — Tidy
 - Wall sizes sit neatly outside the house, room paint can be undone, and the item panel folds away in 3D.
 - Overall sizes keep one line (35'-10") and sit past the wall sizes; picking a room shows it from above in 3D without the outside wall in the way.

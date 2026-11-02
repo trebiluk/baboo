@@ -2218,7 +2218,9 @@ function RoofPlanShapes({ roof, zoom, lightPlan = false }: { roof: import('../ty
           dash={[0.25, 0.18]}
         />
       ))}
-      {/* Teaching label — high contrast chip, not cartoon shout */}
+      {/* Teaching label — only for the sod roof, whose hatch needs a name. Other roofs are named on the plan card,
+          so a second tag here only crowded the flower beds and sizes (2.13.28). */}
+      {isGrass ? (<>
       <Rect
         x={labelX - 0.15}
         y={labelY - 0.15}
@@ -2241,6 +2243,7 @@ function RoofPlanShapes({ roof, zoom, lightPlan = false }: { roof: import('../ty
         fontStyle="bold"
         opacity={1}
       />
+      </>) : null}
     </Group>
   );
 }

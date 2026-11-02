@@ -1635,6 +1635,18 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.28: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.roofTag': g('The plan is less crowded: the roof is named on the plan card, not on top of the flower beds.', {
+    es: 'El plano está menos lleno: el techo se nombra en la tarjeta del plano, no encima de los canteros.',
+    cu: 'El plano está menos lleno: el techo se nombra en la tarjeta del plano, no encima de los canteros.',
+    uk: 'План менш захаращений: дах названо на картці плану, а не поверх клумб.',
+    ru: 'План менее загромождён: крыша названа на карточке плана, а не поверх клумб.',
+    ti: 'እቲ ፕላን ዝሓሸ ጽሩይ እዩ፦ ናሕሲ ኣብ ካርድ ፕላን ይስመ፣ ኣብ ልዕሊ መትከሊ ዕምባባ ኣይኮነን።',
+    fa: 'نقشه شلوغی کمتری دارد: نام سقف روی کارت نقشه است، نه روی باغچه‌ها.',
+    'fa-AF': 'نقشه کمتر شلوغ است: نام بام روی کارت نقشه است، نه روی باغچه‌ها.',
+    ar: 'المخطط أقل ازدحاماً: اسم السقف على بطاقة المخطط، لا فوق أحواض الزهور.',
+    rw: "Igishushanyo nticyuzuye cyane: igisenge cyanditswe ku ikarita y'igishushanyo, si hejuru y'indabo.",
+  }),
   // 2.13.27: ti, fa-AF and rw are UNCHECKED native copy.
   'news.tidy': g('Wall sizes sit neatly outside the house, room paint can be undone, and the item panel folds away in 3D.', {
     es: 'Las medidas de las paredes quedan ordenadas fuera de la casa, la pintura de los cuartos se puede deshacer y el panel se pliega en 3D.',
