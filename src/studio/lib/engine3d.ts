@@ -1101,6 +1101,44 @@ function addChandelier(bag: Bag, g: THREE.Group, item: FurnitureItem) {
   bake(bag, g, pieces);
 }
 
+/** Wall sconce: brass back plate, a curved arm, a candle cup and a glowing bulb under a small shade (2.13.30). */
+function addSconce(bag: Bag, g: THREE.Group, item: FurnitureItem) {
+  const brass = mat(bag, '#C9A55A', 0.32, { metal: 0.75 });
+  const candle = mat(bag, '#F6EFE2', 0.6);
+  const bulb = mat(bag, '#FFF4D6', 0.4, { emissive: '#FFD58A', glow: 2.4 });
+  const shade = mat(bag, '#F3E6CC', 0.7, { emissive: '#FFCF8A', glow: 0.9, side2: true });
+  const back = -Math.max(0.15, item.h / 2) + 0.03; // the wall side of the piece
+  const y = 4.9;
+  const out = back + 0.42;
+  const pieces: { geo: THREE.BufferGeometry; m: THREE.Material; at: THREE.Matrix4 }[] = [
+    { geo: new THREE.CylinderGeometry(0.16, 0.16, 0.04, 16), m: brass, at: M4(0, y - 0.25, back, Math.PI / 2) },
+    { geo: new THREE.TorusGeometry(0.22, 0.022, 6, 14, Math.PI / 2), m: brass, at: M4(0, y - 0.03, back + 0.2, 0, Math.PI / 2) },
+    { geo: new THREE.CylinderGeometry(0.08, 0.045, 0.07, 10), m: brass, at: M4(0, y, out) },
+    { geo: new THREE.CylinderGeometry(0.04, 0.04, 0.26, 8), m: candle, at: M4(0, y + 0.16, out) },
+    { geo: new THREE.SphereGeometry(0.055, 8, 6), m: bulb, at: M4(0, y + 0.34, out) },
+    { geo: new THREE.CylinderGeometry(0.09, 0.17, 0.26, 12, 1, true), m: shade, at: M4(0, y + 0.38, out) },
+  ];
+  bake(bag, g, pieces);
+}
+
+/** Floor lamp: weighted base, slim brass pole, a drum shade that glows, and a finial on top (2.13.30). */
+function addFloorLamp(bag: Bag, g: THREE.Group, item: FurnitureItem) {
+  const brass = mat(bag, '#C9A55A', 0.32, { metal: 0.75 });
+  const iron = mat(bag, '#2E2A26', 0.5, { metal: 0.4 });
+  const bulb = mat(bag, '#FFF4D6', 0.4, { emissive: '#FFD58A', glow: 2.2 });
+  const shade = mat(bag, '#F1E4C8', 0.75, { emissive: '#FFCF8A', glow: 0.7, side2: true });
+  const r = Math.max(0.42, Math.min(item.w, item.h) * 0.42);
+  const pieces: { geo: THREE.BufferGeometry; m: THREE.Material; at: THREE.Matrix4 }[] = [
+    { geo: new THREE.CylinderGeometry(r * 0.75, r * 0.85, 0.08, 20), m: iron, at: M4(0, 0.04, 0) },
+    { geo: new THREE.CylinderGeometry(0.035, 0.035, 4.5, 8), m: brass, at: M4(0, 2.3, 0) },
+    { geo: new THREE.SphereGeometry(0.06, 8, 6), m: brass, at: M4(0, 1.6, 0) },
+    { geo: new THREE.SphereGeometry(0.1, 10, 8), m: bulb, at: M4(0, 4.6, 0) },
+    { geo: new THREE.CylinderGeometry(r * 0.62, r, 0.85, 20, 1, true), m: shade, at: M4(0, 4.75, 0) },
+    { geo: new THREE.SphereGeometry(0.05, 8, 6), m: brass, at: M4(0, 5.25, 0) },
+  ];
+  bake(bag, g, pieces);
+}
+
 function addFurniture(bag: Bag, item: FurnitureItem, storyH = 0) {
   if (item.catalogId === 'banister' && storyH > 7) return;
   if (item.catalogId === 'stairs' && storyH > 7) {
@@ -1117,9 +1155,12 @@ function addFurniture(bag: Bag, item: FurnitureItem, storyH = 0) {
     const top = Math.max(...parts.map((p) => p.z1), 2);
     bag.lights.push(new THREE.Vector3(item.x, Math.min(top, 8) - 0.3, item.y));
   }
-  if (item.catalogId === 'chandelier') {
-    addChandelier(bag, g, item);
+  if (item.catalogId === 'chandelier' || item.catalogId === 'sconce' || item.catalogId === 'floor-lamp') {
+    if (item.catalogId === 'chandelier') addChandelier(bag, g, item);
+    else if (item.catalogId === 'sconce') addSconce(bag, g, item);
+    else addFloorLamp(bag, g, item);
     bag.root.add(g);
+    if (item.catalogId === 'floor-lamp') dropShadow(bag, item.x, item.y, item.w, item.h, item.rot);
     return;
   }
   for (const p of parts) {

@@ -1635,6 +1635,18 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.30: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.lamps': g('Wall lamps and floor lamps look real in 3D: brass arms, little shades and a warm glow.', {
+    es: 'Las lámparas de pared y de pie se ven reales en 3D: brazos de latón, pantallas pequeñas y un brillo cálido.',
+    cu: 'Las lámparas de pared y de pie se ven reales en 3D: brazos de latón, pantallas pequeñas y un brillo cálido.',
+    uk: 'Настінні й підлогові лампи в 3D виглядають справжніми: латунні ріжки, маленькі абажури й тепле світло.',
+    ru: 'Настенные и напольные лампы в 3D выглядят настоящими: латунные рожки, маленькие абажуры и тёплый свет.',
+    ti: 'ናይ መንደቕን ናይ ምድርን መብራህቲ ብ3D ሓቀኛ ይመስሉ፦ ናይ ነሓስ ቅልጽም፣ ንኣሽቱ መሸፈኒታትን ውዑይ ብርሃንን።',
+    fa: 'چراغ‌های دیواری و ایستاده در سه‌بعدی واقعی به نظر می‌رسند: بازوهای برنجی، آباژورهای کوچک و نوری گرم.',
+    'fa-AF': 'چراغ‌های دیواری و ایستاده در سه‌بعدی واقعی معلوم می‌شوند: بازوهای برنجی، سرپوش‌های کوچک و روشنی گرم.',
+    ar: 'مصابيح الجدار والمصابيح الأرضية تبدو حقيقية في العرض الثلاثي: أذرع نحاسية وأغطية صغيرة وتوهج دافئ.',
+    rw: "Amatara yo ku rukuta n'ayo hasi asa n'ay'ukuri muri 3D: amaboko y'umuringa, ibipfukisho bito n'urumuri rushyushye.",
+  }),
   // 2.13.29: ti, fa-AF and rw are UNCHECKED native copy.
   'news.fixtures': g('Inside the 3D house: a real brass chandelier with shades, and panelled doors with knobs that open back out of the way.', {
     es: 'Dentro de la casa 3D: una lámpara de araña de latón con pantallas, y puertas con paneles y pomos que se abren sin estorbar.',

@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.30 — 2026-11-02 — Lamps
+- Wall lamps and floor lamps look real in 3D: brass arms, little shades and a warm glow.
+
 ## 2.13.29 — 2026-11-02 — Fixtures
 - Inside the 3D house: a real brass chandelier with shades, and panelled doors with knobs that open back out of the way.
 

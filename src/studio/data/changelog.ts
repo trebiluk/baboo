@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.30',
+    date: '2026-11-02',
+    bullets: [
+      'Wall lamps and floor lamps look real in 3D: brass arms, little shades and a warm glow.',
+    ],
+  },
+  {
     version: '2.13.29',
     date: '2026-11-02',
     bullets: [
