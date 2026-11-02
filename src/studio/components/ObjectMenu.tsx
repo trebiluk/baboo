@@ -10,6 +10,7 @@ import { TEXTURE_PACKS } from '../data/textures';
 import { FLOOR_FINISHES, asFloorFinish } from '../data/flooring';
 import { FURN_PAINTS, samePaint } from '../data/furnPaint';
 import { ModelPeek } from './ModelPeek';
+import { WALL_PAINTS, WALL_SKINS, faceLookup, storedFace, wallFaces, withFace } from '../lib/finishes';
 
 const DOOR_WIDTHS = [
   { v: 1, label: '12"' },
@@ -338,6 +339,59 @@ export function ObjectMenu() {
                 );
               })}
             </div>
+            {/* Each side of this wall section, on its own (2.13.24). */}
+            {wallFaces(w, faceLookup(floor)).map((rf) => {
+              const mine = storedFace(w, rf.side);
+              const title = rf.room && !rf.outside
+                ? t(locale, 'face.room', { room: roomLabel(locale, rf.room) })
+                : w.kind === 'exterior' ? t(locale, 'face.outside') : t(locale, 'face.other');
+              return (
+                <div key={rf.side} className="face-block" role="group" aria-label={title}>
+                  <p className="object-menu-meta face-title">{title}</p>
+                  {rf.outside && w.kind === 'exterior' ? (
+                    <div className="object-menu-row object-tex-row" role="group" aria-label={t(locale, 'face.cover')}>
+                      {WALL_SKINS.map((k) => (
+                        <button
+                          key={k.id}
+                          type="button"
+                          className={`object-chip tex-swatch aw-pressable${rf.skin === k.id ? ' active' : ''}`}
+                          style={{ background: k.previewCss }}
+                          aria-pressed={rf.skin === k.id}
+                          onClick={() => patchWall(w.id, { faces: withFace(w, rf.side, { skin: k.id }) })}
+                        >
+                          <span className="tex-swatch-label">{t(locale, `skin.${k.id}`)}</span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                  <div className="object-menu-row object-tex-row" role="group" aria-label={t(locale, 'obj.paint')}>
+                    <button
+                      type="button"
+                      className={`object-chip aw-pressable${!mine?.paint ? ' active' : ''}`}
+                      aria-pressed={!mine?.paint}
+                      onClick={() => patchWall(w.id, { faces: withFace(w, rf.side, { paint: null }) })}
+                    >
+                      {rf.outside ? t(locale, 'obj.house') : t(locale, 'face.roomPaint')}
+                    </button>
+                    {WALL_PAINTS.map((p) => {
+                      const on = samePaint(mine?.paint, p.hex);
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          className={`object-chip tex-swatch aw-pressable${on ? ' active' : ''}`}
+                          style={{ background: p.hex }}
+                          aria-pressed={on}
+                          onClick={() => patchWall(w.id, { faces: withFace(w, rf.side, { paint: p.hex }) })}
+                        >
+                          <span className="tex-swatch-label">{t(locale, `paint.${p.id}`)}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
             <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> {t(locale, 'obj.delete')}</button>
           </>
         );
@@ -471,8 +525,79 @@ export function ObjectMenu() {
                     {t(locale, 'obj.sameFloor', { room: t(locale, `room.kind.${r.kind}`) })}
                   </button>
                 ) : null}
+                {/* Paint for this room's walls; a wall side can still have its own (2.13.24). */}
+                <p className="object-menu-meta">{t(locale, 'obj.wallPaint')}</p>
+                <div className="object-menu-row object-tex-row" role="group" aria-label={t(locale, 'obj.wallPaint')}>
+                  <button
+                    type="button"
+                    className={`object-chip aw-pressable${!r.wallPaint ? ' active' : ''}`}
+                    aria-pressed={!r.wallPaint}
+                    onClick={() => patchRoom(r.id, { wallPaint: null })}
+                  >
+                    {t(locale, 'obj.house')}
+                  </button>
+                  {WALL_PAINTS.map((p) => {
+                    const on = samePaint(r.wallPaint, p.hex);
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        className={`object-chip tex-swatch aw-pressable${on ? ' active' : ''}`}
+                        style={{ background: p.hex }}
+                        aria-pressed={on}
+                        onClick={() => patchRoom(r.id, { wallPaint: p.hex })}
+                      >
+                        <span className="tex-swatch-label">{t(locale, `paint.${p.id}`)}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                {r.wallPaint ? (
+                  <button
+                    type="button"
+                    className="object-chip aw-pressable"
+                    onClick={() => {
+                      for (const other of floor.rooms ?? []) {
+                        if (other.kind === r.kind) patchRoom(other.id, { wallPaint: r.wallPaint });
+                      }
+                    }}
+                  >
+                    {t(locale, 'obj.sameWalls', { room: t(locale, `room.kind.${r.kind}`) })}
+                  </button>
+                ) : null}
               </>
-            ) : null}
+            ) : (
+              <>
+                {/* Outdoor rooms: grass, or a picked ground like pavers or a wood deck (2.13.24). */}
+                <p className="object-menu-meta">{t(locale, 'obj.ground')}</p>
+                <div className="object-menu-row object-tex-row" role="group" aria-label={t(locale, 'obj.ground')}>
+                  <button
+                    type="button"
+                    className={`object-chip tex-swatch aw-pressable${r.floorFinishId == null ? ' active' : ''}`}
+                    style={{ background: 'repeating-linear-gradient(80deg,#6FA05A 0 3px,#5E8E4C 3px 5px)' }}
+                    aria-pressed={r.floorFinishId == null}
+                    onClick={() => patchRoom(r.id, { floorFinishId: null })}
+                  >
+                    <span className="tex-swatch-label">{t(locale, 'obj.grass')}</span>
+                  </button>
+                  {FLOOR_FINISHES.filter((p) => ['brick', 'slate', 'concrete', 'terracotta', 'oak', 'walnut'].includes(p.id)).map((p) => {
+                    const on = r.floorFinishId === p.id;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        className={`object-chip tex-swatch aw-pressable${on ? ' active' : ''}`}
+                        style={{ background: p.previewCss }}
+                        aria-pressed={on}
+                        onClick={() => patchRoom(r.id, { floorFinishId: p.id })}
+                      >
+                        <span className="tex-swatch-label">{t(locale, `floor.${p.id}`)}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
             {(() => {
               const bundle = roomBundle(r, floor.nodes, floor.walls, floor.openings, floor.furniture);
               const doors = bundle.openings.filter((o) => o.type === 'door');

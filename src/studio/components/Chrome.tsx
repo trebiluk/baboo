@@ -282,7 +282,23 @@ export function Chrome() {
           <span className="view-only-chip" hidden={canEdit} title={t(locale, 'chrome.viewonly')}>{t(locale, 'chrome.viewonly')}</span>
         </div>
 
+        {/* Phone: the three views stay one tap away instead of inside the menu (2.13.24). */}
+        <div className="phone-views" role="group" aria-label={t(locale, 'chrome.views')}>
+          {([
+            ['plan', 'chrome.plan', () => { setRenderTier(0); setViewMode('plan'); }],
+            ['dollhouse', 'chrome.dollhouse', () => setViewMode('dollhouse')],
+            ['solid3d', 'chrome.view3d', () => { setRenderTier(3); setViewMode('solid3d'); }],
+          ] as const).map(([mode, key, go]) => {
+            const on = mode === 'solid3d' ? viewMode !== 'plan' && viewMode !== 'dollhouse' : viewMode === mode;
+            return (
+              <button key={mode} type="button" className={`phone-view aw-pressable${on ? ' active' : ''}`} aria-pressed={on} onClick={go}>
+                {t(locale, key)}
+              </button>
+            );
+          })}
+        </div>
         <div className="save-export">
+          <VersionChip row onTeacher={() => setTeacherChrome(true)} />
           <div
             className={`save-status save-chip save-${saveStatus} is-${savePhase}`}
             aria-live="polite"

@@ -201,13 +201,13 @@ interface Store {
   cancelWallDraft: () => void;
   placeOpening: (type: 'door' | 'window', p: Point) => void;
   patchOpening: (id: string, patch: Partial<Pick<Opening, 'width' | 'swing' | 'symbolKind' | 't'>>) => void;
-  patchWall: (id: string, patch: Partial<Pick<Wall, 'kind' | 'finishId' | 'thickness' | 'drawStyle'>>) => void;
+  patchWall: (id: string, patch: Partial<Pick<Wall, 'kind' | 'finishId' | 'thickness' | 'drawStyle' | 'faces'>>) => void;
   setRoomWallKind: (roomId: string, kind: 'interior' | 'exterior') => void;
   patchFurniture: (id: string, patch: Partial<Pick<FurnitureItem, 'color' | 'x' | 'y' | 'w' | 'h' | 'rot'>>) => void;
   patchLandscape: (id: string, patch: Partial<Pick<LandscapeItem, 'x' | 'y' | 'w' | 'h'>>) => void;
   moveWallEnd: (wallId: string, end: 'a' | 'b', p: Point, forceOrtho?: boolean) => void;
   setWallLength: (wallId: string, length: number) => void;
-  patchRoom: (id: string, patch: Partial<Pick<Room, 'name' | 'kind' | 'floorFinishId'>>) => void;
+  patchRoom: (id: string, patch: Partial<Pick<Room, 'name' | 'kind' | 'floorFinishId' | 'wallPaint'>>) => void;
   placeFurniture: (p: Point) => void;
   seedCrowd: (count: number) => void;
   placeRoom: (p: Point) => void;

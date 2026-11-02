@@ -5,6 +5,7 @@ import type { Floor, FurnitureItem, Opening, RoofGeometry, Wall } from '../types
 import type { FloorFinishId } from '../data/flooring';
 import { floorTileCanvas } from '../data/flooring';
 import { listInteriorFloors } from './rooms';
+import { faceLookup, storedFace, resolveFace, type FaceLookup } from './finishes';
 import { furnitureParts } from './furnShape';
 import { houseHasUpper, porchBounds, upperBody, viewRoof, wallStories } from './stories';
 
@@ -175,6 +176,60 @@ function brickMap(): THREE.CanvasTexture | null {
         ctx.fillStyle = (r + x) % 5 === 0 ? '#C4846C' : '#B56A55';
         ctx.fillRect(x + off, r * rh + 1, bw - 1, rh - 2);
       }
+    }
+  });
+}
+
+/** Outside coverings a kid can pick per wall (2.13.24). Light gray pictures, so paint tints them. */
+function sidingMap(): THREE.CanvasTexture | null {
+  return paintTex('siding', (ctx, s) => {
+    const rows = 8;
+    const rh = s / rows;
+    for (let r = 0; r < rows; r++) {
+      const g = ctx.createLinearGradient(0, r * rh, 0, (r + 1) * rh);
+      g.addColorStop(0, '#ffffff');
+      g.addColorStop(0.85, '#e4e4e4');
+      g.addColorStop(1, '#9a9a9a');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, r * rh, s, rh);
+    }
+  });
+}
+
+function stoneMap(): THREE.CanvasTexture | null {
+  return paintTex('stone', (ctx, s) => {
+    ctx.fillStyle = '#8a857c';
+    ctx.fillRect(0, 0, s, s);
+    let n = 7;
+    const rows = 5;
+    const rh = s / rows;
+    for (let r = 0; r < rows; r++) {
+      let x = r % 2 ? -rh * 0.6 : 0;
+      while (x < s) {
+        n = (n * 31 + 11) % 97;
+        const w = rh * (1 + (n % 5) / 4);
+        const shade = 196 + (n % 4) * 14;
+        ctx.fillStyle = `rgb(${shade},${shade - 4},${shade - 12})`;
+        ctx.beginPath();
+        ctx.roundRect(x + 2, r * rh + 2, w - 4, rh - 4, 5);
+        ctx.fill();
+        x += w;
+      }
+    }
+  });
+}
+
+function woodMap(): THREE.CanvasTexture | null {
+  return paintTex('woodboard', (ctx, s) => {
+    const cols = 6;
+    const cw = s / cols;
+    for (let c = 0; c < cols; c++) {
+      ctx.fillStyle = c % 2 ? '#e8e2da' : '#f6f0e8';
+      ctx.fillRect(c * cw, 0, cw, s);
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(c * cw + cw - 2, 0, 2, s);
+      ctx.fillStyle = 'rgba(0,0,0,0.06)';
+      for (let k = 0; k < 4; k++) ctx.fillRect(c * cw + 4 + k * 5, 0, 1, s);
     }
   });
 }
@@ -443,7 +498,7 @@ function meshFromPos(bag: Bag, pos: number[], material: THREE.Material, name?: s
   void mesh;
 }
 
-function addWall(bag: Bag, floor: Floor, wall: Wall, look: HouseLook, nodes: Map<string, { x: number; y: number }>, center: { x: number; y: number }) {
+function addWall(bag: Bag, floor: Floor, wall: Wall, look: HouseLook, nodes: Map<string, { x: number; y: number }>, center: { x: number; y: number }, roomOf: FaceLookup) {
   const a = nodes.get(wall.a);
   const b = nodes.get(wall.b);
   if (!a || !b) return;
@@ -501,30 +556,51 @@ function addWall(bag: Bag, floor: Floor, wall: Wall, look: HouseLook, nodes: Map
   }
   const geo = new THREE.ExtrudeGeometry(shape, { depth: thick, bevelEnabled: false });
   geo.translate(0, 0, -thick / 2);
-  const brick = wall.drawStyle === 'brick' && wall.kind === 'exterior';
-  if (brick) uvFeet(geo, 2.2, 1.15);
-  const color = brick ? '#ffffff' : wall.kind === 'exterior' ? look.tint : '#F4EFE6';
-  const mesh = addMesh(
-    bag,
-    geo,
-    mat(bag, color, brick ? 0.92 : 0.8, brick
-      ? { map: brickMap(), bump: look.rich ? brickMap() : null, bumpScale: 2.2 }
-      : { bump: look.rich ? plasterMap() : null, bumpScale: 0.35 }),
-    true,
-    true,
-  );
+  // Which face is outside (local +z when zOut is 1), and what each face wears (2.13.24).
+  const zOut = (-uy) * out.x + ux * out.y > 0 ? 1 : -1;
+  const outSide = zOut === 1 ? 'a' : 'b';
+  const inSide = zOut === 1 ? 'b' : 'a';
+  const outStored = wall.kind === 'exterior' ? storedFace(wall, outSide) : null;
+  const skin = wall.kind === 'exterior' ? (outStored?.skin ?? (wall.drawStyle === 'brick' ? 'brick' : null)) : null;
+  const outPaint = outStored?.paint ?? null;
+  const brick = skin === 'brick';
+  let bodyMat: THREE.Material;
+  if (skin === 'brick') {
+    uvFeet(geo, 2.2, 1.15);
+    bodyMat = mat(bag, outPaint ?? '#ffffff', 0.92, { map: brickMap(), bump: look.rich ? brickMap() : null, bumpScale: 2.2 });
+  } else if (skin === 'siding') {
+    uvFeet(geo, 4, 4);
+    bodyMat = mat(bag, outPaint ?? look.tint, 0.75, { map: sidingMap(), bump: look.rich ? sidingMap() : null, bumpScale: 1.4 });
+  } else if (skin === 'stone') {
+    uvFeet(geo, 3.4, 3.4);
+    bodyMat = mat(bag, outPaint ?? '#ffffff', 0.95, { map: stoneMap(), bump: look.rich ? stoneMap() : null, bumpScale: 2.6 });
+  } else if (skin === 'wood') {
+    uvFeet(geo, 3, 3);
+    bodyMat = mat(bag, outPaint ?? '#B08460', 0.8, { map: woodMap(), bump: look.rich ? woodMap() : null, bumpScale: 1.2 });
+  } else {
+    const color = outPaint ?? (wall.kind === 'exterior' ? look.tint : '#F4EFE6');
+    bodyMat = mat(bag, color, 0.8, { bump: look.rich ? plasterMap() : null, bumpScale: 0.35 });
+  }
+  const mesh = addMesh(bag, geo, bodyMat, true, true);
   mesh.position.set(a.x, 0, a.y);
   mesh.rotation.y = ang;
-  // Inside faces: an outside brick wall is plaster indoors, and every room gets a white baseboard (2.13.22).
-  const zOut = (-uy) * out.x + ux * out.y > 0 ? 1 : -1; // local +z points outside when 1
+  // Inside faces: plaster or the room's paint, and every room gets a white baseboard (2.13.22, paint 2.13.24).
   const insideSides = wall.kind === 'exterior' ? [-zOut] : [1, -1];
-  if (brick || wall.kind === 'exterior') {
+  const skinAt = (z: number, color: string) => {
     const skinGeo = new THREE.ShapeGeometry(shape);
     uvFeet(skinGeo, 3.2, 3.2);
-    const skin = addMesh(bag, skinGeo, mat(bag, '#EFE8DD', 0.9, { side2: true }), false, true);
-    skin.position.set(a.x, 0, a.y);
-    skin.rotation.y = ang;
-    skinGeo.translate(0, 0, -zOut * (thick / 2 + 0.012));
+    const face = addMesh(bag, skinGeo, mat(bag, color, 0.9, { side2: true }), false, true);
+    face.position.set(a.x, 0, a.y);
+    face.rotation.y = ang;
+    skinGeo.translate(0, 0, z * (thick / 2 + 0.012));
+  };
+  if (wall.kind === 'exterior') {
+    skinAt(-zOut, resolveFace(wall, inSide, roomOf).paint ?? '#EFE8DD');
+  } else {
+    for (const side of ['a', 'b'] as const) {
+      const paint = resolveFace(wall, side, roomOf).paint;
+      if (paint) skinAt(side === 'a' ? 1 : -1, paint);
+    }
   }
   const doorRanges = ops.filter((o) => o.type === 'door').map((o) => {
     const half = Math.min((o.width || 3) / 2, len * 0.46);
@@ -557,7 +633,7 @@ function addWall(bag: Bag, floor: Floor, wall: Wall, look: HouseLook, nodes: Map
     band(0.55, 1.1, 0.08);
     if (stories >= 2) band(look.wallH, 0.42, 0.1);
   }
-  for (const o of ops) dressOpening(bag, o, a, ux, uy, ang, len, thick, out, stories, look, wall.drawStyle === 'brick');
+  for (const o of ops) dressOpening(bag, o, a, ux, uy, ang, len, thick, out, stories, look, brick);
 }
 
 /** Low rail with turned balusters, posts at the ends, and a gap where the door or opening is. */
@@ -1168,9 +1244,10 @@ export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
     for (const n of floor.nodes) { sx += n.x; sy += n.y; }
     return { x: sx / floor.nodes.length, y: sy / floor.nodes.length };
   })();
-  for (const wall of floor.walls) addWall(bag, floor, wall, look, nodes, houseCenter);
+  const roomOf = faceLookup(floor);
+  for (const wall of floor.walls) addWall(bag, floor, wall, look, nodes, houseCenter, roomOf);
 
-  let floors: { poly: { x: number; y: number }[]; finish: FloorFinishId }[] = [];
+  let floors: { poly: { x: number; y: number }[]; finish: FloorFinishId; outdoor?: boolean }[] = [];
   try {
     floors = listInteriorFloors(floor.nodes, floor.walls, floor.rooms, look.houseFinish);
   } catch {
@@ -1180,6 +1257,7 @@ export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
   const porch = (floor.rooms ?? []).find((r) => r.kind === 'outdoor');
   for (const face of floors) {
     floorMesh(bag, face.poly, 0.03, mat(bag, '#ffffff', 0.55, { map: floorTex(face.finish), sheen: look.rich ? 0.35 : 0 }));
+    if (face.outdoor) continue; // no ceiling over a patio or porch floor
     if (!upper) {
       floorMesh(bag, face.poly, look.wallH - 0.2, mat(bag, '#F7F3EC', 0.92, { emissive: '#3A3226', glow: 0.6 }), 'ceiling');
       continue;

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { faceLookup, resolveFace, shadeHex, WALL_SKINS } from '../lib/finishes';
 import { Stage, Layer, Line, Rect, Text } from 'react-konva';
 import type Konva from 'konva';
 import { useProjectStore } from '../store/useProjectStore';
@@ -230,6 +231,7 @@ export function DollhouseCanvas() {
 
     const upperHouse = houseHasUpper(floor);
     const hasPorch = (floor.rooms ?? []).some((r) => r.kind === 'outdoor');
+    const roomOf = faceLookup(floor);
     for (const w of floor.walls) {
       const e = wallEnds(w, floor.nodes);
       if (!e) continue;
@@ -263,15 +265,30 @@ export function DollhouseCanvas() {
         : light
           ? ['#f4f0e8', '#e3dcd0', '#ebe4d8', '#e7dfd2', '#faf7f2']
           : ['#3a4560', '#2a3348', '#33405a', '#303a52', '#4a5670'];
+      // Each face's own paint or covering, or its room's paint (2.13.24).
+      const wlen = Math.hypot(e.b.x - e.a.x, e.b.y - e.a.y) || 1;
+      const nx = -(e.b.y - e.a.y) / wlen;
+      const ny = (e.b.x - e.a.x) / wlen;
+      const faceFill = (side: 'a' | 'b'): string | null => {
+        const rf = resolveFace(w, side, roomOf);
+        if (rf.outside && w.kind === 'exterior') {
+          if (rf.skin && rf.skin !== 'brick') return rf.paint ?? WALL_SKINS.find((k) => k.id === rf.skin)?.color ?? null;
+          return rf.paint;
+        }
+        return rf.paint;
+      };
       cuts.walls.forEach((ring, i) => {
         const mx = ring.reduce((s, p) => s + p.x, 0) / ring.length;
         const my = ring.reduce((s, p) => s + p.y, 0) / ring.length;
         const top = ring.every((p) => p.z > wallH - 0.05);
+        const off = (mx - e.a.x) * nx + (my - e.a.y) * ny;
+        const side = !top && Math.abs(off) > thick * 0.3 ? (off > 0 ? 'a' : 'b') : null;
+        const own = side && !porchRail && !blocky ? faceFill(side) : null;
         faces.push({
           key: `w-${w.id}-${i}`,
           pts: projectPoints(ring, spec),
-          fill: porchRail ? (top ? '#ffffff' : '#ece7dd') : blocky ? (top ? '#c4a574' : '#d8c4a0') : (useTex && !top ? fill : shades[i % shades.length]),
-          pattern: useTex && !top && !porchRail ? tile : undefined,
+          fill: own ? shadeHex(own, 0.9 + (i % 3) * 0.05) : porchRail ? (top ? '#ffffff' : '#ece7dd') : blocky ? (top ? '#c4a574' : '#d8c4a0') : (useTex && !top ? fill : shades[i % shades.length]),
+          pattern: own ? undefined : useTex && !top && !porchRail ? tile : undefined,
           stroke: sel ? '#6e72f5' : ink,
           sw: swWall(sel),
           depth: cameraDepth(mx, my, spec) + (top ? 0.2 : 0),
@@ -690,7 +707,9 @@ export function DollhouseCanvas() {
               setSelected({ kind: 'room', id: r.id });
             };
             const name = roomLabel(settings.locale, r);
-            const labelW = Math.max(72, name.length * 7.4);
+            // Width follows the letters at this zoom, so "Dining room" is not cut to "Dining ro" (2.13.24).
+            const fs = 12 / Math.max(0.6, zoom);
+            const labelW = Math.max(72, name.length * fs * 0.68 + fs);
             return (
               <Text
                 key={r.id}
@@ -700,8 +719,11 @@ export function DollhouseCanvas() {
                 align="center"
                 wrap="none"
                 text={name}
-                fontSize={12 / Math.max(0.6, zoom)}
+                fontSize={fs}
                 fill={selected?.kind === 'room' && selected.id === r.id ? '#6e72f5' : (light ? '#1a1a1a' : '#f4f4f5')}
+                shadowColor={light ? '#ffffff' : '#000000'}
+                shadowBlur={4}
+                shadowOpacity={0.95}
                 fontStyle="bold"
                 onClick={pick}
                 onTap={pick}

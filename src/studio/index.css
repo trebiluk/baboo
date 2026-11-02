@@ -5304,3 +5304,127 @@ html.kb-framed body.kb-on .app-shell.is-phone .chrome {
 .skill-what p { margin: 0; }
 .skill-what .skill-help { font-weight: 600; }
 .view3d-keys { opacity: 0.85; }
+
+/* 2.13.24 — on a phone the version chip lives in the save row, so it never sits on the piece count or the 3D buttons. */
+.ver-row {
+  display: none;
+}
+.app-shell.is-phone .ver-row {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--aw-border);
+  border-radius: 999px;
+  background: var(--aw-elevated);
+  color: var(--aw-fg);
+  font: 700 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.app-shell.is-phone .ver-float {
+  display: none !important;
+}
+
+/* 2.13.24 — phone view switch in the save row: 2D Plan, Dollhouse, 3D View one tap away. */
+.phone-views {
+  display: none;
+}
+.app-shell.is-phone .phone-views {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 12px;
+  background: var(--aw-hover, #f1f1f4);
+}
+.app-shell.is-phone .phone-view {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--aw-fg);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.app-shell.is-phone .phone-view.active {
+  background: var(--aw-royal, #4f46e5);
+  color: #fff;
+}
+@media (max-width: 560px) {
+  .app-shell.is-phone .phone-view {
+    padding: 0 7px;
+    font-size: 12px;
+  }
+  .app-shell.is-phone .ver-row {
+    padding: 0 8px;
+    font-size: 11px;
+  }
+}
+@media (max-width: 560px) {
+  /* Portrait phone: one row holds the views, the version chip, the saved tick and Export (as its icon). */
+  .app-shell.is-phone .chrome-right > .save-export {
+    gap: 2px;
+    min-width: 0;
+  }
+  .app-shell.is-phone .chrome-right > .save-export .save-status-text,
+  .app-shell.is-phone .chrome-right > .save-export .chrome-label {
+    display: none !important;
+  }
+  .app-shell.is-phone .chrome-right > .save-export > .save-status.save-chip {
+    flex: 0 0 auto !important;
+    min-width: 32px !important;
+    width: auto !important;
+    padding: 0 6px !important;
+  }
+  .app-shell.is-phone .chrome-right > .save-export > .chrome-ess {
+    width: 44px !important;
+    min-width: 44px !important;
+    padding: 0 !important;
+  }
+  .app-shell.is-phone .phone-view {
+    padding: 0 5px;
+    font-size: 11px;
+  }
+  .app-shell.is-phone .ver-row {
+    padding: 0 6px;
+    font-size: 10px;
+  }
+}
+/* 2.13.24 — phone bottom edge: the hint gets the full width under the plan card; the piece count (a tech number) stays off phones. */
+.app-shell.is-phone .plan-load-chip {
+  display: none !important;
+}
+@media (max-width: 560px) {
+  .app-shell.is-phone .canvas-hint {
+    left: 64px !important;
+    right: 8px !important;
+    width: auto !important;
+    max-width: none !important;
+    transform: none !important;
+    text-align: center;
+    white-space: normal;
+  }
+}
+@media (max-width: 560px) {
+  .app-shell.is-phone .plan-sheet {
+    top: auto !important;
+    bottom: calc(52px + env(safe-area-inset-bottom, 0px)) !important;
+    min-width: 168px;
+  }
+}
+/* 2.13.24 — each side of a wall gets its own little block in the wall panel. */
+.face-block {
+  border-top: 1px solid var(--aw-border);
+  padding-top: 6px;
+  margin-top: 4px;
+}
+.face-title {
+  font-weight: 700;
+  color: var(--aw-fg);
+}

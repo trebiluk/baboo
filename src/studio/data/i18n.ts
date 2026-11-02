@@ -378,6 +378,26 @@ export const STR: Record<string, Gloss> = {
   'chrome.view3d': g('3D View', {
     es: 'Vista 3D', cu: 'Vista 3D', uk: 'Вигляд 3D', ru: 'Вид 3D', ti: 'ትርኢት 3D', fa: 'نمای سه‌بعدی',
   }),
+  // 2.13.24 finishes: ti, fa-AF and rw are UNCHECKED native copy.
+  'face.outside': g('Outside face', { es: 'Cara de afuera', cu: 'Cara de afuera', uk: 'Зовнішній бік', ru: 'Наружная сторона', ti: 'ናይ ደገ ገጽ', fa: 'روی بیرونی', 'fa-AF': 'روی بیرونی', ar: 'الوجه الخارجي', rw: 'Uruhande rw\'inyuma' }),
+  'face.room': g('{room} side', { es: 'Lado de {room}', cu: 'Lado de {room}', uk: 'Бік: {room}', ru: 'Сторона: {room}', ti: 'ገጽ {room}', fa: 'سمت {room}', 'fa-AF': 'سمت {room}', ar: 'جهة {room}', rw: 'Uruhande rwa {room}' }),
+  'face.other': g('Other side', { es: 'El otro lado', cu: 'El otro lado', uk: 'Інший бік', ru: 'Другая сторона', ti: 'እቲ ካልእ ገጽ', fa: 'سمت دیگر', 'fa-AF': 'سمت دیگر', ar: 'الجهة الأخرى', rw: 'Urundi ruhande' }),
+  'face.cover': g('Covering', { es: 'Revestimiento', cu: 'Revestimiento', uk: 'Облицювання', ru: 'Облицовка', ti: 'መሸፈኒ', fa: 'روکش', 'fa-AF': 'روکش', ar: 'الكسوة', rw: 'Igipfundikizo' }),
+  'face.roomPaint': g('Room\'s paint', { es: 'Pintura del cuarto', cu: 'Pintura del cuarto', uk: 'Фарба кімнати', ru: 'Краска комнаты', ti: 'ሕብሪ ክፍሊ', fa: 'رنگ اتاق', 'fa-AF': 'رنگ اتاق', ar: 'دهان الغرفة', rw: 'Irangi ry\'icyumba' }),
+  'skin.brick': g('Brick', { es: 'Ladrillo', cu: 'Ladrillo', uk: 'Цегла', ru: 'Кирпич', ti: 'ጡብ', fa: 'آجر', 'fa-AF': 'خشت پخته', ar: 'طوب', rw: 'Amatafari' }),
+  'skin.siding': g('Siding', { es: 'Tablas', cu: 'Tablas', uk: 'Сайдинг', ru: 'Сайдинг', ti: 'ሰሌዳታት', fa: 'سایدینگ', 'fa-AF': 'تخته‌پوش', ar: 'ألواح', rw: 'Imbaho z\'inyuma' }),
+  'skin.stone': g('Stone', { es: 'Piedra', cu: 'Piedra', uk: 'Камінь', ru: 'Камень', ti: 'እምኒ', fa: 'سنگ', 'fa-AF': 'سنگ', ar: 'حجر', rw: 'Amabuye' }),
+  'skin.stucco': g('Stucco', { es: 'Estuco', cu: 'Repello', uk: 'Штукатурка', ru: 'Штукатурка', ti: 'ልሕሲ', fa: 'گچ‌کاری', 'fa-AF': 'پلستر', ar: 'جص', rw: 'Isima' }),
+  'skin.wood': g('Wood boards', { es: 'Tablas de madera', cu: 'Tablas de madera', uk: 'Дерев’яні дошки', ru: 'Деревянные доски', ti: 'ሰሌዳ ዕንጨይቲ', fa: 'تخته چوبی', 'fa-AF': 'تخته چوبی', ar: 'ألواح خشب', rw: 'Imbaho z\'ibiti' }),
+  'obj.wallPaint': g('Wall paint', { es: 'Pintura de paredes', cu: 'Pintura de paredes', uk: 'Фарба стін', ru: 'Краска стен', ti: 'ሕብሪ መናድቕ', fa: 'رنگ دیوار', 'fa-AF': 'رنگ دیوار', ar: 'دهان الجدران', rw: 'Irangi ry\'inkuta' }),
+  'obj.sameWalls': g('Same walls in every {room}', { es: 'Mismas paredes en cada {room}', cu: 'Mismas paredes en cada {room}', uk: 'Ці стіни в усіх: {room}', ru: 'Эти стены во всех: {room}', ti: 'እዚ መናድቕ ኣብ ኩሉ {room}', fa: 'همین دیوار در هر {room}', 'fa-AF': 'همین دیوار در هر {room}', ar: 'نفس الجدران لكل: {room}', rw: 'Inkuta zimwe mu byumba byose: {room}' }),
+  'obj.ground': g('Ground', { es: 'Suelo', cu: 'Suelo', uk: 'Покриття', ru: 'Покрытие', ti: 'መሬት', fa: 'زمین', 'fa-AF': 'زمین', ar: 'الأرض', rw: 'Hasi' }),
+  'obj.grass': g('Grass', { es: 'Césped', cu: 'Césped', uk: 'Трава', ru: 'Трава', ti: 'ሳዕሪ', fa: 'چمن', 'fa-AF': 'سبزه', ar: 'عشب', rw: 'Ubwatsi' }),
+  'news.finishes': g('Paint each room and each side of each wall: brick, siding, stone or wood outside, and a ground for the porch.', { es: 'Pinta cada cuarto y cada lado de cada pared: ladrillo, tablas, piedra o madera afuera, y un suelo para el porche.', cu: 'Pinta cada cuarto y cada lado de cada pared: ladrillo, tablas, piedra o madera afuera, y un suelo para el portal.', uk: 'Фарбуй кожну кімнату й кожен бік кожної стіни: цегла, сайдинг, камінь чи дерево ззовні, і покриття для ґанку.', ru: 'Крась каждую комнату и каждую сторону каждой стены: кирпич, сайдинг, камень или дерево снаружи, и покрытие для крыльца.', ti: 'ነፍሲ ወከፍ ክፍልን ነፍሲ ወከፍ ገጽ መንደቕን ሕበሮ፦ ብደገ ጡብ፣ ሰሌዳ፣ እምኒ ወይ ዕንጨይቲ፣ ንበረንዳ ድማ መሬት።', fa: 'هر اتاق و هر سمت هر دیوار را رنگ کن: بیرون آجر، سایدینگ، سنگ یا چوب، و یک کف برای ایوان.', 'fa-AF': 'هر اتاق و هر سمت هر دیوار را رنگ کن: بیرون خشت پخته، تخته‌پوش، سنگ یا چوب، و یک کف برای برنده.', ar: 'لوّن كل غرفة وكل جهة من كل جدار: طوب أو ألواح أو حجر أو خشب من الخارج، وأرضية للشرفة.', rw: 'Siga buri cyumba na buri ruhande rwa buri rukuta: amatafari, imbaho, amabuye cyangwa ibiti inyuma, n\'ubutaka bw\'urubaraza.' }),
+  // 2.13.24: ti, fa-AF and rw are UNCHECKED native copy.
+  'chrome.views': g('Views', {
+    es: 'Vistas', cu: 'Vistas', uk: 'Вигляди', ru: 'Виды', ti: 'ትርኢታት', fa: 'نماها', 'fa-AF': 'نماها', ar: 'العروض', rw: 'Uko ureba',
+  }),
   'chrome.undo': g('Undo', {
     es: 'Deshacer', cu: 'Deshacer', uk: 'Скасувати', ru: 'Отменить', ti: 'ተመለስ', fa: 'برگردان',
   }),

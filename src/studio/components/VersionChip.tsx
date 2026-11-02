@@ -6,9 +6,12 @@ import { t, tipLoc } from '../data/i18n';
 /** Tap = what's new. Hold = Teacher. Floating copy is the one kids can actually find on a phone. */
 export function VersionChip({
   floating = false,
+  row = false,
   onTeacher,
 }: {
   floating?: boolean;
+  /** Phone copy that sits in the save row, where nothing else lives (2.13.24). */
+  row?: boolean;
   onTeacher?: () => void;
 }) {
   const toggleChangelog = useProjectStore((s) => s.toggleChangelog);
@@ -37,7 +40,7 @@ export function VersionChip({
   return (
     <button
       type="button"
-      className={`ver-chip aw-pressable${floating ? ' ver-float' : ' ver-chip-header'}`}
+      className={row ? 'ver-row aw-pressable' : `ver-chip aw-pressable${floating ? ' ver-float' : ' ver-chip-header'}`}
       onClick={toggleChangelog}
       onPointerDown={onPointerDown}
       onPointerUp={clearPress}

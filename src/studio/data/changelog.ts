@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.24',
+    date: '2026-11-01',
+    bullets: [
+      'Paint each room and each side of each wall: brick, siding, stone or wood outside, and a ground for the porch.',
+    ],
+  },
+  {
     version: '2.13.23',
     date: '2026-11-01',
     bullets: [

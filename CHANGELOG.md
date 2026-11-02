@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.24 — 2026-11-01 — Finishes
+- Paint each room and each side of each wall: brick, siding, stone or wood outside, and a ground for the porch.
+- Phones: 2D Plan, Dollhouse and 3D View sit in the top row; the version chip no longer covers the piece count or the 3D buttons; Dollhouse room names are not cut off.
+
 ## 2.13.23 — 2026-11-01 — Frames
 - Room names stay whole, doorways get painted frames, and things you pick in 2D show from above in 3D.
 

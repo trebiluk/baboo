@@ -284,6 +284,15 @@ export function PlanCanvas() {
     }
 
     const store = useProjectStore.getState();
+    // A room's name tag is its handle: a tap on it picks the room, not the table or door under it (2.13.24).
+    if (tool === 'select' && e.evt.button === 0) {
+      for (const [id, r] of roomTagRects) {
+        if (world.x >= r.x0 && world.x <= r.x1 && world.y >= r.y0 && world.y <= r.y1) {
+          store.setSelected({ kind: 'room', id });
+          return;
+        }
+      }
+    }
     const empty = !store.hitAt(world);
     if (e.evt.button === 2) {
       toolsPocket.armEmptyPress(e.evt, empty);
@@ -2246,6 +2255,9 @@ function RoomFill({
   );
 }
 
+/** Where each room's name tag sits on the plan, so a tap on it picks the room (2.13.24). */
+const roomTagRects = new Map<string, { x0: number; y0: number; x1: number; y1: number }>();
+
 function RoomLabel({
   room, poly, selected, zoom, units, lightPlan, dimBg, dimFg, onPick,
 }: {
@@ -2291,6 +2303,8 @@ function RoomLabel({
     for (const oy of [0, -1.6, 1.6, -3.2, 3.2, -4.8, 4.8, -6.4, 6.4]) if (clear(oy)) return oy;
     return 0;
   }, [furniture, poly, room.x, room.y, w, h]);
+  roomTagRects.set(room.id, { x0: room.x - w / 2, x1: room.x + w / 2, y0: room.y + dy - h / 2, y1: room.y + dy + h / 2 });
+  useEffect(() => () => { roomTagRects.delete(room.id); }, [room.id]);
   return (
     <Group x={room.x} y={room.y + dy}>
       <Rect

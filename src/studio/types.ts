@@ -70,6 +70,22 @@ export interface Wall {
   drawStyle?: WallDrawStyle;
   /** 1 = one story. 2 = this wall continues to a second floor. Omit = decided by the plan. */
   levels?: number;
+  /**
+   * Each face of this wall section, set on its own (2.13.24). `a` is the face on the left going from end a to end b;
+   * `b` is the other face. Omit a face to follow its room's paint (inside) or the house look (outside).
+   */
+  faces?: { a?: WallFace | null; b?: WallFace | null };
+}
+
+/** What covers the outside of a wall. */
+export type WallSkin = 'brick' | 'siding' | 'stone' | 'stucco' | 'wood';
+
+/** One face of one wall section. */
+export interface WallFace {
+  /** Paint hex. */
+  paint?: string | null;
+  /** Outside covering. Inside faces use paint only. */
+  skin?: WallSkin | null;
 }
 
 export interface Opening {
@@ -171,8 +187,10 @@ export interface Room {
   name: string;
   x: number;
   y: number;
-  /** Room floor finish. null/omit = house default. */
+  /** Room floor finish. null/omit = house default. Outdoor rooms: the ground (omit = grass). */
   floorFinishId?: FloorFinishId | null;
+  /** Paint for every inside wall of this room, unless a wall face has its own (2.13.24). */
+  wallPaint?: string | null;
 }
 
 export interface Floor {

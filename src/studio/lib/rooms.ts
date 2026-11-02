@@ -244,12 +244,13 @@ export function listInteriorFloors(
   walls: Wall[],
   rooms: Room[] | undefined,
   houseFinish: FloorFinishId,
-): { poly: Point[]; finish: FloorFinishId }[] {
+): { poly: Point[]; finish: FloorFinishId; outdoor?: boolean }[] {
   const faces = listInteriorFaces(nodes, walls);
-  const out: { poly: Point[]; finish: FloorFinishId }[] = [];
+  const out: { poly: Point[]; finish: FloorFinishId; outdoor?: boolean }[] = [];
   for (const f of faces) {
     const room = (rooms ?? []).find((r) => pointInPoly({ x: r.x, y: r.y }, f.poly));
-    if (room?.kind === 'outdoor') continue;
+    // An outdoor room is grass unless its ground was picked (pavers, deck, slate…) (2.13.24).
+    if (room?.kind === 'outdoor' && !room.floorFinishId) continue;
     const hw = loopHalfWidth(f.poly, nodes, walls);
     const inset = insetPoly(f.poly, Math.max(0.08, hw * 0.92));
     if (inset.length < 3) continue;
@@ -257,7 +258,7 @@ export function listInteriorFloors(
     if (area < 2) continue;
     const finish = (room?.floorFinishId ?? houseFinish) as FloorFinishId;
     if (!finish) continue;
-    out.push({ poly: inset, finish });
+    out.push(room?.kind === 'outdoor' ? { poly: inset, finish, outdoor: true } : { poly: inset, finish });
   }
   return out;
 }
