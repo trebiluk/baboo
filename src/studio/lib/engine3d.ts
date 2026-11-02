@@ -234,6 +234,29 @@ function woodMap(): THREE.CanvasTexture | null {
   });
 }
 
+/** Window glass: a soft sky reflection with two light streaks, so glass reads as glass on every device (2.13.32). */
+function glassMap(): THREE.CanvasTexture | null {
+  return paintTex('glass', (ctx, s) => {
+    const g = ctx.createLinearGradient(0, 0, 0, s);
+    g.addColorStop(0, '#E4F1FB');
+    g.addColorStop(0.45, '#B5D2E8');
+    g.addColorStop(0.62, '#8FAFC8');
+    g.addColorStop(1, '#5E7891');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, s, s);
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.moveTo(s * 0.18, 0); ctx.lineTo(s * 0.34, 0); ctx.lineTo(s * 0.02, s); ctx.lineTo(0, s); ctx.lineTo(0, s * 0.8);
+    ctx.fill();
+    ctx.globalAlpha = 0.2;
+    ctx.beginPath();
+    ctx.moveTo(s * 0.46, 0); ctx.lineTo(s * 0.52, 0); ctx.lineTo(s * 0.2, s); ctx.lineTo(s * 0.14, s);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+}
+
 function grainMap(): THREE.CanvasTexture | null {
   return paintTex('grain', (ctx, s) => {
     ctx.fillStyle = '#ffffff';
@@ -803,7 +826,7 @@ function placeOpening(
     const glass = addMesh(
       bag,
       new THREE.PlaneGeometry(fw - jamb, fh - jamb * 1.4),
-      mat(bag, '#C5DFF0', 0.04, { opacity: 0.38, metal: 0.1, glass: true }),
+      mat(bag, '#FFFFFF', 0.05, { opacity: 0.62, metal: 0.1, glass: true, map: glassMap(), side2: true }),
       false,
     );
     glass.position.set(px, (y0 + y1) / 2, pz);
@@ -813,7 +836,7 @@ function placeOpening(
   // A real door: full width, two raised panels on each face, a brass knob, opened back toward the wall
   // so it does not stand in the middle of the doorway (2.13.29).
   if (o.symbolKind === 'slidingDoor') {
-    const glass = addMesh(bag, new THREE.PlaneGeometry((cx - x0) * 2 * 0.96, y1 - y0 - 0.1), mat(bag, '#C5DFF0', 0.04, { opacity: 0.4, metal: 0.1, glass: true }), false);
+    const glass = addMesh(bag, new THREE.PlaneGeometry((cx - x0) * 2 * 0.96, y1 - y0 - 0.1), mat(bag, '#FFFFFF', 0.05, { opacity: 0.62, metal: 0.1, glass: true, map: glassMap(), side2: true }), false);
     glass.position.set(px, (y0 + y1) / 2, pz);
     glass.rotation.y = ang;
     return;
@@ -929,7 +952,7 @@ function addDormers(
 ) {
   const white = mat(bag, '#F4F0E8', 0.6);
   // dormer glass reads dark from outside (a small room behind it), with a white sash around it
-  const glass = mat(bag, '#3E5468', 0.12, { metal: 0.2, glass: true });
+  const glass = mat(bag, '#AFC2D2', 0.08, { metal: 0.2, glass: true, map: glassMap() }); // sky in the glass, not a black hole (2.13.32)
   // the pane and the gable face are single planes: show both sides so they read from any angle
   white.side = THREE.DoubleSide;
   glass.side = THREE.DoubleSide;

@@ -1635,6 +1635,18 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.32: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.glass': g('Windows look like glass in 3D: a soft sky in the panes and light streaks, even up in the roof windows.', {
+    es: 'Las ventanas parecen de vidrio en 3D: un cielo suave en los cristales y reflejos de luz, hasta en las ventanas del techo.',
+    cu: 'Las ventanas parecen de vidrio en 3D: un cielo suave en los cristales y reflejos de luz, hasta en las ventanas del techo.',
+    uk: 'Вікна в 3D схожі на скло: м’яке небо в шибках і світлові відблиски, навіть у вікнах на даху.',
+    ru: 'Окна в 3D похожи на стекло: мягкое небо в стёклах и световые блики, даже в окнах на крыше.',
+    ti: 'መሳኹቲ ብ3D ከም ብርጭቆ ይመስሉ፦ ልሙጥ ሰማይ ኣብ መሳኹቲን ጨረራታት ብርሃንን፣ ኣብ መሳኹቲ ናሕሲ እውን።',
+    fa: 'پنجره‌ها در سه‌بعدی شیشه‌ای به نظر می‌رسند: آسمانی نرم در شیشه‌ها و رگه‌های نور، حتی در پنجره‌های سقف.',
+    'fa-AF': 'کلکین‌ها در سه‌بعدی شیشه‌ای معلوم می‌شوند: آسمان نرم در شیشه‌ها و رگه‌های روشنی، حتی در کلکین‌های بام.',
+    ar: 'النوافذ تبدو زجاجية في العرض الثلاثي: سماء ناعمة في الألواح وخطوط ضوء، حتى في نوافذ السقف.',
+    rw: "Amadirishya asa n'ibirahure muri 3D: ijuru ryoroheje mu birahure n'imirasire y'urumuri, ndetse no mu madirishya yo ku gisenge.",
+  }),
   // 2.13.31: ti, fa-AF and rw are UNCHECKED native copy.
   'news.crown': g("Rooms get crown molding at the ceiling, and the Mansion's lampposts stand outside instead of in the parlor.", {
     es: 'Los cuartos tienen moldura en el techo, y los faroles de la Mansión están afuera en vez de en la sala.',

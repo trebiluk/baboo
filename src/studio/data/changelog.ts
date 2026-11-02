@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.32',
+    date: '2026-11-02',
+    bullets: [
+      'Windows look like glass in 3D: a soft sky in the panes and light streaks, even up in the roof windows.',
+    ],
+  },
+  {
     version: '2.13.31',
     date: '2026-11-02',
     bullets: [
