@@ -145,6 +145,7 @@ export function ObjectMenu() {
   const patchLandscape = useProjectStore((s) => s.patchLandscape);
   const setWallLength = useProjectStore((s) => s.setWallLength);
   const patchRoom = useProjectStore((s) => s.patchRoom);
+  const patchRooms = useProjectStore((s) => s.patchRooms);
   const renameRoom = useProjectStore((s) => s.renameRoom);
   const setRoomWallKind = useProjectStore((s) => s.setRoomWallKind);
   const setSelected = useProjectStore((s) => s.setSelected);
@@ -156,9 +157,23 @@ export function ObjectMenu() {
   const clearSelection = useProjectStore((s) => s.clearSelection);
   const [collapsed, setCollapsed] = useState(false);
 
+  const viewMode = useProjectStore((s) => s.viewMode);
   useEffect(() => {
     setCollapsed(false);
   }, [selected?.kind, selected?.id]);
+  // In 3D the panel folds to its small tab, so it does not cover a third of the view; tap it to open (2.13.27).
+  const autoFolded = useRef(false);
+  useEffect(() => {
+    const in3d = viewMode === 'solid3d' || viewMode === 'walkthrough';
+    if (in3d) {
+      autoFolded.current = true;
+      setCollapsed(true);
+    } else if (autoFolded.current) {
+      // back in 2D or the Dollhouse: open again if it was 3D that folded it
+      autoFolded.current = false;
+      setCollapsed(false);
+    }
+  }, [viewMode]);
 
   if (!selected) return null;
 
@@ -518,13 +533,7 @@ export function ObjectMenu() {
                   <button
                     type="button"
                     className="object-chip aw-pressable"
-                    onClick={() => {
-                      for (const other of floor.rooms ?? []) {
-                        if (other.kind === r.kind && other.kind !== 'outdoor') {
-                          patchRoom(other.id, { floorFinishId: r.floorFinishId });
-                        }
-                      }
-                    }}
+                    onClick={() => patchRooms((floor.rooms ?? []).filter((o) => o.kind === r.kind && o.kind !== 'outdoor').map((o) => o.id), { floorFinishId: r.floorFinishId })}
                   >
                     {t(locale, 'obj.sameFloor', { room: t(locale, `room.kind.${r.kind}`) })}
                   </button>
@@ -560,11 +569,7 @@ export function ObjectMenu() {
                   <button
                     type="button"
                     className="object-chip aw-pressable"
-                    onClick={() => {
-                      for (const other of floor.rooms ?? []) {
-                        if (other.kind === r.kind) patchRoom(other.id, { wallPaint: r.wallPaint });
-                      }
-                    }}
+                    onClick={() => patchRooms((floor.rooms ?? []).filter((o) => o.kind === r.kind).map((o) => o.id), { wallPaint: r.wallPaint })}
                   >
                     {t(locale, 'obj.sameWalls', { room: t(locale, `room.kind.${r.kind}`) })}
                   </button>

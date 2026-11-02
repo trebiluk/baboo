@@ -387,7 +387,7 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     const f = focusRef.current;
     // Aim from high enough that the roof lifts off and you look down into the room it is in, not into an
     // outside wall (2.13.23: a low aim used to park the camera among the porch posts).
-    if (f) camRef.current = { ...fitted, tx: f.x, tz: f.y, ty: 2, dist: Math.max(24, Math.min(fitted.dist * 0.75, 34)), pitch: 1.0 };
+    if (f) camRef.current = { ...fitted, tx: f.x, tz: f.y, ty: 2, dist: Math.max(30, Math.min(fitted.dist * 0.85, 40)), pitch: 1.13 };
     else if (savedCam && savedCam.floorId === floor.id) camRef.current = { ...savedCam.cam };
     else camRef.current = fitted;
 

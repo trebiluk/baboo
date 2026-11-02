@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.27 — 2026-11-01 — Tidy
+- Wall sizes sit neatly outside the house, room paint can be undone, and the item panel folds away in 3D.
+- Overall sizes keep one line (35'-10") and sit past the wall sizes; picking a room shows it from above in 3D without the outside wall in the way.
+
 ## 2.13.26 — 2026-11-01 — Touch 3D
 - On phones, 3D shows the whole house, pinch zooms and spreading two fingers walks you in; the buttons take less room.
 - The walk button that leaves the walkthrough now says Step outside; touch screens get touch hints.

@@ -1557,15 +1557,24 @@ function DimMark({
         stroke={stroke}
         strokeWidth={1.4 / zoom}
       />
-      <Text
-        x={(a2.x + b2.x) / 2 - 1.4}
-        y={(a2.y + b2.y) / 2 - 0.55}
-        width={2.8}
-        align="center"
-        text={formatLength(len, units)}
-        fontSize={11 / zoom}
-        fill={dimFg}
-      />
+      {(() => {
+        // Width follows the letters at this zoom, so 35'-10" never breaks onto two lines (2.13.27).
+        const label = formatLength(len, units);
+        const fs = 11 / zoom;
+        const tw = Math.max(2.8, label.length * fs * 0.62 + 4 / zoom);
+        return (
+          <Text
+            x={(a2.x + b2.x) / 2 - tw / 2}
+            y={(a2.y + b2.y) / 2 - fs * 0.55}
+            width={tw}
+            align="center"
+            wrap="none"
+            text={label}
+            fontSize={fs}
+            fill={dimFg}
+          />
+        );
+      })()}
     </Group>
   );
 }
@@ -1777,7 +1786,8 @@ function OverallDims({
   units: 'ft' | 'm';
   dimFg: string;
 }) {
-  const pad = 1.8;
+  // Far enough out to clear each wall's own size, at any zoom (2.13.27).
+  const pad = 1.2 + 34 / Math.max(1, zoom);
   return (
     <Group listening={false} perfectDrawEnabled={false}>
       <DimMark
@@ -1972,19 +1982,37 @@ function WallShape({
         />
       )}
       {showDim && len > 0.8 && (() => {
-        /* Mirroring the offset with the flip keeps the label outside the room. */
+        // Centered on the wall and pushed off it: outside walls put their size outside the house, so the porch and
+        // short walls stop stacking sizes on top of each other (2.13.27).
+        const text = formatLength(len, units);
+        const fs = 11 / zoom;
+        const tw = text.length * fs * 0.62;
+        if (tw + 6 / zoom > len) return null; // a size longer than its wall only adds clutter
         const read = readableAngle((ang * 180) / Math.PI);
-        const off = (read.flipped ? -18 : 18) / zoom;
+        let nx = -(e.b.y - e.a.y) / len;
+        let ny = (e.b.x - e.a.x) / len;
+        let cx = 0;
+        let cy = 0;
+        for (const n of nodes) { cx += n.x; cy += n.y; }
+        cx /= Math.max(1, nodes.length);
+        cy /= Math.max(1, nodes.length);
+        const away = nx * (mx - cx) + ny * (my - cy) >= 0 ? 1 : -1;
+        nx *= away;
+        ny *= away;
+        const gap = Math.max(thick, 0.3) / 2 + 9 / zoom;
         return (
           <Text
-            x={mx}
-            y={my}
-            text={formatLength(len, units)}
-            offsetX={off}
-            offsetY={off}
-            fontSize={11 / zoom}
+            x={mx + nx * gap}
+            y={my + ny * gap}
+            width={tw}
+            align="center"
+            text={text}
+            offsetX={tw / 2}
+            offsetY={fs / 2}
+            fontSize={fs}
             fill={dimFg}
             rotation={read.deg}
+            wrap="none"
             listening={false}
           />
         );

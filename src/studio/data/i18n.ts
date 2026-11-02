@@ -1635,6 +1635,18 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.27: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.tidy': g('Wall sizes sit neatly outside the house, room paint can be undone, and the item panel folds away in 3D.', {
+    es: 'Las medidas de las paredes quedan ordenadas fuera de la casa, la pintura de los cuartos se puede deshacer y el panel se pliega en 3D.',
+    cu: 'Las medidas de las paredes quedan ordenadas fuera de la casa, la pintura de los cuartos se puede deshacer y el panel se pliega en 3D.',
+    uk: 'Розміри стін охайно стоять зовні будинку, фарбу кімнат можна скасувати, а панель предмета згортається в 3D.',
+    ru: 'Размеры стен аккуратно стоят снаружи дома, краску комнат можно отменить, а панель предмета сворачивается в 3D.',
+    ti: 'ዓቐን መናድቕ ብጽቡቕ ኣብ ደገ ገዛ ይቕመጥ፣ ሕብሪ ክፍሊ ክምለስ ይኽእል፣ ሰሌዳ ኣቕሓ ድማ ኣብ 3D ይዕጸፍ።',
+    fa: 'اندازه دیوارها مرتب بیرون خانه می‌نشیند، رنگ اتاق‌ها برگشت‌پذیر است، و پنل در سه‌بعدی جمع می‌شود.',
+    'fa-AF': 'اندازه دیوارها منظم بیرون خانه می‌نشیند، رنگ اتاق‌ها دوباره برگشت‌پذیر است، و پنل در سه‌بعدی جمع می‌شود.',
+    ar: 'مقاسات الجدران مرتبة خارج البيت، ويمكن التراجع عن دهان الغرف، ولوحة العنصر تنطوي في العرض الثلاثي.',
+    rw: "Ingano z'inkuta ziri neza inyuma y'inzu, irangi ry'ibyumba rirasubizwa, kandi akanama k'ikintu kirizinga muri 3D.",
+  }),
   // 2.13.26: ti, fa-AF and rw are UNCHECKED native copy.
   'news.touch3d': g('On phones, 3D shows the whole house, pinch zooms and spreading two fingers walks you in; the buttons take less room.', {
     es: 'En el teléfono, el 3D muestra toda la casa, pellizcar acerca y abrir dos dedos te hace caminar; los botones ocupan menos.',

@@ -208,6 +208,8 @@ interface Store {
   moveWallEnd: (wallId: string, end: 'a' | 'b', p: Point, forceOrtho?: boolean) => void;
   setWallLength: (wallId: string, length: number) => void;
   patchRoom: (id: string, patch: Partial<Pick<Room, 'name' | 'kind' | 'floorFinishId' | 'wallPaint'>>) => void;
+  /** Same floor or wall paint for many rooms at once: one undo step (2.13.27). */
+  patchRooms: (ids: string[], patch: Partial<Pick<Room, 'floorFinishId' | 'wallPaint'>>) => void;
   placeFurniture: (p: Point) => void;
   seedCrowd: (count: number) => void;
   placeRoom: (p: Point) => void;
@@ -1358,8 +1360,22 @@ export const useProjectStore = create<Store>((set, get) => ({
     get().markDirty();
   },
 
+  patchRooms: (ids, patch) => {
+    if (!ids.length) return;
+    get().pushHistory();
+    const want = new Set(ids);
+    set({
+      doc: withFloor(get().doc, (f) => ({
+        ...f,
+        rooms: (f.rooms ?? []).map((r) => (want.has(r.id) ? { ...r, ...patch } : r)),
+      })),
+    });
+    get().markDirty();
+  },
+
   patchRoom: (id, patch) => {
-    if (patch.kind) get().pushHistory();
+    // Type, floor and wall paint changes can be undone; typing a name does not fill the undo list (2.13.27).
+    if (patch.kind || 'floorFinishId' in patch || 'wallPaint' in patch) get().pushHistory();
     set({
       doc: withFloor(get().doc, (f) => ({
         ...f,
