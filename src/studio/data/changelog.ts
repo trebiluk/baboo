@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.31',
+    date: '2026-11-02',
+    bullets: [
+      "Rooms get crown molding at the ceiling, and the Mansion's lampposts stand outside instead of in the parlor.",
+    ],
+  },
+  {
     version: '2.13.30',
     date: '2026-11-02',
     bullets: [

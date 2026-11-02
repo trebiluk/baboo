@@ -1635,6 +1635,18 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.31: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.crown': g("Rooms get crown molding at the ceiling, and the Mansion's lampposts stand outside instead of in the parlor.", {
+    es: 'Los cuartos tienen moldura en el techo, y los faroles de la Mansión están afuera en vez de en la sala.',
+    cu: 'Los cuartos tienen moldura en el techo, y los faroles de la Mansión están afuera en vez de en la sala.',
+    uk: 'У кімнатах з’явився карниз під стелею, а ліхтарі Особняка стоять надворі, а не у вітальні.',
+    ru: 'В комнатах появился карниз под потолком, а фонари Особняка стоят снаружи, а не в гостиной.',
+    ti: 'ክፍልታት ኣብ ጥቓ ናሕሲ ጌጽ ረኺቦም፣ መብራህቲ ጐደና ናይቲ ዓቢ ገዛ ድማ ኣብ ክፍሊ ኣጋይሽ ዘይኮነስ ኣብ ደገ ደው ኢሎም።',
+    fa: 'اتاق‌ها زیر سقف قرنیز گرفتند، و چراغ‌پایه‌های عمارت به جای پذیرایی بیرون ایستاده‌اند.',
+    'fa-AF': 'اتاق‌ها زیر سقف قرنیز گرفتند، و چراغ‌پایه‌های قصر به جای مهمان‌خانه بیرون ایستاده‌اند.',
+    ar: 'صار للغرف كورنيش عند السقف، ومصابيح الشارع في القصر تقف في الخارج بدل غرفة الجلوس.',
+    rw: "Ibyumba byabonye umutako ku gisenge, kandi amatara yo hanze y'Inzu nini ahagaze hanze aho kuba mu ruganiriro.",
+  }),
   // 2.13.30: ti, fa-AF and rw are UNCHECKED native copy.
   'news.lamps': g('Wall lamps and floor lamps look real in 3D: brass arms, little shades and a warm glow.', {
     es: 'Las lámparas de pared y de pie se ven reales en 3D: brazos de latón, pantallas pequeñas y un brillo cálido.',

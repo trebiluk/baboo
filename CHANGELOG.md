@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.31 — 2026-11-02 — Crown
+- Rooms get crown molding at the ceiling, and the Mansion's lampposts stand outside instead of in the parlor.
+
 ## 2.13.30 — 2026-11-02 — Lamps
 - Wall lamps and floor lamps look real in 3D: brass arms, little shades and a warm glow.
 

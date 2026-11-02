@@ -322,8 +322,9 @@ function buildMansion(floor: Floor) {
     plant('hedge', 58, 24, 2.2, 18, 'Side hedge'),
     plant('lamp', 14, -6, 1.2, 1.2, 'Lamppost'),
     plant('lamp', 42, -6, 1.2, 1.2, 'Lamppost'),
-    plant('lamp', 4, 16, 1.2, 1.2, 'Lamppost'),
-    plant('lamp', 52, 16, 1.2, 1.2, 'Lamppost'),
+    // outside the side hedges, not in the parlor and dining room (2.13.31)
+    plant('lamp', -4, 38, 1.2, 1.2, 'Lamppost'),
+    plant('lamp', 60, 38, 1.2, 1.2, 'Lamppost'),
     plant('tree', 8, -10, 8, 8, 'Oak'),
     plant('tree', 48, -10, 8, 8, 'Elm'),
     plant('tree', -6, 12, 7, 7, 'Beech'),

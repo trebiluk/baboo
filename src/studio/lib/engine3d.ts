@@ -621,6 +621,15 @@ function addWall(bag: Bag, floor: Floor, wall: Wall, look: HouseLook, nodes: Map
       bb.position.set(a.x + ux * along + (-uy) * off, 0.225, a.y + uy * along + ux * off);
       bb.rotation.y = ang;
     }
+    // Crown molding where the wall meets the ceiling: the line that makes a room look finished (2.13.31).
+    const ceilY = Math.min(h, upper ? look.wallH - 0.08 : look.wallH - 0.2);
+    const off = side * (thick / 2 + 0.08);
+    const crown = addMesh(bag, new THREE.BoxGeometry(len, 0.32, 0.16), base, false, false);
+    crown.position.set(a.x + ux * (len / 2) + (-uy) * off, ceilY - 0.16, a.y + uy * (len / 2) + ux * off);
+    crown.rotation.y = ang;
+    const lip = addMesh(bag, new THREE.BoxGeometry(len, 0.08, 0.26), base, false, false);
+    lip.position.set(a.x + ux * (len / 2) + (-uy) * (side * (thick / 2 + 0.13)), ceilY - 0.04, a.y + uy * (len / 2) + ux * (side * (thick / 2 + 0.13)));
+    lip.rotation.y = ang;
   }
   if (wall.kind === 'exterior') {
     // Stone plinth at the base and a band between floors: the lines that make a facade look built (2.13.20).
