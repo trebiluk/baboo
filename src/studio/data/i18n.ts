@@ -378,6 +378,18 @@ export const STR: Record<string, Gloss> = {
   'chrome.view3d': g('3D View', {
     es: 'Vista 3D', cu: 'Vista 3D', uk: 'Вигляд 3D', ru: 'Вид 3D', ti: 'ትርኢት 3D', fa: 'نمای سه‌بعدی',
   }),
+  // 2.13.25: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.polish': g('Cleaner screens: even color grids, 3D buttons that keep their words, and nothing hiding under the tool list.', {
+    es: 'Pantallas más limpias: cuadrículas de colores parejas, botones 3D que no cortan sus palabras y nada escondido bajo la lista de herramientas.',
+    cu: 'Pantallas más limpias: cuadrículas de colores parejas, botones 3D que no cortan sus palabras y nada escondido bajo la lista de herramientas.',
+    uk: 'Охайніші екрани: рівні сітки кольорів, кнопки 3D не розривають слів, і ніщо не ховається під списком інструментів.',
+    ru: 'Аккуратнее экраны: ровные сетки цветов, кнопки 3D не разрывают слова, и ничего не прячется под списком инструментов.',
+    ti: 'ጽሩይ መሳኹቲ፦ ማዕረ ሰሌዳ ሕብርታት፣ ቃላቶም ዘይቆርጹ መጠወቕታት 3D፣ ኣብ ትሕቲ ዝርዝር መሳርሒታት ዝሕባእ ድማ የለን።',
+    fa: 'صفحه‌های تمیزتر: جدول‌های رنگ مرتب، دکمه‌های سه‌بعدی که کلمه‌هایشان نمی‌شکند، و چیزی زیر فهرست ابزارها پنهان نمی‌شود.',
+    'fa-AF': 'صفحه‌های پاک‌تر: جدول‌های رنگ منظم، دکمه‌های سه‌بعدی که کلمه‌هایشان نمی‌شکند، و چیزی زیر فهرست ابزارها پنهان نمی‌شود.',
+    ar: 'شاشات أنظف: شبكات ألوان متساوية، وأزرار ثلاثية الأبعاد لا تنقسم كلماتها، ولا شيء يختبئ تحت قائمة الأدوات.',
+    rw: "Amashusho asukuye: imirongo y'amabara iringaniye, utubuto twa 3D tutaca amagambo, kandi nta kintu cyihisha munsi y'urutonde rw'ibikoresho.",
+  }),
   // 2.13.24 finishes: ti, fa-AF and rw are UNCHECKED native copy.
   'face.outside': g('Outside face', { es: 'Cara de afuera', cu: 'Cara de afuera', uk: 'Зовнішній бік', ru: 'Наружная сторона', ti: 'ናይ ደገ ገጽ', fa: 'روی بیرونی', 'fa-AF': 'روی بیرونی', ar: 'الوجه الخارجي', rw: 'Uruhande rw\'inyuma' }),
   'face.room': g('{room} side', { es: 'Lado de {room}', cu: 'Lado de {room}', uk: 'Бік: {room}', ru: 'Сторона: {room}', ti: 'ገጽ {room}', fa: 'سمت {room}', 'fa-AF': 'سمت {room}', ar: 'جهة {room}', rw: 'Uruhande rwa {room}' }),

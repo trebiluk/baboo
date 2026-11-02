@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.25',
+    date: '2026-11-01',
+    bullets: [
+      'Cleaner screens: even color grids, 3D buttons that keep their words, and nothing hiding under the tool list.',
+    ],
+  },
+  {
     version: '2.13.24',
     date: '2026-11-01',
     bullets: [

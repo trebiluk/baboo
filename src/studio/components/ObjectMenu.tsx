@@ -321,24 +321,6 @@ export function ObjectMenu() {
               ))}
               <span className="object-menu-meta">{t(locale, 'obj.stretch')}</span>
             </div>
-            <p className="object-menu-meta">{t(locale, 'obj.wallpaper')}</p>
-            <div className="object-menu-row" role="group" aria-label={t(locale, 'obj.wallpaper')}>
-              {TEXTURE_PACKS.filter((p) => p.id !== 'import:local').map((p) => {
-                const on = (p.id === 'pack:plain' && !w.finishId) || w.finishId === p.id;
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    className={`object-chip tex-swatch aw-pressable${on ? ' active' : ''}`}
-                    style={{ background: p.previewCss }}
-                    title={t(locale, `tex.${p.id.replace(':', '.')}`)}
-                    onClick={() => patchWall(w.id, { finishId: p.id === 'pack:plain' ? null : p.id })}
-                  >
-                    <span className="tex-swatch-label">{t(locale, `tex.${p.id.replace(':', '.')}`)}</span>
-                  </button>
-                );
-              })}
-            </div>
             {/* Each side of this wall section, on its own (2.13.24). */}
             {wallFaces(w, faceLookup(floor)).map((rf) => {
               const mine = storedFace(w, rf.side);
@@ -364,6 +346,7 @@ export function ObjectMenu() {
                       ))}
                     </div>
                   ) : null}
+                  {rf.outside && w.kind === 'exterior' ? <p className="object-menu-meta">{t(locale, 'obj.paint')}</p> : null}
                   <div className="object-menu-row object-tex-row" role="group" aria-label={t(locale, 'obj.paint')}>
                     <button
                       type="button"
@@ -392,6 +375,27 @@ export function ObjectMenu() {
                 </div>
               );
             })}
+            {/* Wallpaper only shows in the Dollhouse: tucked away so the sides come first (2.13.25). */}
+            <details className="object-more">
+              <summary className="object-menu-meta">{t(locale, 'obj.wallpaper')}</summary>
+            <div className="object-menu-row object-tex-row" role="group" aria-label={t(locale, 'obj.wallpaper')}>
+              {TEXTURE_PACKS.filter((p) => p.id !== 'import:local').map((p) => {
+                const on = (p.id === 'pack:plain' && !w.finishId) || w.finishId === p.id;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={`object-chip tex-swatch aw-pressable${on ? ' active' : ''}`}
+                    style={{ background: p.previewCss }}
+                    title={t(locale, `tex.${p.id.replace(':', '.')}`)}
+                    onClick={() => patchWall(w.id, { finishId: p.id === 'pack:plain' ? null : p.id })}
+                  >
+                    <span className="tex-swatch-label">{t(locale, `tex.${p.id.replace(':', '.')}`)}</span>
+                  </button>
+                );
+              })}
+            </div>
+            </details>
             <button type="button" className="object-del aw-pressable" onClick={deleteSelected}><Icon name="trash" /> {t(locale, 'obj.delete')}</button>
           </>
         );

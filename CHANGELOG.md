@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.25 — 2026-11-01 — Polish
+- Cleaner screens: even color grids, 3D buttons that keep their words, and nothing hiding under the tool list.
+- Tapping a room's name picks the room; wall panels show each side first and fold the Dollhouse wallpaper away; the header keeps the version chip whole on mid-size laptops.
+
 ## 2.13.24 — 2026-11-01 — Finishes
 - Paint each room and each side of each wall: brick, siding, stone or wood outside, and a ground for the porch.
 - Phones: 2D Plan, Dollhouse and 3D View sit in the top row; the version chip no longer covers the piece count or the 3D buttons; Dollhouse room names are not cut off.

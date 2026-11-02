@@ -5428,3 +5428,122 @@ html.kb-framed body.kb-on .app-shell.is-phone .chrome {
   font-weight: 700;
   color: var(--aw-fg);
 }
+
+/* 2.13.25 — polish: nothing hides under the open tool list, and the plan card sits above the hint line. */
+.app-shell:not(.is-phone):has(.tool-rail.is-open:not(.is-behind-sheet)) .plan-taps {
+  left: 188px !important;
+}
+.app-shell .plan-sheet {
+  top: auto !important;
+  bottom: calc(52px + env(safe-area-inset-bottom, 0px)) !important;
+}
+/* 2.13.25 — swatch rows line up in three even columns, so names are never squeezed and rows read as a grid. */
+.object-menu-row.object-tex-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.object-menu-row.object-tex-row > .object-chip {
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+}
+.object-menu-row.object-tex-row .tex-swatch-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.object-more {
+  border-top: 1px solid var(--aw-border);
+  margin-top: 6px;
+}
+.object-more > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 700;
+  color: var(--aw-fg);
+}
+.object-more > summary::-webkit-details-marker {
+  display: none;
+}
+.object-more > summary::after {
+  content: '▸';
+  margin-inline-start: auto;
+  transition: transform 0.15s;
+}
+.object-more[open] > summary::after {
+  transform: rotate(90deg);
+}
+.object-menu-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+.object-menu-grid input {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+/* 2.13.25 — 3D controls: the hint gets its own line (never cut off), buttons keep their words on one line. */
+.view3d-hud {
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 8px 10px !important;
+  border-radius: 18px !important;
+  width: max-content;
+}
+.view3d-hint {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  text-align: center !important;
+  font-size: 12px !important;
+  max-width: 560px;
+}
+.view3d-hud-btns {
+  flex-wrap: wrap !important;
+  justify-content: center;
+}
+.view3d-hud-btns .ghost-btn {
+  white-space: nowrap;
+  min-height: 44px !important;
+  padding: 4px 14px !important;
+}
+/* The app name never shrinks to "Ba…"; the plan title gives up the room instead. */
+.chrome-left .brand-name {
+  flex-shrink: 0;
+  overflow: visible;
+}
+.chrome-left .ver-chip-header {
+  flex-shrink: 0;
+}
+.chrome-left .title-input {
+  min-width: 0;
+  flex: 1 1 60px;
+}
+.chrome-left {
+  min-width: 0;
+}
+/* 2.13.25 — mid-width laptops: a narrower save box so the plan title and version chip keep their words. */
+@media (min-width: 915px) and (max-width: 1240px) {
+  .chrome-right > .save-export > .save-status.save-chip {
+    flex: 0 0 140px;
+    width: 140px;
+    min-width: 140px;
+    max-width: 140px;
+  }
+}
+@media (min-width: 915px) and (max-width: 1040px) {
+  .chrome-left .brand-name,
+  .chrome-left .title-input {
+    display: none !important;
+  }
+  .chrome-right > .save-export > .save-status.save-chip {
+    flex: 0 0 120px;
+    width: 120px;
+    min-width: 120px;
+    max-width: 120px;
+  }
+}
