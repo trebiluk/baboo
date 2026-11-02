@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.36 — 2026-11-02 — Lighter walk
+- Walking through the house is lighter work for the computer: faraway rooms’ furniture waits until you get close.
+- Walkthrough draws 43% fewer pieces in the Mansion (221 → 127).
+
 ## 2.13.35 — 2026-11-02 — Speed readout
 - Teachers can see how fast 3D runs: hold the version chip for Teacher, then open 3D to see frames a second.
 

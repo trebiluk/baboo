@@ -3,7 +3,7 @@ import { APP_VERSION, CHANGELOG_ENTRIES } from '../data/changelog';
 import { t, tipLoc } from '../data/i18n';
 
 /** What's new bullets that have a translated line. The bullet text must match the English exactly. */
-const NEWS_KEYS = ['news.fps', 'news.furniture3d', 'news.shade', 'news.glass', 'news.crown', 'news.lamps', 'news.fixtures', 'news.roofTag', 'news.tidy', 'news.touch3d', 'news.polish', 'news.finishes', 'news.frames', 'news.inside3d', 'news.modes', 'news.mansion', 'news.tools2d', 'news.look3d', 'news.furn', 'news.view3d', 'news.words', 'news.save', 'news.line', 'news.fit', 'news.menu', 'news.close', 'news.decoders', 'news.konva', 'news.modelviewer'];
+const NEWS_KEYS = ['news.walkFast', 'news.fps', 'news.furniture3d', 'news.shade', 'news.glass', 'news.crown', 'news.lamps', 'news.fixtures', 'news.roofTag', 'news.tidy', 'news.touch3d', 'news.polish', 'news.finishes', 'news.frames', 'news.inside3d', 'news.modes', 'news.mansion', 'news.tools2d', 'news.look3d', 'news.furn', 'news.view3d', 'news.words', 'news.save', 'news.line', 'news.fit', 'news.menu', 'news.close', 'news.decoders', 'news.konva', 'news.modelviewer'];
 
 export function ChangelogModal() {
   const open = useProjectStore((s) => s.changelogOpen);

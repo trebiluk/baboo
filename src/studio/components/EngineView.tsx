@@ -188,6 +188,9 @@ function loadModel(url: string): Promise<THREE.Object3D | null> {
   return p;
 }
 
+/** In a walkthrough, furniture farther than this (feet) is not drawn: it is behind walls anyway (2.13.36). */
+const FAR_FURN_FT = 26;
+
 /** Pieces where the bundled Quaternius model is clearly richer than Kenney's (curved arms, legs, pedestals) (2.13.34). */
 const RICHER = new Set(['bed-twin', 'bed-queen', 'nightstand', 'dresser', 'sofa', 'dining-table', 'dining-chair', 'fridge', 'toilet', 'bathtub']);
 
@@ -363,7 +366,9 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     const ceilings: THREE.Object3D[] = [];
     const roofs: THREE.Object3D[] = [];
     const shade = new THREE.Box3();
+    const furn: THREE.Object3D[] = [];
     built.root.traverse((obj) => {
+      if (obj.userData?.furn) furn.push(obj);
       if (obj.name === 'ceiling') ceilings.push(obj);
       if (obj.name === 'roof') roofs.push(obj);
       const mesh = obj as THREE.Mesh;
@@ -661,6 +666,13 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
         l.intensity = 9;
       }
       const camNow = camRef.current;
+      // Walking inside: furniture more than a few rooms away is behind walls, so skip drawing it (2.13.36).
+      if (fpsFrames % 8 === 0 && camNow) {
+        const walking = walkRef.current;
+        for (const f of furn) {
+          f.visible = !walking || Math.hypot(f.position.x - camNow.eyeX, f.position.z - camNow.eyeZ) < FAR_FURN_FT;
+        }
+      }
       const hideRoof = !walkRef.current && !!camNow && camNow.pitch > 0.78;
       for (const lid of roofs) lid.visible = !hideRoof;
       apply();

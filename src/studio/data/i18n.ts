@@ -1635,6 +1635,18 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.36: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.walkFast': g('Walking through the house is lighter work for the computer: faraway rooms’ furniture waits until you get close.', {
+    es: 'Recorrer la casa cuesta menos a la computadora: los muebles de los cuartos lejanos esperan hasta que te acercas.',
+    cu: 'Recorrer la casa cuesta menos a la computadora: los muebles de los cuartos lejanos esperan hasta que te acercas.',
+    uk: 'Прогулянка будинком легша для комп’ютера: меблі далеких кімнат з’являються, коли ти підходиш ближче.',
+    ru: 'Прогулка по дому легче для компьютера: мебель дальних комнат появляется, когда ты подходишь ближе.',
+    ti: 'ኣብ ገዛ ምዝዋር ንኮምፒተር ቀሊል እዩ፦ ኣቕሓ ናይ ርሑቓት ክፍልታት ክሳብ ትቐርብ ይጽበ።',
+    fa: 'گشتن در خانه برای رایانه سبک‌تر است: مبلمان اتاق‌های دور تا وقتی نزدیک شوی منتظر می‌ماند.',
+    'fa-AF': 'گشتن در خانه برای کمپیوتر سبک‌تر است: فرنیچر اتاق‌های دور تا وقتی نزدیک شوی منتظر می‌ماند.',
+    ar: 'التجول في البيت أخف على الحاسوب: أثاث الغرف البعيدة ينتظر حتى تقترب.',
+    rw: "Gutembera mu nzu byoroheye mudasobwa: ibikoresho by'ibyumba bya kure bitegereza kugeza wegereye.",
+  }),
   // 2.13.35: ti, fa-AF and rw are UNCHECKED native copy.
   'news.fps': g('Teachers can see how fast 3D runs: hold the version chip for Teacher, then open 3D to see frames a second.', {
     es: 'Los maestros pueden ver qué tan rápido va el 3D: mantén pulsado el chip de versión para Maestro y abre 3D para ver los cuadros por segundo.',
