@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.26 — 2026-11-01 — Touch 3D
+- On phones, 3D shows the whole house, pinch zooms and spreading two fingers walks you in; the buttons take less room.
+- The walk button that leaves the walkthrough now says Step outside; touch screens get touch hints.
+
 ## 2.13.25 — 2026-11-01 — Polish
 - Cleaner screens: even color grids, 3D buttons that keep their words, and nothing hiding under the tool list.
 - Tapping a room's name picks the room; wall panels show each side first and fold the Dollhouse wallpaper away; the header keeps the version chip whole on mid-size laptops.

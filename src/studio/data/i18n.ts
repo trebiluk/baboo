@@ -1635,6 +1635,21 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.26: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.touch3d': g('On phones, 3D shows the whole house, pinch zooms and spreading two fingers walks you in; the buttons take less room.', {
+    es: 'En el teléfono, el 3D muestra toda la casa, pellizcar acerca y abrir dos dedos te hace caminar; los botones ocupan menos.',
+    cu: 'En el teléfono, el 3D muestra toda la casa, pellizcar acerca y abrir dos dedos te hace caminar; los botones ocupan menos.',
+    uk: 'На телефоні 3D показує весь будинок, зведення пальців наближає, а розведення двох пальців веде вперед; кнопки займають менше місця.',
+    ru: 'На телефоне 3D показывает весь дом, щипок приближает, а разведение двух пальцев ведёт вперёд; кнопки занимают меньше места.',
+    ti: 'ብተሌፎን 3D ምሉእ ገዛ የርኢ፣ ኣጻብዕ ምጽቃጥ የቕርብ፣ ክልተ ኣጻብዕ ምዝርጋሕ ድማ የኸይደካ፤ መጠወቕታት ውሑድ ቦታ ይሕዙ።',
+    fa: 'در گوشی، سه‌بعدی کل خانه را نشان می‌دهد، با دو انگشت بزرگ‌نمایی می‌شود و باز کردن دو انگشت تو را جلو می‌برد؛ دکمه‌ها جای کمتری می‌گیرند.',
+    'fa-AF': 'در موبایل، سه‌بعدی تمام خانه را نشان می‌دهد، با دو انگشت کلان‌نمایی می‌شود و باز کردن دو انگشت تو را پیش می‌برد؛ دکمه‌ها جای کمتر می‌گیرند.',
+    ar: 'على الهاتف يُظهر العرض الثلاثي البيت كله، والقرص يقرّب، وتباعد إصبعين يمشي بك؛ والأزرار تأخذ مساحة أقل.',
+    rw: "Kuri telefoni, 3D yerekana inzu yose, gufunga intoki byegereza, gutandukanya intoki ebyiri bikugendesha; utubuto dufata umwanya muto.",
+  }),
+  '3d.drag.touch': g('Drag to turn · pinch to zoom', { es: 'Arrastra para girar · pellizca para acercar', cu: 'Arrastra para girar · pellizca para acercar', uk: 'Тягни, щоб крутити · зведи пальці, щоб наблизити', ru: 'Тяни, чтобы вращать · сведи пальцы, чтобы приблизить', ti: 'ንምዝዋር ስሓብ · ንምቕራብ ኣጻብዕ ጸቕጥ', fa: 'بکش تا بچرخد · با دو انگشت بزرگ‌نمایی کن', 'fa-AF': 'بکش تا بچرخد · با دو انگشت کلان‌نمایی کن', ar: 'اسحب للتدوير · اقرص للتقريب', rw: 'Kurura uzunguruke · funga intoki wegereze' }),
+  '3d.drag.walk.touch': g('Drag to look · spread two fingers to walk', { es: 'Arrastra para mirar · abre dos dedos para caminar', cu: 'Arrastra para mirar · abre dos dedos para caminar', uk: 'Тягни, щоб дивитись · розведи два пальці, щоб іти', ru: 'Тяни, чтобы смотреть · разведи два пальца, чтобы идти', ti: 'ንምርኣይ ስሓብ · ንምኻድ ክልተ ኣጻብዕ ዘርግሕ', fa: 'بکش تا نگاه کنی · دو انگشت را باز کن تا راه بروی', 'fa-AF': 'بکش تا نگاه کنی · دو انگشت را باز کن تا راه بروی', ar: 'اسحب للنظر · باعد إصبعين للمشي', rw: 'Kurura urebe · tandukanya intoki ebyiri ugende' }),
+  '3d.walk.exit': g('Step outside', { es: 'Salir afuera', cu: 'Salir afuera', uk: 'Вийти надвір', ru: 'Выйти наружу', ti: 'ናብ ደገ ውጻእ', fa: 'برو بیرون', 'fa-AF': 'برو بیرون', ar: 'اخرج للخارج', rw: 'Sohoka hanze' }),
   '3d.preview': g('3D preview', {
     es: 'Vista 3D', cu: 'Vista 3D', uk: 'Перегляд 3D', ru: 'Просмотр 3D', ti: 'ቅድመ ትርኢት 3D', fa: 'پیش‌نمایش سه‌بعدی',
   }),

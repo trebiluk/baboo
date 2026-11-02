@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, useRef } from 'react';
+import { lazy, Suspense, useMemo, useRef, useState } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
 import { SITE_PALETTE, SKY_PALETTE, WALL_TINT, asShowFurniture3d, asSite, asSky, asTint } from '../data/scene3d';
 import { asWallHeightFt } from '../lib/wallDraft';
@@ -35,6 +35,8 @@ export function View3DStub() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
   const finePointer = typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+  // The hint line steps aside once you have dragged the view: the buttons are all a phone needs after that (2.13.26).
+  const [moved, setMoved] = useState(false);
 
   const skyId = asSky(settings.skyPreset);
   const siteId = asSite(settings.siteFinish);
@@ -66,16 +68,20 @@ export function View3DStub() {
       data-aw3d-walk={walk ? '1' : '0'}
       data-aw3d-engine="webgl"
     >
-      <div className="solid-preview" aria-label="Solid 3D preview with site and sky">
+      <div
+        className="solid-preview"
+        aria-label="Solid 3D preview with site and sky"
+        onPointerDown={(e) => { if ((e.target as HTMLElement).tagName === 'CANVAS') setMoved(true); }}
+      >
         <Suspense fallback={null}>
           <EngineView ref={engineRef} floor={floor} look={look} sky={sky.zenith} walk={walk} focus={focus} />
         </Suspense>
         {!floor.walls.length ? (
           <p className="view3d-empty">{t(loc, '3d.empty')}</p>
         ) : null}
-        <div className="view3d-hud">
+        <div className={`view3d-hud${moved ? ' has-moved' : ''}`}>
           <p className="view3d-hint">
-            {t(loc, walk ? '3d.drag.walk' : '3d.drag')}
+            {t(loc, finePointer ? (walk ? '3d.drag.walk' : '3d.drag') : (walk ? '3d.drag.walk.touch' : '3d.drag.touch'))}
             {finePointer ? <span className="view3d-keys"> · {t(loc, walk ? '3d.keys.walk' : '3d.keys.orbit')}</span> : null}
           </p>
           <div className="view3d-hud-btns">
@@ -98,7 +104,7 @@ export function View3DStub() {
               className="ghost-btn aw-pressable"
               onClick={() => setViewMode(walk ? 'solid3d' : 'walkthrough')}
             >
-              {t(loc, walk ? '3d.preview' : '3d.tier.walk')}
+              {t(loc, walk ? '3d.walk.exit' : '3d.tier.walk')}
             </button>
           </div>
         </div>

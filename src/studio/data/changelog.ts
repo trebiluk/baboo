@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.26',
+    date: '2026-11-01',
+    bullets: [
+      'On phones, 3D shows the whole house, pinch zooms and spreading two fingers walks you in; the buttons take less room.',
+    ],
+  },
+  {
     version: '2.13.25',
     date: '2026-11-01',
     bullets: [

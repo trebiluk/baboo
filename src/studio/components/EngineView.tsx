@@ -240,7 +240,7 @@ function pickTier(width: number): 'plain' | 'rich' {
   return 'rich';
 }
 
-function fitCam(root: THREE.Object3D): Cam {
+function fitCam(root: THREE.Object3D, aspect = 1.6): Cam {
   const box = new THREE.Box3();
   root.traverse((obj) => {
     const mesh = obj as THREE.Mesh;
@@ -252,7 +252,9 @@ function fitCam(root: THREE.Object3D): Cam {
   }
   const c = box.getCenter(new THREE.Vector3());
   const s = box.getSize(new THREE.Vector3());
-  const dist = Math.max(16, Math.max(s.x, s.z) * 0.98);
+  // A tall phone screen sees less side to side: step back so the whole house fits across (2.13.26).
+  const narrow = aspect < 1.2 ? Math.pow(1.2 / Math.max(0.35, aspect), 0.9) : 1;
+  const dist = Math.min(180, Math.max(16, Math.max(s.x, s.z) * 0.98 * narrow));
   return {
     yaw: 0.65,
     pitch: 0.48,
@@ -379,7 +381,7 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
       cam.updateProjectionMatrix();
     }
     for (const lid of ceilings) lid.visible = walkRef.current;
-    const fitted = fitCam(built.root);
+    const fitted = fitCam(built.root, (wrap.clientWidth || 800) / Math.max(1, wrap.clientHeight || 480));
     const home = { ...fitted };
     // Open where you left off, or aimed at what you picked in 2D; otherwise the whole house.
     const f = focusRef.current;
@@ -426,10 +428,24 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     };
 
     let drag: { x: number; y: number; yaw: number; pitch: number; pan: boolean; tx: number; tz: number } | null = null;
+    // Two fingers: pinch zooms the outside view, and in a walk, spreading your fingers walks forward (2.13.26).
+    const touches = new Map<number, { x: number; y: number }>();
+    let pinch: { d: number; dist: number; walked: number } | null = null;
+    const spread = () => {
+      const [a, b] = [...touches.values()];
+      return Math.max(1, Math.hypot(a.x - b.x, a.y - b.y));
+    };
     const down = (e: PointerEvent) => {
       const cam = camRef.current;
       if (!cam) return;
       renderer.domElement.setPointerCapture(e.pointerId);
+      touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (touches.size === 2) {
+        drag = null;
+        pinch = { d: spread(), dist: cam.dist, walked: 0 };
+        return;
+      }
+      if (touches.size > 2) return;
       drag = {
         x: e.clientX,
         y: e.clientY,
@@ -442,6 +458,23 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     };
     const move = (e: PointerEvent) => {
       const cam = camRef.current;
+      if (touches.has(e.pointerId)) touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pinch && cam && touches.size === 2) {
+        const ratio = spread() / pinch.d;
+        if (walkRef.current) {
+          // every 12% of spread is one step forward (pinching in walks back)
+          const want = Math.round(Math.log(ratio) / Math.log(1.12));
+          if (want !== pinch.walked) {
+            const next = stepWalk(floorRef.current, cam.eyeX, cam.eyeZ, cam.eyeYaw, (want - pinch.walked) * 1.4);
+            cam.eyeX = next.x;
+            cam.eyeZ = next.z;
+            pinch.walked = want;
+          }
+        } else {
+          cam.dist = Math.max(8, Math.min(180, pinch.dist / ratio));
+        }
+        return;
+      }
       if (!drag || !cam) return;
       const dx = e.clientX - drag.x;
       const dy = e.clientY - drag.y;
@@ -457,7 +490,11 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
         cam.pitch = Math.max(0.12, Math.min(1.15, drag.pitch + dy * 0.004));
       }
     };
-    const up = () => { drag = null; };
+    const up = (e: PointerEvent) => {
+      touches.delete(e.pointerId);
+      if (touches.size < 2) pinch = null;
+      drag = null;
+    };
     const wheel = (e: WheelEvent) => {
       e.preventDefault();
       const cam = camRef.current;

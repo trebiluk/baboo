@@ -5547,3 +5547,21 @@ html.kb-framed body.kb-on .app-shell.is-phone .chrome {
     max-width: 120px;
   }
 }
+/* 2.13.26 — after the first drag the hint line goes, so the 3D buttons take less of a phone screen. */
+.view3d-hud.has-moved .view3d-hint {
+  display: none !important;
+}
+@media (max-width: 560px) {
+  .view3d-hud {
+    padding: 6px !important;
+    gap: 4px !important;
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .view3d-hud-btns {
+    gap: 4px !important;
+  }
+  .view3d-hud-btns .ghost-btn {
+    padding: 4px 10px !important;
+    font-size: 13px !important;
+  }
+}
