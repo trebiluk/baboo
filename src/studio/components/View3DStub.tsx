@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
 import { SITE_PALETTE, SKY_PALETTE, WALL_TINT, asShowFurniture3d, asSite, asSky, asTint } from '../data/scene3d';
 import { asWallHeightFt } from '../lib/wallDraft';
@@ -8,6 +8,38 @@ import type { EngineHandle } from './EngineView';
 import type { HouseLook } from '../lib/engine3d';
 
 const EngineView = lazy(() => import('./EngineView').then((m) => ({ default: m.EngineView })));
+
+/**
+ * Teacher-only speed readout for 3D: frames a second and which look is on. Turn Teacher on by holding the version chip
+ * (or ?teacher=1), then open 3D on the school machine you want to test (2.13.35).
+ */
+function FpsBadge({ loc }: { loc: Parameters<typeof t>[0] }) {
+  const [teacher, setTeacher] = useState(() => {
+    try {
+      return new URLSearchParams(location.search).get('teacher') === '1' || localStorage.getItem('baboo-teacher') === '1';
+    } catch {
+      return false;
+    }
+  });
+  const [stat, setStat] = useState<{ fps: number; tier: string } | null>(null);
+  useEffect(() => {
+    const on = () => setTeacher(true);
+    const fps = (e: Event) => setStat((e as CustomEvent<{ fps: number; tier: string }>).detail);
+    window.addEventListener('baboo-teacher', on);
+    window.addEventListener('baboo-fps', fps);
+    return () => {
+      window.removeEventListener('baboo-teacher', on);
+      window.removeEventListener('baboo-fps', fps);
+    };
+  }, []);
+  if (!teacher || !stat) return null;
+  const slow = stat.fps < 20;
+  return (
+    <p className={`view3d-fps${slow ? ' is-slow' : ''}`} role="status">
+      {t(loc, '3d.fps', { n: String(stat.fps) })} · {t(loc, stat.tier === 'rich' ? '3d.look.rich' : '3d.look.plain')}
+    </p>
+  );
+}
 
 export function View3DStub() {
   const viewMode = useProjectStore((s) => s.viewMode);
@@ -79,6 +111,7 @@ export function View3DStub() {
         {!floor.walls.length ? (
           <p className="view3d-empty">{t(loc, '3d.empty')}</p>
         ) : null}
+        <FpsBadge loc={loc} />
         <div className={`view3d-hud${moved ? ' has-moved' : ''}`}>
           <p className="view3d-hint">
             {t(loc, finePointer ? (walk ? '3d.drag.walk' : '3d.drag') : (walk ? '3d.drag.walk.touch' : '3d.drag.touch'))}

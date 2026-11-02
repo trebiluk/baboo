@@ -640,9 +640,20 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     };
 
     let frame = 0;
+    // Once a second, tell the page how fast 3D is drawing (teachers can show it to test real school machines) (2.13.35).
+    let fpsFrames = 0;
+    let fpsStart = performance.now();
     const loop = () => {
       frame = requestAnimationFrame(loop);
       if (hidden) return;
+      fpsFrames += 1;
+      const nowMs = performance.now();
+      if (nowMs - fpsStart >= 1000) {
+        const fps = Math.round((fpsFrames * 1000) / (nowMs - fpsStart));
+        window.dispatchEvent(new CustomEvent('baboo-fps', { detail: { fps, tier, calls: renderer.info.render.calls } }));
+        fpsFrames = 0;
+        fpsStart = nowMs;
+      }
       for (const lid of ceilings) lid.visible = walkRef.current;
       // lamp lights only when you are inside walking; from outside the glowing shades are enough
       for (const l of lampLights) {

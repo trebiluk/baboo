@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.35',
+    date: '2026-11-02',
+    bullets: [
+      'Teachers can see how fast 3D runs: hold the version chip for Teacher, then open 3D to see frames a second.',
+    ],
+  },
+  {
     version: '2.13.34',
     date: '2026-11-02',
     bullets: [

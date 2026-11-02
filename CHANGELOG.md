@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.35 — 2026-11-02 — Speed readout
+- Teachers can see how fast 3D runs: hold the version chip for Teacher, then open 3D to see frames a second.
+
 ## 2.13.34 — 2026-11-02 — Furniture
 - Nicer 3D furniture (tufted sofa, real beds, a pedestal dining table), and the Mansion's chairs face the table.
 

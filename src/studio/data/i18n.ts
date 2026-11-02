@@ -1635,6 +1635,21 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.35: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.fps': g('Teachers can see how fast 3D runs: hold the version chip for Teacher, then open 3D to see frames a second.', {
+    es: 'Los maestros pueden ver qué tan rápido va el 3D: mantén pulsado el chip de versión para Maestro y abre 3D para ver los cuadros por segundo.',
+    cu: 'Los maestros pueden ver qué tan rápido va el 3D: mantén pulsado el chip de versión para Maestro y abre 3D para ver los cuadros por segundo.',
+    uk: 'Учителі можуть бачити, як швидко працює 3D: утримуйте значок версії для режиму вчителя, потім відкрийте 3D, щоб побачити кадри за секунду.',
+    ru: 'Учителя могут видеть, как быстро работает 3D: удерживайте значок версии для режима учителя, затем откройте 3D, чтобы увидеть кадры в секунду.',
+    ti: 'መምህራን 3D ክንደይ ቀልጢፉ ከም ዝሰርሕ ክርእዩ ይኽእሉ፦ ንመምህር ምልክት ስሪት ጠውቕ ሓዝ፣ ድሕሪኡ 3D ክፈት።',
+    fa: 'معلم‌ها می‌توانند سرعت سه‌بعدی را ببینند: نشان نسخه را برای حالت معلم نگه دارید، بعد سه‌بعدی را باز کنید تا فریم در ثانیه را ببینید.',
+    'fa-AF': 'معلمان می‌توانند سرعت سه‌بعدی را ببینند: نشان نسخه را برای حالت معلم نگه دارید، بعد سه‌بعدی را باز کنید.',
+    ar: 'يمكن للمعلمين رؤية سرعة العرض الثلاثي: اضغط مطولاً على شارة الإصدار لوضع المعلم، ثم افتح العرض الثلاثي لترى الإطارات في الثانية.',
+    rw: "Abarimu bashobora kureba umuvuduko wa 3D: kanda igihe kirekire ku kirango cy'inyandiko ubone uburyo bw'umwarimu, hanyuma ufungure 3D.",
+  }),
+  '3d.fps': g('{n} frames a second', { es: '{n} cuadros por segundo', cu: '{n} cuadros por segundo', uk: '{n} кадрів за секунду', ru: '{n} кадров в секунду', ti: '{n} ስእልታት ኣብ ካልኢት', fa: '{n} فریم در ثانیه', 'fa-AF': '{n} فریم در ثانیه', ar: '{n} إطار في الثانية', rw: 'Amashusho {n} ku isegonda' }),
+  '3d.look.rich': g('full look', { es: 'vista completa', cu: 'vista completa', uk: 'повний вигляд', ru: 'полный вид', ti: 'ምሉእ ትርኢት', fa: 'نمای کامل', 'fa-AF': 'نمای کامل', ar: 'المظهر الكامل', rw: 'isura yuzuye' }),
+  '3d.look.plain': g('light look', { es: 'vista ligera', cu: 'vista ligera', uk: 'легкий вигляд', ru: 'облегчённый вид', ti: 'ፎኲስ ትርኢት', fa: 'نمای سبک', 'fa-AF': 'نمای سبک', ar: 'المظهر الخفيف', rw: 'isura yoroheje' }),
   // 2.13.34: ti, fa-AF and rw are UNCHECKED native copy.
   'news.furniture3d': g("Nicer 3D furniture (tufted sofa, real beds, a pedestal dining table), and the Mansion's chairs face the table.", {
     es: 'Muebles 3D más bonitos (sofá capitoné, camas de verdad, una mesa de comedor con pie), y las sillas de la Mansión miran a la mesa.',
