@@ -767,13 +767,10 @@ export function PlanCanvas() {
               selected={selected?.kind === 'wall' && selected.id === w.id}
               accent={accent}
               zoom={zoom}
-              showDim={showDims}
-              units={units}
               textureId={textureId}
               texturePattern={texPattern}
               wallExt={planColors.wallExt}
               wallInt={planColors.wallInt}
-              dimFg={planColors.dimFg}
             />
           ))}
           {selectedGrips && (
@@ -826,6 +823,9 @@ export function PlanCanvas() {
             />
           ))}
 
+          {floor.layers.structure && showDims && floor.walls.map((w) => (
+            <WallSizeLabel key={`ws-${w.id}`} wall={w} nodes={floor.nodes} zoom={zoom} units={units} dimFg={planColors.dimFg} />
+          ))}
           {(floor.notes ?? []).map((n) => (
             <NoteMark
               key={n.id}
@@ -1922,23 +1922,19 @@ function brickTileCanvas(): HTMLCanvasElement | null {
 }
 
 function WallShape({
-  wall, walls, nodes, selected, accent, zoom, showDim, units, textureId, texturePattern,
-  wallExt, wallInt, dimFg,
+  wall, walls, nodes, selected, accent, zoom, textureId, texturePattern,
+  wallExt, wallInt,
 }: {
-  wall: Wall; walls: Wall[]; nodes: Node[]; selected: boolean; accent: string; zoom: number; showDim: boolean; units: 'ft' | 'm';
+  wall: Wall; walls: Wall[]; nodes: Node[]; selected: boolean; accent: string; zoom: number;
   textureId: string | null;
   texturePattern: HTMLImageElement | HTMLCanvasElement | null;
   wallExt: string;
   wallInt: string;
-  dimFg: string;
 }) {
   const e = wallEnds(wall, nodes);
   if (!e) return null;
   const thick = wall.thickness || 0.5;
-  const len = wallLength(wall, nodes);
   const ang = wallAngle(wall, nodes);
-  const mx = (e.a.x + e.b.x) / 2;
-  const my = (e.a.y + e.b.y) / 2;
   const paint = selected ? accent : wall.kind === 'exterior' ? wallExt : wallInt;
   const textured = Boolean(textureId && textureId !== 'pack:plain');
   const fallback = textureStrokeFallback(textureId);
@@ -1981,44 +1977,58 @@ function WallShape({
           listening={false}
         />
       )}
-      {showDim && len > 0.8 && (() => {
-        // Centered on the wall and pushed off it: outside walls put their size outside the house, so the porch and
-        // short walls stop stacking sizes on top of each other (2.13.27).
-        const text = formatLength(len, units);
-        const fs = 11 / zoom;
-        const tw = text.length * fs * 0.62;
-        if (tw + 6 / zoom > len) return null; // a size longer than its wall only adds clutter
-        const read = readableAngle((ang * 180) / Math.PI);
-        let nx = -(e.b.y - e.a.y) / len;
-        let ny = (e.b.x - e.a.x) / len;
-        let cx = 0;
-        let cy = 0;
-        for (const n of nodes) { cx += n.x; cy += n.y; }
-        cx /= Math.max(1, nodes.length);
-        cy /= Math.max(1, nodes.length);
-        const away = nx * (mx - cx) + ny * (my - cy) >= 0 ? 1 : -1;
-        nx *= away;
-        ny *= away;
-        const gap = Math.max(thick, 0.3) / 2 + 9 / zoom;
-        return (
-          <Text
-            x={mx + nx * gap}
-            y={my + ny * gap}
-            width={tw}
-            align="center"
-            text={text}
-            offsetX={tw / 2}
-            offsetY={fs / 2}
-            fontSize={fs}
-            fill={dimFg}
-            rotation={read.deg}
-            wrap="none"
-            listening={false}
-          />
-        );
-      })()}
     </Group>
   );
+}
+
+/** A wall's size, drawn after plants and beds so a flower bed never hides it (2.13.37). */
+function WallSizeLabel({ wall, nodes, zoom, units, dimFg }: { wall: Wall; nodes: Node[]; zoom: number; units: 'ft' | 'm'; dimFg: string }) {
+  const e = wallEnds(wall, nodes);
+  if (!e) return null;
+  const thick = wall.thickness || 0.5;
+  const len = wallLength(wall, nodes);
+  if (len <= 0.8) return null;
+  const ang = wallAngle(wall, nodes);
+  const mx = (e.a.x + e.b.x) / 2;
+  const my = (e.a.y + e.b.y) / 2;
+    // Centered on the wall and pushed off it: outside walls put their size outside the house, so the porch and
+    // short walls stop stacking sizes on top of each other (2.13.27).
+    const text = formatLength(len, units);
+    const fs = 11 / zoom;
+    const tw = text.length * fs * 0.62;
+    if (tw + 6 / zoom > len) return null; // a size longer than its wall only adds clutter
+    const read = readableAngle((ang * 180) / Math.PI);
+    let nx = -(e.b.y - e.a.y) / len;
+    let ny = (e.b.x - e.a.x) / len;
+    let cx = 0;
+    let cy = 0;
+    for (const n of nodes) { cx += n.x; cy += n.y; }
+    cx /= Math.max(1, nodes.length);
+    cy /= Math.max(1, nodes.length);
+    const away = nx * (mx - cx) + ny * (my - cy) >= 0 ? 1 : -1;
+    nx *= away;
+    ny *= away;
+    const gap = Math.max(thick, 0.3) / 2 + 9 / zoom;
+    return (
+      <Text
+        x={mx + nx * gap}
+        y={my + ny * gap}
+        width={tw}
+        align="center"
+        text={text}
+        offsetX={tw / 2}
+        offsetY={fs / 2}
+        fontSize={fs}
+        fill={dimFg}
+        // a soft halo in the paper color keeps the size readable over a flower bed or path
+        shadowColor={/^#?[0-7]/.test(dimFg.replace('#', '')) ? '#ffffff' : '#0b1020'}
+        shadowBlur={3}
+        shadowOpacity={1}
+        rotation={read.deg}
+        wrap="none"
+        listening={false}
+      />
+    );
 }
 
 function OpeningShape({

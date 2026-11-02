@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.37 — 2026-11-02 — Sizes on top
+- Wall sizes on the plan stay on top of flower beds and paths, with a soft halo so they are easy to read.
+
 ## 2.13.36 — 2026-11-02 — Lighter walk
 - Walking through the house is lighter work for the computer: faraway rooms’ furniture waits until you get close.
 - Walkthrough draws 43% fewer pieces in the Mansion (221 → 127).

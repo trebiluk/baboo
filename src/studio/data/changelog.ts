@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.37',
+    date: '2026-11-02',
+    bullets: [
+      'Wall sizes on the plan stay on top of flower beds and paths, with a soft halo so they are easy to read.',
+    ],
+  },
+  {
     version: '2.13.36',
     date: '2026-11-02',
     bullets: [

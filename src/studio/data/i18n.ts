@@ -1635,6 +1635,18 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.37: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.sizesOnTop': g('Wall sizes on the plan stay on top of flower beds and paths, with a soft halo so they are easy to read.', {
+    es: 'Las medidas de las paredes en el plano quedan encima de canteros y caminos, con un halo suave para leerlas fácil.',
+    cu: 'Las medidas de las paredes en el plano quedan encima de canteros y caminos, con un halo suave para leerlas fácil.',
+    uk: 'Розміри стін на плані лишаються поверх клумб і доріжок, з м’яким ореолом, щоб їх легко читати.',
+    ru: 'Размеры стен на плане остаются поверх клумб и дорожек, с мягким ореолом, чтобы их легко читать.',
+    ti: 'ዓቐን መናድቕ ኣብ ፕላን ኣብ ልዕሊ መትከሊ ዕምባባን መገድን ይተርፍ፣ ብቐሊሉ ንምንባብ ልሙጥ ብርሃን ኣለዎ።',
+    fa: 'اندازه دیوارها روی نقشه بالای باغچه‌ها و راه‌ها می‌ماند، با هاله‌ای نرم تا راحت خوانده شود.',
+    'fa-AF': 'اندازه دیوارها روی نقشه بالای باغچه‌ها و راه‌ها می‌ماند، با هاله نرم تا آسان خوانده شود.',
+    ar: 'مقاسات الجدران على المخطط تبقى فوق أحواض الزهور والممرات، مع هالة ناعمة لتسهل قراءتها.',
+    rw: "Ingano z'inkuta ku gishushanyo ziguma hejuru y'indabo n'inzira, zifite urumuri rworoheje kugira ngo zisomeke neza.",
+  }),
   // 2.13.36: ti, fa-AF and rw are UNCHECKED native copy.
   'news.walkFast': g('Walking through the house is lighter work for the computer: faraway rooms’ furniture waits until you get close.', {
     es: 'Recorrer la casa cuesta menos a la computadora: los muebles de los cuartos lejanos esperan hasta que te acercas.',
