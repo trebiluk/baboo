@@ -257,6 +257,33 @@ function glassMap(): THREE.CanvasTexture | null {
   });
 }
 
+/**
+ * Soft corner shade for phones and Chromebooks, which skip the costly ambient-occlusion pass: a dark-to-clear strip
+ * where the wall meets the floor and the ceiling, so rooms are not flat (2.13.33).
+ */
+function aoMat(bag: Bag, top: boolean): THREE.Material {
+  const key = top ? 'ao-top' : 'ao-bottom';
+  const hit = bag.shared.get(key);
+  if (hit) return hit;
+  const tex = paintTex(key, (ctx, s) => {
+    const g = ctx.createLinearGradient(0, 0, 0, s);
+    const dark = 'rgba(30,24,18,0.34)';
+    const mid = 'rgba(30,24,18,0.12)';
+    const clear = 'rgba(30,24,18,0)';
+    if (top) { g.addColorStop(0, dark); g.addColorStop(0.35, mid); g.addColorStop(1, clear); }
+    else { g.addColorStop(0, clear); g.addColorStop(0.65, mid); g.addColorStop(1, dark); }
+    ctx.clearRect(0, 0, s, s);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, s, s);
+  }, 64);
+  const m = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, fog: true });
+  m.polygonOffset = true;
+  m.polygonOffsetFactor = -2;
+  bag.shared.set(key, m);
+  bag.mats.push(m);
+  return m;
+}
+
 function grainMap(): THREE.CanvasTexture | null {
   return paintTex('grain', (ctx, s) => {
     ctx.fillStyle = '#ffffff';
@@ -653,6 +680,18 @@ function addWall(bag: Bag, floor: Floor, wall: Wall, look: HouseLook, nodes: Map
     const lip = addMesh(bag, new THREE.BoxGeometry(len, 0.08, 0.26), base, false, false);
     lip.position.set(a.x + ux * (len / 2) + (-uy) * (side * (thick / 2 + 0.13)), ceilY - 0.04, a.y + uy * (len / 2) + ux * (side * (thick / 2 + 0.13)));
     lip.rotation.y = ang;
+    if (!look.rich) {
+      const face = side * (thick / 2 + 0.03);
+      const strip = (r0: number, r1: number, y0: number, y1: number, top: boolean) => {
+        const m = addMesh(bag, new THREE.PlaneGeometry(r1 - r0, y1 - y0), aoMat(bag, top), false, false);
+        const along = (r0 + r1) / 2;
+        m.position.set(a.x + ux * along + (-uy) * face, (y0 + y1) / 2, a.y + uy * along + ux * face);
+        m.rotation.y = ang + (side < 0 ? Math.PI : 0);
+        m.renderOrder = 2;
+      };
+      for (const [r0, r1] of runs) strip(r0, r1, 0.45, 1.9, false); // not across doorways
+      strip(0, len, ceilY - 1.5, ceilY - 0.32, true);
+    }
   }
   if (wall.kind === 'exterior') {
     // Stone plinth at the base and a band between floors: the lines that make a facade look built (2.13.20).

@@ -1635,6 +1635,18 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.33: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.shade': g('On phones and Chromebooks, rooms get soft shade where walls meet the floor and ceiling, so they look deep, not flat.', {
+    es: 'En teléfonos y Chromebooks, los cuartos tienen una sombra suave donde las paredes tocan el piso y el techo, y se ven profundos, no planos.',
+    cu: 'En teléfonos y Chromebooks, los cuartos tienen una sombra suave donde las paredes tocan el piso y el techo, y se ven profundos, no planos.',
+    uk: 'На телефонах і Chromebook у кімнатах з’явилася м’яка тінь там, де стіни сходяться з підлогою та стелею, тож вони виглядають глибокими, а не пласкими.',
+    ru: 'На телефонах и Chromebook в комнатах появилась мягкая тень там, где стены сходятся с полом и потолком, и они выглядят глубокими, а не плоскими.',
+    ti: 'ኣብ ተሌፎናትን ክሮምቡክን፣ መናድቕ ምስ ወለልን ናሕስን ኣብ ዝራኸብሉ ልሙጥ ጽላል ስለ ዘሎ ክፍልታት ዓሚቝ ይመስሉ።',
+    fa: 'در گوشی‌ها و کروم‌بوک‌ها، اتاق‌ها جایی که دیوار به کف و سقف می‌رسد سایه نرم می‌گیرند و عمیق به نظر می‌رسند، نه صاف.',
+    'fa-AF': 'در موبایل‌ها و کروم‌بوک‌ها، اتاق‌ها جایی که دیوار به فرش و سقف می‌رسد سایه نرم می‌گیرند و عمیق معلوم می‌شوند، نه هموار.',
+    ar: 'على الهواتف وأجهزة Chromebook، تحصل الغرف على ظل ناعم حيث تلتقي الجدران بالأرض والسقف، فتبدو عميقة لا مسطحة.',
+    rw: "Kuri telefoni na Chromebook, ibyumba bibona igicucu cyoroheje aho inkuta zihurira n'hasi n'igisenge, bikagaragara bifite ubujyakuzimu.",
+  }),
   // 2.13.32: ti, fa-AF and rw are UNCHECKED native copy.
   'news.glass': g('Windows look like glass in 3D: a soft sky in the panes and light streaks, even up in the roof windows.', {
     es: 'Las ventanas parecen de vidrio en 3D: un cielo suave en los cristales y reflejos de luz, hasta en las ventanas del techo.',

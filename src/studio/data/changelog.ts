@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.33',
+    date: '2026-11-02',
+    bullets: [
+      'On phones and Chromebooks, rooms get soft shade where walls meet the floor and ceiling, so they look deep, not flat.',
+    ],
+  },
+  {
     version: '2.13.32',
     date: '2026-11-02',
     bullets: [

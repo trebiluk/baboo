@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.33 — 2026-11-02 — Soft shade
+- On phones and Chromebooks, rooms get soft shade where walls meet the floor and ceiling, so they look deep, not flat.
+
 ## 2.13.32 — 2026-11-02 — Glass
 - Windows look like glass in 3D: a soft sky in the panes and light streaks, even up in the roof windows.
 
