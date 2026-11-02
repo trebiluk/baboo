@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.29 — 2026-11-02 — Fixtures
+- Inside the 3D house: a real brass chandelier with shades, and panelled doors with knobs that open back out of the way.
+
 ## 2.13.28 — 2026-11-02 — Roof tag
 - The plan is less crowded: the roof is named on the plan card, not on top of the flower beds.
 

@@ -801,21 +801,35 @@ function placeOpening(
     glass.rotation.y = ang;
     return;
   }
-  const leafW = Math.max(0.6, (o.width || 3) * 0.46);
-  const leaf = addMesh(
-    bag,
-    new THREE.BoxGeometry(leafW, y1 - y0 - 0.08, 0.12),
-    mat(bag, '#6B5344', 0.62),
-    true,
-    false,
-  );
+  // A real door: full width, two raised panels on each face, a brass knob, opened back toward the wall
+  // so it does not stand in the middle of the doorway (2.13.29).
+  if (o.symbolKind === 'slidingDoor') {
+    const glass = addMesh(bag, new THREE.PlaneGeometry((cx - x0) * 2 * 0.96, y1 - y0 - 0.1), mat(bag, '#C5DFF0', 0.04, { opacity: 0.4, metal: 0.1, glass: true }), false);
+    glass.position.set(px, (y0 + y1) / 2, pz);
+    glass.rotation.y = ang;
+    return;
+  }
+  const leafW = Math.max(0.6, (cx - x0) * 2 * 0.97);
+  const leafH = y1 - y0 - 0.06;
   const swing = o.swing === 'right' ? -1 : 1;
-  const hingeX = a.x + ux * x0;
-  const hingeZ = a.y + uy * x0;
-  const nx = -uy * swing;
-  const nz = ux * swing;
-  leaf.position.set(hingeX + ux * leafW * 0.15 + nx * leafW * 0.42, (y0 + y1) / 2, hingeZ + uy * leafW * 0.15 + nz * leafW * 0.42);
-  leaf.rotation.y = ang + swing * 0.7;
+  const paint = mat(bag, '#F1ECE2', 0.55);
+  const panel = mat(bag, '#E8E1D4', 0.6);
+  const brass = mat(bag, '#C9A55A', 0.3, { metal: 0.75 });
+  const hinge = new THREE.Matrix4().compose(
+    new THREE.Vector3(a.x + ux * x0, y0, a.y + uy * x0),
+    new THREE.Quaternion().setFromEuler(new THREE.Euler(0, ang + swing * 1.45, 0)),
+    new THREE.Vector3(1, 1, 1),
+  );
+  const at = (x: number, y: number, z: number) => hinge.clone().multiply(M4(x, y, z));
+  const pieces: { geo: THREE.BufferGeometry; m: THREE.Material; at: THREE.Matrix4 }[] = [];
+  pieces.push({ geo: new THREE.BoxGeometry(leafW, leafH, 0.13), m: paint, at: at(leafW / 2, leafH / 2 + 0.03, 0) });
+  for (const face of [-1, 1]) {
+    for (const [py, ph] of [[leafH * 0.7, leafH * 0.38], [leafH * 0.25, leafH * 0.3]] as const) {
+      pieces.push({ geo: new THREE.BoxGeometry(leafW * 0.72, ph, 0.03), m: panel, at: at(leafW / 2, py, face * 0.075) });
+    }
+    pieces.push({ geo: new THREE.SphereGeometry(0.075, 10, 8), m: brass, at: at(leafW - 0.28, leafH * 0.48, face * 0.12) });
+  }
+  bake(bag, bag.root, pieces, true);
 }
 
 function addRoof(bag: Bag, roof: RoofGeometry, rich = false) {
@@ -1029,6 +1043,64 @@ function addChimneys(bag: Bag, floor: Floor, roof: RoofGeometry, rich: boolean) 
   }
 }
 
+/** Bake many small pieces into one mesh per material, so detail does not cost draw calls (2.13.29). */
+function bake(bag: Bag, target: THREE.Object3D, pieces: { geo: THREE.BufferGeometry; m: THREE.Material; at: THREE.Matrix4 }[], cast = false) {
+  const byMat = new Map<THREE.Material, THREE.BufferGeometry[]>();
+  for (const p of pieces) {
+    const g = p.geo.index ? p.geo.toNonIndexed() : p.geo;
+    g.applyMatrix4(p.at);
+    for (const name of Object.keys(g.attributes)) if (!['position', 'normal', 'uv'].includes(name)) g.deleteAttribute(name);
+    const list = byMat.get(p.m) ?? [];
+    list.push(g);
+    byMat.set(p.m, list);
+  }
+  for (const [m, geos] of byMat) {
+    const merged = mergeGeometries(geos, false);
+    if (!merged) continue;
+    bag.geos.push(merged);
+    const mesh = new THREE.Mesh(merged, m);
+    mesh.castShadow = cast;
+    if (target === bag.root) mesh.userData.batch = true; // joins the house batches by material
+    target.add(mesh);
+  }
+}
+
+const M4 = (x: number, y: number, z: number, rx = 0, ry = 0, rz = 0) =>
+  new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromEuler(new THREE.Euler(rx, ry, rz)), new THREE.Vector3(1, 1, 1));
+
+/** A real chandelier: brass stem and bowl, curved arms, candle cups, glowing bulbs under cream shades (2.13.29). */
+function addChandelier(bag: Bag, g: THREE.Group, item: FurnitureItem) {
+  const brass = mat(bag, '#C9A55A', 0.32, { metal: 0.75 });
+  const candle = mat(bag, '#F6EFE2', 0.6);
+  const bulb = mat(bag, '#FFF4D6', 0.4, { emissive: '#FFD58A', glow: 2.4 });
+  const shade = mat(bag, '#F3E6CC', 0.7, { emissive: '#FFCF8A', glow: 0.9, side2: true });
+  const crystal = mat(bag, '#EAF2F8', 0.06, { opacity: 0.7, glass: true });
+  const r = Math.max(0.9, Math.min(item.w, item.h) * 0.42);
+  const top = 8.8;
+  const ring = top - 1.55;
+  const pieces: { geo: THREE.BufferGeometry; m: THREE.Material; at: THREE.Matrix4 }[] = [];
+  pieces.push({ geo: new THREE.CylinderGeometry(0.035, 0.035, 1.1, 6), m: brass, at: M4(0, top - 0.55, 0) });
+  pieces.push({ geo: new THREE.CylinderGeometry(0.22, 0.05, 0.12, 10), m: brass, at: M4(0, top - 0.06, 0) });
+  pieces.push({ geo: new THREE.SphereGeometry(0.2, 12, 8), m: brass, at: M4(0, ring + 0.15, 0) });
+  pieces.push({ geo: new THREE.CylinderGeometry(0.06, 0.16, 0.35, 10), m: brass, at: M4(0, ring - 0.12, 0) });
+  pieces.push({ geo: new THREE.TorusGeometry(r, 0.03, 6, 28), m: brass, at: M4(0, ring, 0, Math.PI / 2) });
+  const arms = 6;
+  for (let i = 0; i < arms; i++) {
+    const a = (i / arms) * Math.PI * 2;
+    const x = Math.cos(a) * r;
+    const z = Math.sin(a) * r;
+    // arm from the bowl out to the ring, rising a little
+    const len = r;
+    pieces.push({ geo: new THREE.CylinderGeometry(0.025, 0.025, len, 5), m: brass, at: M4(x / 2, ring + 0.05, z / 2, 0, -a, Math.PI / 2 - 0.12) });
+    pieces.push({ geo: new THREE.CylinderGeometry(0.09, 0.05, 0.08, 8), m: brass, at: M4(x, ring + 0.06, z) });
+    pieces.push({ geo: new THREE.CylinderGeometry(0.045, 0.045, 0.32, 8), m: candle, at: M4(x, ring + 0.26, z) });
+    pieces.push({ geo: new THREE.SphereGeometry(0.06, 8, 6), m: bulb, at: M4(x, ring + 0.47, z) });
+    pieces.push({ geo: new THREE.CylinderGeometry(0.1, 0.2, 0.28, 12, 1, true), m: shade, at: M4(x, ring + 0.5, z) });
+    pieces.push({ geo: new THREE.OctahedronGeometry(0.05), m: crystal, at: M4(Math.cos(a + 0.52) * r * 0.9, ring - 0.18, Math.sin(a + 0.52) * r * 0.9) });
+  }
+  bake(bag, g, pieces);
+}
+
 function addFurniture(bag: Bag, item: FurnitureItem, storyH = 0) {
   if (item.catalogId === 'banister' && storyH > 7) return;
   if (item.catalogId === 'stairs' && storyH > 7) {
@@ -1044,6 +1116,11 @@ function addFurniture(bag: Bag, item: FurnitureItem, storyH = 0) {
   if (lamp) {
     const top = Math.max(...parts.map((p) => p.z1), 2);
     bag.lights.push(new THREE.Vector3(item.x, Math.min(top, 8) - 0.3, item.y));
+  }
+  if (item.catalogId === 'chandelier') {
+    addChandelier(bag, g, item);
+    bag.root.add(g);
+    return;
   }
   for (const p of parts) {
     const tall = Math.max(0.04, p.z1 - p.z0);

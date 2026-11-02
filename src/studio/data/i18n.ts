@@ -1635,6 +1635,18 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.29: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.fixtures': g('Inside the 3D house: a real brass chandelier with shades, and panelled doors with knobs that open back out of the way.', {
+    es: 'Dentro de la casa 3D: una lámpara de araña de latón con pantallas, y puertas con paneles y pomos que se abren sin estorbar.',
+    cu: 'Dentro de la casa 3D: una lámpara de araña de latón con pantallas, y puertas con paneles y pomos que se abren sin estorbar.',
+    uk: 'У 3D-будинку: справжня латунна люстра з абажурами та філенчасті двері з ручками, що відчиняються й не заважають.',
+    ru: 'В 3D-доме: настоящая латунная люстра с абажурами и филёнчатые двери с ручками, которые открываются и не мешают.',
+    ti: 'ኣብ ውሽጢ 3D ገዛ፦ ሓቀኛ ናይ ነሓስ ቻንደልየር ምስ መሸፈኒ፣ ከምኡ’ውን ብፓነል ዝተሰርሑ ማዕጾታት ምስ መትሓዚ፣ ዘይዕንቅፉ ዝኽፈቱ።',
+    fa: 'درون خانه سه‌بعدی: یک لوستر برنجی واقعی با آباژور، و درهای قاب‌دار با دستگیره که کنار باز می‌شوند.',
+    'fa-AF': 'درون خانه سه‌بعدی: یک چراغ‌دان برنجی واقعی با سرپوش، و دروازه‌های قاب‌دار با دستگیره که کنار باز می‌شوند.',
+    ar: 'داخل البيت الثلاثي: ثريا نحاسية حقيقية بأغطية، وأبواب بألواح ومقابض تنفتح بعيداً عن الطريق.',
+    rw: "Imbere mu nzu ya 3D: itara rinini ry'umuringa rifite ibipfukisho, n'inzugi zifite imbaho n'imikoresho yo kuzifungura zifunguka zitabangamira.",
+  }),
   // 2.13.28: ti, fa-AF and rw are UNCHECKED native copy.
   'news.roofTag': g('The plan is less crowded: the roof is named on the plan card, not on top of the flower beds.', {
     es: 'El plano está menos lleno: el techo se nombra en la tarjeta del plano, no encima de los canteros.',
