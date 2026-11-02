@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.38 — 2026-11-02 — Clear sizes
+- Wall sizes slide along the wall to a clear spot, so they never sit on a door or a room name.
+
 ## 2.13.37 — 2026-11-02 — Sizes on top
 - Wall sizes on the plan stay on top of flower beds and paths, with a soft halo so they are easy to read.
 

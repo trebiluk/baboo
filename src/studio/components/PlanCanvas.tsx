@@ -824,7 +824,7 @@ export function PlanCanvas() {
           ))}
 
           {floor.layers.structure && showDims && floor.walls.map((w) => (
-            <WallSizeLabel key={`ws-${w.id}`} wall={w} nodes={floor.nodes} zoom={zoom} units={units} dimFg={planColors.dimFg} />
+            <WallSizeLabel key={`ws-${w.id}`} wall={w} nodes={floor.nodes} openings={floor.layers.openings ? floor.openings : []} zoom={zoom} units={units} dimFg={planColors.dimFg} />
           ))}
           {(floor.notes ?? []).map((n) => (
             <NoteMark
@@ -1982,7 +1982,7 @@ function WallShape({
 }
 
 /** A wall's size, drawn after plants and beds so a flower bed never hides it (2.13.37). */
-function WallSizeLabel({ wall, nodes, zoom, units, dimFg }: { wall: Wall; nodes: Node[]; zoom: number; units: 'ft' | 'm'; dimFg: string }) {
+function WallSizeLabel({ wall, nodes, openings, zoom, units, dimFg }: { wall: Wall; nodes: Node[]; openings: Opening[]; zoom: number; units: 'ft' | 'm'; dimFg: string }) {
   const e = wallEnds(wall, nodes);
   if (!e) return null;
   const thick = wall.thickness || 0.5;
@@ -2006,13 +2006,39 @@ function WallSizeLabel({ wall, nodes, zoom, units, dimFg }: { wall: Wall; nodes:
     cx /= Math.max(1, nodes.length);
     cy /= Math.max(1, nodes.length);
     const away = nx * (mx - cx) + ny * (my - cy) >= 0 ? 1 : -1;
+    // Slide the size along the wall into the longest stretch with no door or window (a door's swing reaches
+    // its width), and off any room name tag, so sizes never sit on doors or names (2.13.38).
+    const ux = (e.b.x - e.a.x) / len;
+    const uy = (e.b.y - e.a.y) / len;
+    const blocked = openings.filter((o) => o.wallId === wall.id).map((o) => {
+      const c = (o.t ?? 0.5) * len;
+      const half = (o.width || 3) / 2 + (o.type === 'door' ? 0.4 : 0.15);
+      return [c - half, c + half] as const;
+    }).sort((p, q) => p[0] - q[0]);
+    const gaps: [number, number][] = [];
+    let from = 0;
+    for (const [b0, b1] of blocked) { if (b0 > from) gaps.push([from, b0]); from = Math.max(from, b1); }
+    if (len > from) gaps.push([from, len]);
+    gaps.sort((p, q) => (q[1] - q[0]) - (p[1] - p[0]));
     nx *= away;
     ny *= away;
     const gap = Math.max(thick, 0.3) / 2 + 9 / zoom;
+    let at: number | null = null;
+    for (const [g0, g1] of gaps) {
+      if (g1 - g0 < tw + 4 / zoom) continue;
+      const along = (g0 + g1) / 2;
+      const px = e.a.x + ux * along + nx * gap;
+      const py = e.a.y + uy * along + ny * gap;
+      const onTag = [...roomTagRects.values()].some((r) => px > r.x0 - tw / 2 && px < r.x1 + tw / 2 && py > r.y0 - fs && py < r.y1 + fs);
+      if (!onTag) { at = along; break; }
+    }
+    if (at == null) return null;
+    const lx = e.a.x + ux * at;
+    const ly = e.a.y + uy * at;
     return (
       <Text
-        x={mx + nx * gap}
-        y={my + ny * gap}
+        x={lx + nx * gap}
+        y={ly + ny * gap}
         width={tw}
         align="center"
         text={text}

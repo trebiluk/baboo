@@ -1635,6 +1635,18 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.38: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.sizesClear': g('Wall sizes slide along the wall to a clear spot, so they never sit on a door or a room name.', {
+    es: 'Las medidas de las paredes se deslizan a un lugar libre, así nunca quedan sobre una puerta o el nombre de un cuarto.',
+    cu: 'Las medidas de las paredes se deslizan a un lugar libre, así nunca quedan sobre una puerta o el nombre de un cuarto.',
+    uk: 'Розміри стін зсуваються вздовж стіни на вільне місце, тож ніколи не стоять на дверях чи назві кімнати.',
+    ru: 'Размеры стен сдвигаются вдоль стены на свободное место и никогда не стоят на двери или названии комнаты.',
+    ti: 'ዓቐን መናድቕ ናብ ጽሩይ ቦታ ይሕንበብ፣ ስለዚ ኣብ ልዕሊ ማዕጾ ወይ ስም ክፍሊ ኣይቕመጥን።',
+    fa: 'اندازه دیوارها در طول دیوار به جای خالی می‌لغزد، تا هرگز روی در یا نام اتاق نیفتد.',
+    'fa-AF': 'اندازه دیوارها در طول دیوار به جای خالی می‌لغزد، تا هرگز روی دروازه یا نام اتاق نیفتد.',
+    ar: 'تنزلق مقاسات الجدران على طول الجدار إلى مكان خالٍ، فلا تقع أبداً على باب أو اسم غرفة.',
+    rw: "Ingano z'inkuta zinyerera ku rukuta zijya ahantu hatarimo ikintu, ntizijya ku rugi cyangwa ku izina ry'icyumba.",
+  }),
   // 2.13.37: ti, fa-AF and rw are UNCHECKED native copy.
   'news.sizesOnTop': g('Wall sizes on the plan stay on top of flower beds and paths, with a soft halo so they are easy to read.', {
     es: 'Las medidas de las paredes en el plano quedan encima de canteros y caminos, con un halo suave para leerlas fácil.',
