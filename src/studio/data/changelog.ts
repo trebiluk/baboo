@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.47',
+    date: '2026-11-03',
+    bullets: [
+      'Settings is fully in your language: layers, roof, wallpaper, the look themes, and the corner-clip and wallpaper messages.',
+    ],
+  },
+  {
     version: '2.13.46',
     date: '2026-11-03',
     bullets: [

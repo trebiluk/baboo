@@ -619,11 +619,11 @@ export const useProjectStore = create<Store>((set, get) => ({
     try {
       await putTextureBlob(ref, result.blob);
     } catch {
-      get().showToast('Could not save image locally — try again.');
+      get().showToast(t(tip(get), 'toast.wallpaperFail'));
       return;
     }
     get().setTexture('import:local', result.label, ref);
-    get().showToast(`Wallpaper: ${result.label} (${result.width}×${result.height})`);
+    get().showToast(t(tip(get), 'toast.wallpaper', { name: result.label }));
   },
   setTypologyShell: (shell) => {
     const doc = get().doc;
@@ -1176,7 +1176,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     const size = Math.max(1, get().doc.settings.gridSize || 1) * 2;
     const cut = chamferCorner(floor.nodes, floor.walls, floor.openings, node.id, size);
     if (!cut) {
-      get().showToast('That corner is too tight to clip', 2800);
+      get().showToast(t(tip(get), 'toast.clipTight'), 2800);
       return;
     }
     get().pushHistory();
@@ -1188,7 +1188,7 @@ export const useProjectStore = create<Store>((set, get) => ({
       )),
     });
     get().markDirty();
-    get().showToast('Corner clipped — rooms follow the slant', 2400);
+    get().showToast(t(tip(get), 'toast.clipped'), 2400);
   },
   cancelWallDraft: () => set({ wallDraft: null, dimDraft: null }),
 

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
 import { ROOF_STYLE_OPTIONS, roofStyleName } from '../lib/roof';
-import { TEXTURE_PACKS, textureName } from '../data/textures';
+import { TEXTURE_PACKS } from '../data/textures';
 import { FLOOR_FINISHES, asFloorFinish, asFloorGrain } from '../data/flooring';
 import type { GuiThemeId, Locale, RoofStyleId, SiteFinish, SkyPreset, TypologyShell, WallTintId } from '../types';
 import { DEFAULT_SKILL_LEVEL, skillRank } from '../data/skill';
@@ -93,11 +93,11 @@ export function CustomizePanel() {
                   type="button"
                   className={`look-chip aw-pressable${on ? ' active' : ''}`}
                   aria-pressed={on}
-                  title={opt.blurb}
+                  title={t(tipLoc(settings), `theme.${opt.id}`)}
                   onClick={() => setSettings({ guiTheme: opt.id as GuiThemeId })}
                 >
                   <strong>{opt.name}</strong>
-                  <span>{opt.blurb}</span>
+                  <span>{t(tipLoc(settings), `theme.${opt.id}`)}</span>
                 </button>
               );
             })}
@@ -145,8 +145,8 @@ export function CustomizePanel() {
             value={settings.units}
             onChange={(e) => setSettings({ units: e.target.value as 'ft' | 'm' })}
           >
-            <option value="ft">Feet</option>
-            <option value="m">Meters</option>
+            <option value="ft">{t(tipLoc(settings), 'set2.feet')}</option>
+            <option value="m">{t(tipLoc(settings), 'set2.meters')}</option>
           </select>
         </label>
         <label className="field">
@@ -233,33 +233,26 @@ export function CustomizePanel() {
         <SkillPicker value={skillLevel} onChange={setSkillLevel} legend={t(settings.locale, 'skill.legend')} />
 
         {skillRank(skillLevel) >= 3 && (
-          <section className="skill-layers" aria-label="Plan layers">
-            <h3>Layers</h3>
-            <p className="muted">Hide plan overlays while you draft.</p>
+          <section className="skill-layers" aria-label={t(tipLoc(settings), 'set2.layers')}>
+            <h3>{t(tipLoc(settings), 'set2.layers')}</h3>
+            <p className="muted">{t(tipLoc(settings), 'set2.layersLead')}</p>
             {([
-              ['structure', 'Walls'],
-              ['openings', 'Doors & windows'],
-              ['furniture', 'Furniture'],
-              ['rooms', 'Room names'],
-              ['dims', 'Size labels'],
-              ['landscape', 'Plants'],
-              ['sketch', 'Sketches'],
-              ['roof', 'Roof lines'],
-            ] as const).map(([key, label]) => (
+              'structure', 'openings', 'furniture', 'rooms', 'dims', 'landscape', 'sketch', 'roof',
+            ] as const).map((key) => (
               <label key={key} className="field check">
                 <input
                   type="checkbox"
                   checked={floor.layers[key] !== false}
                   onChange={(e) => setFloorLayer(key, e.target.checked)}
                 />
-                <span>{label}</span>
+                <span>{t(tipLoc(settings), `set2.layer.${key}`)}</span>
               </label>
             ))}
           </section>
         )}
 
         <label className="field">
-          <span>Roof style (learn the names)</span>
+          <span>{t(tipLoc(settings), 'set2.roofStyle')}</span>
           <select
             value={settings.roofStyleId ?? ''}
             onChange={(e) => {
@@ -267,7 +260,7 @@ export function CustomizePanel() {
               setRoofStyle(v === '' ? null : (v as RoofStyleId));
             }}
           >
-            <option value="">None (no auto roof)</option>
+            <option value="">{t(tipLoc(settings), 'set2.roofNone')}</option>
             {ROOF_STYLE_OPTIONS.map((o) => (
               <option key={o.id} value={o.id}>{o.name}</option>
             ))}
@@ -279,10 +272,10 @@ export function CustomizePanel() {
             checked={settings.showRoof !== false}
             onChange={(e) => setSettings({ showRoof: e.target.checked })}
           />
-          <span>Show roof overlay on plan</span>
+          <span>{t(tipLoc(settings), 'set2.roofShow')}</span>
         </label>
         <label className="field">
-          <span>Roof name (student)</span>
+          <span>{t(tipLoc(settings), 'set2.roofName')}</span>
           <input
             type="text"
             value={settings.roofLabel ?? ''}
@@ -292,27 +285,25 @@ export function CustomizePanel() {
           />
         </label>
         <p className="muted">
-          Current roof:{' '}
-          <strong>{settings.roofLabel?.trim() || roofStyleName(settings.roofStyleId)}</strong>.
-          Changing the style regenerates dashed plan lines + 3D massing from exterior walls.
-          Blank starts with no roof until you pick one. Hobbit defaults to <strong>grass/sod</strong>;
-          Yurt to <strong>conical</strong>.
+          {t(tipLoc(settings), 'chip.roof')}:{' '}
+          <strong>{settings.roofLabel?.trim() || (settings.roofStyleId ? roofStyleName(settings.roofStyleId) : t(tipLoc(settings), 'chip.roofNone'))}</strong>.{' '}
+          {t(tipLoc(settings), 'set2.roofNote')}
         </p>
 
         {isTinyHome ? (
           <section className="aw-typology" aria-labelledby="typology-title">
-            <h3 id="typology-title">Tiny Home · shell &amp; inventory</h3>
+            <h3 id="typology-title">{t(tipLoc(settings), 'set2.tinyTitle')}</h3>
             <p className="muted">
-              Tiny home type is always on (trailer or shipping container). Contest is separate.
+              {t(tipLoc(settings), 'set2.tinyLead')}
             </p>
-            <div className="aw-shell-toggle" role="group" aria-label="Tiny Home shell">
+            <div className="aw-shell-toggle" role="group" aria-label={t(tipLoc(settings), 'set2.tinyTitle')}>
               <button
                 type="button"
                 className={`aw-shell-chip aw-pressable${shell === 'trailer' ? ' active' : ''}`}
                 aria-pressed={shell === 'trailer'}
                 onClick={() => setTypologyShell('trailer')}
               >
-                Trailer
+                {t(tipLoc(settings), 'set2.trailer')}
               </button>
               <button
                 type="button"
@@ -320,7 +311,7 @@ export function CustomizePanel() {
                 aria-pressed={shell === 'shipping-container'}
                 onClick={() => setTypologyShell('shipping-container')}
               >
-                Container
+                {t(tipLoc(settings), 'set2.container')}
               </button>
             </div>
             <ul className="aw-inventory-list">
@@ -340,9 +331,9 @@ export function CustomizePanel() {
                       <span>
                         {item.label}
                         {item.required ? (
-                          <em className="aw-inv-req">{missing ? ' required · missing' : ' required'}</em>
+                          <em className="aw-inv-req">{missing ? ` ${t(tipLoc(settings), 'set2.required')} · ${t(tipLoc(settings), 'set2.missing')}` : ` ${t(tipLoc(settings), 'set2.required')}`}</em>
                         ) : (
-                          <em className="aw-inv-opt"> optional</em>
+                          <em className="aw-inv-opt"> {t(tipLoc(settings), 'set2.optional')}</em>
                         )}
                       </span>
                     </label>
@@ -355,12 +346,11 @@ export function CustomizePanel() {
 
         {/* Materials / silly textures — StyleBot UI; Debugzy applies */}
         <section className="aw-materials" aria-labelledby="materials-title">
-          <h3 id="materials-title">Materials · wallpaper</h3>
+          <h3 id="materials-title">{t(tipLoc(settings), 'set2.materials')}</h3>
           <p className="muted">
-            Silly packs + import for plan walls (tile hatch). School-appropriate images only.
-            Imports stay local (≤512px) — not saved inside the JSON file.
+            {t(tipLoc(settings), 'set2.materialsLead')}
           </p>
-          <div className="aw-tex-grid" role="listbox" aria-label="Texture packs">
+          <div className="aw-tex-grid" role="listbox" aria-label={t(tipLoc(settings), 'set2.materials')}>
             {TEXTURE_PACKS.map((pack) => {
               const selected = activeTex === pack.id || (pack.id === 'pack:plain' && !activeTex);
               return (
@@ -381,7 +371,7 @@ export function CustomizePanel() {
                     style={{ background: pack.previewCss }}
                     aria-hidden="true"
                   />
-                  <span className="aw-tex-chip__label">{pack.name}</span>
+                  <span className="aw-tex-chip__label">{t(tipLoc(settings), `tex.${pack.id.replace(':', '.')}`)}</span>
                 </button>
               );
             })}
@@ -392,7 +382,7 @@ export function CustomizePanel() {
               type="file"
               accept="image/*"
               className="aw-tex-file"
-              aria-label="Import wallpaper image"
+              aria-label={t(tipLoc(settings), 'set2.importImage')}
               onChange={(e) => onImport(e.target.files?.[0])}
             />
             <button
@@ -401,24 +391,24 @@ export function CustomizePanel() {
               onClick={() => fileRef.current?.click()}
               disabled={importBusy}
             >
-              {importBusy ? 'Importing…' : 'Import image…'}
+              {importBusy ? t(tipLoc(settings), 'set2.importing') : t(tipLoc(settings), 'set2.importImage')}
             </button>
             <button
               type="button"
               className="ghost-btn secondary-btn aw-pressable aw-tex-clear"
               onClick={() => clearTexture()}
               disabled={!activeTex}
-              title="One-tap revert to plain paint"
+              title={t(tipLoc(settings), 'set2.clearTexTip')}
             >
-              Clear texture
+              {t(tipLoc(settings), 'set2.clearTex')}
             </button>
           </div>
           <p className="muted">
-            Current:{' '}
+            {t(tipLoc(settings), 'set2.current', { name: '' })}
             <strong>
               {activeTex
-                ? (settings.textureLabel?.trim() || textureName(activeTex))
-                : 'Plain paint'}
+                ? (settings.textureLabel?.trim() || t(tipLoc(settings), `tex.${activeTex.replace(':', '.')}`))
+                : t(tipLoc(settings), 'tex.pack.plain')}
             </strong>
             {activeTex === 'import:local'
               ? (settings.imageBlobRef
@@ -488,7 +478,7 @@ export function CustomizePanel() {
         </section>
 
         <label className="field">
-          <span>Accent color</span>
+          <span>{t(tipLoc(settings), 'set2.accent')}</span>
           <input
             type="color"
             value={settings.accent}
@@ -569,7 +559,7 @@ export function CustomizePanel() {
           </label>
         </section>
 
-        <p className="muted">Few settings on purpose. Grid stays visible; snap is easy to toggle.</p>
+        <p className="muted">{t(tipLoc(settings), 'set2.footer')}</p>
       </aside>
     </>
   );
