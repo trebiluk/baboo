@@ -18,7 +18,7 @@ import {
 } from '../lib/geometry';
 import { chamferCorner, nearestChamferable } from '../lib/chamfer';
 import { boxCorners } from '../lib/boxWalls';
-import { findEnclosedFace, formatArea, hitRoom, polygonArea, listInteriorFaces, roomBundle } from '../lib/rooms';
+import { findEnclosedFace, formatArea, hitRoom, pointInPoly, polygonArea, listInteriorFaces, roomBundle } from '../lib/rooms';
 import { DEFAULT_ROOM_KIND, roomType } from '../data/rooms';
 import { defaultFloorForKind } from '../data/flooring';
 import {
@@ -1492,15 +1492,25 @@ export const useProjectStore = create<Store>((set, get) => ({
     const poly = findEnclosedFace(floor.nodes, floor.walls, pt);
     if (!poly) {
       get().showToast(
-        'Click inside a closed room. Walls have to meet first.',
+        t(tip(get), 'toast.roomOutside'),
         toastMs(get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL, 3600),
       );
       return;
     }
-    const already = (floor.rooms ?? []).find((r) => dist({ x: r.x, y: r.y }, pt) < 1.2);
+    const area = formatArea(polygonArea(poly), s.units);
+    const kindName = t(tip(get), `room.kind.${kind}`);
+    // One room per space: clicking anywhere inside a named room changes its type instead of stacking a
+    // second name tag on top (2.13.46).
+    const already = (floor.rooms ?? []).find((r) => pointInPoly({ x: r.x, y: r.y }, poly));
     if (already) {
+      if (already.kind === kind) {
+        set({ selected: { kind: 'room', id: already.id } });
+        get().showToast(t(tip(get), 'toast.roomSame', { room: kindName }), 2800);
+        return;
+      }
+      get().patchRoom(already.id, { kind });
       set({ selected: { kind: 'room', id: already.id } });
-      get().showToast('That room is already named — click Select to rename', 2800);
+      get().showToast(t(tip(get), 'toast.roomNamed', { room: kindName, area }), 2400, 'ok');
       return;
     }
     get().pushHistory();
@@ -1512,13 +1522,12 @@ export const useProjectStore = create<Store>((set, get) => ({
       y: pt.y,
       floorFinishId: defaultFloorForKind(kind),
     };
-    const area = formatArea(polygonArea(poly), s.units);
     set({
       doc: withFloor(doc, (f) => ({ ...f, rooms: [...(f.rooms ?? []), item] })),
       selected: { kind: 'room', id: item.id },
     });
     get().markDirty(pt);
-    get().showToast(`${cat.name} named · ${area}`, 2400, 'ok');
+    get().showToast(t(tip(get), 'toast.roomNamed', { room: kindName, area }), 2400, 'ok');
   },
 
   renameRoom: (id, name) => {

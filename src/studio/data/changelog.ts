@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.46',
+    date: '2026-11-03',
+    bullets: [
+      'One name per room: using the Room tool inside a named room changes its type, and tool tips are in your language.',
+    ],
+  },
+  {
     version: '2.13.45',
     date: '2026-11-03',
     bullets: [

@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.46 — 2026-11-03 — One room, one name
+- One name per room: using the Room tool inside a named room changes its type, and tool tips are in your language.
+- The Wall tip describes corner-to-corner drawing; room messages are translated.
+
 ## 2.13.45 — 2026-11-03 — New plan on phones
 - On phones the New plan screen shows the houses first, house descriptions are in your language, and Settings has bigger tick boxes.
 

@@ -25,7 +25,7 @@ const PLANT_ICON: Record<PlantKind, IconName> = {
 const TOOLS: { id: Tool; label: string; tip: string; icon: IconName }[] = [
   { id: 'select', label: 'Select', tip: 'Click something to move it (V)', icon: 'select' },
   { id: 'sketch', label: 'Sketch', tip: 'Drag like a pencil, then Trace into walls (S)', icon: 'sketch' },
-  { id: 'wall', label: 'Wall', tip: 'Click start, then click end (W)', icon: 'wall' },
+  { id: 'wall', label: 'Wall', tip: 'Click each corner; click the first corner to close the room (W)', icon: 'wall' },
   { id: 'box', label: 'Box', tip: 'Drag from one corner to the other (B)', icon: 'box' },
   { id: 'door', label: 'Door', tip: 'Click on a wall (D)', icon: 'door' },
   { id: 'window', label: 'Window', tip: 'Click on a wall (N)', icon: 'window' },
@@ -183,7 +183,7 @@ export function ToolRail() {
           type="button"
           className={`tool-rail-btn aw-pressable ${tool === t.id ? 'active is-current' : ''}${quick ? ' tool-rail-quick' : ''}${extra ? ' tool-rail-extra' : ''}${capped ? ' is-capped' : ''}${t.id === 'wall' && tool === 'wall' ? ' has-caret' : ''}`}
           onClick={() => pick(t.id)}
-          title={t.tip}
+          title={tx(locale, `tooltip.${t.id}`)}
           aria-pressed={tool === t.id}
           aria-disabled={capped}
           tabIndex={expanded || quick || extra ? 0 : -1}
