@@ -5608,3 +5608,26 @@ html.kb-framed body.kb-on .app-shell.is-phone .chrome {
   outline: 3px solid var(--aw-royal, #4f46e5);
   outline-offset: -3px;
 }
+/* 2.13.45 — phones: the help level folds to one line so the houses show first; bigger checkboxes for small fingers. */
+.new-skill-fold {
+  border: 1px solid var(--aw-border);
+  border-radius: 12px;
+  padding: 0 10px;
+  margin: 6px 0 10px;
+}
+.new-skill-fold > summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.drawer input[type='checkbox'],
+.panel-card input[type='checkbox'],
+.customize-drawer input[type='checkbox'] {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  accent-color: var(--aw-royal, #4f46e5);
+}

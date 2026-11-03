@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.45',
+    date: '2026-11-03',
+    bullets: [
+      'On phones the New plan screen shows the houses first, house descriptions are in your language, and Settings has bigger tick boxes.',
+    ],
+  },
+  {
     version: '2.13.44',
     date: '2026-11-03',
     bullets: [

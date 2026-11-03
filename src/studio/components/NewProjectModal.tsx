@@ -5,6 +5,7 @@ import { DEFAULT_SKILL_LEVEL } from '../data/skill';
 import { SkillPicker } from './SkillPicker';
 import { roofDefaultForStyle, roofStyleName } from '../lib/roof';
 import { t } from '../data/i18n';
+import { usePhoneChrome } from '../hooks/usePhoneChrome';
 
 export function NewProjectModal() {
   const open = useProjectStore((s) => s.newProjectOpen);
@@ -13,6 +14,7 @@ export function NewProjectModal() {
   const skillLevel = useProjectStore((s) => s.doc.settings.skillLevel) ?? DEFAULT_SKILL_LEVEL;
   const locale = useProjectStore((s) => s.doc.settings.locale);
   const setSkillLevel = useProjectStore((s) => s.setSkillLevel);
+  const phone = usePhoneChrome();
   if (!open) return null;
 
   const dismiss = () => close(false);
@@ -32,7 +34,15 @@ export function NewProjectModal() {
           </button>
         </div>
         <p className="muted">{t(locale, 'new.lead')}</p>
-        <SkillPicker value={skillLevel} onChange={setSkillLevel} legend={t(locale, 'new.help')} />
+        {/* On a phone the houses come first; the help level folds into one line you can open (2.13.45). */}
+        {phone ? (
+          <details className="new-skill-fold">
+            <summary>{t(locale, 'new.help')} · <strong>{t(locale, `skill.${skillLevel}`)}</strong></summary>
+            <SkillPicker value={skillLevel} onChange={setSkillLevel} legend={t(locale, 'new.help')} />
+          </details>
+        ) : (
+          <SkillPicker value={skillLevel} onChange={setSkillLevel} legend={t(locale, 'new.help')} />
+        )}
         <div className="template-grid">
           {STYLE_TEMPLATES.map((tpl) => {
             const roof = roofDefaultForStyle(tpl.id);
@@ -47,8 +57,8 @@ export function NewProjectModal() {
                   {tpl.name}
                   {tpl.badge ? <span className="template-badge">{tpl.badge}</span> : null}
                 </strong>
-                <span>{tpl.blurb}</span>
-                <em className="template-roof">Roof: {roofStyleName(roof)}</em>
+                <span>{t(locale, `tpl.${tpl.id}`)}</span>
+                <em className="template-roof">{t(locale, 'chip.roof')}: {roofStyleName(roof)}</em>
               </button>
             );
           })}

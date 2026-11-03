@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.45 — 2026-11-03 — New plan on phones
+- On phones the New plan screen shows the houses first, house descriptions are in your language, and Settings has bigger tick boxes.
+
 ## 2.13.44 — 2026-11-03 — Join walls
 - Walls join up as you draw: keep clicking corners and the room closes when you click the first corner again.
 - Esc or a second tap on the last corner stops; a room's starter name shows in your language in its panel.
