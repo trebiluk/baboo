@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.42',
+    date: '2026-11-03',
+    bullets: [
+      'Starter houses have real rooms: the Ranch gets a kitchen, bath and bedroom, every room shows its own size, and more windows.',
+    ],
+  },
+  {
     version: '2.13.41',
     date: '2026-11-03',
     bullets: [

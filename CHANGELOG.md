@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.42 — 2026-11-03 — Real rooms
+- Starter houses have real rooms: the Ranch gets a kitchen, bath and bedroom, every room shows its own size, and more windows.
+- Greek Revival gets a centre hall between a parlor and a dining room; Cape Cod gets a bedroom and a bath; Colonial's front door no longer sits on its centre wall.
+
 ## 2.13.41 — 2026-11-03 — House looks
 - Every starter house has its own outside: brick Colonial, sage Arts & Crafts, white Greek Revival, stone Hobbit, and more.
 

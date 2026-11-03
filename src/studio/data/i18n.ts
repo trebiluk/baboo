@@ -1636,6 +1636,18 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.42: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.rooms': g('Starter houses have real rooms: the Ranch gets a kitchen, bath and bedroom, every room shows its own size, and more windows.', {
+    es: 'Las casas iniciales tienen cuartos de verdad: el Ranch tiene cocina, baño y dormitorio, cada cuarto muestra su tamaño, y hay más ventanas.',
+    cu: 'Las casas iniciales tienen cuartos de verdad: el Ranch tiene cocina, baño y cuarto, cada cuarto muestra su tamaño, y hay más ventanas.',
+    uk: 'Будинки-заготовки мають справжні кімнати: у Ranch є кухня, ванна й спальня, кожна кімната показує свій розмір, і вікон більше.',
+    ru: 'У стартовых домов настоящие комнаты: в Ranch есть кухня, ванная и спальня, каждая комната показывает свой размер, и окон больше.',
+    ti: 'መጀመሪ ኣባይቲ ሓቀኛ ክፍልታት ኣለዎም፦ Ranch ክሽነ፣ መሕጸብን መደቀስን ረኺቡ፣ ነፍሲ ወከፍ ክፍሊ ዓቐኑ የርኢ፣ ተወሳኺ መሳኹቲ ድማ ኣሎ።',
+    fa: 'خانه‌های آماده اتاق‌های واقعی دارند: Ranch آشپزخانه، حمام و اتاق خواب دارد، هر اتاق اندازه خودش را نشان می‌دهد، و پنجره‌ها بیشترند.',
+    'fa-AF': 'خانه‌های آماده اتاق‌های واقعی دارند: Ranch آشپزخانه، تشناب و اتاق خواب دارد، هر اتاق اندازه خودش را نشان می‌دهد، و کلکین‌ها بیشترند.',
+    ar: 'البيوت الجاهزة فيها غرف حقيقية: Ranch فيه مطبخ وحمام وغرفة نوم، وكل غرفة تُظهر مساحتها، ونوافذ أكثر.',
+    rw: "Inzu zitangira zifite ibyumba nyabyo: Ranch ifite igikoni, ubwogero n'icyumba cyo kuraramo, buri cyumba cyerekana ingano yacyo, n'amadirishya menshi.",
+  }),
   // 2.13.41: ti, fa-AF and rw are UNCHECKED native copy.
   'news.styles': g('Every starter house has its own outside: brick Colonial, sage Arts & Crafts, white Greek Revival, stone Hobbit, and more.', {
     es: 'Cada casa inicial tiene su propio exterior: Colonial de ladrillo, Arts & Crafts verde salvia, Greek Revival blanca, Hobbit de piedra y más.',
