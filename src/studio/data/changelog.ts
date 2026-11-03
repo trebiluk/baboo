@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.43',
+    date: '2026-11-03',
+    bullets: [
+      'Arts & Crafts, Victorian and Tudor now have real rooms too: bedrooms, kitchens, a parlor with a fireplace, and windows on every side.',
+    ],
+  },
+  {
     version: '2.13.42',
     date: '2026-11-03',
     bullets: [

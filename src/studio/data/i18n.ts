@@ -1636,6 +1636,18 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.43: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.rooms2': g('Arts & Crafts, Victorian and Tudor now have real rooms too: bedrooms, kitchens, a parlor with a fireplace, and windows on every side.', {
+    es: 'Arts & Crafts, Victorian y Tudor también tienen cuartos de verdad: dormitorios, cocinas, una sala con chimenea y ventanas por todos lados.',
+    cu: 'Arts & Crafts, Victorian y Tudor también tienen cuartos de verdad: cuartos de dormir, cocinas, una sala con chimenea y ventanas por todos lados.',
+    uk: 'Arts & Crafts, Victorian і Tudor тепер теж мають справжні кімнати: спальні, кухні, вітальню з каміном і вікна з усіх боків.',
+    ru: 'У Arts & Crafts, Victorian и Tudor теперь тоже настоящие комнаты: спальни, кухни, гостиная с камином и окна со всех сторон.',
+    ti: 'Arts & Crafts፣ Victorian ከምኡ’ውን Tudor ሕጂ ሓቀኛ ክፍልታት ኣለዎም፦ መደቀሲ፣ ክሽነ፣ ምስ መንደድ ዘለዎ ክፍሊ ኣጋይሽን ኣብ ኩሉ ወገን መሳኹትን።',
+    fa: 'Arts & Crafts، Victorian و Tudor هم حالا اتاق‌های واقعی دارند: اتاق خواب، آشپزخانه، پذیرایی با شومینه، و پنجره در هر طرف.',
+    'fa-AF': 'Arts & Crafts، Victorian و Tudor هم حالا اتاق‌های واقعی دارند: اتاق خواب، آشپزخانه، مهمان‌خانه با بخاری، و کلکین در هر طرف.',
+    ar: 'Arts & Crafts وVictorian وTudor صار فيها غرف حقيقية أيضاً: غرف نوم ومطابخ وغرفة جلوس بمدفأة ونوافذ من كل جهة.',
+    rw: "Arts & Crafts, Victorian na Tudor nazo ubu zifite ibyumba nyabyo: ibyumba byo kuraramo, ibikoni, uruganiriro rufite iziko, n'amadirishya impande zose.",
+  }),
   // 2.13.42: ti, fa-AF and rw are UNCHECKED native copy.
   'news.rooms': g('Starter houses have real rooms: the Ranch gets a kitchen, bath and bedroom, every room shows its own size, and more windows.', {
     es: 'Las casas iniciales tienen cuartos de verdad: el Ranch tiene cocina, baño y dormitorio, cada cuarto muestra su tamaño, y hay más ventanas.',

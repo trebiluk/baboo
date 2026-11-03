@@ -96,9 +96,14 @@ function artsCraftsPlan(): { nodes: Node[]; walls: Wall[]; openings: Opening[] }
   const walls = [frontLeft, frontEntry, frontRight, right, back, left, porchLeft, porchFront, porchRight];
   const openings = [
     doorOn(frontEntry.id, 0.5, 3.5),
-    windowOn(right.id, 0.4, 4),
-    windowOn(back.id, 0.5, 5),
-    windowOn(left.id, 0.55, 4),
+    windowOn(frontLeft.id, 0.5, 3),
+    windowOn(frontRight.id, 0.5, 3),
+    windowOn(right.id, 0.3, 4),
+    windowOn(right.id, 0.8, 3),
+    windowOn(back.id, 0.25, 4),
+    windowOn(back.id, 0.75, 4),
+    windowOn(left.id, 0.2, 3),
+    windowOn(left.id, 0.65, 4),
     windowOn(porchFront.id, 0.5, 3),
   ];
   return { nodes, walls, openings };
@@ -449,19 +454,37 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
       room('dining', 27, 12),
     ];
   } else if (styleId === 'arts-crafts') {
+    // Living room across the front; a bedroom and a kitchen behind it (2.13.43).
     const ac = artsCraftsPlan();
-    floor.nodes = ac.nodes;
-    floor.walls = ac.walls;
-    floor.openings = ac.openings;
+    const hL = { id: uid('n'), x: 0, y: 15 };
+    const hM = { id: uid('n'), x: 14, y: 15 };
+    const hR = { id: uid('n'), x: 28, y: 15 };
+    const hB = { id: uid('n'), x: 14, y: 24 };
+    const across: Wall = { id: uid('w'), a: hL.id, b: hR.id, kind: 'interior', thickness: 0.35 };
+    const split: Wall = { id: uid('w'), a: hM.id, b: hB.id, kind: 'interior', thickness: 0.35 };
+    floor.nodes = [...ac.nodes, hL, hM, hR, hB];
+    floor.walls = [...ac.walls, across, split];
+    floor.openings = [
+      ...ac.openings,
+      doorOn(across.id, 0.25, 2.5),
+      doorOn(across.id, 0.75, 2.5),
+    ];
     floor.furniture = [
-      furn('sofa', 10, 14, 7, 3, 'Sofa'),
-      furn('coffee-table', 10, 18, 4, 2, 'Coffee Table'),
-      furn('chair', 22, 12, 2.5, 2.5, 'Armchair'),
-      furn('storage-shelf', 24, 20, 3, 1.5, 'Bookcase'),
+      furn('sofa', 10, 11.5, 7, 3, 'Sofa'),
+      furn('coffee-table', 10, 8, 4, 2, 'Coffee Table'),
+      furn('chair', 22, 9, 2.5, 2.5, 'Armchair', Math.PI / 2),
+      furn('storage-shelf', 3, 6, 3, 1.5, 'Bookcase'),
+      furn('bed-queen', 6, 20, 5, 6.5, 'Bed'),
+      furn('nightstand', 9.6, 17, 1.5, 1.5, 'Nightstand'),
+      furn('fridge', 26.2, 22.6, 3, 2.5, 'Fridge'),
+      furn('stove', 22.5, 22.6, 2.5, 2.5, 'Stove'),
+      furn('sink', 19, 22.8, 2.5, 2, 'Sink'),
     ];
     floor.rooms = [
       room('entry', 14, 2, 'Porch'),
-      room('living', 14, 14),
+      room('living', 17, 6),
+      room('bedroom', 11, 21, undefined, 'carpet'),
+      room('kitchen', 21, 18, undefined, 'tile'),
     ];
   } else if (styleId === 'greek-revival') {
     // A centre hall with a parlor and a dining room on either side, windows on every side (2.13.42).
@@ -556,21 +579,49 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
       room('bedroom', 41, 15, undefined, 'carpet'),
     ];
   } else if (styleId === 'victorian') {
+    // Parlor on the left; dining room in front and kitchen behind on the right (2.13.43).
     const outer = rectPlan(0, 0, 28, 22);
-    floor.nodes = outer.nodes;
-    floor.walls = outer.walls;
+    const vA = { id: uid('n'), x: 16, y: 0 };
+    const vM = { id: uid('n'), x: 16, y: 11 };
+    const vB = { id: uid('n'), x: 16, y: 22 };
+    const hR = { id: uid('n'), x: 28, y: 11 };
+    const upper: Wall = { id: uid('w'), a: vA.id, b: vM.id, kind: 'interior', thickness: 0.35 };
+    const lower: Wall = { id: uid('w'), a: vM.id, b: vB.id, kind: 'interior', thickness: 0.35 };
+    const across: Wall = { id: uid('w'), a: vM.id, b: hR.id, kind: 'interior', thickness: 0.35 };
+    floor.nodes = [...outer.nodes, vA, vM, vB, hR];
+    floor.walls = [...outer.walls, upper, lower, across];
     floor.openings = [
-      doorOn(outer.walls[0].id, 0.4, 3.5),
-      windowOn(outer.walls[0].id, 0.75, 3),
-      windowOn(outer.walls[1].id, 0.5, 3),
-      windowOn(outer.walls[2].id, 0.5, 4),
+      doorOn(outer.walls[0].id, 0.35, 3.5),
+      windowOn(outer.walls[0].id, 0.12, 3),
+      windowOn(outer.walls[0].id, 0.78, 3),
+      windowOn(outer.walls[1].id, 0.25, 3),
+      windowOn(outer.walls[1].id, 0.75, 3),
+      windowOn(outer.walls[2].id, 0.22, 3),
+      windowOn(outer.walls[2].id, 0.7, 4),
+      windowOn(outer.walls[3].id, 0.5, 3),
+      doorOn(upper.id, 0.55, 2.5),
+      doorOn(lower.id, 0.5, 2.5),
+      doorOn(across.id, 0.5, 2.5),
     ];
     floor.furniture = [
-      furn('sofa', 10, 10, 7, 3, 'Sofa'),
-      furn('dining-table', 20, 12, 5, 3, 'Dining'),
-      furn('mech-closet', 4, 18, 3, 3, 'Mech'),
+      furn('sofa', 8, 10, 7, 3, 'Sofa'),
+      furn('coffee-table', 8, 13.5, 4, 2, 'Table'),
+      furn('fireplace', 8, 21.1, 6, 1.2, 'Fireplace', Math.PI),
+      furn('mech-closet', 2, 2, 3, 3, 'Mech'),
+      furn('dining-table', 22, 5.5, 5, 3, 'Dining'),
+      furn('dining-chair', 20.7, 3.1, 1.5, 1.5, 'Chair'),
+      furn('dining-chair', 23.3, 3.1, 1.5, 1.5, 'Chair'),
+      furn('dining-chair', 20.7, 7.9, 1.5, 1.5, 'Chair', Math.PI),
+      furn('dining-chair', 23.3, 7.9, 1.5, 1.5, 'Chair', Math.PI),
+      furn('fridge', 26.2, 20.4, 3, 2.5, 'Fridge'),
+      furn('stove', 22.6, 20.4, 2.5, 2.5, 'Stove'),
+      furn('sink', 19, 20.6, 2.5, 2, 'Sink'),
     ];
-    floor.rooms = [room('living', 14, 11)];
+    floor.rooms = [
+      room('living', 8, 5, 'Parlor'),
+      room('dining', 22, 9.3),
+      room('kitchen', 22, 15, undefined, 'checker'),
+    ];
   } else if (styleId === 'mansion') {
     buildMansion(floor);
   } else if (styleId === 'cape-cod') {
@@ -623,27 +674,38 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
     ];
     floor.rooms = [room('living', 18, 11)];
   } else if (styleId === 'tudor') {
-    // Simple L: main 24×16 + wing 10×12
+    // Simple L: main 24×16 + wing 10×12. The wing is a bedroom with its own door (2.13.43).
     const n1 = { id: uid('n'), x: 0, y: 0 };
     const n2 = { id: uid('n'), x: 24, y: 0 };
     const n3 = { id: uid('n'), x: 24, y: 16 };
     const n4 = { id: uid('n'), x: 10, y: 16 };
     const n5 = { id: uid('n'), x: 10, y: 28 };
     const n6 = { id: uid('n'), x: 0, y: 28 };
-    floor.nodes = [n1, n2, n3, n4, n5, n6];
+    const n7 = { id: uid('n'), x: 0, y: 16 };
+    floor.nodes = [n1, n2, n3, n4, n5, n6, n7];
     const w = (a: Node, b: Node): Wall => ({ id: uid('w'), a: a.id, b: b.id, kind: 'exterior', thickness: 0.5 });
-    floor.walls = [w(n1, n2), w(n2, n3), w(n3, n4), w(n4, n5), w(n5, n6), w(n6, n1)];
+    const wingWall: Wall = { id: uid('w'), a: n7.id, b: n4.id, kind: 'interior', thickness: 0.35 };
+    floor.walls = [w(n1, n2), w(n2, n3), w(n3, n4), w(n4, n5), w(n5, n6), w(n6, n1), wingWall];
     floor.openings = [
       doorOn(floor.walls[0].id, 0.4, 3),
+      windowOn(floor.walls[0].id, 0.15, 3),
+      windowOn(floor.walls[0].id, 0.75, 3),
       windowOn(floor.walls[1].id, 0.5, 3),
+      windowOn(floor.walls[2].id, 0.5, 3),
+      windowOn(floor.walls[3].id, 0.5, 3),
       windowOn(floor.walls[4].id, 0.5, 3),
+      windowOn(floor.walls[5].id, 0.3, 3),
+      windowOn(floor.walls[5].id, 0.75, 3),
+      doorOn(wingWall.id, 0.6, 2.5),
     ];
     floor.furniture = [
       furn('sofa', 12, 8, 7, 3, 'Sofa'),
-      furn('bed-queen', 5, 22, 5, 6.5, 'Bed'),
-      furn('washer', 20, 12, 2.5, 2.5, 'Washer'),
+      furn('coffee-table', 12, 11.5, 4, 2, 'Table'),
+      furn('bed-queen', 5, 23, 5, 6.5, 'Bed'),
+      furn('nightstand', 8.6, 20.3, 1.5, 1.5, 'Nightstand'),
+      furn('washer', 22, 14, 2.5, 2.5, 'Washer'),
     ];
-    floor.rooms = [room('living', 12, 8)];
+    floor.rooms = [room('living', 17, 4), room('bedroom', 5, 18.2, undefined, 'carpet')];
   } else if (styleId === 'yurt') {
     const poly = polygonPlan(12, 12, 11, 12, 0.45);
     floor.nodes = poly.nodes;

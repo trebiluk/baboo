@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.43 — 2026-11-03 — More rooms
+- Arts & Crafts, Victorian and Tudor now have real rooms too: bedrooms, kitchens, a parlor with a fireplace, and windows on every side.
+
 ## 2.13.42 — 2026-11-03 — Real rooms
 - Starter houses have real rooms: the Ranch gets a kitchen, bath and bedroom, every room shows its own size, and more windows.
 - Greek Revival gets a centre hall between a parlor and a dining room; Cape Cod gets a bedroom and a bath; Colonial's front door no longer sits on its centre wall.
