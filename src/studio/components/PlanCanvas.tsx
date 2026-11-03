@@ -649,16 +649,35 @@ export function PlanCanvas() {
     ? `${Math.round(zoom / 0.3048)} px/m`
     : `${Math.round(zoom)} px/ft`;
 
+  // What a screen reader hears for the plan: rooms with their sizes, and how many walls, doors and pieces (2.13.40).
+  const planRooms = (floor.rooms ?? []).map((r) => {
+    const poly = roomPolygon(r, floor.nodes, floor.walls);
+    return poly ? `${roomLabel(tips, r)} ${formatArea(polygonArea(poly), units)}` : roomLabel(tips, r);
+  });
+  const planSummary = t(tips, 'plan.summary', {
+    w: String(floor.walls.length),
+    d: String(floor.openings.filter((o) => o.type === 'door').length),
+    n: String(floor.openings.filter((o) => o.type !== 'door').length),
+    f: String(floor.furniture.length),
+  });
+
   return (
     <div
       className={`plan-canvas ${dragOver ? 'drag-over' : ''}`}
       ref={wrapRef}
+      role="region"
+      tabIndex={0}
+      aria-label={t(tips, 'plan.label')}
+      aria-describedby="plan-sr-summary"
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
       onContextMenu={toolsPocket.onContextMenu}
       style={{ touchAction: 'none', cursor: hoverGrip ? (dragging ? 'grabbing' : 'grab') : undefined }}
     >
+      <p id="plan-sr-summary" className="sr-only">
+        {planSummary}{planRooms.length ? ` ${t(tips, 'plan.rooms')}: ${planRooms.join(', ')}.` : ''}
+      </p>
       <Stage
         width={size.w}
         height={size.h}

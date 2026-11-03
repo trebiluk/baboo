@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.40 — 2026-11-02 — Screen readers
+- Screen readers can hear the plan: each room and its size, plus how many walls, doors and windows there are.
+- The plan can be reached with Tab and shows a clear focus ring.
+
 ## 2.13.39 — 2026-11-02 — One font
 - One clean font across the top bar, and the tool list button that hides the names now says Fold.
 

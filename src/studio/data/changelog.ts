@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.40',
+    date: '2026-11-02',
+    bullets: [
+      'Screen readers can hear the plan: each room and its size, plus how many walls, doors and windows there are.',
+    ],
+  },
+  {
     version: '2.13.39',
     date: '2026-11-02',
     bullets: [

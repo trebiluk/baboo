@@ -1636,6 +1636,21 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.40: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.a11y': g('Screen readers can hear the plan: each room and its size, plus how many walls, doors and windows there are.', {
+    es: 'Los lectores de pantalla pueden oír el plano: cada cuarto y su tamaño, y cuántas paredes, puertas y ventanas hay.',
+    cu: 'Los lectores de pantalla pueden oír el plano: cada cuarto y su tamaño, y cuántas paredes, puertas y ventanas hay.',
+    uk: 'Програми читання з екрана озвучують план: кожну кімнату та її розмір, а також скільки стін, дверей і вікон.',
+    ru: 'Программы чтения с экрана озвучивают план: каждую комнату и её размер, а также сколько стен, дверей и окон.',
+    ti: 'ኣንበብቲ ስክሪን ነቲ ፕላን ክሰምዕዎ ይኽእሉ፦ ነፍሲ ወከፍ ክፍልን ዓቐኑን፣ ክንደይ መናድቕ፣ ማዕጾታትን መሳኹትን ከም ዘለዉ።',
+    fa: 'صفحه‌خوان‌ها نقشه را می‌خوانند: هر اتاق و اندازه‌اش، و چند دیوار، در و پنجره هست.',
+    'fa-AF': 'صفحه‌خوان‌ها نقشه را می‌خوانند: هر اتاق و اندازه‌اش، و چند دیوار، دروازه و کلکین است.',
+    ar: 'قارئات الشاشة تقرأ المخطط: كل غرفة ومساحتها، وكم جداراً وباباً ونافذة.',
+    rw: "Porogaramu zisoma ecran zishobora kumva igishushanyo: buri cyumba n'ingano yacyo, n'umubare w'inkuta, inzugi n'amadirishya.",
+  }),
+  'plan.label': g('Floor plan', { es: 'Plano de planta', cu: 'Plano de planta', uk: 'План поверху', ru: 'План этажа', ti: 'ፕላን ደርቢ', fa: 'نقشه طبقه', 'fa-AF': 'نقشه منزل', ar: 'مخطط الطابق', rw: 'Igishushanyo cy\'inzu' }),
+  'plan.summary': g('{w} walls, {d} doors, {n} windows, {f} pieces.', { es: '{w} paredes, {d} puertas, {n} ventanas, {f} muebles.', cu: '{w} paredes, {d} puertas, {n} ventanas, {f} muebles.', uk: 'Стін: {w}, дверей: {d}, вікон: {n}, предметів: {f}.', ru: 'Стен: {w}, дверей: {d}, окон: {n}, предметов: {f}.', ti: '{w} መናድቕ፣ {d} ማዕጾታት፣ {n} መሳኹቲ፣ {f} ኣቕሑ።', fa: '{w} دیوار، {d} در، {n} پنجره، {f} وسیله.', 'fa-AF': '{w} دیوار، {d} دروازه، {n} کلکین، {f} وسیله.', ar: 'جدران: {w}، أبواب: {d}، نوافذ: {n}، قطع: {f}.', rw: 'Inkuta {w}, inzugi {d}, amadirishya {n}, ibikoresho {f}.' }),
+  'plan.rooms': g('Rooms', { es: 'Cuartos', cu: 'Cuartos', uk: 'Кімнати', ru: 'Комнаты', ti: 'ክፍልታት', fa: 'اتاق‌ها', 'fa-AF': 'اتاق‌ها', ar: 'الغرف', rw: 'Ibyumba' }),
   // 2.13.39: ti, fa-AF and rw are UNCHECKED native copy.
   'news.fold': g('One clean font across the top bar, and the tool list button that hides the names now says Fold.', {
     es: 'Una sola letra limpia en la barra de arriba, y el botón que oculta los nombres de las herramientas ahora dice Plegar.',
