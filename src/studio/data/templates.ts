@@ -1,4 +1,4 @@
-import type { Floor, Opening, ProjectDocument, StyleId, StyleTemplate, Wall, Node, FurnitureItem, Room, RoomKind, LandscapeItem, PlantKind, FloorFinishId } from '../types';
+import type { Floor, Opening, ProjectDocument, StyleId, StyleTemplate, Wall, Node, FurnitureItem, Room, RoomKind, LandscapeItem, PlantKind, FloorFinishId, WallSkin, WallTintId } from '../types';
 import { DEFAULT_ROOF_BY_STYLE, roofStyleName } from './roofs';
 import { exteriorBounds, generateRoof } from '../lib/roof';
 import { APP_VERSION } from '../version';
@@ -340,6 +340,34 @@ function buildMansion(floor: Floor) {
   floor.layers = { ...floor.layers, landscape: true, rooms: true, furniture: true };
 }
 
+/**
+ * Each starter house wears its own outside, so they do not all look like the same beige box (2.13.41).
+ * The colour is the house wall colour (Settings), so students can still repaint it.
+ */
+const STYLE_LOOK: Partial<Record<StyleId, { skin: WallSkin; tint: WallTintId }>> = {
+  colonial: { skin: 'brick', tint: 'white' },
+  'arts-crafts': { skin: 'siding', tint: 'sage' },
+  'greek-revival': { skin: 'siding', tint: 'white' },
+  hobbit: { skin: 'stone', tint: 'cream' },
+  ranch: { skin: 'stucco', tint: 'clay' },
+  victorian: { skin: 'siding', tint: 'blush' },
+  'cape-cod': { skin: 'wood', tint: 'white' },
+  modern: { skin: 'stucco', tint: 'white' },
+  tudor: { skin: 'stucco', tint: 'cream' },
+};
+
+function dressOutside(styleId: StyleId, floor: Floor): WallTintId {
+  const look = STYLE_LOOK[styleId];
+  if (!look) return 'sand';
+  floor.walls = floor.walls.map((w) => {
+    if (w.kind !== 'exterior') return w;
+    // the covering only shows on the outside face; inside faces keep their room's paint
+    const faces = { a: { paint: null, skin: look.skin }, b: { paint: null, skin: look.skin } };
+    return look.skin === 'brick' ? { ...w, drawStyle: 'brick', faces } : { ...w, faces };
+  });
+  return look.tint;
+}
+
 export function buildTemplateProject(styleId: StyleId, title?: string): ProjectDocument {
   const now = new Date().toISOString();
   const floor = emptyFloor();
@@ -558,6 +586,7 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
   const roofStyleId = DEFAULT_ROOF_BY_STYLE[styleId] ?? null;
   const wallH = styleId === 'mansion' ? 10 : DEFAULT_WALL_HEIGHT_FT;
   if (styleId !== 'dog-house' && styleId !== 'tiny-home' && styleId !== 'mansion' && floor.walls.length > 2) furnishYard(floor);
+  const wallTintId = dressOutside(styleId, floor);
   floor.roof = generateRoof(floor.nodes, floor.walls, roofStyleId, wallH);
 
   return {
@@ -601,7 +630,7 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
       imageBlobRef: null,
       skyPreset: 'day',
       siteFinish: 'grass',
-      wallTintId: 'sand',
+      wallTintId,
       showFurniture3d: true,
       floorFinishId: 'oak',
       floorGrain: 0,

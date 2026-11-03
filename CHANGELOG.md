@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.41 — 2026-11-03 — House looks
+- Every starter house has its own outside: brick Colonial, sage Arts & Crafts, white Greek Revival, stone Hobbit, and more.
+
 ## 2.13.40 — 2026-11-02 — Screen readers
 - Screen readers can hear the plan: each room and its size, plus how many walls, doors and windows there are.
 - The plan can be reached with Tab and shows a clear focus ring.

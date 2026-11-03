@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.41',
+    date: '2026-11-03',
+    bullets: [
+      'Every starter house has its own outside: brick Colonial, sage Arts & Crafts, white Greek Revival, stone Hobbit, and more.',
+    ],
+  },
+  {
     version: '2.13.40',
     date: '2026-11-02',
     bullets: [

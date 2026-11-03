@@ -1636,6 +1636,18 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.41: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.styles': g('Every starter house has its own outside: brick Colonial, sage Arts & Crafts, white Greek Revival, stone Hobbit, and more.', {
+    es: 'Cada casa inicial tiene su propio exterior: Colonial de ladrillo, Arts & Crafts verde salvia, Greek Revival blanca, Hobbit de piedra y más.',
+    cu: 'Cada casa inicial tiene su propio exterior: Colonial de ladrillo, Arts & Crafts verde salvia, Greek Revival blanca, Hobbit de piedra y más.',
+    uk: 'Кожен будинок-заготовка має свій вигляд ззовні: цегляний Colonial, шавлієвий Arts & Crafts, білий Greek Revival, кам’яний Hobbit та інші.',
+    ru: 'У каждого стартового дома свой вид снаружи: кирпичный Colonial, шалфейный Arts & Crafts, белый Greek Revival, каменный Hobbit и другие.',
+    ti: 'ነፍሲ ወከፍ መጀመሪ ገዛ ናቱ ደገ ኣለዎ፦ ብጡብ Colonial፣ ቀጠልያ Arts & Crafts፣ ጻዕዳ Greek Revival፣ ብእምኒ Hobbit፣ ካልኦትን።',
+    fa: 'هر خانهٔ آماده ظاهر بیرونی خودش را دارد: Colonial آجری، Arts & Crafts سبز مریمی، Greek Revival سفید، Hobbit سنگی و بیشتر.',
+    'fa-AF': 'هر خانهٔ آماده ظاهر بیرونی خودش را دارد: Colonial خشتی، Arts & Crafts سبز، Greek Revival سفید، Hobbit سنگی و دیگر.',
+    ar: 'لكل بيت جاهز مظهر خارجي خاص: Colonial من الطوب، Arts & Crafts بلون المريمية، Greek Revival أبيض، Hobbit من الحجر، وغيرها.',
+    rw: "Buri nzu itangira ifite inyuma yayo: Colonial y'amatafari, Arts & Crafts y'icyatsi, Greek Revival y'umweru, Hobbit y'amabuye, n'izindi.",
+  }),
   // 2.13.40: ti, fa-AF and rw are UNCHECKED native copy.
   'news.a11y': g('Screen readers can hear the plan: each room and its size, plus how many walls, doors and windows there are.', {
     es: 'Los lectores de pantalla pueden oír el plano: cada cuarto y su tamaño, y cuántas paredes, puertas y ventanas hay.',
