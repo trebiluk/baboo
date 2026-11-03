@@ -117,6 +117,8 @@ interface Store {
   panY: number;
   zoom: number;
   wallDraft: Point | null;
+  /** True while walls chain corner to corner (the draft started at the last wall's end) (2.13.44). */
+  wallChained: boolean;
   dimDraft: Point | null;
   wallKind: 'exterior' | 'interior';
   wallMode: 'draw' | 'clip';
@@ -343,6 +345,7 @@ export const useProjectStore = create<Store>((set, get) => ({
   panY: 40,
   zoom: 24,
   wallDraft: null,
+  wallChained: false,
   dimDraft: null,
   wallKind: 'exterior',
   wallMode: 'draw',
@@ -1038,7 +1041,7 @@ export const useProjectStore = create<Store>((set, get) => ({
       return;
     }
     const s = get().doc.settings;
-    set({ wallDraft: exact ? p : snapPoint(p, s.gridSize, s.snap), dimDraft: null });
+    set({ wallDraft: exact ? p : snapPoint(p, s.gridSize, s.snap), dimDraft: null, wallChained: false });
   },
   finishWall: (p, forceOrtho, exact) => {
     const { wallDraft, doc } = get();
@@ -1056,13 +1059,17 @@ export const useProjectStore = create<Store>((set, get) => ({
       gridSize: s.gridSize,
     });
     if (Math.hypot(endPt.x - wallDraft.x, endPt.y - wallDraft.y) < 0.5) {
-      set({ wallDraft: null });
-      get().showToast(t(tip(get), 'toast.wallShort'), 2800, 'miss');
+      const chained = get().wallChained;
+      set({ wallDraft: null, wallChained: false });
+      // a second tap on the last corner just stops the chain; only a first wall that short is a mistake
+      if (!chained) get().showToast(t(tip(get), 'toast.wallShort'), 2800, 'miss');
       return;
     }
     const beforeFloor = get().floor();
     get().pushHistory();
     const merge = s.snap ? s.gridSize * 0.4 : 0.35;
+    // Walls chain corner to corner like a pencil line; landing on a corner that already exists ends the chain (2.13.44).
+    const endsOnCorner = beforeFloor.nodes.some((n) => Math.hypot(n.x - endPt.x, n.y - endPt.y) <= merge);
     set({
       doc: withFloor(doc, (f) => {
         let nodes = [...f.nodes];
@@ -1088,7 +1095,8 @@ export const useProjectStore = create<Store>((set, get) => ({
         const next = { ...f, nodes, walls: [...walls, wall], openings };
         return refreshRoof(withFirstRoom(next), get().doc.settings.roofStyleId ?? null, get().doc.settings.wallHeight);
       }),
-      wallDraft: null,
+      wallDraft: endsOnCorner ? null : endPt,
+      wallChained: !endsOnCorner,
     });
     get().markDirty(endPt);
     if (!toastIfJustClosed(get, beforeFloor)) {

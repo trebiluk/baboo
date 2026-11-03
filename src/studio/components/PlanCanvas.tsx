@@ -76,6 +76,7 @@ export function PlanCanvas() {
   const panY = useProjectStore((s) => s.panY);
   const zoom = useProjectStore((s) => s.zoom);
   const wallDraft = useProjectStore((s) => s.wallDraft);
+  const wallChained = useProjectStore((s) => s.wallChained);
   const dimDraft = useProjectStore((s) => s.dimDraft);
   const wallMode = useProjectStore((s) => s.wallMode);
   const accessOpen = useProjectStore((s) => s.accessOpen);
@@ -1216,7 +1217,9 @@ export function PlanCanvas() {
           : tool === 'wall'
           ? (wallMode === 'clip'
             ? (clipHover ? t(tips, 'hint.clip.hot') : t(tips, 'hint.clip'))
-            : (wallDraft
+            : (wallDraft && wallChained
+            ? t(tips, 'hint.wall.next')
+            : wallDraft
             ? t(tips, skillRank(skillLevel) <= 1 ? 'hint.wall.end' : 'hint.wall.end.short')
             : t(tips, skillRank(skillLevel) <= 1 ? 'hint.wall.start' : 'hint.wall.start.short')))
           : tool === 'sketch'

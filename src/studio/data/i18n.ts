@@ -1636,6 +1636,19 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.44: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.chain': g('Walls join up as you draw: keep clicking corners and the room closes when you click the first corner again.', {
+    es: 'Las paredes se unen mientras dibujas: sigue haciendo clic en las esquinas y el cuarto se cierra al volver a la primera.',
+    cu: 'Las paredes se unen mientras dibujas: sigue tocando las esquinas y el cuarto se cierra al volver a la primera.',
+    uk: 'Стіни з’єднуються, поки малюєш: клікай кути далі, і кімната замкнеться, коли клікнеш перший кут.',
+    ru: 'Стены соединяются, пока рисуешь: кликай углы дальше, и комната замкнётся, когда кликнешь первый угол.',
+    ti: 'ክትስእል ከለኻ መናድቕ ይራኸቡ፦ ኣብ ኩርናዓት ምጥዋቕ ቀጽል፣ ነቲ ቀዳማይ ኩርናዕ ክትጠውቕ ከለኻ ክፍሊ ይዕጾ።',
+    fa: 'دیوارها هنگام کشیدن به هم وصل می‌شوند: روی گوشه‌ها کلیک کن و با کلیک دوباره روی گوشه اول، اتاق بسته می‌شود.',
+    'fa-AF': 'دیوارها هنگام کشیدن به هم وصل می‌شوند: روی گوشه‌ها کلیک کن و با کلیک دوباره روی گوشه اول، اتاق بسته می‌شود.',
+    ar: 'الجدران تتصل وأنت ترسم: تابع النقر على الزوايا وستُغلق الغرفة عندما تنقر الزاوية الأولى مجدداً.',
+    rw: "Inkuta zihuzwa uko ushushanya: komeza ukande ku nguni, icyumba gifunge iyo wongeye gukanda ku nguni ya mbere.",
+  }),
+  'hint.wall.next': g('Keep clicking corners. Click the first corner to close the room, or press Esc to stop.', { es: 'Sigue haciendo clic en las esquinas. Haz clic en la primera para cerrar el cuarto, o pulsa Esc para parar.', cu: 'Sigue tocando las esquinas. Toca la primera para cerrar el cuarto, o pulsa Esc para parar.', uk: 'Клікай далі по кутах. Клікни перший кут, щоб замкнути кімнату, або натисни Esc, щоб зупинитись.', ru: 'Кликай дальше по углам. Кликни первый угол, чтобы замкнуть комнату, или нажми Esc, чтобы остановиться.', ti: 'ኣብ ኩርናዓት ምጥዋቕ ቀጽል። ክፍሊ ንምዕጻው ነቲ ቀዳማይ ኩርናዕ ጠውቕ፣ ንምቁራጽ ድማ Esc ጠውቕ።', fa: 'روی گوشه‌ها کلیک کن. برای بستن اتاق روی گوشه اول کلیک کن، یا برای توقف Esc را بزن.', 'fa-AF': 'روی گوشه‌ها کلیک کن. برای بستن اتاق روی گوشه اول کلیک کن، یا برای توقف Esc را فشار بده.', ar: 'تابع النقر على الزوايا. انقر الزاوية الأولى لإغلاق الغرفة، أو اضغط Esc للتوقف.', rw: 'Komeza ukande ku nguni. Kanda ku nguni ya mbere ufunge icyumba, cyangwa ukande Esc uhagarike.' }),
   // 2.13.43: ti, fa-AF and rw are UNCHECKED native copy.
   'news.rooms2': g('Arts & Crafts, Victorian and Tudor now have real rooms too: bedrooms, kitchens, a parlor with a fireplace, and windows on every side.', {
     es: 'Arts & Crafts, Victorian y Tudor también tienen cuartos de verdad: dormitorios, cocinas, una sala con chimenea y ventanas por todos lados.',

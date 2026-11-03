@@ -487,7 +487,12 @@ export function ObjectMenu() {
             <DockHead title={roomLabel(locale, r)} onCollapse={() => setCollapsed(true)} onClose={clearSelection} />
             <label className="object-menu-field">
               <span>{t(locale, 'obj.name')}</span>
-              <input value={r.name} onChange={(e) => renameRoom(r.id, e.target.value)} aria-label={t(locale, 'obj.roomName')} />
+              <input
+                // the starter name ("Living") shows in the reader's language until it is renamed (2.13.44)
+                value={r.name === roomType(r.kind).name ? roomLabel(locale, r) : r.name}
+                onChange={(e) => renameRoom(r.id, e.target.value)}
+                aria-label={t(locale, 'obj.roomName')}
+              />
             </label>
             <label className="object-menu-field">
               <span>{t(locale, 'obj.type')}</span>

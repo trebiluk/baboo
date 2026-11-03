@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.44',
+    date: '2026-11-03',
+    bullets: [
+      'Walls join up as you draw: keep clicking corners and the room closes when you click the first corner again.',
+    ],
+  },
+  {
     version: '2.13.43',
     date: '2026-11-03',
     bullets: [
