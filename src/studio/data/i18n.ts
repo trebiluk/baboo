@@ -112,8 +112,9 @@ export const STR: Record<string, Gloss> = {
   'tool.more': g('More', {
     es: 'Más', cu: 'Más', uk: 'Ще', ru: 'Ещё', ti: 'ተወሳኺ', fa: 'بیشتر',
   }),
-  'tool.min': g('Min', {
-    es: 'Min', cu: 'Min', uk: 'Згорнути', ru: 'Свернуть', ti: 'ኣሕጽር', fa: 'جمع',
+  // 2.13.39: "Min" said nothing; it folds the tool list. ti, fa-AF and rw are UNCHECKED native copy.
+  'tool.min': g('Fold', {
+    es: 'Plegar', cu: 'Plegar', uk: 'Згорнути', ru: 'Свернуть', ti: 'ኣሕጽር', fa: 'جمع کن', 'fa-AF': 'جمع کن', ar: 'اطوِ', rw: 'Funga',
   }),
   'tool.list': g('List', {
     es: 'Lista', cu: 'Lista', uk: 'Список', ru: 'Список', ti: 'ዝርዝር', fa: 'فهرست',
@@ -1634,6 +1635,18 @@ export const STR: Record<string, Gloss> = {
     ru: 'Нарисуй стены в 2D, чтобы увидеть их в 3D',
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
+  }),
+  // 2.13.39: ti, fa-AF and rw are UNCHECKED native copy.
+  'news.fold': g('One clean font across the top bar, and the tool list button that hides the names now says Fold.', {
+    es: 'Una sola letra limpia en la barra de arriba, y el botón que oculta los nombres de las herramientas ahora dice Plegar.',
+    cu: 'Una sola letra limpia en la barra de arriba, y el botón que oculta los nombres de las herramientas ahora dice Plegar.',
+    uk: 'Один охайний шрифт у верхній панелі, а кнопка, що ховає назви інструментів, тепер називається «Згорнути».',
+    ru: 'Один аккуратный шрифт в верхней панели, а кнопка, которая прячет названия инструментов, теперь называется «Свернуть».',
+    ti: 'ኣብ ላዕለዋይ መስመር ሓደ ጽሩይ ፊደል፣ ኣስማት መሳርሒታት ዝሓብእ መጠወቕ ድማ ሕጂ "ኣሕጽር" ይብል።',
+    fa: 'یک قلم یکدست در نوار بالا، و دکمه‌ای که نام ابزارها را پنهان می‌کند حالا «جمع کن» است.',
+    'fa-AF': 'یک قلم یکدست در نوار بالا، و دکمه‌ای که نام ابزارها را پنهان می‌کند حالا «جمع کن» است.',
+    ar: 'خط واحد نظيف في الشريط العلوي، والزر الذي يخفي أسماء الأدوات صار اسمه «اطوِ».',
+    rw: "Inyuguti imwe isukuye mu murongo wo hejuru, kandi akabuto gahisha amazina y'ibikoresho ubu kanditseho Funga.",
   }),
   // 2.13.38: ti, fa-AF and rw are UNCHECKED native copy.
   'news.sizesClear': g('Wall sizes slide along the wall to a clear spot, so they never sit on a door or a room name.', {

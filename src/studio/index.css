@@ -5583,3 +5583,12 @@ html.kb-framed body.kb-on .app-shell.is-phone .chrome {
 .view3d-fps.is-slow {
   color: #b91c1c;
 }
+/* 2.13.39 — one type family across the top bar: the version and view-only chips use the app font, not a typewriter one. */
+.ver-chip,
+.ver-row,
+.app-shell.is-phone .ver-row,
+.view-only-chip {
+  font-family: inherit !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+}

@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.39',
+    date: '2026-11-02',
+    bullets: [
+      'One clean font across the top bar, and the tool list button that hides the names now says Fold.',
+    ],
+  },
+  {
     version: '2.13.38',
     date: '2026-11-02',
     bullets: [

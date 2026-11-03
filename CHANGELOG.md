@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.39 — 2026-11-02 — One font
+- One clean font across the top bar, and the tool list button that hides the names now says Fold.
+
 ## 2.13.38 — 2026-11-02 — Clear sizes
 - Wall sizes slide along the wall to a clear spot, so they never sit on a door or a room name.
 
