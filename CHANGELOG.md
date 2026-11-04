@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.60 — 2026-11-04 — Photo mode
+- Photo mode in 3D: tap Photo, frame the house, Snap — a sharp picture to share or save. Every panel hides while you frame; Snap draws the view at 2× and hands it to the phone's share sheet, or downloads “Plan name date.png”. Done or Escape brings the panels back. Nothing leaves the device unless you share it.
+- Postcard (captions, Dollhouse) comes next.
+
 ## 2.13.59 — 2026-11-04 — New York code
 - Baboo's Access check and “Read this plan” follow the 2025 Residential Code of New York State (in force since December 31, 2025; based on the 2024 IRC).
 - Rooms people live in (bedroom, living, dining, office) need at least 70 sq ft and 7 ft each way; kitchens, baths and halls are not counted.

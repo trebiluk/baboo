@@ -3,10 +3,12 @@ import { useProjectStore } from '../store/useProjectStore';
 import { SITE_PALETTE, SKY_PALETTE, WALL_TINT, asShowFurniture3d, asSite, asSky, asTint } from '../data/scene3d';
 import { asWallHeightFt } from '../lib/wallDraft';
 import { asFloorFinish } from '../data/flooring';
-import { t } from '../data/i18n';
+import { planTitle, t } from '../data/i18n';
 import type { EngineHandle } from './EngineView';
 import type { HouseLook } from '../lib/engine3d';
 import { saveProject } from '../lib/storage';
+import { handOverPhoto } from '../lib/photo';
+import { useEscape } from '../hooks/useEscape';
 
 // A fresh lazy loader per try, so "Try 3D again" downloads again after the wifi comes back (2.13.49).
 const makeEngine = () => lazy(() => import('./EngineView').then((m) => ({ default: m.EngineView })));
@@ -126,6 +128,22 @@ export function View3DStub() {
   const site = SITE_PALETTE[siteId];
   const blocky = settings.guiTheme === 'blocky';
   const loc = settings.locale;
+  // Photo mode (2.13.60): hide every panel, frame the shot, Snap.
+  const [photo, setPhoto] = useState(false);
+  const showToast = useProjectStore((s) => s.showToast);
+  const title = useProjectStore((s) => planTitle(s.doc.meta.title, loc));
+  useEscape(photo, () => setPhoto(false));
+  useEffect(() => {
+    document.body.classList.toggle('aw-photo', photo);
+    return () => document.body.classList.remove('aw-photo');
+  }, [photo]);
+  const snap = async () => {
+    const canvas = engineRef.current?.snapshot(2);
+    if (!canvas) { showToast(t(loc, 'photo.fail')); return; }
+    const r = await handOverPhoto(canvas, title);
+    if (r === 'downloaded') showToast(t(loc, 'photo.saved'));
+    else if (r === 'failed') showToast(t(loc, 'photo.fail'));
+  };
 
   const look = useMemo<HouseLook>(() => ({
     wallH: asWallHeightFt(settings.wallHeight),
@@ -189,8 +207,18 @@ export function View3DStub() {
             >
               {t(loc, walk ? '3d.walk.exit' : '3d.tier.walk')}
             </button>
+            {floor.walls.length ? (
+              <button type="button" className="ghost-btn aw-pressable" onClick={() => setPhoto(true)}>{t(loc, 'photo.btn')}</button>
+            ) : null}
           </div>
         </div>
+        {photo ? (
+          <div className="photo-bar" role="toolbar" aria-label={t(loc, 'photo.mode')}>
+            <span className="photo-hint">{t(loc, 'photo.hint')}</span>
+            <button type="button" className="primary-btn aw-pressable" onClick={() => { void snap(); }}>{t(loc, 'photo.snap')}</button>
+            <button type="button" className="ghost-btn aw-pressable" onClick={() => setPhoto(false)}>{t(loc, 'photo.done')}</button>
+          </div>
+        ) : null}
       </div>
     </div>
   );

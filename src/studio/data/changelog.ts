@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.60',
+    date: '2026-11-04',
+    bullets: [
+      'Photo mode in 3D: tap Photo, frame the house, Snap — a sharp picture to share or save.',
+    ],
+  },
+  {
     version: '2.13.59',
     date: '2026-11-04',
     bullets: [

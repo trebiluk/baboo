@@ -5670,3 +5670,16 @@ html.kb-framed body.kb-on .app-shell.is-phone .chrome {
   .app-shell.is-phone:has(.job-chip) .plan-taps,
   .app-shell.is-phone:has(.job-chip) .plan-taps.aw-ribbon { top: 116px; }
 }
+
+/* 2.13.60: Photo mode — only the picture and a small bar. */
+body.aw-photo .tool-rail, body.aw-photo .job-chip, body.aw-photo .coach-card, body.aw-photo .plan-taps,
+body.aw-photo .view3d-hud, body.aw-photo .view3d-empty, body.aw-photo .fps-badge, body.aw-photo .toast-stack .toast:not(:last-child) { display: none !important; }
+.photo-bar {
+  position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px 8px 14px;
+  background: var(--aw-panel); color: var(--aw-fg); border: 1px solid var(--aw-border); border-radius: 14px;
+  box-shadow: 0 6px 18px #0a0a0a2e; z-index: 40; max-width: calc(100vw - 24px);
+}
+.photo-bar .photo-hint { font-size: 14px; font-weight: 600; }
+.photo-bar button { min-height: 44px; padding: 0 16px; }
+@media (max-width: 640px) { .photo-bar .photo-hint { display: none; } }

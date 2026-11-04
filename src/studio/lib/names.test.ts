@@ -22,3 +22,13 @@ describe('plan names in every language (2.13.55)', () => {
     for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) assert.notEqual(planTitle('', l), 'Untitled plan', l);
   });
 });
+
+describe('photo file names (2.13.60)', () => {
+  it('uses the plan name and a time stamp, in any language', async () => {
+    const { photoFileName } = await import('./photo');
+    const when = new Date('2026-11-04T11:29:00Z');
+    assert.equal(photoFileName('Cape Cod Plan', when), 'Cape Cod Plan 2026-11-04-11-29.png');
+    assert.equal(photoFileName('بيتي', when), 'بيتي 2026-11-04-11-29.png');
+    assert.equal(photoFileName('', when), 'baboo 2026-11-04-11-29.png');
+  });
+});

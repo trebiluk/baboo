@@ -19,6 +19,8 @@ export type EngineHandle = {
   turn: (dir: -1 | 1) => void;
   /** Camera presets for the orbit view (2.13.21). */
   preset: (kind: 'front' | 'top') => void;
+  /** A sharp picture of the current view, drawn at `scale` × the screen size (2.13.60 Photo mode). */
+  snapshot: (scale?: number) => HTMLCanvasElement | null;
 };
 
 /** Where the orbit camera was, per floor, so leaving 3D and coming back keeps your place (2.13.21). */
@@ -577,6 +579,31 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     // How much the last frame drew, for speed checks (draw calls and triangles).
     (wrap as HTMLDivElement & { __babooDraws?: () => { calls: number; tris: number } }).__babooDraws = () => ({ calls: renderer.info.render.calls, tris: renderer.info.render.triangles });
     (wrap as HTMLDivElement & { __babooReset?: () => void }).__babooReset = reset;
+    // Photo mode (2.13.60): draw one frame at a higher pixel ratio into an offscreen copy, then put the screen back.
+    (wrap as HTMLDivElement & { __babooSnapshot?: (scale: number) => HTMLCanvasElement | null }).__babooSnapshot = (scale: number) => {
+      const w = wrap.clientWidth || 800;
+      const h = wrap.clientHeight || 480;
+      const prevRatio = renderer.getPixelRatio();
+      const ratio = Math.min(3, Math.max(prevRatio, scale));
+      try {
+        renderer.setPixelRatio(ratio);
+        renderer.setSize(w, h, false);
+        composer?.setSize(w, h);
+        if (composer) composer.render();
+        else renderer.render(scene, camera);
+        const out = document.createElement('canvas');
+        out.width = renderer.domElement.width;
+        out.height = renderer.domElement.height;
+        out.getContext('2d')?.drawImage(renderer.domElement, 0, 0);
+        return out;
+      } catch {
+        return null;
+      } finally {
+        renderer.setPixelRatio(prevRatio);
+        renderer.setSize(w, h, false);
+        composer?.setSize(w, h);
+      }
+    };
 
     const ro = new ResizeObserver(() => {
       const w = wrap.clientWidth || 800;
@@ -734,6 +761,10 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     preset: (kind: 'front' | 'top') => {
       const wrap = wrapRef.current as (HTMLDivElement & { __babooPreset?: (k: 'front' | 'top') => void }) | null;
       wrap?.__babooPreset?.(kind);
+    },
+    snapshot: (scale = 2) => {
+      const wrap = wrapRef.current as (HTMLDivElement & { __babooSnapshot?: (s: number) => HTMLCanvasElement | null }) | null;
+      return wrap?.__babooSnapshot?.(scale) ?? null;
     },
     walkBy: (steps: number) => {
       const cam = camRef.current;
