@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.66',
+    date: '2026-11-04',
+    bullets: [
+      'Every message now reads in your language: the crash screen, the roof and wallpaper notes, and the catalog button tip.',
+    ],
+  },
+  {
     version: '2.13.65',
     date: '2026-11-04',
     bullets: [

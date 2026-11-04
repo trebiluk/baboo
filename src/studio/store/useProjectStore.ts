@@ -577,7 +577,7 @@ export const useProjectStore = create<Store>((set, get) => ({
     };
     const next = withFloor(doc, (f) => refreshRoof(f, roofStyleId, doc.settings.wallHeight));
     set({ doc: { ...next, settings }, saveStatus: 'unsaved' as SaveStatus });
-    get().showToast(roofStyleId ? `Roof: ${label}` : 'Roof cleared');
+    get().showToast(roofStyleId ? t(tip(get), 'toast.roof', { name: label }) : t(tip(get), 'toast.roofOff'));
   },
   setRoofLabel: (roofLabel) => {
     const doc = get().doc;
@@ -606,9 +606,7 @@ export const useProjectStore = create<Store>((set, get) => ({
       forgetImportPattern(prevRef);
     }
     get().showToast(
-      textureId
-        ? `Wallpaper: ${label}`
-        : 'Wallpaper cleared · plain paint',
+      textureId ? t(tip(get), 'toast.wallpaper', { name: label }) : t(tip(get), 'toast.wallpaperOff'),
     );
   },
   clearTexture: () => {

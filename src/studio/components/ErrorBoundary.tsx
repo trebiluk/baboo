@@ -1,5 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { useDebugStore } from '../store/useDebugStore';
+import { useProjectStore } from '../store/useProjectStore';
+import { t, tipLoc } from '../data/i18n';
 
 type Props = { children: ReactNode; label?: string };
 type State = { crashed: boolean; message: string };
@@ -20,12 +22,19 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.crashed) {
+      // 2.13.66: the crash screen reads in the student's language.
+      let loc = tipLoc(null);
+      try {
+        loc = tipLoc(useProjectStore.getState().doc.settings);
+      } catch {
+        /* store itself may be what broke; English is fine */
+      }
       return (
         <div className="error-screen" role="alert">
-          <strong>Baboo hit a snag</strong>
+          <strong>{t(loc, 'crash.title')}</strong>
           <pre>{this.state.message}</pre>
           <p style={{ margin: 0, fontSize: 13, opacity: 0.7, maxWidth: 480, textAlign: 'center' }}>
-            Your plan is still saved here. Try again — or ask a teacher if it keeps happening.
+            {t(loc, 'crash.body')}
           </p>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
             <button
@@ -33,14 +42,14 @@ export class ErrorBoundary extends Component<Props, State> {
               className="primary-btn"
               onClick={() => this.setState({ crashed: false, message: '' })}
             >
-              Try recover
+              {t(loc, 'crash.recover')}
             </button>
             <button
               type="button"
               className="ghost-btn"
               onClick={() => window.location.reload()}
             >
-              Reload
+              {t(loc, 'crash.reload')}
             </button>
           </div>
         </div>

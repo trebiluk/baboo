@@ -278,7 +278,7 @@ export function ToolRail() {
           type="button"
           className={`tool-rail-btn tool-rail-dock aw-pressable ${catalogOpen ? 'active' : ''}`}
           onClick={toggleCatalog}
-          title={tool === 'room' ? 'Show or hide room types' : 'Show or hide the furniture catalog'}
+          title={tx(locale, tool === 'room' ? 'tooltip.catalogRooms' : 'tooltip.catalogFurn')}
           aria-pressed={catalogOpen}
           tabIndex={expanded ? 0 : -1}
           aria-hidden={!expanded}
