@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.64',
+    date: '2026-11-04',
+    bullets: [
+      'On phones, the plan name box in the menu says “Untitled plan” in your language too.',
+    ],
+  },
+  {
     version: '2.13.63',
     date: '2026-11-04',
     bullets: [

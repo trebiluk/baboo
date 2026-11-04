@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.64 — 2026-11-04 — Phone menu name
+- On phones, the plan name box in the menu says “Untitled plan” in your language too. (The laptop name box was fixed in 2.13.55; the phone menu's copy still said “Untitled Plan”.)
+- Looked over on an Arabic phone: the Teach panel, What's new and the New plan window read right-to-left with no sideways scroll.
+
 ## 2.13.63 — 2026-11-04 — Templates pass
 - Every house template now passes the Access check: the Tiny Home has a 3'-0" front door, and nothing sits in a door swing.
 - Tiny Home: 3'-0" front door in the middle of the long wall; fridge, stove and sink in one run along the left wall.

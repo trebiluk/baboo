@@ -350,7 +350,8 @@ export function Chrome() {
                 <VersionChip onTeacher={() => setTeacherChrome(true)} />
                 <input
                   className="title-input"
-                  value={title}
+                  value={isUnnamedPlan(title) ? '' : title}
+                  placeholder={t(locale, 'plan.untitled')}
                   onChange={(e) => setTitle(e.target.value)}
                   aria-label={t(locale, 'chrome.projectName')}
                 />
@@ -401,7 +402,8 @@ export function Chrome() {
           </div>
           <input
             className="title-input menu-title"
-            value={title}
+            value={isUnnamedPlan(title) ? '' : title}
+            placeholder={t(locale, 'plan.untitled')}
             onChange={(e) => setTitle(e.target.value)}
             aria-label={t(locale, 'chrome.projectName')}
           />
