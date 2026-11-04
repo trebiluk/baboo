@@ -92,3 +92,33 @@ describe('architect check', () => {
     assert.equal(report.checks.find((c) => c.id === 'envelope')?.status, 'pass');
   });
 });
+
+describe('read this plan in other languages (2.13.52)', () => {
+  it('speaks the student\'s language with numbers filled in', () => {
+    const bare = boxFloor(12, 10);
+    const full = boxFloor(12, 10);
+    full.openings = [
+      { id: 'd', wallId: full.walls[0].id, t: 0.5, width: 3, type: 'door', symbolKind: 'swingDoor' },
+      { id: 'w', wallId: full.walls[2].id, t: 0.5, width: 3, type: 'window', symbolKind: 'windowFixed' },
+    ];
+    full.rooms = [{ id: 'r', kind: 'bedroom', name: 'Bedroom', x: 6, y: 5 }];
+    full.furniture = [
+      { id: 's', catalogId: 'sink', x: 2, y: 2, w: 2, h: 2, rot: 0, zIndex: 1, label: '' },
+      { id: 'o', catalogId: 'stove', x: 8, y: 2, w: 2, h: 2, rot: 0, zIndex: 1, label: '' },
+    ];
+    for (const f of [bare, full]) {
+      const en = runArchitectCheck(f, 'ft', 'blank', 'en');
+      for (const locale of ['es', 'uk', 'ar', 'fa-AF', 'rw', 'ti'] as const) {
+        const r = runArchitectCheck(f, 'ft', 'blank', locale);
+        assert.deepEqual(r.checks.map((c) => c.status), en.checks.map((c) => c.status), locale);
+        for (let i = 0; i < r.checks.length; i++) {
+          assert.notEqual(r.checks[i].title, en.checks[i].title, `${locale} ${r.checks[i].id}`);
+          assert.notEqual(r.checks[i].detail, en.checks[i].detail, `${locale} ${r.checks[i].id}`);
+          assert.ok(!/\{\w+\}/.test(r.checks[i].detail + r.checks[i].tip), `${locale} {slot} in ${r.checks[i].id}`);
+        }
+      }
+    }
+    const es = runArchitectCheck(full, 'ft', 'blank', 'es');
+    assert.match(es.checks.find((c) => c.id === 'triangle')!.detail, /Nevera/);
+  });
+});

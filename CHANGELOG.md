@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.52 — 2026-11-04 — Teach panel words
+- The Teach panel’s plan reading, unit steps and reflections are in your language.
+- The “Read this plan” checks name rooms and kitchen pieces in your language. Challenges are still English.
+
 ## 2.13.51 — 2026-11-04 — Dog House words
 - Baboo’s Dog House contest and the Teach panel labels are in your language.
 - With extra doors on a dog house, Baboo blames the extra doors instead of calling a good door too tight.

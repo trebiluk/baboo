@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.52',
+    date: '2026-11-04',
+    bullets: [
+      'The Teach panel’s plan reading, unit steps and reflections are in your language.',
+    ],
+  },
+  {
     version: '2.13.51',
     date: '2026-11-04',
     bullets: [

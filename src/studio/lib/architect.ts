@@ -2,6 +2,9 @@ import type { Floor, FurnitureItem, Point, StyleId } from '../types';
 import { formatLength } from './geometry';
 import { listInteriorFaces, polygonArea, roomPolygon } from './rooms';
 import { exteriorBounds } from './roof';
+import { t, type Locale } from '../data/i18n';
+import { roomLabel } from '../data/rooms';
+import { furnLabel } from '../data/furniture';
 
 /** Classroom room sizes — not a code book. Big enough to live in, small enough to draw. */
 export const ROOM_SCALE: Record<string, { min: number; nice: number; label: string }> = {
@@ -100,7 +103,10 @@ export function runArchitectCheck(
   floor: Floor,
   units: 'ft' | 'm' = 'ft',
   styleId: StyleId | string = 'blank',
+  locale: Locale = 'en',
 ): ArchReport {
+  // 2.13.52: every sentence comes from i18n.ts, in the student's language.
+  const tr = (key: string, vars?: Record<string, string>) => t(locale, key, vars);
   const checks: ArchCheck[] = [];
   if (!floor) return { checks, pass: 0, warn: 0, fail: 0, skip: 0 };
 
@@ -121,29 +127,29 @@ export function runArchitectCheck(
   if (walls.length === 0) {
     checks.push({
       id: 'envelope',
-      title: 'A closed envelope',
+      title: tr('arch.env.title'),
       status: 'fail',
-      detail: 'No walls yet. An envelope is the outside that keeps weather out.',
-      tip: 'Sketch a box, then Trace — or Wall, two clicks at a time, until it meets.',
+      detail: tr('arch.env.none'),
+      tip: tr('arch.env.noneTip'),
     });
   } else if (faces.length === 0) {
     checks.push({
       id: 'envelope',
-      title: 'A closed envelope',
+      title: tr('arch.env.title'),
       status: 'fail',
-      detail: 'Walls do not close a room yet. Rain would walk in at the gaps.',
-      tip: 'Meet every corner. The last click should land on the first.',
+      detail: tr('arch.env.open'),
+      tip: tr('arch.env.openTip'),
     });
   } else {
     const area = faces.reduce((s, f) => s + f.area, 0);
     checks.push({
       id: 'envelope',
-      title: 'A closed envelope',
+      title: tr('arch.env.title'),
       status: 'pass',
       detail: envelope
-        ? `Outside is about ${len(envelope.w)} × ${len(envelope.h)} · ${Math.round(area)} sq ft inside.`
-        : `Closed. About ${Math.round(area)} sq ft inside.`,
-      tip: 'That outside box is the envelope. Interior walls split it into rooms.',
+        ? tr('arch.env.pass', { w: len(envelope.w), h: len(envelope.h), a: String(Math.round(area)) })
+        : tr('arch.env.pass2', { a: String(Math.round(area)) }),
+      tip: tr('arch.env.passTip'),
     });
   }
 
@@ -151,27 +157,27 @@ export function runArchitectCheck(
   if (doors.length === 0) {
     checks.push({
       id: 'entry',
-      title: 'A way in',
+      title: tr('acc.entry.title'),
       status: 'fail',
-      detail: 'No door. A plan needs an entry from outside.',
-      tip: 'Door tool → click an outside wall. That is the front door until you say otherwise.',
+      detail: tr('arch.entry.none'),
+      tip: tr('arch.entry.noneTip'),
     });
   } else if (exteriorIds.size && exteriorDoors.length === 0) {
     checks.push({
       id: 'entry',
-      title: 'A way in',
+      title: tr('acc.entry.title'),
       status: 'warn',
-      detail: 'Doors sit on interior walls only. Guests still need a door from outside.',
-      tip: 'Put one door on an exterior wall. That is the entry.',
+      detail: tr('arch.entry.inside'),
+      tip: tr('arch.entry.insideTip'),
       hit: { kind: 'opening', id: doors[0].id },
     });
   } else {
     checks.push({
       id: 'entry',
-      title: 'A way in',
+      title: tr('acc.entry.title'),
       status: 'pass',
-      detail: `${exteriorDoors.length || doors.length} exterior door${(exteriorDoors.length || doors.length) === 1 ? '' : 's'}.`,
-      tip: 'Keep a clear path from that door to the rooms people use first.',
+      detail: (exteriorDoors.length || doors.length) === 1 ? tr('arch.entry.one') : tr('arch.entry.many', { n: String(exteriorDoors.length || doors.length) }),
+      tip: tr('arch.entry.passTip'),
       hit: { kind: 'opening', id: (exteriorDoors[0] ?? doors[0]).id },
     });
   }
@@ -179,30 +185,30 @@ export function runArchitectCheck(
   if (dog) {
     checks.push({
       id: 'daylight',
-      title: 'Daylight',
+      title: tr('arch.day.title'),
       status: 'skip',
-      detail: 'A den is a shelter, not a people house — skip the window check.',
-      tip: 'Baboo judges this one in Contest.',
+      detail: tr('arch.day.dog'),
+      tip: tr('arch.day.dogTip'),
     });
   } else if (windows.length === 0) {
     checks.push({
       id: 'daylight',
-      title: 'Daylight',
+      title: tr('arch.day.title'),
       status: 'fail',
-      detail: 'No windows. Rooms need a way for sun and air.',
-      tip: 'Window tool → click a wall, usually across from the door.',
+      detail: tr('arch.day.none'),
+      tip: tr('arch.day.noneTip'),
     });
   } else {
     const doorWalls = new Set(doors.map((d) => d.wallId));
     const cross = windows.some((w) => !doorWalls.has(w.wallId));
     checks.push({
       id: 'daylight',
-      title: 'Daylight',
+      title: tr('arch.day.title'),
       status: cross ? 'pass' : 'warn',
       detail: cross
-        ? `${windows.length} window${windows.length === 1 ? '' : 's'} — at least one sits on a different wall than the door.`
-        : `${windows.length} window${windows.length === 1 ? '' : 's'}, all on the same wall as a door. Air wants a path through.`,
-      tip: 'A window across from a door is the simple cross-breeze.',
+        ? windows.length === 1 ? tr('arch.day.cross1') : tr('arch.day.cross', { n: String(windows.length) })
+        : windows.length === 1 ? tr('arch.day.same1') : tr('arch.day.same', { n: String(windows.length) }),
+      tip: tr('arch.day.tip'),
       hit: { kind: 'opening', id: windows[0].id },
     });
   }
@@ -210,28 +216,26 @@ export function runArchitectCheck(
   if (dog) {
     checks.push({
       id: 'named',
-      title: 'Named rooms',
+      title: tr('arch.named.title'),
       status: 'skip',
-      detail: 'A dog house is one den. No kitchen, no bath.',
-      tip: 'Keep it one room. Name is Den.',
+      detail: tr('arch.named.dog'),
+      tip: tr('arch.named.dogTip'),
     });
   } else if (rooms.length === 0) {
     checks.push({
       id: 'named',
-      title: 'Named rooms',
+      title: tr('arch.named.title'),
       status: faces.length ? 'warn' : 'skip',
-      detail: faces.length
-        ? 'Spaces are closed but not named. A plan without names is hard to read.'
-        : 'Close walls first, then name the rooms.',
-      tip: 'Room tool → Kitchen, Bath, Living… → click inside.',
+      detail: faces.length ? tr('arch.named.unnamed') : tr('arch.named.first'),
+      tip: tr('arch.named.howTip'),
     });
   } else {
     checks.push({
       id: 'named',
-      title: 'Named rooms',
+      title: tr('arch.named.title'),
       status: 'pass',
-      detail: `${rooms.length} named space${rooms.length === 1 ? '' : 's'}.`,
-      tip: 'Every closed space people use should have a name and an area.',
+      detail: rooms.length === 1 ? tr('arch.named.one') : tr('arch.named.many', { n: String(rooms.length) }),
+      tip: tr('arch.named.passTip'),
       hit: { kind: 'room', id: rooms[0].id },
     });
   }
@@ -239,18 +243,18 @@ export function runArchitectCheck(
   if (dog) {
     checks.push({
       id: 'scale',
-      title: 'Room scale',
+      title: tr('arch.scale.title'),
       status: 'skip',
-      detail: 'Den size is a Contest check (about 8–18 sq ft), not a people bedroom.',
-      tip: 'Open Contest — Baboo has the textbook list.',
+      detail: tr('arch.scale.dog'),
+      tip: tr('arch.scale.dogTip'),
     });
   } else if (rooms.length === 0) {
     checks.push({
       id: 'scale',
-      title: 'Room scale',
+      title: tr('arch.scale.title'),
       status: 'skip',
-      detail: 'Name rooms and we’ll ask if they feel like real sizes.',
-      tip: 'A bedroom wants about 10×10. A bath can be 5×8.',
+      detail: tr('arch.scale.skip'),
+      tip: tr('arch.scale.skipTip'),
     });
   } else {
     let worst: ArchCheck | null = null;
@@ -261,10 +265,10 @@ export function runArchitectCheck(
       if (!poly) {
         worst = {
           id: 'scale',
-          title: 'Room scale',
+          title: tr('arch.scale.title'),
           status: 'warn',
-          detail: `${room.name} is tagged but the walls are not a closed shape.`,
-          tip: 'Finish the walls around it, then read the square-foot label.',
+          detail: tr('arch.scale.open', { room: roomLabel(locale, room) }),
+          tip: tr('arch.scale.openTip'),
           hit: { kind: 'room', id: room.id },
         };
         break;
@@ -273,10 +277,10 @@ export function runArchitectCheck(
       if (area + 1e-6 < rule.min) {
         worst = {
           id: 'scale',
-          title: 'Room scale',
+          title: tr('arch.scale.title'),
           status: 'fail',
-          detail: `${room.name} is ${Math.round(area)} sq ft. A ${rule.label.toLowerCase()} wants about ${rule.min}+ (${rule.nice} feels better).`,
-          tip: 'Nudge a wall. Size should match how the room is used.',
+          detail: tr('arch.scale.fail', { room: roomLabel(locale, room), a: String(Math.round(area)), min: String(rule.min), nice: String(rule.nice) }),
+          tip: tr('arch.scale.failTip'),
           hit: { kind: 'room', id: room.id },
         };
         break;
@@ -284,20 +288,20 @@ export function runArchitectCheck(
       if (area + 1e-6 < rule.nice && (!worst || worst.status === 'pass')) {
         worst = {
           id: 'scale',
-          title: 'Room scale',
+          title: tr('arch.scale.title'),
           status: 'warn',
-          detail: `${room.name} is ${Math.round(area)} sq ft — tight. ${rule.nice} sq ft feels more like a real ${rule.label.toLowerCase()}.`,
-          tip: 'A little extra room is easier to furnish.',
+          detail: tr('arch.scale.warn', { room: roomLabel(locale, room), a: String(Math.round(area)), nice: String(rule.nice) }),
+          tip: tr('arch.scale.warnTip'),
           hit: { kind: 'room', id: room.id },
         };
       }
     }
     checks.push(worst ?? {
       id: 'scale',
-      title: 'Room scale',
+      title: tr('arch.scale.title'),
       status: 'pass',
-      detail: 'Named rooms are in a size people can live in.',
-      tip: 'Read the square-foot label. Does it match the furniture you put in?',
+      detail: tr('arch.scale.pass'),
+      tip: tr('arch.scale.passTip'),
       hit: rooms[0] ? { kind: 'room', id: rooms[0].id } : undefined,
     });
   }
@@ -305,26 +309,28 @@ export function runArchitectCheck(
   if (!envelope) {
     checks.push({
       id: 'overall',
-      title: 'Overall size',
+      title: tr('arch.overall.title'),
       status: 'skip',
-      detail: 'Need an outside box before we can label overall width and depth.',
-      tip: 'Size tool → two clicks. The sheet also draws overall ticks once walls close.',
+      detail: tr('arch.overall.skip'),
+      tip: tr('arch.overall.skipTip'),
     });
   } else if (dims.length === 0) {
     checks.push({
       id: 'overall',
-      title: 'Overall size',
+      title: tr('arch.overall.title'),
       status: 'warn',
-      detail: `Envelope is ${len(envelope.w)} × ${len(envelope.h)}. Put at least one size label so someone else can read it.`,
-      tip: 'Size tool → click two ends of a wall. Overall ticks on the sheet are the architect’s outside numbers.',
+      detail: tr('arch.overall.warn', { w: len(envelope.w), h: len(envelope.h) }),
+      tip: tr('arch.overall.warnTip'),
     });
   } else {
     checks.push({
       id: 'overall',
-      title: 'Overall size',
+      title: tr('arch.overall.title'),
       status: 'pass',
-      detail: `Envelope ${len(envelope.w)} × ${len(envelope.h)} · ${dims.length} size label${dims.length === 1 ? '' : 's'} on the sheet.`,
-      tip: 'Outside numbers are overall. Inside numbers are rooms.',
+      detail: dims.length === 1
+        ? tr('arch.overall.pass1', { w: len(envelope.w), h: len(envelope.h) })
+        : tr('arch.overall.pass', { w: len(envelope.w), h: len(envelope.h), n: String(dims.length) }),
+      tip: tr('arch.overall.passTip'),
       hit: { kind: 'dim', id: dims[0].id },
     });
   }
@@ -332,10 +338,10 @@ export function runArchitectCheck(
   if (dog) {
     checks.push({
       id: 'triangle',
-      title: 'Kitchen work triangle',
+      title: tr('arch.tri.title'),
       status: 'skip',
-      detail: 'No kitchen in a den.',
-      tip: 'People houses: sink, stove, fridge — keep the three walks short.',
+      detail: tr('arch.tri.dog'),
+      tip: tr('arch.tri.dogTip'),
     });
   } else {
     const stations = kitchenStations(furniture);
@@ -344,23 +350,23 @@ export function runArchitectCheck(
     if (have === 0) {
       checks.push({
         id: 'triangle',
-        title: 'Kitchen work triangle',
+        title: tr('arch.tri.title'),
         status: 'skip',
-        detail: 'No sink, stove, or fridge yet.',
-        tip: 'Furniture → kitchen pieces. The three walks between them are the work triangle.',
+        detail: tr('arch.tri.none'),
+        tip: tr('arch.tri.noneTip'),
       });
     } else if (!tri) {
       const missing = [
         !stations.sink ? 'sink' : null,
         !stations.stove ? 'stove' : null,
         !stations.fridge ? 'fridge' : null,
-      ].filter(Boolean).join(', ');
+      ].filter((x): x is string => !!x).map((id) => furnLabel(locale, id, '')).join(', ');
       checks.push({
         id: 'triangle',
-        title: 'Kitchen work triangle',
+        title: tr('arch.tri.title'),
         status: 'warn',
-        detail: `Kitchen is missing ${missing}. Need all three to measure the triangle.`,
-        tip: 'Sink, stove, fridge. Not in a line if you can help it.',
+        detail: tr('arch.tri.missing', { list: missing }),
+        tip: tr('arch.tri.missingTip'),
         hit: { kind: 'furniture', id: (stations.sink ?? stations.stove ?? stations.fridge)!.id },
       });
     } else {
@@ -371,12 +377,10 @@ export function runArchitectCheck(
       const ok = !long && !short && !fat && !skinny;
       checks.push({
         id: 'triangle',
-        title: 'Kitchen work triangle',
+        title: tr('arch.tri.title'),
         status: ok ? 'pass' : fat || long ? 'fail' : 'warn',
-        detail: ok
-          ? `Walks ${len(tri.legs[0])}, ${len(tri.legs[1])}, ${len(tri.legs[2])} · total ${len(tri.sum)}.`
-          : `Walks ${len(tri.legs[0])}, ${len(tri.legs[1])}, ${len(tri.legs[2])} · total ${len(tri.sum)}. Want each 4–9 ft, total about 13–26 ft.`,
-        tip: 'Keep the cook’s three steps short. A dining table in the middle stretches them.',
+        detail: tr(ok ? 'arch.tri.ok' : 'arch.tri.bad', { a: len(tri.legs[0]), b: len(tri.legs[1]), c: len(tri.legs[2]), s: len(tri.sum) }),
+        tip: tr('arch.tri.tip'),
         hit: { kind: 'furniture', id: stations.sink!.id },
       });
     }

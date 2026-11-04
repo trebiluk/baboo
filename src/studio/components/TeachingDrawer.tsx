@@ -30,9 +30,11 @@ export function TeachingDrawer() {
   const ellEnglish = doc.settings.ellEnglish !== false;
   const rank = skillRank(skillLevel);
   const unit = styleId === 'dog-house' ? DOG_HOUSE_UNIT : UNIT_1;
-  const unitSteps = styleId === 'dog-house'
+  // 2.13.52: steps come from i18n.ts by position (teach.dog.s1…, teach.nov.s1…, teach.u1.s1…).
+  const stepKey = styleId === 'dog-house' ? 'teach.dog' : (rank === 0 ? 'teach.nov' : 'teach.u1');
+  const unitSteps = (styleId === 'dog-house'
     ? DOG_HOUSE_UNIT.steps
-    : (rank === 0 ? NOVICE_UNIT_STEPS : UNIT_1.steps);
+    : (rank === 0 ? NOVICE_UNIT_STEPS : UNIT_1.steps)).map((_, i) => t(locale, `${stepKey}.s${i + 1}`));
   const challenges = CHALLENGES.filter((c) => {
     if (styleId === 'dog-house') {
       return c.id === 'C-DOG-HOUSE-CONTEST' || c.id === 'C-ROOF-NAME';
@@ -125,7 +127,7 @@ export function TeachingDrawer() {
             <ol>
               {unitSteps.map((s) => <li key={s}>{s}</li>)}
             </ol>
-            <p className="done-like"><strong>{t(locale, 'teach.done')}</strong> {unit.doneLooksLike}</p>
+            <p className="done-like"><strong>{t(locale, 'teach.done')}</strong> {t(locale, unit === DOG_HOUSE_UNIT ? 'teach.dog.done' : 'teach.u1.done')}</p>
             {styleId === 'dog-house' && (
               <button type="button" className="primary-btn aw-pressable" style={{ marginTop: 10 }} onClick={toggleContest}>
                 {t(locale, 'teach.judge')}
@@ -146,8 +148,8 @@ export function TeachingDrawer() {
             <h3>{t(locale, 'teach.reflect')}</h3>
             {REFLECTION_PROMPTS.map((r) => (
               <article key={r.id} className="challenge-card">
-                <h4>{r.title}</h4>
-                <p className="teach-multiline">{r.prompt}</p>
+                <h4>{t(locale, `teach.ref.${r.id}.title`)}</h4>
+                <p className="teach-multiline">{t(locale, `teach.ref.${r.id}.prompt`)}</p>
               </article>
             ))}
           </section>
@@ -288,7 +290,7 @@ function ArchitectReadout({
 }) {
   let report;
   try {
-    report = runArchitectCheck(floor, units, styleId);
+    report = runArchitectCheck(floor, units, styleId, locale);
   } catch {
     report = { checks: [] as ArchCheck[], pass: 0, warn: 0, fail: 0, skip: 0 };
   }
