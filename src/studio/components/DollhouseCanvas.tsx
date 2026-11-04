@@ -26,7 +26,9 @@ import { asFloorFinish, asFloorGrain, floorFinish, floorTileCanvas } from '../da
 import { bloomSpots } from '../data/landscape';
 import { listInteriorFloors, roomPolygon } from '../lib/rooms';
 import { DEFAULT_GUI_THEME } from '../data/themes';
-import { t } from '../data/i18n';
+import { planTitle, t } from '../data/i18n';
+import { PhotoBar } from './PhotoBar';
+import { photoNote } from '../lib/photoNote';
 import { roomLabel } from '../data/rooms';
 import { houseHasUpper, wallStories } from '../lib/stories';
 import type { LandscapeItem } from '../types';
@@ -73,6 +75,11 @@ export function DollhouseCanvas() {
 
   const floor = useProjectStore((s) => s.doc.floors[0]);
   const settings = useProjectStore((s) => s.doc.settings);
+  // Photo mode (2.13.61): the Konva stage draws itself sharp into a canvas.
+  const stageRef = useRef<Konva.Stage>(null);
+  const [photo, setPhoto] = useState(false);
+  const photoTitle = planTitle(useProjectStore((s) => s.doc.meta.title), settings.locale);
+  const photoNoteText = photoNote(settings, settings.locale);
   const setSettings = useProjectStore((s) => s.setSettings);
   const selected = useProjectStore((s) => s.selected);
   const setSelected = useProjectStore((s) => s.setSelected);
@@ -549,6 +556,7 @@ export function DollhouseCanvas() {
       onContextMenu={toolsPocket.onContextMenu}
     >
       <Stage
+        ref={stageRef}
         width={size.w}
         height={size.h}
         x={pan.x}
@@ -762,7 +770,18 @@ export function DollhouseCanvas() {
           ▶
         </button>
         <AxisGizmo spec={spec} light={light} />
+        {floor.walls.length ? (
+          <button type="button" className="doll-chip aw-pressable doll-photo" onClick={() => setPhoto(true)}>{t(settings.locale, 'photo.btn')}</button>
+        ) : null}
       </div>
+      <PhotoBar
+        open={photo}
+        onClose={() => setPhoto(false)}
+        loc={settings.locale}
+        title={photoTitle}
+        note={photoNoteText}
+        getPicture={() => { try { return stageRef.current?.toCanvas({ pixelRatio: 2 }) ?? null; } catch { return null; } }}
+      />
       <div className="canvas-hint">
         {floor.walls.length === 0
           ? t(settings.locale, 'hint.doll.empty')

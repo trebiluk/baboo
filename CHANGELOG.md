@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.61 — 2026-11-04 — Postcard
+- Postcard: in 3D or the Dollhouse, tap Photo then Postcard for your house on a cream card with its name, the date, style and roof. Cards are always 1200×900 so a class board lines up; a footer says “Made with Baboo · v…”. Right-to-left languages mirror the captions.
+- Photo mode now works in the Dollhouse too (Photo button in its toolbar).
+
 ## 2.13.60 — 2026-11-04 — Photo mode
 - Photo mode in 3D: tap Photo, frame the house, Snap — a sharp picture to share or save. Every panel hides while you frame; Snap draws the view at 2× and hands it to the phone's share sheet, or downloads “Plan name date.png”. Done or Escape brings the panels back. Nothing leaves the device unless you share it.
 - Postcard (captions, Dollhouse) comes next.

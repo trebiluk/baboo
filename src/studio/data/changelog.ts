@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.61',
+    date: '2026-11-04',
+    bullets: [
+      'Postcard: in 3D or the Dollhouse, tap Photo then Postcard for your house on a cream card with its name, the date, style and roof.',
+    ],
+  },
+  {
     version: '2.13.60',
     date: '2026-11-04',
     bullets: [

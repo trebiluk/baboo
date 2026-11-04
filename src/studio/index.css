@@ -5683,3 +5683,5 @@ body.aw-photo .view3d-hud, body.aw-photo .view3d-empty, body.aw-photo .fps-badge
 .photo-bar .photo-hint { font-size: 14px; font-weight: 600; }
 .photo-bar button { min-height: 44px; padding: 0 16px; }
 @media (max-width: 640px) { .photo-bar .photo-hint { display: none; } }
+.doll-chip.doll-photo { padding: 0 12px; margin-inline-start: 6px; }
+body.aw-photo .doll-proj, body.aw-photo .canvas-hint, body.aw-photo .plan-sheet { display: none !important; }

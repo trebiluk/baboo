@@ -32,3 +32,14 @@ describe('photo file names (2.13.60)', () => {
     assert.equal(photoFileName('', when), 'baboo 2026-11-04-11-29.png');
   });
 });
+
+describe('postcard caption (2.13.61)', () => {
+  it('says date · style · roof in the student\'s language', async () => {
+    const { photoNote } = await import('./photoNote');
+    const when = new Date('2026-11-04T12:00:00Z');
+    assert.match(photoNote({ styleId: 'victorian', roofStyleId: 'mansard', roofLabel: '' }, 'en', when), /^November 4, 2026 · Victorian · Mansard$/);
+    assert.match(photoNote({ styleId: 'victorian', roofStyleId: 'mansard', roofLabel: '' }, 'es', when), /noviembre/);
+    assert.match(photoNote({ styleId: 'victorian', roofStyleId: 'mansard', roofLabel: '' }, 'ar', when), /نوفمبر/);
+    assert.equal(photoNote({ styleId: 'blank', roofStyleId: null, roofLabel: '' }, 'en', when), 'November 4, 2026');
+  });
+});
