@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.67 — 2026-11-04 — class card in your language
+- The class card preview in Help now reads in your language.
+- Every label, hint, field and note on the class card (and its Help toggle) goes through i18n; the dog-house ribbon uses the contest words. ti, fa-AF, rw unchecked native copy.
+- The card's words spilled 100px out of the Help panel (Style/Roof/Wallpaper values were off-screen). The card now stacks in Help and its body can't push past its edge.
+
 ## 2.13.66 — 2026-11-04 — every message in your language
 - Every message now reads in your language: the crash screen, the roof and wallpaper notes, and the catalog button tip.
 - The crash screen, the roof/wallpaper toasts and the catalog button tip were still English-only in the student view. All go through i18n now (ti, fa-AF, rw unchecked native copy).

@@ -1858,20 +1858,26 @@ html[data-ell-english] {
   background:radial-gradient(ellipse 80% 50% at 100% 0%, oklab(62.6846% .129701 -.193012/.12), transparent 70%), var(--aw-elevated);
   box-shadow:var(--aw-shine), 0 14px 28px -20px #000;
   border-radius:14px;
-  grid-template-columns:120px 1fr;
+  grid-template-columns:120px minmax(0, 1fr);
   gap:14px;
   margin-top:10px;
   padding:14px;
   display:grid
 }
 .aw-gallery-card--compact {
-  grid-template-columns:88px 1fr;
+  grid-template-columns:88px minmax(0, 1fr);
   gap:10px;
   padding:10px
 }
 .aw-gallery-card__thumb {
   min-height:96px
 }
+/* 2.13.67: the card body may not push past the card (it spilled 100px out of the Help panel). */
+.aw-gallery-card__body { min-width:0; }
+.aw-gallery-card__export input, .aw-gallery-card__export textarea { max-width:100%; box-sizing:border-box; }
+/* Help is a 320px panel: stack the picture over the words there. */
+.aw-gallery-preview-block .aw-gallery-card { grid-template-columns:1fr; }
+.aw-gallery-preview-block .aw-gallery-card__plan-ph { min-height:72px; }
 .aw-gallery-card__plan-ph {
   border:1px solid color-mix(in srgb, var(--aw-indigo) 40%, transparent);
   background:radial-gradient(ellipse 70% 60% at 50% 40%, oklab(58.5404% .0252827 -.202483/.12), transparent 70%), repeating-linear-gradient(-45deg, transparent, transparent 6px, color-mix(in oklab, var(--aw-muted) 12%, transparent) 6px, color-mix(in oklab, var(--aw-muted) 12%, transparent) 7px), var(--aw-surface);

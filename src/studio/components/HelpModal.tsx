@@ -128,7 +128,7 @@ export function HelpModal() {
             aria-expanded={showGallery}
             onClick={() => setShowGallery((v) => !v)}
           >
-            {showGallery ? 'Hide class card preview' : 'Class card preview'}
+            {t(locale, showGallery ? 'card.hide' : 'card.preview')}
           </button>
           {showGallery ? <GalleryCardPreview /> : null}
         </div>

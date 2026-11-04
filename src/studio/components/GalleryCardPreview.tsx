@@ -5,7 +5,8 @@ import { STYLE_TEMPLATES } from '../data/templates';
 import { textureName } from '../data/textures';
 import { shellDisplayName } from '../data/typology';
 import { DEFAULT_GALLERY_ALIAS } from '../lib/galleryExport';
-import { judgeDogHouse, ribbonLabel } from '../lib/contest';
+import { judgeDogHouse } from '../lib/contest';
+import { t, tipLoc, planTitle } from '../data/i18n';
 
 /** Share-gallery card — aliases only (SHARE-GALLERY.md · FERPA). */
 export function GalleryCardPreview({
@@ -18,6 +19,8 @@ export function GalleryCardPreview({
 }) {
   const settings = useProjectStore((s) => s.doc.settings);
   const title = useProjectStore((s) => s.doc.meta.title);
+  // 2.13.67: the card reads in the student's language.
+  const locale = tipLoc(settings);
   const exportGalleryCard = useProjectStore((s) => s.exportGalleryCard);
   const [alias, setAlias] = useState(DEFAULT_GALLERY_ALIAS);
   const [reflection, setReflection] = useState('');
@@ -25,24 +28,24 @@ export function GalleryCardPreview({
   const styleName =
     STYLE_TEMPLATES.find((t) => t.id === settings.styleId)?.name ?? settings.styleId;
   const roof =
-    (settings.roofLabel?.trim() || roofStyleName(settings.roofStyleId)) || 'None';
-  const tex = textureName(settings.textureId);
+    settings.roofLabel?.trim() || (settings.roofStyleId ? roofStyleName(settings.roofStyleId) : t(locale, 'card.none'));
+  const tex = settings.textureId ? textureName(settings.textureId) : t(locale, 'card.none');
   const isTiny = settings.styleId === 'tiny-home' || settings.typology?.kind === 'tiny-home';
   const shellLabel = isTiny ? shellDisplayName(settings.typology?.shell ?? 'trailer') : '';
   const floor = useProjectStore((s) => s.doc.floors[0]);
   const contestRibbon = settings.styleId === 'dog-house'
-    ? ribbonLabel(judgeDogHouse(floor, { roofStyleId: settings.roofStyleId }).ribbon)
+    ? t(locale, `contest.ribbon.${judgeDogHouse(floor, { roofStyleId: settings.roofStyleId, locale }).ribbon}`)
     : null;
 
   return (
     <article
       className={`aw-gallery-card${compact ? ' aw-gallery-card--compact' : ''}`}
-      aria-label="Class card preview"
+      aria-label={t(locale, 'card.preview')}
     >
       <div className="aw-gallery-card__thumb" aria-hidden="true">
         <div className="aw-gallery-card__plan-ph">
-          <span>Plan picture</span>
-          <small>Coming soon</small>
+          <span>{t(locale, 'card.picture')}</span>
+          <small>{t(locale, 'card.soon')}</small>
         </div>
       </div>
       <div className="aw-gallery-card__body">
@@ -50,18 +53,18 @@ export function GalleryCardPreview({
           <span className="aw-gallery-card__badge">Baboo</span>
           <p className="aw-gallery-card__alias">{alias.trim() || DEFAULT_GALLERY_ALIAS}</p>
         </div>
-        <h3 className="aw-gallery-card__title">{title || 'Untitled plan'}</h3>
+        <h3 className="aw-gallery-card__title">{planTitle(title, locale)}</h3>
         {reflection.trim() && !compact ? (
           <p className="aw-gallery-card__blurb">{reflection.trim()}</p>
         ) : null}
         <dl className="aw-gallery-card__meta">
           <div>
-            <dt>Style</dt>
+            <dt>{t(locale, 'card.style')}</dt>
             <dd>{styleName}</dd>
           </div>
           {shellLabel ? (
             <div>
-              <dt>Shell</dt>
+              <dt>{t(locale, 'card.shell')}</dt>
               <dd>{shellLabel}</dd>
             </div>
           ) : null}
@@ -72,39 +75,39 @@ export function GalleryCardPreview({
             </div>
           ) : null}
           <div>
-            <dt>Roof</dt>
+            <dt>{t(locale, 'chip.roof')}</dt>
             <dd>{roof}</dd>
           </div>
           <div>
-            <dt>Wallpaper</dt>
+            <dt>{t(locale, 'obj.wallpaper')}</dt>
             <dd>{tex}</dd>
           </div>
         </dl>
         {showExport ? (
           <div className="aw-gallery-card__export">
             <label className="field">
-              <span>Gallery alias (no real name)</span>
+              <span>{t(locale, 'card.alias')}</span>
               <input
                 type="text"
                 value={alias}
                 maxLength={40}
                 autoComplete="off"
                 spellCheck={false}
-                aria-label="Gallery alias"
+                aria-label={t(locale, 'card.alias')}
                 onChange={(e) => setAlias(e.target.value)}
                 placeholder={DEFAULT_GALLERY_ALIAS}
               />
             </label>
             {!compact ? (
               <label className="field">
-                <span>Short reflection (optional)</span>
+                <span>{t(locale, 'card.reflection')}</span>
                 <textarea
                   value={reflection}
                   maxLength={500}
                   rows={2}
-                  aria-label="Gallery reflection"
+                  aria-label={t(locale, 'card.reflection')}
                   onChange={(e) => setReflection(e.target.value)}
-                  placeholder="One proud detail…"
+                  placeholder={t(locale, 'card.proud')}
                 />
               </label>
             ) : null}
@@ -118,15 +121,15 @@ export function GalleryCardPreview({
                 })
               }
             >
-              Class card
+              {t(locale, 'chrome.classCard')}
             </button>
             <p className="aw-gallery-card__note muted">
-              Downloads lean JSON (alias only · no image blobs). Plan PNG later.
+              {t(locale, 'card.note')}
             </p>
           </div>
         ) : (
           <p className="aw-gallery-card__note muted">
-            Class card — alias only, no last name.
+            {t(locale, 'card.aliasOnly')}
           </p>
         )}
       </div>

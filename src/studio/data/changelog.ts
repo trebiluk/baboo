@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.67',
+    date: '2026-11-04',
+    bullets: [
+      'The class card preview in Help now reads in your language.',
+      'The card fits inside Help again; its Style, Roof and Wallpaper values were off the edge.',
+    ],
+  },
+  {
     version: '2.13.66',
     date: '2026-11-04',
     bullets: [
