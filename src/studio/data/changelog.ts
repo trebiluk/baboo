@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.59',
+    date: '2026-11-04',
+    bullets: [
+      'Baboo\'s checks follow the 2025 Residential Code of New York State: rooms you live in at least 70 sq ft and 7 ft across, and one 3\'-0" front door.',
+    ],
+  },
+  {
     version: '2.13.58',
     date: '2026-11-04',
     bullets: [

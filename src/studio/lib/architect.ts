@@ -16,6 +16,11 @@ export const ROOM_SCALE: Record<string, { min: number; nice: number; label: stri
   entry: { min: 12, nice: 20, label: 'Entry' },
 };
 
+/** 2025 Residential Code of New York State: habitable rooms (2.13.59). Kitchens are exempt. */
+export const NY_ROOM_SQFT = 70;
+export const NY_ROOM_MIN_FT = 7;
+export const NY_HABITABLE = new Set<string>(['bedroom', 'living', 'dining', 'office']);
+
 /** NKBA work-triangle, simplified for grades 5–8. */
 export const TRIANGLE = {
   legMin: 4,
@@ -254,13 +259,15 @@ export function runArchitectCheck(
       title: tr('arch.scale.title'),
       status: 'skip',
       detail: tr('arch.scale.skip'),
-      tip: tr('arch.scale.skipTip'),
+      tip: tr('arch.ny.skipTip'),
     });
   } else {
+    // 2.13.59: 2025 Residential Code of New York State — rooms people live in (bedroom, living, dining, office)
+    // need at least 70 sq ft and 7 ft in every direction. Kitchens, baths, halls and storage are not counted.
     let worst: ArchCheck | null = null;
     for (const room of rooms) {
+      if (!NY_HABITABLE.has(room.kind)) continue;
       const rule = ROOM_SCALE[room.kind];
-      if (!rule) continue;
       const poly = roomPolygon(room, nodes, walls);
       if (!poly) {
         worst = {
@@ -274,18 +281,32 @@ export function runArchitectCheck(
         break;
       }
       const area = polygonArea(poly);
-      if (area + 1e-6 < rule.min) {
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      for (const p of poly) { minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x); minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y); }
+      const across = Math.min(maxX - minX, maxY - minY);
+      if (area + 1e-6 < NY_ROOM_SQFT) {
         worst = {
           id: 'scale',
           title: tr('arch.scale.title'),
           status: 'fail',
-          detail: tr('arch.scale.fail', { room: roomLabel(locale, room), a: String(Math.round(area)), min: String(rule.min), nice: String(rule.nice) }),
+          detail: tr('arch.ny.small', { room: roomLabel(locale, room), a: String(Math.round(area)) }),
           tip: tr('arch.scale.failTip'),
           hit: { kind: 'room', id: room.id },
         };
         break;
       }
-      if (area + 1e-6 < rule.nice && (!worst || worst.status === 'pass')) {
+      if (across + 1e-6 < NY_ROOM_MIN_FT) {
+        worst = {
+          id: 'scale',
+          title: tr('arch.scale.title'),
+          status: 'fail',
+          detail: tr('arch.ny.narrow', { room: roomLabel(locale, room), w: len(across) }),
+          tip: tr('arch.scale.failTip'),
+          hit: { kind: 'room', id: room.id },
+        };
+        break;
+      }
+      if (rule && area + 1e-6 < rule.nice && (!worst || worst.status === 'pass')) {
         worst = {
           id: 'scale',
           title: tr('arch.scale.title'),
@@ -300,7 +321,7 @@ export function runArchitectCheck(
       id: 'scale',
       title: tr('arch.scale.title'),
       status: 'pass',
-      detail: tr('arch.scale.pass'),
+      detail: tr('arch.ny.pass'),
       tip: tr('arch.scale.passTip'),
       hit: rooms[0] ? { kind: 'room', id: rooms[0].id } : undefined,
     });

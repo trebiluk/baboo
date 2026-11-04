@@ -15,6 +15,14 @@ export const ADA = {
   kitchenAisleFt: 40 / 12, // 804.2.2
 } as const;
 
+/** 2025 Residential Code of New York State (based on the 2024 IRC), simplified for class (2.13.59). */
+export const NY = {
+  exitDoorFt: 3, // one exit door with 32" clear opening — a 3'-0" door
+  hallFt: 3, // hallways at least 3 feet wide
+  roomSqFt: 70, // habitable rooms at least 70 sq ft…
+  roomMinFt: 7, // …and at least 7 ft in every direction (kitchens exempt)
+} as const;
+
 export type AccessStatus = 'pass' | 'warn' | 'fail' | 'skip';
 
 export type AccessHit = {
@@ -215,44 +223,45 @@ export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft', locale: L
     });
   }
 
-  const tightDoors = doors.filter((d) => d.width + 1e-6 < ADA.doorClearFt);
-  const okDoors = doors.filter((d) => d.width + 1e-6 >= ADA.doorNiceFt);
+  // 2.13.59: 2025 Residential Code of New York State — one exit door with 32" clear (a 3'-0" door).
+  // Inside doors have no minimum width, so only doors on outside walls are measured.
+  const exteriorIds = new Set(walls.filter((w) => w.kind === 'exterior').map((w) => w.id));
+  const outside = doors.filter((d) => exteriorIds.has(d.wallId));
+  const exit = outside.slice().sort((a, b) => b.width - a.width)[0];
   if (doors.length === 0) {
     checks.push({
       id: 'door-width',
-      title: tr('acc.dw.title'),
+      title: tr('acc.ny.dwTitle'),
       status: 'skip',
       detail: tr('acc.dw.skip'),
-      tip: tr('acc.dw.skipTip'),
+      tip: tr('acc.ny.dwTip'),
     });
-  } else if (tightDoors.length) {
-    const d = tightDoors[0];
+  } else if (!exit) {
     checks.push({
       id: 'door-width',
-      title: tr('acc.dw.title'),
-      status: 'fail',
-      detail: tr('acc.dw.fail', { w: len(d.width), c: len(ADA.doorClearFt) }),
-      tip: tr('acc.dw.failTip'),
-      hit: { kind: 'opening', id: d.id },
-    });
-  } else if (okDoors.length === doors.length) {
-    checks.push({
-      id: 'door-width',
-      title: tr('acc.dw.title'),
-      status: 'pass',
-      detail: tr('acc.dw.pass', { w: len(doors[0].width) }),
-      tip: tr('acc.dw.passTip'),
+      title: tr('acc.ny.dwTitle'),
+      status: 'warn',
+      detail: tr('acc.ny.dwNoExt'),
+      tip: tr('acc.ny.dwTip'),
       hit: { kind: 'opening', id: doors[0].id },
     });
-  } else {
-    const d = doors.find((x) => x.width < ADA.doorNiceFt) ?? doors[0];
+  } else if (exit.width + 1e-6 < NY.exitDoorFt) {
     checks.push({
       id: 'door-width',
-      title: tr('acc.dw.title'),
-      status: 'warn',
-      detail: tr('acc.dw.warn', { w: len(d.width) }),
-      tip: tr('acc.dw.warnTip'),
-      hit: { kind: 'opening', id: d.id },
+      title: tr('acc.ny.dwTitle'),
+      status: 'fail',
+      detail: tr('acc.ny.dwFail', { w: len(exit.width) }),
+      tip: tr('acc.ny.dwTip'),
+      hit: { kind: 'opening', id: exit.id },
+    });
+  } else {
+    checks.push({
+      id: 'door-width',
+      title: tr('acc.ny.dwTitle'),
+      status: 'pass',
+      detail: tr('acc.ny.dwPass', { w: len(exit.width) }),
+      tip: tr('acc.dw.passTip'),
+      hit: { kind: 'opening', id: exit.id },
     });
   }
 
@@ -364,7 +373,7 @@ export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft', locale: L
       } else {
         worst = {
           roomId: room.id,
-          status: 'fail',
+          status: 'warn', // 2.13.59: accessibility guidance, not one-family code
           detail: tr('acc.turn.fail', { room: roomName(room), w: len(minSide) }),
         };
         break;
@@ -376,7 +385,7 @@ export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft', locale: L
       title: tr('acc.turn.title'),
       status: w.status,
       detail: w.detail,
-      tip: tr('acc.turn.tip'),
+      tip: `${tr('acc.turn.tip')} ${tr('acc.ny.adaNote')}`,
       hit: { kind: 'room', id: w.roomId },
     });
   }
@@ -419,9 +428,9 @@ export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft', locale: L
       checks.push({
         id: 'kitchen',
         title: tr('acc.k.title'),
-        status: 'fail',
+        status: 'warn', // 2.13.59: accessibility guidance, not one-family code
         detail: tr('acc.k.fail', { a: itemName(a), b: itemName(b), w: len(Math.max(0, minGap)) }),
-        tip: tr('acc.k.failTip'),
+        tip: `${tr('acc.k.failTip')} ${tr('acc.ny.adaNote')}`,
         hit: { kind: 'furniture', id: a.id },
       });
     } else {

@@ -153,11 +153,32 @@ describe('kitchen aisle (2.13.50)', () => {
     const f = boxFloor(20, 20);
     f.furniture = [piece('a', 'stove', 5, 2, 2.5, 2.5), piece('b', 'sink', 5, 5, 2.5, 2)];
     const k = runAccessCheck(f).checks.find((c) => c.id === 'kitchen')!;
-    assert.equal(k.status, 'fail');
+    assert.equal(k.status, 'warn'); // 2.13.59: accessibility guidance, not NY one-family code
     assert.match(k.detail, /Stove and Kitchen Sink/);
   });
   it('turns a rotated row the same way', () => {
     assert.equal(aisleGap(piece('a', 'stove', 2, 5, 2.5, 2.5, 90), piece('b', 'sink', 2, 8, 3, 2, 90)), null);
     assert.ok((aisleGap(piece('a', 'stove', 2, 5, 2.5, 2.5, 90), piece('b', 'sink', 7, 5, 3, 2, 90)) ?? -1) > 0);
+  });
+});
+
+describe('New York code (2.13.59)', () => {
+  const door = (id: string, wallId: string, width: number) => ({ id, wallId, t: 0.5, width, type: 'door' as const, symbolKind: 'swingDoor' as const });
+  it('measures only the outside (exit) door: 32" clear means a 3\'-0" door', () => {
+    const f = boxFloor(20, 14);
+    f.walls.push({ id: 'in', a: 'a', b: 'c', kind: 'interior', thickness: 0.35 });
+    f.openings = [door('front', 'w1', 3), door('inside', 'in', 2.5)];
+    assert.equal(runAccessCheck(f).checks.find((c) => c.id === 'door-width')?.status, 'pass');
+    f.openings = [door('front', 'w1', 2.5), door('inside', 'in', 3)];
+    assert.equal(runAccessCheck(f).checks.find((c) => c.id === 'door-width')?.status, 'fail');
+    f.openings = [door('inside', 'in', 3)];
+    assert.equal(runAccessCheck(f).checks.find((c) => c.id === 'door-width')?.status, 'warn');
+  });
+  it('a small bath is an accessibility tip, not a code failure', () => {
+    const f = boxFloor(4, 4);
+    f.rooms = [{ id: 'b', kind: 'bath', name: 'Bath', x: 2, y: 2 }];
+    const turn = runAccessCheck(f).checks.find((c) => c.id === 'turn')!;
+    assert.equal(turn.status, 'warn');
+    assert.match(turn.tip, /not required/);
   });
 });

@@ -58,7 +58,7 @@ export function AccessDrawer() {
             {t(locale, 'chrome.close')}
           </button>
         </div>
-        <p className="muted teach-hello">{headline}. {t(locale, 'acc.disclaimer')}</p>
+        <p className="muted teach-hello">{headline}. {t(locale, 'acc.ny.disclaimer')}</p>
         <ul className="access-list">
           {report.checks.map((c) => (
             <li key={c.id}>
@@ -76,7 +76,7 @@ export function AccessDrawer() {
             </li>
           ))}
         </ul>
-        <p className="muted access-legal">{t(locale, 'acc.legal')}</p>
+        <p className="muted access-legal">{t(locale, 'acc.ny.legal')}</p>
       </aside>
     </>
   );

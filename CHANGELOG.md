@@ -3,6 +3,13 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.59 — 2026-11-04 — New York code
+- Baboo's Access check and “Read this plan” follow the 2025 Residential Code of New York State (in force since December 31, 2025; based on the 2024 IRC).
+- Rooms people live in (bedroom, living, dining, office) need at least 70 sq ft and 7 ft each way; kitchens, baths and halls are not counted.
+- Front door: one door on an outside wall with 32" clear — a 3'-0" door. Inside doors have no minimum, so 2'-6" inside doors no longer “need a fix”.
+- Bath turning circle (5') and kitchen aisle (40") are accessibility guidelines for wheelchair homes: they now say “Take a look”, not “Needs a fix”.
+- New York City has its own code; the drawer says so.
+
 ## 2.13.58 — 2026-11-04 — Right-to-left sizes
 - In Arabic and Dari, a size filled into a sentence (1'-0", 2'-6", 80) was reordered by the right-to-left text, so 1'-0" showed as "0-'1 with the inch mark at the far end. Filled-in values now sit in a Unicode isolate and keep their order (sheet, Access, Contest, Teach, toasts, screen-reader summary).
 - The plan sheet date is in your language (it said “Nov 4, 2026” in Arabic).

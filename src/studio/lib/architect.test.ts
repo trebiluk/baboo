@@ -122,3 +122,18 @@ describe('read this plan in other languages (2.13.52)', () => {
     assert.match(es.checks.find((c) => c.id === 'triangle')!.detail, /Nevera/);
   });
 });
+
+describe('New York code room sizes (2.13.59)', () => {
+  const withRoom = (w: number, h: number, kind: 'bedroom' | 'kitchen' | 'bath' | 'living') => { const f = boxFloor(w, h); f.rooms = [{ id: 'r', kind, name: '', x: w / 2, y: h / 2 }]; return f; };
+  it('rooms you live in need 70 sq ft and 7 ft each way', () => {
+    assert.equal(runArchitectCheck(withRoom(10, 10, 'bedroom')).checks.find((c) => c.id === 'scale')?.status, 'pass');
+    assert.equal(runArchitectCheck(withRoom(8, 8, 'bedroom')).checks.find((c) => c.id === 'scale')?.status, 'fail'); // 64 sq ft
+    const narrow = runArchitectCheck(withRoom(6, 14, 'living')).checks.find((c) => c.id === 'scale')!; // 84 sq ft but 6 ft wide
+    assert.equal(narrow.status, 'fail');
+    assert.match(narrow.detail, /7 ft/);
+  });
+  it('kitchens and baths are not held to the room minimum', () => {
+    assert.equal(runArchitectCheck(withRoom(6, 8, 'kitchen')).checks.find((c) => c.id === 'scale')?.status, 'pass');
+    assert.equal(runArchitectCheck(withRoom(5, 7, 'bath')).checks.find((c) => c.id === 'scale')?.status, 'pass');
+  });
+});
