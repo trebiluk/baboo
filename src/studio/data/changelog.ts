@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.48',
+    date: '2026-11-04',
+    bullets: [
+      'Hover tips on the tools, save messages, and screen-reader labels are in your language.',
+    ],
+  },
+  {
     version: '2.13.47',
     date: '2026-11-03',
     bullets: [

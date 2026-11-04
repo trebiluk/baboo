@@ -1,5 +1,6 @@
 import { runAccessCheck, type AccessCheck, type AccessHit } from '../lib/access';
 import { useProjectStore } from '../store/useProjectStore';
+import { t, tipLoc } from '../data/i18n';
 
 function mark(status: AccessCheck['status']) {
   if (status === 'pass') return 'Looks good';
@@ -22,6 +23,7 @@ export function AccessDrawer() {
   const toggle = useProjectStore((s) => s.toggleAccess);
   const floor = useProjectStore((s) => s.doc.floors[0]);
   const units = useProjectStore((s) => s.doc.settings.units);
+  const locale = tipLoc(useProjectStore((s) => s.doc.settings));
 
   if (!open) return null;
 
@@ -44,10 +46,10 @@ export function AccessDrawer() {
       <button
         type="button"
         className="teaching-backdrop"
-        aria-label="Dismiss access check"
+        aria-label={t(locale, 'chrome.close')}
         onClick={toggle}
       />
-      <aside className="drawer access-drawer" role="dialog" aria-label="Access check">
+      <aside className="drawer access-drawer" role="dialog" aria-label={t(locale, 'a11y.access')}>
         <div className="drawer-head">
           <div className="drawer-head-title">
             <span className="sheet-handle" aria-hidden="true" />

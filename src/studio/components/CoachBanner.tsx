@@ -82,7 +82,7 @@ export function JobChip() {
   if (viewMode !== 'plan' || skillRank(skillLevel) > 1) return null;
 
   return (
-    <aside className="job-chip" role="status" aria-label="Job">
+    <aside className="job-chip" role="status" aria-label={t(locale, 'a11y.job')}>
       <p>{saved ? t(locale, 'job.saved') : tt(locale, 'job.line', JOB_LINE)}</p>
       <button
         type="button"
@@ -95,8 +95,8 @@ export function JobChip() {
         type="button"
         id="baboo-help"
         className="ghost-btn aw-pressable job-help"
-        aria-label="Show me"
-        title="Show me"
+        aria-label={t(locale, 'coach.showMe')}
+        title={t(locale, 'coach.showMe')}
         onClick={toggleHelp}
       >
         ?
@@ -142,7 +142,7 @@ export function CoachBanner() {
   const body = tt(locale, `${prefix}.body`, step.body);
 
   return (
-    <aside className="coach-card" role="status" aria-label="Next step">
+    <aside className="coach-card" role="status" aria-label={t(locale, 'a11y.next')}>
       <img
         className="coach-mascot"
         src={BABOO_LOGO}

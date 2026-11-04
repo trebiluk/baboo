@@ -199,7 +199,7 @@ export function ToolRail() {
           type="button"
           className="tool-rail-btn tool-rail-trace-chip aw-pressable"
           onClick={() => traceSketch()}
-          title="Turn the latest sketch into straight walls"
+          title={tx(locale, 'tip.trace')}
           tabIndex={0}
           aria-hidden={false}
         >
@@ -212,7 +212,7 @@ export function ToolRail() {
           type="button"
           className={`tool-rail-btn tool-rail-extra aw-pressable ${wallMode === 'clip' ? 'active' : ''}`}
           onClick={() => setWallMode(wallMode === 'clip' ? 'draw' : 'clip')}
-          title="Clip a sharp corner — rooms keep the slant"
+          title={tx(locale, 'tip.clip')}
           tabIndex={0}
           aria-hidden={false}
           aria-pressed={wallMode === 'clip'}
@@ -226,7 +226,7 @@ export function ToolRail() {
           type="button"
           className={`tool-rail-btn aw-pressable ${wallKind === 'interior' ? 'active' : ''}`}
           onClick={() => setWallKind(wallKind === 'interior' ? 'exterior' : 'interior')}
-          title="Interior walls are thinner and skip the roof outline"
+          title={tx(locale, 'tip.inside')}
           tabIndex={expanded ? 0 : -1}
           aria-hidden={!expanded}
         >
@@ -252,7 +252,7 @@ export function ToolRail() {
           type="button"
           className="tool-rail-btn aw-pressable"
           onClick={duplicateSelected}
-          title="Duplicate (Ctrl+D)"
+          title={tx(locale, 'tip.copy')}
           tabIndex={expanded ? 0 : -1}
           aria-hidden={!expanded}
         >
@@ -265,7 +265,7 @@ export function ToolRail() {
           type="button"
           className="tool-rail-btn aw-pressable"
           onClick={() => rotateSelected(1)}
-          title="Rotate 90° (])"
+          title={tx(locale, 'tip.rotate')}
           tabIndex={expanded ? 0 : -1}
           aria-hidden={!expanded}
         >
@@ -304,7 +304,7 @@ export function ToolRail() {
         type="button"
         className="tool-rail-btn tool-rail-min aw-pressable"
         onClick={minimizeTools}
-        title="Hide tools — grid stays full (Esc)"
+        title={tx(locale, 'tip.fold')}
         tabIndex={expanded ? 0 : -1}
         aria-hidden={!expanded}
       >

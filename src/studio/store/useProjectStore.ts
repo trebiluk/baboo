@@ -919,7 +919,7 @@ export const useProjectStore = create<Store>((set, get) => ({
       styleId === 'dog-house'
         ? t(doc.settings.locale, 'toast.contestStart')
         : styleId === 'mansion'
-          ? 'The Mansion is ready. Open the dollhouse, then 3D.'
+          ? t(doc.settings.locale, 'toast.mansionReady')
           : t(doc.settings.locale, 'toast.ready', { title: doc.meta.title }),
     );
     setTimeout(() => get().fitPlan(), 80);
@@ -930,8 +930,8 @@ export const useProjectStore = create<Store>((set, get) => ({
     void get().flushSave().then(() => {
       set({
         saveCard: get().saveStatus === 'error'
-          ? 'Could not save on this Chromebook. Tap Save again.'
-          : `Saved on this Chromebook. Name: ${title}. A copy also downloaded.`,
+          ? t(tip(get), 'save.fail')
+          : t(tip(get), 'save.ok', { title }),
       });
     });
   },

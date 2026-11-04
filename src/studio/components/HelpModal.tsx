@@ -28,7 +28,7 @@ export function HelpModal() {
         aria-label={t(locale, 'chrome.close')}
         onClick={toggle}
       />
-      <aside className="drawer help-drawer" role="dialog" aria-label="Help">
+      <aside className="drawer help-drawer" role="dialog" aria-label={t(locale, 'chrome.help')}>
         <div className="drawer-head">
           <div className="drawer-head-title">
             <span className="sheet-handle" aria-hidden="true" />

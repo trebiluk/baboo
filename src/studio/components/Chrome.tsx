@@ -245,7 +245,7 @@ export function Chrome() {
           <span className="chrome-label">{t(locale, 'chrome.redo')}</span>
         </button>
 
-        <div className="chrome-view" role="group" aria-label="Viewport">
+        <div className="chrome-view" role="group" aria-label={t(locale, 'chrome.views')}>
           <button
             type="button"
             className={`ghost-btn aw-pressable chrome-ico ${viewMode === 'plan' ? 'active' : ''}`}

@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.48 — 2026-11-04 — Tips and labels
+- Hover tips on the tools, save messages, and screen-reader labels are in your language.
+- The saved-on-Chromebook card and the Mansion-ready message are translated.
+
 ## 2.13.47 — 2026-11-03 — Settings words
 - Settings is fully in your language: layers, roof, wallpaper, the look themes, and the corner-clip and wallpaper messages.
 - Roof style names (Gable, Hip, Mansard…) stay as the terms students learn.

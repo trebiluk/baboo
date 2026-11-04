@@ -1141,7 +1141,7 @@ export function PlanCanvas() {
           </button>
         </div>
       )}
-      <div className="plan-taps aw-ribbon" role="toolbar" aria-label="Plan taps">
+      <div className="plan-taps aw-ribbon" role="toolbar" aria-label={t(tips, 'a11y.planTaps')}>
         {(skillRank(skillLevel) >= 1 || planIsClosed(floor)) && (
         <div className="plan-roof" ref={roofRef}>
           <button

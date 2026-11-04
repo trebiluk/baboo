@@ -102,7 +102,7 @@ export function View3DStub() {
     >
       <div
         className="solid-preview"
-        aria-label="Solid 3D preview with site and sky"
+        aria-label={t(loc, '3d.preview')}
         onPointerDown={(e) => { if ((e.target as HTMLElement).tagName === 'CANVAS') setMoved(true); }}
       >
         <Suspense fallback={null}>
