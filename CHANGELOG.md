@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.65 — 2026-11-04 — 3D on phones
+- 3D on phones: the whole house fits a tall screen, and the buttons stay out of the way on a phone turned sideways.
+- The 3D camera now steps back until the house's footprint fits the screen's real field of view (the Mansion lost both ends on a tall phone). On a short screen the 3D bar drops its hint and shrinks its buttons; it covered most of the Hobbit house.
+
 ## 2.13.64 — 2026-11-04 — Phone menu name
 - On phones, the plan name box in the menu says “Untitled plan” in your language too. (The laptop name box was fixed in 2.13.55; the phone menu's copy still said “Untitled Plan”.)
 - Looked over on an Arabic phone: the Teach panel, What's new and the New plan window read right-to-left with no sideways scroll.

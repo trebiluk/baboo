@@ -261,9 +261,12 @@ function fitCam(root: THREE.Object3D, aspect = 1.6): Cam {
   }
   const c = box.getCenter(new THREE.Vector3());
   const s = box.getSize(new THREE.Vector3());
-  // A tall phone screen sees less side to side: step back so the whole house fits across (2.13.26).
-  const narrow = aspect < 1.2 ? Math.pow(1.2 / Math.max(0.35, aspect), 0.9) : 1;
-  const dist = Math.min(180, Math.max(16, Math.max(s.x, s.z) * 0.98 * narrow));
+  // Step back until the house's whole footprint fits the screen's real field of view, sideways and up-and-down
+  // (2.13.65: on a tall phone the Mansion lost both ends; before that a fixed "narrow" factor guessed).
+  const halfV = Math.tan((48 / 2) * Math.PI / 180);
+  const halfH = halfV * Math.max(0.35, aspect);
+  const reach = Math.hypot(s.x, s.z) / 2; // seen at an angle, the diagonal is what spans the screen
+  const dist = Math.min(180, Math.max(16, Math.max(reach / halfH, (reach * 0.55 + s.y * 0.5) / halfV) * 1.12));
   return {
     yaw: 0.65,
     pitch: 0.48,

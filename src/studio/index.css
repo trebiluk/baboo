@@ -5685,3 +5685,10 @@ body.aw-photo .view3d-hud, body.aw-photo .view3d-empty, body.aw-photo .fps-badge
 @media (max-width: 640px) { .photo-bar .photo-hint { display: none; } }
 .doll-chip.doll-photo { padding: 0 12px; margin-inline-start: 6px; }
 body.aw-photo .doll-proj, body.aw-photo .canvas-hint, body.aw-photo .plan-sheet { display: none !important; }
+
+/* 2.13.65: phone turned sideways — the 3D bar stays one slim row so the house shows. */
+@media (max-height: 500px) {
+  .view3d-hud { bottom: 6px; padding: 3px 6px; gap: 6px; }
+  .view3d-hud .view3d-hint { display: none; }
+  .view3d-hud-btns .ghost-btn { min-height: 40px; padding: 0 10px; font-size: 12px; }
+}
