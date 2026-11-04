@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.57',
+    date: '2026-11-04',
+    bullets: [
+      'Fit centers the plan in the space you can see, not under the job card or the tool rail.',
+    ],
+  },
+  {
     version: '2.13.56',
     date: '2026-11-04',
     bullets: [

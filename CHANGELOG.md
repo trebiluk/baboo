@@ -3,6 +3,9 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.57 — 2026-11-04 — Fit in view
+- Fit centers the plan in the space you can see, not under the job card or the tool rail. On a phone turned sideways the top of a template sat under the job card.
+
 ## 2.13.56 — 2026-11-04 — Readable tags
 - Dollhouse room names sit on a soft rounded tag. Before, “Kitchen” was drawn on top of the fridge and “Bedroom” on the bed head.
 - Phone turned sideways (short screen): the “Draw a 16 by 24 box” job card stays one row, so it covers about a third less of the plan.

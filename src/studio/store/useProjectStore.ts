@@ -18,6 +18,7 @@ import {
 } from '../lib/geometry';
 import { chamferCorner, nearestChamferable } from '../lib/chamfer';
 import { boxCorners } from '../lib/boxWalls';
+import { readInsets } from '../lib/freeView';
 import { findEnclosedFace, formatArea, hitRoom, pointInPoly, polygonArea, listInteriorFaces, roomBundle } from '../lib/rooms';
 import { DEFAULT_ROOM_KIND, roomType } from '../data/rooms';
 import { defaultFloorForKind } from '../data/flooring';
@@ -507,13 +508,17 @@ export const useProjectStore = create<Store>((set, get) => ({
     const pad = 4;
     const bw = Math.max(8, maxX - minX + pad * 2);
     const bh = Math.max(8, maxY - minY + pad * 2);
-    const zoom = Math.min(80, Math.max(8, 0.82 * Math.min(w / bw, h / bh)));
+    // 2.13.57: fit into the part of the plan not covered by the job card and the tool rail.
+    const ins = readInsets();
+    const fw = Math.max(40, w - ins.left);
+    const fh = Math.max(40, h - ins.top);
+    const zoom = Math.min(80, Math.max(8, 0.82 * Math.min(fw / bw, fh / bh)));
     const cx = (minX + maxX) / 2;
     const cy = (minY + maxY) / 2;
     set({
       zoom,
-      panX: w / 2 - cx * zoom,
-      panY: h / 2 - cy * zoom,
+      panX: ins.left + fw / 2 - cx * zoom,
+      panY: ins.top + fh / 2 - cy * zoom,
       viewMode: 'plan',
       fitNonce: get().fitNonce + 1,
     });
