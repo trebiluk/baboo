@@ -974,6 +974,23 @@ function addRoof(bag: Bag, roof: RoofGeometry, rich = false) {
     meshFromPos(bag, pos, slate, 'roof', true);
     return;
   }
+  if (roof.styleId === 'conical' && roof.hips.length) {
+    // 2.13.68: a real cone — one slate triangle per eave edge up to the peak. It drew as a flat disc before.
+    const peak = roof.hips[0].b;
+    const top = [peak.x, rh, peak.y];
+    const pos: number[] = [];
+    for (let i = 0; i < o.length; i++) {
+      const p = o[i];
+      const q = o[(i + 1) % o.length];
+      pushTri(pos, [p.x, eh, p.y], [q.x, eh, q.y], top);
+    }
+    meshFromPos(bag, pos, slate, 'roof', true);
+    // a small crown ring at the peak, like a yurt's smoke ring
+    const crown = addMesh(bag, new THREE.CylinderGeometry(0.9, 1.1, 0.5, 12), mat(bag, '#EFE8DC', 0.7), false, true);
+    crown.position.set(peak.x, rh + 0.1, peak.y);
+    crown.name = 'roof';
+    return;
+  }
   floorMesh(bag, o, eh + 0.4, slate, 'roof');
 }
 

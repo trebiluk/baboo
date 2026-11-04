@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.68',
+    date: '2026-11-04',
+    bullets: [
+      'The Yurt\'s cone roof is a real cone in 3D now, and a toast no longer covers the plan card on a phone.',
+    ],
+  },
+  {
     version: '2.13.67',
     date: '2026-11-04',
     bullets: [

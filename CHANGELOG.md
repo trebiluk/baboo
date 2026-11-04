@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.68 — 2026-11-04 — a real cone roof
+- The Yurt's cone roof is a real cone in 3D now, and a toast no longer covers the plan card on a phone.
+- 3D View drew the Conical roof as a flat disc (the fallback for any roof without ridges). It now fans slate triangles from each eave edge to the peak with a small crown ring. On phones the plan sheet steps aside while a toast shows; they overlapped at the bottom edge.
+
 ## 2.13.67 — 2026-11-04 — class card in your language
 - The class card preview in Help now reads in your language.
 - Every label, hint, field and note on the class card (and its Help toggle) goes through i18n; the dog-house ribbon uses the contest words. ti, fa-AF, rw unchecked native copy.

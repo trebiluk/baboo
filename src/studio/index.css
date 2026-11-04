@@ -2906,6 +2906,11 @@ html.aw-teaching-open, body.aw-teaching-open {
   .toast {
     bottom:max(16px, env(safe-area-inset-bottom, 0px))
   }
+  /* 2.13.68: on a phone the toast and the plan sheet share the bottom edge and overlapped; the sheet steps aside while a toast shows. */
+  .app-shell:has(.toast) .plan-sheet {
+    opacity:0;
+    transition:opacity var(--aw-motion-fast)
+  }
 }
 @media (width<=800px) {
   .brand-name {
