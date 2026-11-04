@@ -265,7 +265,7 @@ function buildMansion(floor: Floor) {
     doorOn(parLib.id, 0.62, 2.6),
     doorOn(dinKit.id, 0.5, 2.6),
     doorOn(bathWall.id, 0.3, 2.4),
-    doorOn(stairFront.id, 0.5, 3),
+    { ...doorOn(stairFront.id, 0.5, 3), swing: 'right' }, // opens into the hall, away from the bottom step (2.13.63)
   ];
   floor.furniture = [
     furn('rug', 11, 16, 12, 8, 'Parlor rug'),
@@ -288,7 +288,7 @@ function buildMansion(floor: Floor) {
     furn('chandelier', 28, 16, 3.2, 3.2, 'Hall chandelier'),
     furn('sconce', 23.2, 12, 0.7, 0.45, 'Sconce'),
     furn('sconce', 32.8, 12, 0.7, 0.45, 'Sconce'),
-    furn('banister', 28, 27.55, 10, 0.3, 'Banister'),
+    furn('banister', 24.9, 34.2, 0.3, 8, 'Banister'), // the stair rail, beside the steps (2.13.63)
     furn('stairs', 28, 34.2, 5.2, 8, 'Stairs'),
     furn('dining-table', 45, 15, 8, 3.6, 'Dining table'),
     furn('dining-chair', 42, 12.6, 1.5, 1.5, 'Chair'),
@@ -474,8 +474,8 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
       furn('coffee-table', 10, 8, 4, 2, 'Coffee Table'),
       furn('chair', 22, 9, 2.5, 2.5, 'Armchair', Math.PI / 2),
       furn('storage-shelf', 3, 6, 3, 1.5, 'Bookcase'),
-      furn('bed-queen', 6, 20, 5, 6.5, 'Bed'),
-      furn('nightstand', 9.6, 17, 1.5, 1.5, 'Nightstand'),
+      furn('bed-queen', 3.2, 20.4, 5, 6.5, 'Bed'), // clear of the door swing (2.13.63)
+      furn('nightstand', 1.2, 17.2, 1.5, 1.5, 'Nightstand'),
       furn('fridge', 26.2, 22.6, 3, 2.5, 'Fridge'),
       furn('stove', 22.5, 22.6, 2.5, 2.5, 'Stove'),
       furn('sink', 19, 22.8, 2.5, 2, 'Sink'),
@@ -727,15 +727,16 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
     floor.nodes = outer.nodes;
     floor.walls = outer.walls;
     floor.openings = [
-      doorOn(outer.walls[0].id, 0.2, 2.5),
-      windowOn(outer.walls[0].id, 0.7, 3),
+      doorOn(outer.walls[0].id, 0.5, 3), // 3'-0" front door: NY code wants 32" clear (2.13.63)
+      windowOn(outer.walls[0].id, 0.8, 3),
       windowOn(outer.walls[2].id, 0.5, 3),
     ];
     floor.furniture = [
       furn('bed-twin', 14, 5, 3.25, 6.25, 'Bed'),
-      furn('sink', 6, 2.5, 3, 2, 'Sink'),
-      furn('stove', 3, 2.5, 2.5, 2.5, 'Stove'),
-      furn('fridge', 1.5, 7, 3, 2.5, 'Fridge'),
+      // kitchen in one row along the left wall, out of the door swing
+      furn('fridge', 1.5, 1.6, 3, 2.5, 'Fridge', Math.PI / 2),
+      furn('stove', 1.4, 4.4, 2.5, 2.5, 'Stove', Math.PI / 2),
+      furn('sink', 1.5, 7.2, 3, 2, 'Sink', Math.PI / 2),
       furn('toilet', 9, 7.5, 1.5, 2.5, 'Toilet'),
       furn('closet', 16, 1.5, 2, 2, 'Closet'),
       furn('washer', 11, 7.5, 2.5, 2.5, 'Washer'),

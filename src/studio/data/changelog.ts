@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.63',
+    date: '2026-11-04',
+    bullets: [
+      'Every house template now passes the Access check: the Tiny Home has a 3\'-0" front door, and nothing sits in a door swing.',
+    ],
+  },
+  {
     version: '2.13.62',
     date: '2026-11-04',
     bullets: [

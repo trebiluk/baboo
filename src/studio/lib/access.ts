@@ -48,6 +48,8 @@ export type AccessReport = {
 };
 
 const KITCHEN_IDS = new Set(['fridge', 'stove', 'sink', 'dining-table']);
+/** Things on a wall or ceiling, or flat on the floor: a door swings past them (2.13.63). */
+export const NOT_IN_THE_WAY = new Set(['sconce', 'painting', 'chandelier', 'wainscot', 'rug', 'wall-paneling']);
 
 function doorHinge(opening: Opening, walls: Wall[], nodes: Node[]): {
   hinge: Point;
@@ -162,7 +164,8 @@ export function tightestHall(walls: Wall[], nodes: Node[]): { dist: number; a: s
 
 /** Box of a piece on the plan; a quarter turn swaps width and depth. */
 function footprint(i: FurnitureItem) {
-  const q = Math.round((((i.rot ?? 0) % 360) + 360) % 360 / 90) % 2;
+  // rot is in radians (2.13.63 fix: it was read as degrees, so turned pieces measured unturned)
+  const q = Math.round((((i.rot ?? 0) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) / (Math.PI / 2)) % 2;
   const w = q ? i.h : i.w;
   const h = q ? i.w : i.h;
   return { minX: i.x - w / 2, maxX: i.x + w / 2, minY: i.y - h / 2, maxY: i.y + h / 2, facesY: q === 0 };
@@ -267,9 +270,12 @@ export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft', locale: L
 
   let blocked: { door: Opening; item: FurnitureItem } | null = null;
   for (const door of doors) {
+    // An opening 6 ft or wider is a porch, garage or wide case opening, not a swinging leaf (2.13.63).
+    if (door.width >= 6) continue;
     const geo = doorHinge(door, walls, nodes);
     if (!geo) continue;
     for (const item of furniture) {
+      if (NOT_IN_THE_WAY.has(item.catalogId)) continue;
       if (furnitureInSwing(item, geo.hinge, geo.ang, geo.swing, geo.radius)) {
         blocked = { door, item };
         break;

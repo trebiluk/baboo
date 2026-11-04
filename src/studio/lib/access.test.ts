@@ -157,8 +157,11 @@ describe('kitchen aisle (2.13.50)', () => {
     assert.match(k.detail, /Stove and Kitchen Sink/);
   });
   it('turns a rotated row the same way', () => {
-    assert.equal(aisleGap(piece('a', 'stove', 2, 5, 2.5, 2.5, 90), piece('b', 'sink', 2, 8, 3, 2, 90)), null);
-    assert.ok((aisleGap(piece('a', 'stove', 2, 5, 2.5, 2.5, 90), piece('b', 'sink', 7, 5, 3, 2, 90)) ?? -1) > 0);
+    const q = Math.PI / 2; // rot is radians
+    assert.equal(aisleGap(piece('a', 'stove', 2, 5, 2.5, 2.5, q), piece('b', 'sink', 2, 8, 3, 2, q)), null);
+    assert.ok((aisleGap(piece('a', 'stove', 2, 5, 2.5, 2.5, q), piece('b', 'sink', 7, 5, 3, 2, q)) ?? -1) > 0);
+    // a quarter turn swaps width and depth: 2.5×6 turned is 6 wide and 2.5 deep
+    assert.equal(aisleGap(piece('a', 'stove', 0, 0, 2.5, 6, q), piece('b', 'sink', 6, 0, 2, 3, q)), 6 - 3 - 1.5);
   });
 });
 
@@ -180,5 +183,17 @@ describe('New York code (2.13.59)', () => {
     const turn = runAccessCheck(f).checks.find((c) => c.id === 'turn')!;
     assert.equal(turn.status, 'warn');
     assert.match(turn.tip, /not required/);
+  });
+});
+
+describe('every house template passes the Access check (2.13.63)', () => {
+  it('no fails on doors, swings or halls', async () => {
+    const { STYLE_TEMPLATES, buildTemplateProject } = await import('../data/templates');
+    for (const tpl of STYLE_TEMPLATES) {
+      if (tpl.id === 'blank' || tpl.id === 'dog-house') continue;
+      const f = buildTemplateProject(tpl.id).floors[0];
+      const fails = runAccessCheck(f).checks.filter((c) => c.status === 'fail').map((c) => `${tpl.id}:${c.id}: ${c.detail}`);
+      assert.deepEqual(fails, []);
+    }
   });
 });

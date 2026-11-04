@@ -3,6 +3,13 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.63 — 2026-11-04 — Templates pass
+- Every house template now passes the Access check: the Tiny Home has a 3'-0" front door, and nothing sits in a door swing.
+- Tiny Home: 3'-0" front door in the middle of the long wall; fridge, stove and sink in one run along the left wall.
+- Arts & Crafts: bed and nightstand moved out of the bedroom door swing. Mansion: stair-hall door opens into the hall; the banister is now the stair rail beside the steps.
+- Access check: wall and ceiling fixtures (sconces, paintings, chandeliers, paneling) and rugs no longer count as blocking a door; openings 6 ft or wider (porches) are not swinging doors.
+- Bug: the kitchen-aisle check read furniture rotation as degrees (it is radians), so turned pieces were measured unturned.
+
 ## 2.13.62 — 2026-11-04 — Photo in the walk
 - Photo mode works in the Walkthrough too, and template room names like Parlor and Porch show in your language. Pinch-zoom keeps working while you frame a shot on a phone; a stray touch no longer throws.
 - Checked by a test that snaps real pictures in 3D, Walkthrough and Dollhouse on laptop and phone sizes.
