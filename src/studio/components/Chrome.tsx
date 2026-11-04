@@ -4,7 +4,7 @@ import { BABOO_LOGO } from '../logo';
 import { Icon } from '../icons';
 import { ClassShareModal } from './ClassShareModal';
 import { VersionChip } from './VersionChip';
-import { t, tipLoc } from '../data/i18n';
+import { isUnnamedPlan, t, tipLoc } from '../data/i18n';
 
 type SavePhase = 'saved' | 'saving' | 'offline' | 'error';
 
@@ -224,12 +224,13 @@ export function Chrome() {
           <span className="brand-name"><bdi>Baboo</bdi></span>
           <VersionChip onTeacher={() => setTeacherChrome(true)} />
           {fileShare ? (
-            <span className="save-chip" title="Opened from a class folder — no server">Class share</span>
+            <span className="save-chip" title={t(locale, 'chrome.classShareTip')}>{t(locale, 'chrome.classShare')}</span>
           ) : null}
         </div>
         <input
           className="title-input"
-          value={title}
+          value={isUnnamedPlan(title) ? '' : title}
+          placeholder={t(locale, 'plan.untitled')}
           onChange={(e) => setTitle(e.target.value)}
           aria-label={t(locale, 'chrome.projectName')}
         />

@@ -23,7 +23,7 @@ import { exteriorBounds, ROOF_STYLE_OPTIONS, roofStyleName } from '../lib/roof';
 import { roomLabel, roomType } from '../data/rooms';
 import { furnLabel } from '../data/furniture';
 import type { FurnitureItem, Opening, Wall, Node, Room, DimItem, NoteItem, LandscapeItem, Locale } from '../types';
-import { t, tipLoc } from '../data/i18n';
+import { planTitle, t, tipLoc } from '../data/i18n';
 import { bloomSpots } from '../data/landscape';
 import {
   loadImportPattern,
@@ -1792,7 +1792,7 @@ function PlanSheet({
   }
   return (
     <div className="plan-sheet" aria-hidden="true">
-      <strong className="plan-sheet-title">{title || 'Untitled Plan'}</strong>
+      <strong className="plan-sheet-title">{planTitle(title, locale)}</strong>
       <span>{roof ? `${t(locale, 'sheet.roof')} · ${roof}` : t(locale, 'sheet.roofNone')}</span>
       <span>{t(locale, 'sheet.scale')} · {t(locale, 'sheet.grid', { n: square })}</span>
       {date ? <span>{date}</span> : null}

@@ -237,13 +237,21 @@ export function triggerDownload(filename: string, blob: Blob): void {
   window.setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-export function exportProjectFile(doc: ProjectDocument): void {
+/**
+ * A file name from a plan title. Keeps letters and numbers from every language (Arabic, Cyrillic, Ge'ez…),
+ * drops only characters a file name can't hold (2.13.55; before, "قصري" saved as "project").
+ */
+export function safeFileName(title: string, fallback = 'project'): string {
+  return title.normalize('NFC').replace(/[^\p{L}\p{M}\p{N}\- _]+/gu, '').replace(/\s+/g, ' ').trim().slice(0, 80) || fallback;
+}
+
+export function exportProjectFile(doc: ProjectDocument, shownTitle?: string): void {
   const payload = {
     ...doc,
     meta: { ...doc.meta, version: APP_VERSION, updatedAt: new Date().toISOString() },
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const safe = payload.meta.title.replace(/[^\w\- ]+/g, '').trim() || 'project';
+  const safe = safeFileName(shownTitle ?? payload.meta.title);
   triggerDownload(`${safe}.archworks.json`, blob);
 }
 

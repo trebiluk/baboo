@@ -1636,6 +1636,11 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.55: unnamed plans and file names in every language. ti, fa-AF and rw are UNCHECKED native copy.
+  'plan.untitled': g('Untitled plan', { es: 'Plano sin nombre', cu: 'Plano sin nombre', uk: 'План без назви', ru: 'План без названия', ti: 'ስም ዘይብሉ ትልሚ', fa: 'نقشه بی‌نام', 'fa-AF': 'نقشه بی‌نام', ar: 'مخطط بلا اسم', rw: 'Igishushanyo kitagira izina' }),
+  'chrome.classShare': g('Class share', { es: 'Compartido en clase', cu: 'Compartido en clase', uk: 'Спільне для класу', ru: 'Общее для класса', ti: 'ናይ ክፍሊ ምክፋል', fa: 'اشتراک کلاسی', 'fa-AF': 'اشتراک صنفی', ar: 'مشاركة الصف', rw: 'Ibisangiwe n\'ishuri' }),
+  'chrome.classShareTip': g('Opened from a class folder — no server', { es: 'Abierto desde una carpeta de clase, sin servidor', cu: 'Abierto desde una carpeta de clase, sin servidor', uk: 'Відкрито з папки класу — без сервера', ru: 'Открыто из папки класса — без сервера', ti: 'ካብ ፎልደር ክፍሊ ተኸፊቱ — ሰርቨር የለን', fa: 'از پوشه کلاس باز شد — بدون سرور', 'fa-AF': 'از پوشه صنف باز شد — بدون سرور', ar: 'فُتح من مجلد الصف — بلا خادم', rw: 'Byafunguwe mu bubiko bw\'ishuri — nta seriveri' }),
+  'news.names': g('Unnamed plans say “Untitled plan” in your language, and saved files keep names written in any language.', { es: 'Los planos sin nombre dicen “Plano sin nombre” en tu idioma, y los archivos guardados conservan nombres en cualquier idioma.', cu: 'Los planos sin nombre dicen “Plano sin nombre” en tu idioma, y los archivos guardados conservan nombres en cualquier idioma.', uk: 'Плани без назви показують «План без назви» твоєю мовою, а збережені файли зберігають назви будь-якою мовою.', ru: 'Планы без названия показывают «План без названия» на твоём языке, а сохранённые файлы сохраняют названия на любом языке.', ti: 'ስም ዘይብሎም ትልምታት ብቋንቋኻ “ስም ዘይብሉ ትልሚ” ይብሉ፣ ዝተዓቀቡ ፋይላት ብዝኾነ ቋንቋ ዝተጻሕፉ ኣስማት ይሕዙ።', fa: 'نقشه‌های بی‌نام به زبان تو «نقشه بی‌نام» نوشته می‌شوند و فایل‌های ذخیره‌شده نام‌هایی به هر زبانی را نگه می‌دارند.', 'fa-AF': 'نقشه‌های بی‌نام به زبان تو «نقشه بی‌نام» نوشته می‌شوند و فایل‌های ذخیره‌شده نام‌هایی به هر زبانی را نگه می‌دارند.', ar: 'المخططات بلا اسم تظهر «مخطط بلا اسم» بلغتك، والملفات المحفوظة تحتفظ بأسماء بأي لغة.', rw: 'Ibishushanyo bitagira izina byandikwa “Igishushanyo kitagira izina” mu rurimi rwawe, kandi amadosiye abitswe agumana amazina yanditse mu rurimi urwo ari rwo rwose.' }),
   // 2.13.54: wall sizes in plan units. ti, fa-AF and rw are UNCHECKED native copy.
   'news.wallUnits': g('Wall sizes read in feet and inches on feet plans, room areas say sq ft in your language, and wall options fold on phones.', { es: 'Las medidas de pared se leen en pies y pulgadas en planos en pies, las áreas dicen pies² en tu idioma y las opciones de pared se pliegan en el teléfono.', cu: 'Las medidas de pared se leen en pies y pulgadas en planos en pies, las áreas dicen pies² en tu idioma y las opciones de pared se pliegan en el teléfono.', uk: 'Розміри стін на планах у футах читаються у футах і дюймах, площі — твоєю мовою, а параметри стіни згортаються на телефоні.', ru: 'Размеры стен на планах в футах читаются в футах и дюймах, площади — на твоём языке, а параметры стены сворачиваются на телефоне.', ti: 'ኣብ ትልሚ ብጫማ ዓቐን መናድቕ ብጫማን ኢንችን ይንበብ፣ ስፍሓት ክፍልታት ብቋንቋኻ፣ ኣማራጺታት መንደቕ ኣብ ተሌፎን ይዕጸፍ።', fa: 'اندازه دیوارها در نقشه‌های فوتی با فوت و اینچ خوانده می‌شود، مساحت‌ها به زبان تو هستند و گزینه‌های دیوار در گوشی جمع می‌شوند.', 'fa-AF': 'اندازه دیوارها در نقشه‌های فتی با فت و انچ خوانده می‌شود، مساحت‌ها به زبان تو هستند و گزینه‌های دیوار در موبایل جمع می‌شوند.', ar: 'مقاسات الجدران تُقرأ بالأقدام والبوصات في مخططات الأقدام، والمساحات بلغتك، وخيارات الجدار تُطوى على الهاتف.', rw: 'Ingano z\'inkuta zisomwa mu birenge n\'intambwe ku bishushanyo by\'ibirenge, ubuso buri mu rurimi rwawe, n\'amahitamo y\'urukuta arahinnye kuri telefoni.' }),
   // 2.13.53: Teach panel challenges. ti, fa-AF and rw are UNCHECKED native copy.
@@ -3231,6 +3236,15 @@ export function readHubLocale(): Locale | null {
     }
   } catch { /* ignore */ }
   return null;
+}
+
+/** The default name every new plan gets; shown as "Untitled plan" in the student's language (2.13.55). */
+export const DEFAULT_PLAN_TITLE = 'Untitled Plan';
+export function isUnnamedPlan(title: string | null | undefined): boolean {
+  return !title || !title.trim() || title === DEFAULT_PLAN_TITLE;
+}
+export function planTitle(title: string | null | undefined, locale: Locale | null | undefined): string {
+  return isUnnamedPlan(title) ? t(locale, 'plan.untitled') : (title as string);
 }
 
 export function t(locale: Locale | null | undefined, key: string, vars?: Record<string, string>): string {

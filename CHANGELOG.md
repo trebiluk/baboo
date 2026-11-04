@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.55 — 2026-11-04 — Plan names
+- Saving a plan named in Arabic, Russian, Dari or Tigrinya downloaded “project.archworks.json”: every letter outside A–Z was dropped. File names now keep letters from every language (class cards too).
+- A new plan's name box shows “Untitled plan” in your language as a hint; typing replaces it. The plan sheet and the saved card say it in your language too.
+- The “Class share” chip is translated.
+
 ## 2.13.54 — 2026-11-04 — Wall units
 - Wall options on a feet plan read 5" · 8" · 12" thick and 7'-10" · 8'-10" · 9'-10" tall (they said mm and m while the plan said feet). Metric plans keep mm and m. The sizes underneath are unchanged.
 - Room areas say sq ft in your language on the plan, in panels and in the screen-reader summary.

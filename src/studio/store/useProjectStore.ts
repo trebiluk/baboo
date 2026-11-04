@@ -22,7 +22,7 @@ import { findEnclosedFace, formatArea, hitRoom, pointInPoly, polygonArea, listIn
 import { DEFAULT_ROOM_KIND, roomType } from '../data/rooms';
 import { defaultFloorForKind } from '../data/flooring';
 import {
-  t, tipLoc, readLocalePref, readTipsLocalePref, readUdlFatPref, readUdlTypePref,
+  t, tipLoc, planTitle, readLocalePref, readTipsLocalePref, readUdlFatPref, readUdlTypePref,
   readUdlContrastPref, readEllEnglishPref, writeLocalePref, writeTipsLocalePref,
   writeUdlFatPref, writeUdlTypePref, writeUdlContrastPref, writeEllEnglishPref,
   readHubLocale, publishHubLocale,
@@ -925,8 +925,8 @@ export const useProjectStore = create<Store>((set, get) => ({
     setTimeout(() => get().fitPlan(), 80);
   },
   exportJson: () => {
-    const title = get().doc.meta.title || 'Untitled Plan';
-    exportProjectFile(get().doc);
+    const title = planTitle(get().doc.meta.title, tip(get));
+    exportProjectFile(get().doc, title);
     void get().flushSave().then(() => {
       set({
         saveCard: get().saveStatus === 'error'

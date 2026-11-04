@@ -98,7 +98,7 @@ export function buildGalleryCard(
 }
 
 function safeFilenamePart(s: string): string {
-  return s.replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-') || 'card';
+  return s.normalize('NFC').replace(/[^\p{L}\p{M}\p{N}\- ]+/gu, '').trim().replace(/\s+/g, '-') || 'card';
 }
 
 /** Download gallery card JSON — no PNG/blob bytes. */

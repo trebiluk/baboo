@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.55',
+    date: '2026-11-04',
+    bullets: [
+      'Unnamed plans say “Untitled plan” in your language, and saved files keep names written in any language.',
+    ],
+  },
+  {
     version: '2.13.54',
     date: '2026-11-04',
     bullets: [
