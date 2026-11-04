@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.70',
+    date: '2026-11-04',
+    bullets: [
+      'Shed and Gambrel roofs look right in 3D now: one clean slope, and a barn roof with its bend.',
+    ],
+  },
+  {
     version: '2.13.69',
     date: '2026-11-04',
     bullets: [

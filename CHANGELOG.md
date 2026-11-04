@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.70 — 2026-11-04 — shed and gambrel roofs
+- Shed and Gambrel roofs look right in 3D now: one clean slope, and a barn roof with its bend.
+- 3D View pushed both through the gable builder: Shed (sideways ridge) came out as a twisted cross, Gambrel lost its break and drew as a plain gable. Each has its own builder now, with boarded ends so the roof sits on the walls. Checker: rb/roofs.mjs (picks each roof on the Ranch and shoots 3D).
+
 ## 2.13.69 — 2026-11-04 — turf mound and a clean horizon
 - The Hobbit house wears a soft turf mound in 3D, and the ground no longer ends in a pale shape in the sky on phones.
 - 3D View drew the Grass/sod roof as a flat green polygon; it is now a rounded mound (three rings stepping in and up to a cap). On tall phones the camera sits far back and the 240 ft ground disc ended inside the view; the ground now runs to 640 ft, past the fog, and the camera far plane moved to 900 so nothing clips.

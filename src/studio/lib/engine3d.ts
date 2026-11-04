@@ -954,6 +954,68 @@ function addRoof(bag: Bag, roof: RoofGeometry, rich = false) {
     addDormers(bag, o.slice(0, 4), inner, eh, capY, slate);
     return;
   }
+  if (roof.styleId === 'shed' && o.length >= 4) {
+    // 2.13.70: one slope, high along one long side and low along the other. It went through the gable code
+    // with a sideways ridge and came out as a twisted cross.
+    const p = o.slice(0, 4);
+    const pos: number[] = [];
+    const hi = roof.longAxis === 'x' ? [0, 1] : [1, 2];
+    const H = (i: number) => [p[i].x, hi.includes(i) ? rh : eh, p[i].y];
+    pushQuad(pos, H(0), H(1), H(2), H(3));
+    meshFromPos(bag, pos, slate, 'roof', true);
+    // the open ends under the slope are wall-colour boards, so the roof does not float
+    const board = mat(bag, '#EFE8DC', 0.7);
+    const ends: number[] = [];
+    const E = (i: number) => [p[i].x, eh, p[i].y];
+    if (roof.longAxis === 'x') {
+      pushTri(ends, E(0), E(3), H(0));
+      pushTri(ends, E(1), E(2), H(1));
+      pushQuad(ends, E(0), E(1), H(1), H(0));
+    } else {
+      pushTri(ends, E(0), E(1), H(1));
+      pushTri(ends, E(3), E(2), H(2));
+      pushQuad(ends, E(1), E(2), H(2), H(1));
+    }
+    meshFromPos(bag, ends, board, 'roof', true);
+    return;
+  }
+  if (roof.styleId === 'gambrel' && roof.ridges.length && o.length >= 4) {
+    // 2.13.70: a barn roof — steep lower slope to a break line, then a shallow slope to the ridge.
+    const r = roof.ridges[0];
+    const p = o.slice(0, 4);
+    const breakY = eh + (rh - eh) * 0.72;
+    const k = 0.44; // break line sits 44% of the way from eave to ridge, in plan
+    const pos: number[] = [];
+    const ends: number[] = [];
+    const ra = [r.a.x, rh, r.a.y];
+    const rb = [r.b.x, rh, r.b.y];
+    const mix = (a: { x: number; y: number }, b: { x: number; y: number }, t: number, y: number) => [a.x + (b.x - a.x) * t, y, a.y + (b.y - a.y) * t];
+    if (roof.longAxis === 'x') {
+      // sides p0-p1 (near) and p3-p2 (far); ridge runs r.a (left) → r.b (right)
+      const nL = mix(p[0], { x: r.a.x, y: r.a.y }, k, breakY), nR = mix(p[1], { x: r.b.x, y: r.b.y }, k, breakY);
+      const fL = mix(p[3], { x: r.a.x, y: r.a.y }, k, breakY), fR = mix(p[2], { x: r.b.x, y: r.b.y }, k, breakY);
+      pushQuad(pos, [p[0].x, eh, p[0].y], [p[1].x, eh, p[1].y], nR, nL);
+      pushQuad(pos, nL, nR, rb, ra);
+      pushQuad(pos, [p[3].x, eh, p[3].y], [p[2].x, eh, p[2].y], fR, fL);
+      pushQuad(pos, fL, fR, rb, ra);
+      for (const [a, b, c, d, e] of [[[p[0].x, eh, p[0].y], nL, ra, fL, [p[3].x, eh, p[3].y]], [[p[1].x, eh, p[1].y], nR, rb, fR, [p[2].x, eh, p[2].y]]]) {
+        pushTri(ends, a, b, c); pushTri(ends, a, c, e); pushTri(ends, c, d, e);
+      }
+    } else {
+      const nA = mix(p[0], { x: r.a.x, y: r.a.y }, k, breakY), nB = mix(p[3], { x: r.b.x, y: r.b.y }, k, breakY);
+      const fA = mix(p[1], { x: r.a.x, y: r.a.y }, k, breakY), fB = mix(p[2], { x: r.b.x, y: r.b.y }, k, breakY);
+      pushQuad(pos, [p[0].x, eh, p[0].y], [p[3].x, eh, p[3].y], nB, nA);
+      pushQuad(pos, nA, nB, rb, ra);
+      pushQuad(pos, [p[1].x, eh, p[1].y], [p[2].x, eh, p[2].y], fB, fA);
+      pushQuad(pos, fA, fB, rb, ra);
+      for (const [a, b, c, d, e] of [[[p[0].x, eh, p[0].y], nA, ra, fA, [p[1].x, eh, p[1].y]], [[p[3].x, eh, p[3].y], nB, rb, fB, [p[2].x, eh, p[2].y]]]) {
+        pushTri(ends, a, b, c); pushTri(ends, a, c, e); pushTri(ends, c, d, e);
+      }
+    }
+    meshFromPos(bag, pos, slate, 'roof', true);
+    meshFromPos(bag, ends, mat(bag, '#EFE8DC', 0.7), 'roof', true);
+    return;
+  }
   if (roof.ridges.length && o.length >= 4) {
     const r = roof.ridges[0];
     const ra = [r.a.x, rh, r.a.y];
