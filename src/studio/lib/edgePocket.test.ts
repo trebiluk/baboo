@@ -9,9 +9,21 @@ import { upperBody } from './stories.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.13.48 tips and labels, 2.13.47 settings words, 2.13.46 one room one name, 2.13.45 new plan on phones, 2.13.44 join walls, 2.13.43 more rooms, 2.13.42 real rooms, 2.13.41 house looks, 2.13.40 screen readers, 2.13.39 one font, 2.13.38 clear sizes, 2.13.37 sizes on top, 2.13.36 lighter walk, 2.13.35 speed readout, 2.13.34 furniture, 2.13.33 soft shade, 2.13.32 glass, 2.13.31 crown, 2.13.30 lamps, 2.13.29 fixtures, 2.13.28 roof tag, 2.13.27 tidy, 2.13.26 touch 3d, 2.13.25 polish, 2.13.24 finishes, 2.13.23 frames, 2.13.22 inside 3d, 2.13.21 modes, 2.13.20 grand mansion, 2.13.19 2d tools, 2.13.18 richer 3d, 2.13.17 furniture list, 2.13.16 3d and dollhouse fixes, 2.13.15 more languages, 2.13.14 save status, 2.13.13 3d viewer update, 2.13.12 drawing engine update, 2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
-  it('chips 2.13.48 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.13.48');
+describe('2.13.49 sturdier, 2.13.48 tips and labels, 2.13.47 settings words, 2.13.46 one room one name, 2.13.45 new plan on phones, 2.13.44 join walls, 2.13.43 more rooms, 2.13.42 real rooms, 2.13.41 house looks, 2.13.40 screen readers, 2.13.39 one font, 2.13.38 clear sizes, 2.13.37 sizes on top, 2.13.36 lighter walk, 2.13.35 speed readout, 2.13.34 furniture, 2.13.33 soft shade, 2.13.32 glass, 2.13.31 crown, 2.13.30 lamps, 2.13.29 fixtures, 2.13.28 roof tag, 2.13.27 tidy, 2.13.26 touch 3d, 2.13.25 polish, 2.13.24 finishes, 2.13.23 frames, 2.13.22 inside 3d, 2.13.21 modes, 2.13.20 grand mansion, 2.13.19 2d tools, 2.13.18 richer 3d, 2.13.17 furniture list, 2.13.16 3d and dollhouse fixes, 2.13.15 more languages, 2.13.14 save status, 2.13.13 3d viewer update, 2.13.12 drawing engine update, 2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
+  it('chips 2.13.49 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.13.49');
+    for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) {
+      for (const k of ['news.robust', 'toast.importFixed', 'toast.importFixed1', 'toast.notPlan', '3d.fail.title', '3d.fail.body', '3d.fail.retry']) assert.notEqual(t(l, k), t('en', k), `${l} ${k}`);
+    }
+    assert.ok(t('uk', 'toast.importFixed', { n: '3' }).includes('3'));
+    const v3d49 = readFileSync(join(studio, 'components/View3DStub.tsx'), 'utf8');
+    assert.match(v3d49, /<Engine3DGuard loc=\{loc\}/);
+    assert.match(readFileSync(join(studio, 'components/EngineView.tsx'), 'utf8'), /addEventListener\('webglcontextlost', onLost\)/);
+    assert.match(readFileSync(join(studio, 'lib/storage.ts'), 'utf8'), /const f = repairFloor\(raw, report\);/);
+    for (const m of ['ChangelogModal', 'HelpModal', 'NewProjectModal', 'AccessDrawer', 'ContestDrawer', 'TeachingDrawer', 'ClassShareModal']) {
+      assert.match(readFileSync(join(studio, `components/${m}.tsx`), 'utf8'), /useEscape\(/, m);
+    }
+    assert.match(readFileSync(join(studio, 'data/changelog.ts'), 'utf8'), /version:\s*'2\.13\.48'/);
     for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) {
       for (const k of ['news.tipsWords', 'tip.trace', 'tip.fold', 'save.ok', 'save.fail', 'toast.mansionReady', 'a11y.next', 'a11y.access']) assert.notEqual(t(l, k), t('en', k), `${l} ${k}`);
     }

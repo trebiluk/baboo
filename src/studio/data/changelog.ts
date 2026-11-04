@@ -11,6 +11,15 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.49',
+    date: '2026-11-04',
+    bullets: [
+      'Plan files with broken pieces now open safely: Baboo leaves out the broken parts and tells you how many.',
+      'If 3D cannot start on a computer, the rest of Baboo keeps working and offers the Dollhouse.',
+      'Escape closes every window and drawer.',
+    ],
+  },
+  {
     version: '2.13.48',
     date: '2026-11-04',
     bullets: [

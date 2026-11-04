@@ -6,6 +6,7 @@ import { SkillPicker } from './SkillPicker';
 import { roofDefaultForStyle, roofStyleName } from '../lib/roof';
 import { t } from '../data/i18n';
 import { usePhoneChrome } from '../hooks/usePhoneChrome';
+import { useEscape } from '../hooks/useEscape';
 
 export function NewProjectModal() {
   const open = useProjectStore((s) => s.newProjectOpen);
@@ -15,6 +16,7 @@ export function NewProjectModal() {
   const locale = useProjectStore((s) => s.doc.settings.locale);
   const setSkillLevel = useProjectStore((s) => s.setSkillLevel);
   const phone = usePhoneChrome();
+  useEscape(open, () => close(false));
   if (!open) return null;
 
   const dismiss = () => close(false);

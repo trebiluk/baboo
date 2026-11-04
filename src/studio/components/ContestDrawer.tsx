@@ -4,6 +4,7 @@ import { useProjectStore } from '../store/useProjectStore';
 import { Icon } from '../icons';
 import { t, tt, asLocale } from '../data/i18n';
 import type { Locale } from '../types';
+import { useEscape } from '../hooks/useEscape';
 
 function mark(status: ContestCheck['status'], locale: Locale) {
   return t(locale, `contest.mark.${status}`);
@@ -32,6 +33,7 @@ export function ContestDrawer() {
   const styleId = useProjectStore((s) => s.doc.settings.styleId);
   const locale = asLocale(useProjectStore((s) => s.doc.settings.locale));
 
+  useEscape(open, () => toggle());
   if (!open) return null;
 
   let report;

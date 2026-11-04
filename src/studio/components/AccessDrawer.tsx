@@ -1,6 +1,7 @@
 import { runAccessCheck, type AccessCheck, type AccessHit } from '../lib/access';
 import { useProjectStore } from '../store/useProjectStore';
 import { t, tipLoc } from '../data/i18n';
+import { useEscape } from '../hooks/useEscape';
 
 function mark(status: AccessCheck['status']) {
   if (status === 'pass') return 'Looks good';
@@ -25,6 +26,7 @@ export function AccessDrawer() {
   const units = useProjectStore((s) => s.doc.settings.units);
   const locale = tipLoc(useProjectStore((s) => s.doc.settings));
 
+  useEscape(open, () => toggle());
   if (!open) return null;
 
   let report;

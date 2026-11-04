@@ -12,6 +12,7 @@ import { APP_VERSION } from '../version';
 import { blankProject } from '../data/templates';
 import { defaultTinyHomeTypology } from '../data/typology';
 import { generateRoof, roofDefaultForStyle, roofStyleName } from './roof';
+import { repairFloor, type RepairReport } from './repair';
 
 const DB_NAME = 'archworks';
 const STORE = 'projects';
@@ -33,7 +34,15 @@ function getDb() {
   return dbPromise;
 }
 
-function normalizeDoc(data: ProjectDocument): ProjectDocument {
+function normalizeDoc(input: ProjectDocument, report: RepairReport = { dropped: 0 }): ProjectDocument {
+  // 2.13.49: a file can say anything. Make meta and settings objects before reading them.
+  const isObj = (v: unknown) => !!v && typeof v === 'object' && !Array.isArray(v);
+  const data = {
+    ...input,
+    meta: isObj(input.meta) ? input.meta : ({} as ProjectDocument['meta']),
+    settings: isObj(input.settings) ? input.settings : ({} as ProjectDocument['settings']),
+  } as ProjectDocument;
+  if (typeof data.meta.title !== 'string') data.meta = { ...data.meta, title: '' };
   const base = blankProject(data.meta?.title || 'Imported Plan');
   const styleId = data.meta?.styleId ?? data.settings?.styleId ?? base.settings.styleId;
   let roofStyleId = (data.settings as { roofStyleId?: RoofStyleId | null })?.roofStyleId;
@@ -58,7 +67,8 @@ function normalizeDoc(data: ProjectDocument): ProjectDocument {
     else roofStyleId = roofDefaultForStyle(styleId);
   }
 
-  const floors = (data.floors ?? base.floors).map((f) => {
+  const floors = (Array.isArray(data.floors) && data.floors.length ? data.floors : base.floors).map((raw) => {
+    const f = repairFloor(raw, report);
     const layers = {
       ...(f.layers ?? {}),
       structure: f.layers?.structure ?? true,
@@ -237,10 +247,10 @@ export function exportProjectFile(doc: ProjectDocument): void {
   triggerDownload(`${safe}.archworks.json`, blob);
 }
 
-export async function importProjectFile(file: File): Promise<ProjectDocument> {
+export async function importProjectFile(file: File, report: RepairReport = { dropped: 0 }): Promise<ProjectDocument> {
   const data = JSON.parse(await file.text()) as ProjectDocument;
-  if (!data?.floors || !Array.isArray(data.floors)) {
+  if (!data || typeof data !== 'object' || !Array.isArray(data.floors) || !data.floors.some((f) => f && typeof f === 'object')) {
     throw new Error('Invalid ArchWorks project file');
   }
-  return normalizeDoc(data);
+  return normalizeDoc(data, report);
 }

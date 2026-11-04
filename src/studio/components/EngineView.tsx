@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -285,6 +285,9 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
   walkRef.current = walk;
   floorRef.current = floor;
   focusRef.current = focus ?? null;
+  // 2.13.49: if the graphics card drops the 3D picture, hand it to Engine3DGuard instead of freezing.
+  const [glLost, setGlLost] = useState(false);
+  if (glLost) throw new Error('WebGL context lost');
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -306,6 +309,8 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     renderer.domElement.style.height = '100%';
     renderer.domElement.style.display = 'block';
     renderer.domElement.style.touchAction = 'none';
+    const onLost = (e: Event) => { e.preventDefault(); setGlLost(true); };
+    renderer.domElement.addEventListener('webglcontextlost', onLost);
     wrap.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
@@ -695,6 +700,7 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
       renderer.domElement.removeEventListener('pointerup', up);
       renderer.domElement.removeEventListener('pointercancel', up);
       renderer.domElement.removeEventListener('wheel', wheel);
+      renderer.domElement.removeEventListener('webglcontextlost', onLost);
       built.dispose();
       composer?.dispose();
       envRT?.dispose();

@@ -8,6 +8,7 @@ import { DEFAULT_SKILL_LEVEL, NOVICE_UNIT_STEPS, skillRank } from '../data/skill
 import { t, localeOption, asLocale, tipLoc } from '../data/i18n';
 import type { Locale, Floor, StyleId } from '../types';
 import { runArchitectCheck, type ArchCheck, type ArchHit } from '../lib/architect';
+import { useEscape } from '../hooks/useEscape';
 
 export function TeachingDrawer() {
   const open = useProjectStore((s) => s.teachingOpen);
@@ -62,6 +63,7 @@ export function TeachingDrawer() {
     };
   }, [open]);
 
+  useEscape(open, () => toggle());
   if (!open) return null;
 
   return (

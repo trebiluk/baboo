@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Component, lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
 import { SITE_PALETTE, SKY_PALETTE, WALL_TINT, asShowFurniture3d, asSite, asSky, asTint } from '../data/scene3d';
 import { asWallHeightFt } from '../lib/wallDraft';
@@ -6,8 +6,55 @@ import { asFloorFinish } from '../data/flooring';
 import { t } from '../data/i18n';
 import type { EngineHandle } from './EngineView';
 import type { HouseLook } from '../lib/engine3d';
+import { saveProject } from '../lib/storage';
 
-const EngineView = lazy(() => import('./EngineView').then((m) => ({ default: m.EngineView })));
+// A fresh lazy loader per try, so "Try 3D again" downloads again after the wifi comes back (2.13.49).
+const makeEngine = () => lazy(() => import('./EngineView').then((m) => ({ default: m.EngineView })));
+let sharedEngine = makeEngine();
+
+type Loc = Parameters<typeof t>[0];
+
+/**
+ * Keeps a 3D failure inside the 3D box (2.13.49). Old or locked-down computers may have no WebGL, the graphics
+ * card can drop the picture, or school wifi can drop the 3D download. The plan, Dollhouse and 2D keep working.
+ */
+class Engine3DGuard extends Component<{ loc: Loc; onRetry: () => void; children: ReactNode }, { failed: boolean; tries: number; download: boolean }> {
+  state = { failed: false, tries: 0, download: false };
+  static getDerivedStateFromError(err: unknown) {
+    // The browser remembers a failed code download until the page reloads.
+    const download = /dynamically imported module|Importing a module script failed|error loading dynamically|Failed to fetch/i.test(String((err as Error)?.message ?? err));
+    return { failed: true, download };
+  }
+  componentDidCatch(err: Error) {
+    console.warn('Baboo 3D could not run:', err?.message);
+  }
+  retry = async () => {
+    if (this.state.download) {
+      // Save the plan first, then reload so the 3D code downloads fresh.
+      try { await saveProject(useProjectStore.getState().doc); } catch { /* the autosave copy is still there */ }
+      location.reload();
+      return;
+    }
+    this.props.onRetry();
+    this.setState((s) => ({ failed: false, tries: s.tries + 1 }));
+  };
+  render() {
+    const { loc, children } = this.props;
+    if (!this.state.failed) return <div key={this.state.tries} className="engine3d-slot">{children}</div>;
+    const go = (m: 'plan' | 'dollhouse') => useProjectStore.getState().setViewMode(m);
+    return (
+      <div className="view3d-fail" role="alert">
+        <p className="view3d-fail-title">{t(loc, '3d.fail.title')}</p>
+        <p>{t(loc, '3d.fail.body')}</p>
+        <div className="view3d-fail-btns">
+          <button type="button" className="primary-btn aw-pressable" onClick={() => go('dollhouse')}>{t(loc, 'chrome.dollhouse')}</button>
+          <button type="button" className="ghost-btn aw-pressable" onClick={() => go('plan')}>{t(loc, 'chrome.plan')}</button>
+          <button type="button" className="ghost-btn aw-pressable" onClick={() => this.retry()}>{t(loc, '3d.fail.retry')}</button>
+        </div>
+      </div>
+    );
+  }
+}
 
 /**
  * Teacher-only speed readout for 3D: frames a second and which look is on. Turn Teacher on by holding the version chip
@@ -48,6 +95,7 @@ export function View3DStub() {
   const floor = useProjectStore((s) => s.doc.floors[0]);
   const selected = useProjectStore((s) => s.selected);
   const engineRef = useRef<EngineHandle>(null);
+  const [EngineView, setEngineView] = useState(() => sharedEngine);
   // What was picked in 2D, as a plan point: 3D opens aimed at it (2.13.21).
   const focus = useMemo(() => {
     if (!selected) return null;
@@ -105,9 +153,11 @@ export function View3DStub() {
         aria-label={t(loc, '3d.preview')}
         onPointerDown={(e) => { if ((e.target as HTMLElement).tagName === 'CANVAS') setMoved(true); }}
       >
-        <Suspense fallback={null}>
-          <EngineView ref={engineRef} floor={floor} look={look} sky={sky.zenith} walk={walk} focus={focus} />
-        </Suspense>
+        <Engine3DGuard loc={loc} onRetry={() => { sharedEngine = makeEngine(); setEngineView(() => sharedEngine); }}>
+          <Suspense fallback={null}>
+            <EngineView ref={engineRef} floor={floor} look={look} sky={sky.zenith} walk={walk} focus={focus} />
+          </Suspense>
+        </Engine3DGuard>
         {!floor.walls.length ? (
           <p className="view3d-empty">{t(loc, '3d.empty')}</p>
         ) : null}

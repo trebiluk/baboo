@@ -978,7 +978,8 @@ export const useProjectStore = create<Store>((set, get) => ({
   },
   importJson: async (file) => {
     try {
-      const loaded = await importProjectFile(file);
+      const report = { dropped: 0 };
+      const loaded = await importProjectFile(file, report);
       const doc = {
         ...loaded,
         settings: {
@@ -990,9 +991,13 @@ export const useProjectStore = create<Store>((set, get) => ({
       };
       set({ doc, past: [], future: [], selected: null, newProjectOpen: false });
       get().markDirty();
-      get().showToast(t(get().doc.settings.locale, 'toast.imported'));
+      get().showToast(report.dropped
+        ? report.dropped === 1
+          ? t(get().doc.settings.locale, 'toast.importFixed1')
+          : t(get().doc.settings.locale, 'toast.importFixed', { n: String(report.dropped) })
+        : t(get().doc.settings.locale, 'toast.imported'));
     } catch {
-      get().showToast(t(get().doc.settings.locale, 'toast.importFail'));
+      get().showToast(t(get().doc.settings.locale, 'toast.notPlan'));
     }
   },
 

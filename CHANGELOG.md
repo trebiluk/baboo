@@ -3,6 +3,12 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.49 — 2026-11-04 — Sturdier
+- Plan files with broken pieces now open safely: Baboo leaves out the broken parts and tells you how many.
+- If 3D cannot start on a computer (no WebGL, graphics dropped, or the 3D download failed), the rest of Baboo keeps working and offers the Dollhouse, 2D, or Try 3D again.
+- Escape closes every window and drawer.
+- A file that is not a Baboo plan says so and leaves your plan alone.
+
 ## 2.13.48 — 2026-11-04 — Tips and labels
 - Hover tips on the tools, save messages, and screen-reader labels are in your language.
 - The saved-on-Chromebook card and the Mansion-ready message are translated.

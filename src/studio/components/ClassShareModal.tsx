@@ -1,6 +1,8 @@
 import { BABOO_LOGO } from '../logo';
+import { useEscape } from '../hooks/useEscape';
 
 export function ClassShareModal({ onClose }: { onClose: () => void }) {
+  useEscape(true, onClose);
   const download = () => {
     const a = document.createElement('a');
     a.href = `${import.meta.env.BASE_URL}baboo-class-folder.zip`;

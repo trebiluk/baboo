@@ -5631,3 +5631,25 @@ html.kb-framed body.kb-on .app-shell.is-phone .chrome {
   flex: 0 0 22px;
   accent-color: var(--aw-royal, #4f46e5);
 }
+
+/* 2.13.49: 3D failure stays inside the 3D box. */
+.engine3d-slot { display: contents; }
+.view3d-fail {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  text-align: center;
+  background: var(--aw-surface, #f4f4f6);
+  color: var(--aw-text, #1a1a1a);
+  z-index: 3;
+}
+.view3d-fail p { margin: 0; max-width: 34rem; line-height: 1.45; }
+.view3d-fail-title { font-weight: 700; font-size: 1.15rem; }
+.view3d-fail-btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 6px; }
+.view3d-fail-btns button { min-height: 44px; padding: 0 18px; }
+.solid-preview:has(.view3d-fail) .view3d-hud, .solid-preview:has(.view3d-fail) .view3d-empty { display: none; }

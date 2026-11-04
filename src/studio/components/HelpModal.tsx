@@ -4,6 +4,7 @@ import { APP_VERSION } from '../version';
 import { GalleryCardPreview } from './GalleryCardPreview';
 import { LOCALE_OPTIONS, asLocale, t, tipLoc } from '../data/i18n';
 import type { Locale } from '../types';
+import { useEscape } from '../hooks/useEscape';
 
 /** Quiet dedication — DEDICATION.md · not a loud splash. */
 export const DEDICATION_LINE =
@@ -19,6 +20,7 @@ export function HelpModal() {
   const setSettings = useProjectStore((s) => s.setSettings);
   const locale = tipLoc(settings);
   const [showGallery, setShowGallery] = useState(false);
+  useEscape(open, () => toggle());
   if (!open) return null;
   return (
     <>

@@ -1,14 +1,16 @@
 import { useProjectStore } from '../store/useProjectStore';
 import { APP_VERSION, CHANGELOG_ENTRIES } from '../data/changelog';
 import { t, tipLoc } from '../data/i18n';
+import { useEscape } from '../hooks/useEscape';
 
 /** What's new bullets that have a translated line. The bullet text must match the English exactly. */
-const NEWS_KEYS = ['news.tipsWords', 'news.settingsWords', 'news.oneRoom', 'news.newPlan', 'news.chain', 'news.rooms2', 'news.rooms', 'news.styles', 'news.a11y', 'news.fold', 'news.sizesClear', 'news.sizesOnTop', 'news.walkFast', 'news.fps', 'news.furniture3d', 'news.shade', 'news.glass', 'news.crown', 'news.lamps', 'news.fixtures', 'news.roofTag', 'news.tidy', 'news.touch3d', 'news.polish', 'news.finishes', 'news.frames', 'news.inside3d', 'news.modes', 'news.mansion', 'news.tools2d', 'news.look3d', 'news.furn', 'news.view3d', 'news.words', 'news.save', 'news.line', 'news.fit', 'news.menu', 'news.close', 'news.decoders', 'news.konva', 'news.modelviewer'];
+const NEWS_KEYS = ['news.robust', 'news.tipsWords', 'news.settingsWords', 'news.oneRoom', 'news.newPlan', 'news.chain', 'news.rooms2', 'news.rooms', 'news.styles', 'news.a11y', 'news.fold', 'news.sizesClear', 'news.sizesOnTop', 'news.walkFast', 'news.fps', 'news.furniture3d', 'news.shade', 'news.glass', 'news.crown', 'news.lamps', 'news.fixtures', 'news.roofTag', 'news.tidy', 'news.touch3d', 'news.polish', 'news.finishes', 'news.frames', 'news.inside3d', 'news.modes', 'news.mansion', 'news.tools2d', 'news.look3d', 'news.furn', 'news.view3d', 'news.words', 'news.save', 'news.line', 'news.fit', 'news.menu', 'news.close', 'news.decoders', 'news.konva', 'news.modelviewer'];
 
 export function ChangelogModal() {
   const open = useProjectStore((s) => s.changelogOpen);
   const toggle = useProjectStore((s) => s.toggleChangelog);
   const locale = tipLoc(useProjectStore((s) => s.doc.settings));
+  useEscape(open, () => toggle());
   if (!open) return null;
   const localBullet = (line: string) => {
     const key = NEWS_KEYS.find((k) => t('en', k) === line);
