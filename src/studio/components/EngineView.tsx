@@ -326,7 +326,7 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     const skyMesh = skyDome(sky);
     scene.add(skyMesh.mesh);
 
-    const camera = new THREE.PerspectiveCamera(48, 1, 0.15, 500);
+    const camera = new THREE.PerspectiveCamera(48, 1, 0.15, 900);
     const hemi = new THREE.HemisphereLight(0xd6e6f5, look.ground, 0.82);
     scene.add(hemi);
     const sun = new THREE.DirectionalLight(0xffefd2, 2.1);

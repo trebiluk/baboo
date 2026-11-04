@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.69',
+    date: '2026-11-04',
+    bullets: [
+      'The Hobbit house wears a soft turf mound in 3D, and the ground no longer ends in a pale shape in the sky on phones.',
+    ],
+  },
+  {
     version: '2.13.68',
     date: '2026-11-04',
     bullets: [

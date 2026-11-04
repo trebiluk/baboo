@@ -974,6 +974,41 @@ function addRoof(bag: Bag, roof: RoofGeometry, rich = false) {
     meshFromPos(bag, pos, slate, 'roof', true);
     return;
   }
+  if (roof.styleId === 'grass' && roof.sodEdge && roof.sodEdge.length >= 6) {
+    // 2.13.69: a soft turf mound — two rings stepping in and up to a rounded top, then a cap. It was a flat green polygon.
+    let cx = 0;
+    let cz = 0;
+    for (const p of o) { cx += p.x; cz += p.y; }
+    cx /= o.length;
+    cz /= o.length;
+    const rise = rh - eh;
+    const rings: { k: number; y: number }[] = [
+      { k: 1, y: eh + 0.1 },
+      { k: 0.78, y: eh + rise * 0.55 },
+      { k: 0.5, y: eh + rise * 0.88 },
+      { k: 0.22, y: eh + rise },
+    ];
+    const ringPt = (p: { x: number; y: number }, k: number, y: number) => [cx + (p.x - cx) * k, y, cz + (p.y - cz) * k];
+    const turf = mat(bag, '#4C7A3E', 0.95, { map: grassMap() });
+    const pos: number[] = [];
+    for (let r = 0; r < rings.length - 1; r++) {
+      const A = rings[r];
+      const B = rings[r + 1];
+      for (let i = 0; i < o.length; i++) {
+        const p = o[i];
+        const q = o[(i + 1) % o.length];
+        pushQuad(pos, ringPt(p, A.k, A.y), ringPt(q, A.k, A.y), ringPt(q, B.k, B.y), ringPt(p, B.k, B.y));
+      }
+    }
+    const top = rings[rings.length - 1];
+    for (let i = 0; i < o.length; i++) {
+      const p = o[i];
+      const q = o[(i + 1) % o.length];
+      pushTri(pos, ringPt(p, top.k, top.y), ringPt(q, top.k, top.y), [cx, top.y + 0.3, cz]);
+    }
+    meshFromPos(bag, pos, turf, 'roof', true);
+    return;
+  }
   if (roof.styleId === 'conical' && roof.hips.length) {
     // 2.13.68: a real cone — one slate triangle per eave edge up to the peak. It drew as a flat disc before.
     const peak = roof.hips[0].b;
@@ -1417,14 +1452,16 @@ export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
     gx /= floor.nodes.length;
     gz /= floor.nodes.length;
   }
-  const pad = new THREE.CircleGeometry(240, 48);
+  // 2.13.69: the ground runs out past the fog (fog ends at 520), so its edge never shows as a pale shape
+  // in the sky. On a tall phone the camera sits far enough back that a 240 ft disc ended in plain view.
+  const pad = new THREE.CircleGeometry(640, 64);
   const pos = pad.getAttribute('position');
   const colors = new Float32Array(pos.count * 3);
   const grass = new THREE.Color(look.ground);
   const skyEdge = new THREE.Color('#e4eaf0');
   for (let i = 0; i < pos.count; i++) {
-    const d = Math.min(1, Math.hypot(pos.getX(i), pos.getY(i)) / 240);
-    const t = d < 0.62 ? 0 : (d - 0.62) / 0.38;
+    const d = Math.min(1, Math.hypot(pos.getX(i), pos.getY(i)) / 640);
+    const t = d < 0.4 ? 0 : (d - 0.4) / 0.6;
     const c = grass.clone().lerp(skyEdge, t * t);
     colors[i * 3] = c.r;
     colors[i * 3 + 1] = c.g;
@@ -1433,7 +1470,7 @@ export function buildHouse(floor: Floor, look: HouseLook): BuiltHouse {
   pad.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   const grassTex = grassMap();
   if (grassTex) {
-    grassTex.repeat.set(90, 90);
+    grassTex.repeat.set(240, 240);
     grassTex.anisotropy = 1;
   }
   const groundMat = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.96, vertexColors: true, map: grassTex });

@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.69 — 2026-11-04 — turf mound and a clean horizon
+- The Hobbit house wears a soft turf mound in 3D, and the ground no longer ends in a pale shape in the sky on phones.
+- 3D View drew the Grass/sod roof as a flat green polygon; it is now a rounded mound (three rings stepping in and up to a cap). On tall phones the camera sits far back and the 240 ft ground disc ended inside the view; the ground now runs to 640 ft, past the fog, and the camera far plane moved to 900 so nothing clips.
+
 ## 2.13.68 — 2026-11-04 — a real cone roof
 - The Yurt's cone roof is a real cone in 3D now, and a toast no longer covers the plan card on a phone.
 - 3D View drew the Conical roof as a flat disc (the fallback for any roof without ridges). It now fans slate triangles from each eave edge to the peak with a small crown ring. On phones the plan sheet steps aside while a toast shows; they overlapped at the bottom edge.
