@@ -2,6 +2,9 @@ import type { Floor, FurnitureItem, Opening, RoofStyleId } from '../types';
 import { formatLength } from './geometry';
 import { circleFitsInPoly } from './access';
 import { listInteriorFaces } from './rooms';
+import { t, type Locale } from '../data/i18n';
+import { roomLabel } from '../data/rooms';
+import { furnLabel } from '../data/furniture';
 
 /** Textbook dog-house rules (classroom, not a kennel license). */
 export const DOG_HOUSE = {
@@ -113,10 +116,13 @@ function push(
 
 export function judgeDogHouse(
   floor: Floor,
-  opts: { roofStyleId?: RoofStyleId | null; units?: 'ft' | 'm' } = {},
+  opts: { roofStyleId?: RoofStyleId | null; units?: 'ft' | 'm'; locale?: Locale } = {},
 ): ContestReport {
   const checks: ContestCheck[] = [];
   const units = opts.units ?? 'ft';
+  // 2.13.51: every sentence comes from i18n.ts, in the student's language.
+  const locale: Locale = opts.locale ?? 'en';
+  const tr = (key: string, vars?: Record<string, string>) => t(locale, key, vars);
   const len = (n: number) => formatLength(n, units);
   const faces = listInteriorFaces(floor.nodes ?? [], floor.walls ?? []);
   const den = faces.slice().sort((a, b) => b.area - a.area)[0] ?? null;
@@ -128,19 +134,19 @@ export function judgeDogHouse(
   if (!den) {
     push(checks, {
       id: 'shelter',
-      title: 'A closed den',
+      title: tr('dog.den.title'),
       status: 'fail',
-      detail: 'Walls don’t meet yet. A dog house is a closed box — rain stays out.',
-      tip: 'Sketch, then Trace, or Wall until the corners meet.',
+      detail: tr('dog.den.fail'),
+      tip: tr('dog.den.failTip'),
       max: 18,
     });
   } else {
     push(checks, {
       id: 'shelter',
-      title: 'A closed den',
+      title: tr('dog.den.title'),
       status: 'pass',
-      detail: 'The walls meet. That’s a shelter.',
-      tip: 'Keep it one room — a den, not a people plan.',
+      detail: tr('dog.den.pass'),
+      tip: tr('dog.den.passTip'),
       max: 18,
     });
   }
@@ -149,39 +155,39 @@ export function judgeDogHouse(
   if (!den) {
     push(checks, {
       id: 'scale',
-      title: 'Just large enough',
+      title: tr('dog.scale.title'),
       status: 'skip',
-      detail: 'Close the den before we talk size.',
-      tip: 'Textbook: big enough to stand, turn, and lie down — small enough to warm with body heat.',
+      detail: tr('dog.scale.skip'),
+      tip: tr('dog.scale.skipTip'),
       max: 18,
     });
   } else if (area >= DOG_HOUSE.areaMin && area <= DOG_HOUSE.areaMax) {
     push(checks, {
       id: 'scale',
-      title: 'Just large enough',
+      title: tr('dog.scale.title'),
       status: 'pass',
-      detail: `${area} sq ft. I can warm this with my own heat.`,
-      tip: 'Textbook size for a medium dog: about 8–18 sq ft.',
+      detail: tr('dog.scale.pass', { area: String(area) }),
+      tip: tr('dog.scale.passTip'),
       max: 18,
     });
   } else if (area >= DOG_HOUSE.areaWarnLo && area <= DOG_HOUSE.areaWarnHi) {
     push(checks, {
       id: 'scale',
-      title: 'Just large enough',
+      title: tr('dog.scale.title'),
       status: 'warn',
-      detail: `${area} sq ft — close, but ${area < DOG_HOUSE.areaMin ? 'snug' : 'a bit roomy'} for body heat.`,
+      detail: tr(area < DOG_HOUSE.areaMin ? 'dog.scale.warnSnug' : 'dog.scale.warnRoomy', { area: String(area) }),
       tip: area < DOG_HOUSE.areaMin
-        ? 'Nudge the walls out a foot. I still need to turn around.'
-        : 'A bigger box loses heat. Pull the walls in toward 8–18 sq ft.',
+        ? tr('dog.scale.warnSnugTip')
+        : tr('dog.scale.warnRoomyTip'),
       max: 18,
     });
   } else {
     push(checks, {
       id: 'scale',
-      title: 'Just large enough',
+      title: tr('dog.scale.title'),
       status: 'fail',
-      detail: `${area} sq ft. ${area < DOG_HOUSE.areaMin ? 'I can’t turn around.' : 'That’s a people room — I can’t heat it.'}`,
-      tip: 'Textbook: 8–18 sq ft for a medium dog. Not 12×10 like a bedroom.',
+      detail: tr(area < DOG_HOUSE.areaMin ? 'dog.scale.failSmall' : 'dog.scale.failBig', { area: String(area) }),
+      tip: tr('dog.scale.failTip'),
       max: 18,
     });
   }
@@ -189,34 +195,37 @@ export function judgeDogHouse(
   if (doors.length === 0) {
     push(checks, {
       id: 'door',
-      title: 'A dog-sized door',
+      title: tr('dog.door.title'),
       status: 'fail',
-      detail: 'No door. I need a way in that isn’t a 3-foot people opening.',
-      tip: 'Door tool → click a wall → tap it and pick 12" or 18".',
+      detail: tr('dog.door.none'),
+      tip: tr('dog.door.noneTip'),
       max: 14,
     });
   } else {
     const d = doors[0];
     const w = d.width;
-    const extra = doors.length > 1 ? ` ${doors.length} doors leak drafts.` : '';
+    const extra = doors.length > 1 ? ` ${tr('dog.door.extra', { n: String(doors.length) })}` : '';
     let status: ContestStatus = 'pass';
-    let detail = `${len(w)} opening.${extra}`;
-    let tip = 'One opening, just wide enough to walk through.';
+    let detail = '';
+    let tip = tr('dog.door.tip');
     if (w < DOG_HOUSE.doorMinFt || w > DOG_HOUSE.doorMaxFt || doors.length > 1) {
       status = 'fail';
+      // 2.13.51: a good-sized door with extra doors is not "too tight" — the extra doors are the problem.
       detail = w > DOG_HOUSE.doorMaxFt
-        ? `${len(w)} is a people door. Heat pours out.${extra}`
-        : `${len(w)} is too tight.${extra}`;
-      tip = 'Tap the door → 12" or 18". One door only.';
+        ? tr('dog.door.big', { w: len(w) }) + extra
+        : w < DOG_HOUSE.doorMinFt
+          ? tr('dog.door.tight', { w: len(w) }) + extra
+          : (tr('dog.door.pass', { w: len(w) }) + extra);
+      tip = tr('dog.door.failTip');
     } else if (w < DOG_HOUSE.doorNiceMinFt || w > DOG_HOUSE.doorNiceMaxFt) {
       status = 'warn';
-      detail = `${len(w)} works, but 12–18" is the textbook sweet spot.${extra}`;
+      detail = tr('dog.door.warn', { w: len(w) }) + extra;
     } else {
-      detail = `${len(w)} — just wide enough.${extra}`;
+      detail = tr('dog.door.pass', { w: len(w) }) + extra;
     }
     push(checks, {
       id: 'door',
-      title: 'A dog-sized door',
+      title: tr('dog.door.title'),
       status,
       detail,
       tip,
@@ -228,10 +237,10 @@ export function judgeDogHouse(
   if (doors.length === 0) {
     push(checks, {
       id: 'offset',
-      title: 'Offset from the wind',
+      title: tr('dog.offset.title'),
       status: 'skip',
-      detail: 'Place a door first, then slide it off-center.',
-      tip: 'Textbook: don’t put the opening in the middle — rain and wind miss the bed.',
+      detail: tr('dog.offset.skip'),
+      tip: tr('dog.offset.skipTip'),
       max: 10,
     });
   } else {
@@ -240,20 +249,20 @@ export function judgeDogHouse(
     if (off >= DOG_HOUSE.offsetT) {
       push(checks, {
         id: 'offset',
-        title: 'Offset from the wind',
+        title: tr('dog.offset.title'),
         status: 'pass',
-        detail: 'Door sits off-center. Wind and rain don’t blow straight onto the bed.',
-        tip: 'Keep the sleeping pad on the far side of the opening.',
+        detail: tr('dog.offset.pass'),
+        tip: tr('dog.offset.passTip'),
         max: 10,
         hit: { kind: 'opening', id: d.id },
       });
     } else {
       push(checks, {
         id: 'offset',
-        title: 'Offset from the wind',
+        title: tr('dog.offset.title'),
         status: 'fail',
-        detail: 'Door is in the middle of the wall. A gust goes right in.',
-        tip: 'Select the door and slide it toward a corner.',
+        detail: tr('dog.offset.fail'),
+        tip: tr('dog.offset.failTip'),
         max: 10,
         hit: { kind: 'opening', id: d.id },
       });
@@ -263,28 +272,28 @@ export function judgeDogHouse(
   if (!den) {
     push(checks, {
       id: 'turn',
-      title: 'Room to turn',
+      title: tr('dog.turn.title'),
       status: 'skip',
-      detail: 'Close the den first.',
-      tip: 'I need about a 2-foot circle inside.',
+      detail: tr('dog.turn.skip'),
+      tip: tr('dog.turn.skipTip'),
       max: 10,
     });
   } else if (circleFitsInPoly(den.poly, DOG_HOUSE.turnFt)) {
     push(checks, {
       id: 'turn',
-      title: 'Room to turn',
+      title: tr('dog.turn.title'),
       status: 'pass',
-      detail: 'A 2-foot circle fits. I can spin and lie down.',
-      tip: 'Don’t fill the floor with people furniture.',
+      detail: tr('dog.turn.pass'),
+      tip: tr('dog.turn.passTip'),
       max: 10,
     });
   } else {
     push(checks, {
       id: 'turn',
-      title: 'Room to turn',
+      title: tr('dog.turn.title'),
       status: 'fail',
-      detail: 'Too tight to turn around. Stretch the short wall.',
-      tip: 'Textbook: stand, turn, lie stretched — all three.',
+      detail: tr('dog.turn.fail'),
+      tip: tr('dog.turn.failTip'),
       max: 10,
     });
   }
@@ -293,37 +302,37 @@ export function judgeDogHouse(
   if (!roofId) {
     push(checks, {
       id: 'roof',
-      title: 'A pitched roof',
+      title: tr('dog.roof.title'),
       status: 'fail',
-      detail: 'No roof named yet. Rain has to shed.',
-      tip: 'Settings → Roof → Gable or Shed.',
+      detail: tr('dog.roof.none'),
+      tip: tr('dog.roof.noneTip'),
       max: 14,
     });
   } else if (PITCHED.has(roofId)) {
     push(checks, {
       id: 'roof',
-      title: 'A pitched roof',
+      title: tr('dog.roof.title'),
       status: 'pass',
-      detail: `${roofId === 'gable' ? 'Gable' : roofId === 'shed' ? 'Shed' : 'Hip'} — water runs off.`,
-      tip: 'Name it with a real word. You already did.',
+      detail: tr('dog.roof.pass', { roof: roofId === 'gable' ? 'Gable' : roofId === 'shed' ? 'Shed' : 'Hip' }),
+      tip: tr('dog.roof.passTip'),
       max: 14,
     });
   } else if (ODD_ROOF.has(roofId)) {
     push(checks, {
       id: 'roof',
-      title: 'A pitched roof',
+      title: tr('dog.roof.title'),
       status: 'warn',
-      detail: 'That roof is for a people house or a story. A kennel wants gable or shed.',
-      tip: 'Settings → Gable or Shed. Simple pitch, rain sheds.',
+      detail: tr('dog.roof.people'),
+      tip: tr('dog.roof.peopleTip'),
       max: 14,
     });
   } else {
     push(checks, {
       id: 'roof',
-      title: 'A pitched roof',
+      title: tr('dog.roof.title'),
       status: 'fail',
-      detail: 'A flat roof puddles. Dogs don’t need a modern box.',
-      tip: 'Settings → Gable or Shed.',
+      detail: tr('dog.roof.flat'),
+      tip: tr('dog.roof.flatTip'),
       max: 14,
     });
   }
@@ -332,13 +341,13 @@ export function judgeDogHouse(
   const peopleFurn = furniture.filter((f: FurnitureItem) => PEOPLE_FURN.has(f.catalogId));
   const bigWin = windows.filter((w) => w.width >= 2);
   if (peopleRooms.length || peopleFurn.length) {
-    const who = peopleRooms[0]?.name ?? peopleFurn[0]?.label ?? 'people stuff';
+    const who = peopleRooms[0] ? roomLabel(locale, peopleRooms[0]) : peopleFurn[0] ? furnLabel(locale, peopleFurn[0].catalogId, peopleFurn[0].label) : tr('dog.program.stuff');
     push(checks, {
       id: 'program',
-      title: 'A den, not a people house',
+      title: tr('dog.program.title'),
       status: 'fail',
-      detail: `${who} belongs in a house for humans. I need a sleeping box.`,
-      tip: 'Delete the kitchen and bath. One named den is enough.',
+      detail: tr('dog.program.fail', { who }),
+      tip: tr('dog.program.failTip'),
       max: 6,
       hit: peopleRooms[0]
         ? { kind: 'room', id: peopleRooms[0].id }
@@ -347,20 +356,20 @@ export function judgeDogHouse(
   } else if (bigWin.length) {
     push(checks, {
       id: 'program',
-      title: 'A den, not a people house',
+      title: tr('dog.program.title'),
       status: 'warn',
-      detail: 'A people-sized window leaks heat. Kennels stay mostly solid.',
-      tip: 'Delete extra windows, or skip them.',
+      detail: tr('dog.program.window'),
+      tip: tr('dog.program.windowTip'),
       max: 6,
       hit: { kind: 'opening', id: bigWin[0].id },
     });
   } else {
     push(checks, {
       id: 'program',
-      title: 'A den, not a people house',
+      title: tr('dog.program.title'),
       status: 'pass',
-      detail: 'No kitchen, no bath, no sofa. This reads as a den.',
-      tip: 'One room. Sleeping only.',
+      detail: tr('dog.program.pass'),
+      tip: tr('dog.program.passTip'),
       max: 6,
     });
   }
@@ -369,19 +378,19 @@ export function judgeDogHouse(
   if (dims.length === 0) {
     push(checks, {
       id: 'dims',
-      title: 'Size labels',
+      title: tr('dog.dims.title'),
       status: 'warn',
-      detail: 'No size labels on the plan. The book wants numbers you can read.',
-      tip: 'Size tool → click two corners of a wall.',
+      detail: tr('dog.dims.none'),
+      tip: tr('dog.dims.noneTip'),
       max: 5,
     });
   } else {
     push(checks, {
       id: 'dims',
-      title: 'Size labels',
+      title: tr('dog.dims.title'),
       status: 'pass',
-      detail: `${dims.length} size label${dims.length === 1 ? '' : 's'} on the plan.`,
-      tip: 'Keep them in feet so the class can check scale.',
+      detail: dims.length === 1 ? tr('dog.dims.one') : tr('dog.dims.many', { n: String(dims.length) }),
+      tip: tr('dog.dims.passTip'),
       max: 5,
       hit: { kind: 'dim', id: dims[0].id },
     });
@@ -391,30 +400,30 @@ export function judgeDogHouse(
   if (trees.length === 0) {
     push(checks, {
       id: 'shade',
-      title: 'Summer shade',
+      title: tr('dog.shade.title'),
       status: 'warn',
-      detail: 'No tree on the site. Textbook: shade in summer, sun in winter if you can.',
-      tip: 'Plant tool → Tree. Put it on the south or west side.',
+      detail: tr('dog.shade.none'),
+      tip: tr('dog.shade.noneTip'),
       max: 5,
     });
   } else {
     push(checks, {
       id: 'shade',
-      title: 'Summer shade',
+      title: tr('dog.shade.title'),
       status: 'pass',
-      detail: 'A tree on the plan. I’ll thank you in July.',
-      tip: 'Keep the door out of the prevailing wind if you know it.',
+      detail: tr('dog.shade.pass'),
+      tip: tr('dog.shade.passTip'),
       max: 5,
       hit: { kind: 'landscape', id: trees[0].id },
     });
   }
 
-  const t = tally(checks);
-  const ribbon = ribbonFor(t.score, t.max, t.fail);
+  const score = tally(checks);
+  const ribbon = ribbonFor(score.score, score.max, score.fail);
   return {
     checks,
-    ...t,
+    ...score,
     ribbon,
-    quote: babooQuote(ribbon, t.fail),
+    quote: babooQuote(ribbon, score.fail),
   };
 }

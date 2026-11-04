@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.51',
+    date: '2026-11-04',
+    bullets: [
+      'Baboo’s Dog House contest and the Teach panel labels are in your language.',
+      'With extra doors on a dog house, Baboo blames the extra doors instead of calling a good door too tight.',
+    ],
+  },
+  {
     version: '2.13.50',
     date: '2026-11-04',
     bullets: [

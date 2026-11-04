@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.51 — 2026-11-04 — Dog House words
+- Baboo’s Dog House contest and the Teach panel labels are in your language.
+- With extra doors on a dog house, Baboo blames the extra doors instead of calling a good door too tight.
+- Teach panel: floor area, roof, style term, named rooms and the storage checklist are translated. Reflection prompts and unit steps are still English.
+
 ## 2.13.50 — 2026-11-04 — Access check words
 - The Access check is in your language, with room and furniture names translated too.
 - The headline, the check titles, the details, the tips and the ADA note all come from the translation table.

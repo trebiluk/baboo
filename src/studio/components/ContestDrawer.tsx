@@ -38,7 +38,7 @@ export function ContestDrawer() {
 
   let report;
   try {
-    report = judgeDogHouse(floor, { roofStyleId, units });
+    report = judgeDogHouse(floor, { roofStyleId, units, locale });
   } catch {
     report = {
       checks: [], pass: 0, warn: 0, fail: 0, skip: 0,

@@ -127,3 +127,31 @@ describe('dog house contest judge', () => {
     assert.ok(3 > DOG_HOUSE.doorMaxFt);
   });
 });
+
+describe('dog house contest in other languages (2.13.51)', () => {
+  it('speaks the student\'s language with numbers filled in', () => {
+    const f = emptyFloor();
+    const en = judgeDogHouse(f, { roofStyleId: 'flat' });
+    for (const locale of ['es', 'uk', 'ar', 'fa-AF', 'rw', 'ti'] as const) {
+      const r = judgeDogHouse(f, { roofStyleId: 'flat', locale });
+      assert.deepEqual(r.checks.map((c) => c.status), en.checks.map((c) => c.status), locale);
+      assert.equal(r.score, en.score);
+      for (let i = 0; i < r.checks.length; i++) {
+        assert.notEqual(r.checks[i].title, en.checks[i].title, `${locale} ${r.checks[i].id}`);
+        assert.notEqual(r.checks[i].detail, en.checks[i].detail, `${locale} ${r.checks[i].id}`);
+        assert.ok(!/\{\w+\}/.test(r.checks[i].detail + r.checks[i].tip), `${locale} left a {slot} in ${r.checks[i].id}`);
+      }
+    }
+  });
+});
+
+describe('dog door count (2.13.51)', () => {
+  it('blames extra doors, not the width, when the door is a good size', () => {
+    const f = boxFloor(4, 3);
+    f.openings = [0.2, 0.5, 0.8].map((t, i) => ({ id: `d${i}`, wallId: f.walls[0].id, t, width: 1.2, type: 'door' as const, symbolKind: 'swingDoor' as const }));
+    const door = judgeDogHouse(f, { roofStyleId: 'gable' }).checks.find((c) => c.id === 'door')!;
+    assert.equal(door.status, 'fail');
+    assert.doesNotMatch(door.detail, /too tight/);
+    assert.match(door.detail, /3 doors leak drafts/);
+  });
+});

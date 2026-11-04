@@ -71,7 +71,7 @@ export function TeachingDrawer() {
       <button
         type="button"
         className="teaching-backdrop"
-        aria-label="Dismiss teaching"
+        aria-label={t(locale, 'chrome.close')}
         onClick={toggle}
       />
       <aside
@@ -110,12 +110,12 @@ export function TeachingDrawer() {
           <section>
             <h3>{t(locale, 'teach.readout')}</h3>
             <p>
-              Approx. floor area:{' '}
-              <strong>{area != null ? `${area} sq ft` : '— (draw exterior walls)'}</strong>
+              {t(locale, 'teach.areaLabel')}{' '}
+              <strong>{area != null ? t(locale, 'teach.areaVal', { n: String(area) }) : t(locale, 'teach.areaNone')}</strong>
             </p>
             <p>
-              Roof on this plan: <strong>{roofName}</strong>
-              {doc.settings.roofStyleId ? ' — can you name it without looking?' : ' — pick one in Settings'}
+              {t(locale, 'teach.roofLabel')} <strong>{roofName}</strong>{' '}
+              {doc.settings.roofStyleId ? t(locale, 'teach.roofAsk') : t(locale, 'teach.roofPick')}
             </p>
           </section>
 
@@ -135,15 +135,15 @@ export function TeachingDrawer() {
 
           {style && style.id !== 'blank' && (
             <section className="style-term">
-              <h3>Style term</h3>
-              <p><strong>{style.name}</strong> — {style.blurb}</p>
-              {style.badge && <p><em>{style.badge} assignment linked</em></p>}
+              <h3>{t(locale, 'teach.styleTerm')}</h3>
+              <p><strong>{style.name}</strong> — {t(locale, `tpl.${style.id}`)}</p>
+              {style.badge && <p><em>{t(locale, 'teach.badge', { badge: style.badge })}</em></p>}
             </section>
           )}
 
           {styleId !== 'dog-house' && (
           <section>
-            <h3>Build reflections</h3>
+            <h3>{t(locale, 'teach.reflect')}</h3>
             {REFLECTION_PROMPTS.map((r) => (
               <article key={r.id} className="challenge-card">
                 <h4>{r.title}</h4>
@@ -155,15 +155,15 @@ export function TeachingDrawer() {
 
           {rank >= 1 && styleId !== 'dog-house' && (
           <section>
-            <h3>Named rooms</h3>
-            <p className="muted">Room tool → pick a type → click inside closed walls.</p>
+            <h3>{t(locale, 'teach.rooms')}</h3>
+            <p className="muted">{t(locale, 'teach.roomsHow')}</p>
             <ul>
               {ROOM_CHECKLIST.map((item) => {
                 const ok = (doc.floors[0].rooms ?? []).some((r) => item.kinds.includes(r.kind));
                 return (
                   <li key={item.id}>
-                    {ok ? '✓' : '○'} {item.label}
-                    {!ok && <em className="muted"> — add with Room</em>}
+                    {ok ? '✓' : '○'} {t(locale, `teach.check.${item.id}`)}
+                    {!ok && <em className="muted"> {t(locale, 'teach.addRoom')}</em>}
                   </li>
                 );
               })}
@@ -173,8 +173,8 @@ export function TeachingDrawer() {
 
           {rank >= 2 && styleId !== 'dog-house' && (
           <section>
-            <h3>Utility + storage checklist</h3>
-            <p className="muted">Every student project needs common-sense spaces.</p>
+            <h3>{t(locale, 'teach.util')}</h3>
+            <p className="muted">{t(locale, 'teach.utilLead')}</p>
             <ul>
               {UTILITY_CHECKLIST.map((u) => {
                 const ok =
@@ -183,14 +183,14 @@ export function TeachingDrawer() {
                       : hasUtility(['closet', 'storage-shelf']);
                 return (
                   <li key={u.id}>
-                    {ok ? '✓' : '○'} {u.label}
-                    {!ok && <em className="muted"> — add from Furniture → {u.id === 'closet' ? 'Storage' : 'Utility'}</em>}
+                    {ok ? '✓' : '○'} {t(locale, `teach.util.${u.id}`)}
+                    {!ok && <em className="muted"> {t(locale, 'teach.addFurn', { cat: t(locale, u.id === 'closet' ? 'furn.cat.storage' : 'furn.cat.utility') })}</em>}
                   </li>
                 );
               })}
             </ul>
             <p className="muted" style={{ fontSize: 12 }}>
-              Catalog: {FURNITURE_CATALOG.filter((c) => c.category === 'Utility' || c.category === 'Storage').map((c) => c.name).join(' · ')}
+              {t(locale, 'teach.catalog')} {FURNITURE_CATALOG.filter((c) => c.category === 'Utility' || c.category === 'Storage').map((c) => t(locale, `furn.item.${c.id}`)).join(' · ')}
             </p>
           </section>
           )}
