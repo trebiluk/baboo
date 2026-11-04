@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.56 — 2026-11-04 — Readable tags
+- Dollhouse room names sit on a soft rounded tag. Before, “Kitchen” was drawn on top of the fridge and “Bedroom” on the bed head.
+- Phone turned sideways (short screen): the “Draw a 16 by 24 box” job card stays one row, so it covers about a third less of the plan.
+
 ## 2.13.55 — 2026-11-04 — Plan names
 - Saving a plan named in Arabic, Russian, Dari or Tigrinya downloaded “project.archworks.json”: every letter outside A–Z was dropped. File names now keep letters from every language (class cards too).
 - A new plan's name box shows “Untitled plan” in your language as a hint; typing replaces it. The plan sheet and the saved card say it in your language too.

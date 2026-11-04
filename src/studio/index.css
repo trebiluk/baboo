@@ -5661,3 +5661,12 @@ html.kb-framed body.kb-on .app-shell.is-phone .chrome {
 .wall-flyout-fold > summary::after { content: '▾'; margin-inline-start: auto; opacity: 0.6; }
 .wall-flyout-fold[open] > summary::after { content: '▴'; }
 .wall-flyout-fold[open] { padding-bottom: 12px; }
+
+/* 2.13.56: phone landscape (short screens): the job card stays one row so the plan shows. */
+@media (max-height: 500px) {
+  .app-shell.is-phone .job-chip { flex-wrap: nowrap; gap: 8px; padding: 4px 6px 4px 12px; }
+  .app-shell.is-phone .job-chip p { flex: 1 1 auto; font-size: 14px; line-height: 1.2; }
+  .app-shell.is-phone .job-chip .job-start { min-height: 44px; min-width: 0; padding: 0 14px; font-size: 15px; white-space: nowrap; }
+  .app-shell.is-phone:has(.job-chip) .plan-taps,
+  .app-shell.is-phone:has(.job-chip) .plan-taps.aw-ribbon { top: 116px; }
+}

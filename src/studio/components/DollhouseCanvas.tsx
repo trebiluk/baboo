@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { faceLookup, resolveFace, shadeHex, WALL_SKINS } from '../lib/finishes';
-import { Stage, Layer, Line, Rect, Text } from 'react-konva';
+import { Stage, Layer, Line, Rect, Text, Group } from 'react-konva';
 import type Konva from 'konva';
 import { useProjectStore } from '../store/useProjectStore';
 import { wallEnds } from '../lib/geometry';
@@ -710,24 +710,35 @@ export function DollhouseCanvas() {
             // Width follows the letters at this zoom, so "Dining room" is not cut to "Dining ro" (2.13.24).
             const fs = 12 / Math.max(0.6, zoom);
             const labelW = Math.max(72, name.length * fs * 0.68 + fs);
+            // 2.13.56: a soft tag behind the name, so it reads over furniture (it sat on the fridge and the bed).
+            const tagW = Math.min(labelW, name.length * fs * 0.62 + fs * 1.4);
+            const tagH = fs * 1.7;
+            const on = selected?.kind === 'room' && selected.id === r.id;
             return (
-              <Text
-                key={r.id}
-                x={p.x - labelW / 2}
-                y={p.y - 7}
-                width={labelW}
-                align="center"
-                wrap="none"
-                text={name}
-                fontSize={fs}
-                fill={selected?.kind === 'room' && selected.id === r.id ? '#6e72f5' : (light ? '#1a1a1a' : '#f4f4f5')}
-                shadowColor={light ? '#ffffff' : '#000000'}
-                shadowBlur={4}
-                shadowOpacity={0.95}
-                fontStyle="bold"
-                onClick={pick}
-                onTap={pick}
-              />
+              <Group key={r.id} onClick={pick} onTap={pick}>
+                <Rect
+                  x={p.x - tagW / 2}
+                  y={p.y - 7 - (tagH - fs) / 2}
+                  width={tagW}
+                  height={tagH}
+                  cornerRadius={tagH / 2}
+                  fill={light ? '#ffffff' : '#18181b'}
+                  opacity={0.86}
+                  stroke={on ? '#6e72f5' : undefined}
+                  strokeWidth={on ? 1.5 / Math.max(0.6, zoom) : 0}
+                />
+                <Text
+                  x={p.x - labelW / 2}
+                  y={p.y - 7}
+                  width={labelW}
+                  align="center"
+                  wrap="none"
+                  text={name}
+                  fontSize={fs}
+                  fill={on ? '#6e72f5' : (light ? '#1a1a1a' : '#f4f4f5')}
+                  fontStyle="bold"
+                />
+              </Group>
             );
           })}
         </Layer>
