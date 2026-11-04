@@ -23,7 +23,7 @@ import { exteriorBounds, ROOF_STYLE_OPTIONS, roofStyleName } from '../lib/roof';
 import { roomLabel, roomType } from '../data/rooms';
 import { furnLabel } from '../data/furniture';
 import type { FurnitureItem, Opening, Wall, Node, Room, DimItem, NoteItem, LandscapeItem, Locale } from '../types';
-import { planTitle, t, tipLoc } from '../data/i18n';
+import { localeOption, planTitle, t, tipLoc } from '../data/i18n';
 import { bloomSpots } from '../data/landscape';
 import {
   loadImportPattern,
@@ -1786,7 +1786,8 @@ function PlanSheet({
     : gridSize === 1 ? "1'-0\"" : formatLength(gridSize, 'ft');
   let date = '';
   try {
-    date = new Date(updatedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    // 2.13.58: the date in the student's language (it said "Nov 4, 2026" in Arabic too).
+    date = new Date(updatedAt).toLocaleDateString(localeOption(locale).htmlLang, { year: 'numeric', month: 'short', day: 'numeric' });
   } catch {
     date = '';
   }

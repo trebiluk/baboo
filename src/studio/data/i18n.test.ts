@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { LOCALES, STR, asLocale, ellToolParts, homePhrase, isLocale, t, tipLoc, tt } from './i18n.ts';
+import { LOCALES, STR, asLocale, ellToolParts, homePhrase, isLocale, stripIsolates, t, tipLoc, tt } from './i18n.ts';
 import { VOCAB, VOCAB_PACKS, ellPracticeEntries, ellVocabCard, vocabGloss } from './teaching.ts';
 
 describe('i18n', () => {
@@ -63,7 +63,20 @@ describe('i18n', () => {
 
   it('interpolates vars and falls back missing keys', () => {
     assert.equal(t('es', 'toast.helpAs', { level: 'Novato' }), 'Te ayudo como Novato');
-    assert.equal(t('fa', 'toast.helpAs', { level: 'مبتدی' }), 'کمکت می‌کنم مثل مبتدی');
+    assert.equal(stripIsolates(t('fa', 'toast.helpAs', { level: 'مبتدی' })), 'کمکت می‌کنم مثل مبتدی');
+  });
+
+  it('keeps filled-in sizes in their own order in right-to-left languages (2.13.58)', () => {
+    const sq = '1\'-0"';
+    assert.equal(t('ar', 'sheet.grid', { n: sq }).includes(`\u2068${sq}\u2069`), true);
+    assert.equal(t('fa-AF', 'sheet.grid', { n: sq }).includes(`\u2068${sq}\u2069`), true);
+    assert.equal(t('es', 'sheet.grid', { n: sq }).includes('\u2068'), false);
+    assert.equal(t('en', 'sheet.grid', { n: sq }).includes('\u2068'), false);
+    assert.equal(t('ar', 'sheet.grid', { n: '' }).includes('\u2068'), false);
+    // Sizes written into the Arabic text itself are isolated too.
+    assert.ok(t('ar', 'acc.dw.title').includes('\u206832"\u2069'));
+    assert.ok(t('ar', 'acc.dw.skipTip').includes('\u20683\'-0"\u2069'));
+    assert.ok(!t('es', 'acc.dw.title').includes('\u2068'));
     assert.equal(t('en', 'no.such.key'), 'no.such.key');
     assert.equal(tt('es', 'no.such.key', 'fallback'), 'fallback');
     assert.equal(tt('es', 'chrome.close', 'nope'), 'Cerrar');

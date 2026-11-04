@@ -46,7 +46,7 @@ export function VersionChip({
       onPointerUp={clearPress}
       onPointerLeave={clearPress}
       onPointerCancel={clearPress}
-      title={`${whats} · long-press for Teacher`}
+      title={`${whats} · ${t(locale, 'ver.holdTeacher')}`}
       aria-label={`Baboo v${APP_VERSION}. ${whats}`}
     >
       v{APP_VERSION} · {whats}

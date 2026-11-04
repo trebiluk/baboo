@@ -1636,6 +1636,9 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.58: right-to-left sizes and dates. ti, fa-AF and rw are UNCHECKED native copy.
+  'ver.holdTeacher': g('hold for Teacher', { es: 'mantén pulsado para Docente', cu: 'mantén apretado para Maestro', uk: 'утримуй для Вчителя', ru: 'удерживай для Учителя', ti: 'ንመምህር ጠውቕ ኣትሒዝካ', fa: 'برای معلم نگه دار', 'fa-AF': 'برای معلم نگه دار', ar: 'اضغط مطولاً للمعلم', rw: 'fata kugira ngo ubone Mwarimu' }),
+  'news.rtlSizes': g('Sizes like 1\'-0" read the right way in Arabic and Dari, and the plan sheet date is in your language.', { es: 'Las medidas como 1\'-0" se leen bien en árabe y dari, y la fecha de la hoja está en tu idioma.', cu: 'Las medidas como 1\'-0" se leen bien en árabe y dari, y la fecha de la hoja está en tu idioma.', uk: 'Розміри на зразок 1\'-0" правильно читаються арабською й дарі, а дата на аркуші — твоєю мовою.', ru: 'Размеры вроде 1\'-0" правильно читаются на арабском и дари, а дата на листе — на твоём языке.', ti: 'ዓቐናት ከም 1\'-0" ብዓረብኛን ዳሪን ብቕኑዕ ይንበቡ፣ ዕለት ወረቐት ትልሚ ብቋንቋኻ እዩ።', fa: 'اندازه‌هایی مثل 1\'-0" در عربی و دری درست خوانده می‌شوند و تاریخ برگه نقشه به زبان توست.', 'fa-AF': 'اندازه‌هایی مثل 1\'-0" در عربی و دری درست خوانده می‌شوند و تاریخ ورق نقشه به زبان توست.', ar: 'المقاسات مثل 1\'-0" تُقرأ بشكل صحيح بالعربية والدارية، وتاريخ ورقة المخطط بلغتك.', rw: 'Ingano nka 1\'-0" zisomwa neza mu Cyarabu no mu Kidari, kandi itariki ku rupapuro ry\'igishushanyo iri mu rurimi rwawe.' }),
   // 2.13.57: fit into the free view. ti, fa-AF and rw are UNCHECKED native copy.
   'news.fitFree': g('Fit centers the plan in the space you can see, not under the job card or the tool rail.', { es: 'Ajustar centra el plano en el espacio que ves, no debajo de la tarjeta de tarea ni de las herramientas.', cu: 'Ajustar centra el plano en el espacio que ves, no debajo de la tarjeta de tarea ni de las herramientas.', uk: 'Вмістити ставить план у видиму частину, а не під картку завдання чи панель інструментів.', ru: 'Вписать ставит план в видимую часть, а не под карточку задания или панель инструментов.', ti: 'ምምጣን ነቲ ትልሚ ኣብቲ ትርእዮ ቦታ የማእክሎ፣ ኣብ ትሕቲ ካርድ ስራሕ ወይ መሳርሒታት ኣይኮነን።', fa: 'جا دادن نقشه را در فضایی که می‌بینی وسط می‌گذارد، نه زیر کارت کار یا نوار ابزار.', 'fa-AF': 'جا دادن نقشه را در فضایی که می‌بینی وسط می‌گذارد، نه زیر کارت کار یا نوار ابزار.', ar: 'الملاءمة تضع المخطط في وسط المساحة التي تراها، لا تحت بطاقة المهمة أو شريط الأدوات.', rw: 'Guhuza bishyira igishushanyo hagati y\'aho ubona, si munsi y\'ikarita y\'umukoro cyangwa ibikoresho.' }),
   // 2.13.56: dollhouse tags, phone landscape. ti, fa-AF and rw are UNCHECKED native copy.
@@ -3202,6 +3205,8 @@ export function asLocale(v: unknown): Locale {
   return isLocale(v) ? v : DEFAULT_LOCALE;
 }
 
+const RTL_LOCALES = new Set<string>(LOCALE_OPTIONS.filter((o) => o.dir === 'rtl').map((o) => o.id));
+
 export function localeOption(locale: Locale | null | undefined) {
   const loc = asLocale(locale);
   return LOCALE_OPTIONS.find((o) => o.id === loc) ?? LOCALE_OPTIONS[0];
@@ -3257,9 +3262,25 @@ export function t(locale: Locale | null | undefined, key: string, vars?: Record<
   let out = (row ? row[loc] || row.en : '') || key;
   if (!out) out = key;
   if (vars) {
-    for (const [k, v] of Object.entries(vars)) out = out.replaceAll(`{${k}}`, v);
+    // 2.13.58: in right-to-left languages a filled-in value (a size like 1'-0", a number, a name) is set in a
+    // Unicode first-strong isolate, so its characters keep their own order. Without it, Arabic and Dari
+    // showed 1'-0" as "0-'1 with the inch mark flung to the far end of the line.
+    const rtl = RTL_LOCALES.has(loc);
+    if (rtl) out = isolateSizes(out);
+    for (const [k, v] of Object.entries(vars)) out = out.replaceAll(`{${k}}`, rtl && v ? `\u2068${v}\u2069` : v);
+    return out;
   }
-  return out;
+  return RTL_LOCALES.has(loc) ? isolateSizes(out) : out;
+}
+
+/** Sizes written into right-to-left text (32", 3'-0", 12–18", 5') keep their own order (2.13.58). */
+export function isolateSizes(s: string): string {
+  return s.replace(/\d+'-\d+"|\d+(?:[–-]\d+)?"|\d+'(?!-)/g, (m) => `\u2068${m}\u2069`);
+}
+
+/** Plain text without the direction marks t() adds in right-to-left languages (for file names and tests). */
+export function stripIsolates(s: string): string {
+  return s.replace(/[\u2066-\u2069]/g, '');
 }
 
 const HUB_LANGS = new Set(['en', 'uk', 'ru', 'es', 'ar', 'fa-AF', 'rw', 'ti']);

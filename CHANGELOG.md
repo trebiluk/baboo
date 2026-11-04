@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.58 — 2026-11-04 — Right-to-left sizes
+- In Arabic and Dari, a size filled into a sentence (1'-0", 2'-6", 80) was reordered by the right-to-left text, so 1'-0" showed as "0-'1 with the inch mark at the far end. Filled-in values now sit in a Unicode isolate and keep their order (sheet, Access, Contest, Teach, toasts, screen-reader summary).
+- The plan sheet date is in your language (it said “Nov 4, 2026” in Arabic).
+- The version chip tip (“long-press for Teacher”) is translated.
+
 ## 2.13.57 — 2026-11-04 — Fit in view
 - Fit centers the plan in the space you can see, not under the job card or the tool rail. On a phone turned sideways the top of a template sat under the job card.
 

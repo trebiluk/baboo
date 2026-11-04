@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.58',
+    date: '2026-11-04',
+    bullets: [
+      'Sizes like 1\'-0" read the right way in Arabic and Dari, and the plan sheet date is in your language.',
+    ],
+  },
+  {
     version: '2.13.57',
     date: '2026-11-04',
     bullets: [
