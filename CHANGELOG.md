@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.71 — 2026-11-04 — wall chip off the job card
+- On a phone, the wall chip no longer sits on top of the job card words.
+- With the Wall tool on a phone, the folded wall chip (Wall · 8" · 8'-10") rendered over the job card's text. When a job card is up, the chip now sits at the foot of the tool rail. Checker: rb/flyout.mjs. Drawing on phone (en, ar) and desktop (ar) re-verified; Dollhouse hides roofs by design.
+
 ## 2.13.70 — 2026-11-04 — shed and gambrel roofs
 - Shed and Gambrel roofs look right in 3D now: one clean slope, and a barn roof with its bend.
 - 3D View pushed both through the gable builder: Shed (sideways ridge) came out as a twisted cross, Gambrel lost its break and drew as a plain gable. Each has its own builder now, with boarded ends so the roof sits on the walls. Checker: rb/roofs.mjs (picks each roof on the Ranch and shoots 3D).

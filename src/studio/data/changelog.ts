@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.71',
+    date: '2026-11-04',
+    bullets: [
+      'On a phone, the wall chip no longer sits on top of the job card words.',
+    ],
+  },
+  {
     version: '2.13.70',
     date: '2026-11-04',
     bullets: [

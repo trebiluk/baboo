@@ -5667,6 +5667,8 @@ html.kb-framed body.kb-on .app-shell.is-phone .chrome {
 
 /* 2.13.54: wall options fold to one line on phones so the grid stays free. */
 .wall-flyout.is-phone { width: auto; max-width: min(300px, calc(100vw - 96px)); padding: 0 12px; }
+/* 2.13.71: with a job card up top on a phone, the wall chip sat on the job words. It drops to the foot of the rail instead. */
+.app-shell.is-phone:has(.job-chip) .edge-pocket.has-wall-flyout .wall-flyout.is-phone { align-self: flex-end; }
 .wall-flyout-fold > summary { list-style: none; min-height: 44px; margin: 0; cursor: pointer; }
 .wall-flyout-fold > summary::-webkit-details-marker { display: none; }
 .wall-flyout-fold > summary::after { content: '▾'; margin-inline-start: auto; opacity: 0.6; }
