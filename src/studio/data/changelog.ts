@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.54',
+    date: '2026-11-04',
+    bullets: [
+      'Wall sizes read in feet and inches on feet plans, room areas say sq ft in your language, and wall options fold on phones.',
+    ],
+  },
+  {
     version: '2.13.53',
     date: '2026-11-04',
     bullets: [

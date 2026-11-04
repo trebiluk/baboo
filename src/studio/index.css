@@ -5653,3 +5653,11 @@ html.kb-framed body.kb-on .app-shell.is-phone .chrome {
 .view3d-fail-btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 6px; }
 .view3d-fail-btns button { min-height: 44px; padding: 0 18px; }
 .solid-preview:has(.view3d-fail) .view3d-hud, .solid-preview:has(.view3d-fail) .view3d-empty { display: none; }
+
+/* 2.13.54: wall options fold to one line on phones so the grid stays free. */
+.wall-flyout.is-phone { width: auto; max-width: min(300px, calc(100vw - 96px)); padding: 0 12px; }
+.wall-flyout-fold > summary { list-style: none; min-height: 44px; margin: 0; cursor: pointer; }
+.wall-flyout-fold > summary::-webkit-details-marker { display: none; }
+.wall-flyout-fold > summary::after { content: '▾'; margin-inline-start: auto; opacity: 0.6; }
+.wall-flyout-fold[open] > summary::after { content: '▴'; }
+.wall-flyout-fold[open] { padding-bottom: 12px; }

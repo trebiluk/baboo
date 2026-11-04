@@ -1502,7 +1502,7 @@ export const useProjectStore = create<Store>((set, get) => ({
       );
       return;
     }
-    const area = formatArea(polygonArea(poly), s.units);
+    const area = formatArea(polygonArea(poly), s.units, tip(get));
     const kindName = t(tip(get), `room.kind.${kind}`);
     // One room per space: clicking anywhere inside a named room changes its type instead of stacking a
     // second name tag on top (2.13.46).

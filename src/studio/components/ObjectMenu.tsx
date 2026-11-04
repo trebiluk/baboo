@@ -503,7 +503,7 @@ export function ObjectMenu() {
               </select>
             </label>
             <p className="object-menu-meta">
-              {poly ? formatArea(polygonArea(poly), units) : t(locale, 'obj.openArea')}
+              {poly ? formatArea(polygonArea(poly), units, locale) : t(locale, 'obj.openArea')}
               {' · '}{t(locale, `room.blurb.${r.kind}`)}
             </p>
             {r.kind !== 'outdoor' ? (

@@ -11,6 +11,8 @@ import {
   mmToFt,
   nearestHeightM,
   nearestThicknessMm,
+  WALL_HEIGHT_M,
+  WALL_THICKNESS_MM,
 } from './wallDraft.ts';
 
 describe('wall draft presets', () => {
@@ -38,5 +40,13 @@ describe('wall draft presets', () => {
     assert.equal(asWallHeightFt(2), DEFAULT_WALL_HEIGHT_FT);
     assert.equal(asWallDrawStyle('brick'), 'brick');
     assert.equal(asWallDrawStyle('nope'), 'outline');
+  });
+});
+
+describe('wall option labels follow plan units (2.13.54)', () => {
+  it('feet plans read inches and feet; metric plans keep mm and m', () => {
+    const inch = (mm: number) => `${Math.round(mm / 25.4)}"`;
+    assert.deepEqual(WALL_THICKNESS_MM.map(inch), ['5"', '8"', '12"']);
+    assert.deepEqual(WALL_HEIGHT_M.map((m) => Math.round(mToFt(m) * 12)), [94, 106, 118]);
   });
 });

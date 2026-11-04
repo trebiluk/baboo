@@ -653,7 +653,7 @@ export function PlanCanvas() {
   // What a screen reader hears for the plan: rooms with their sizes, and how many walls, doors and pieces (2.13.40).
   const planRooms = (floor.rooms ?? []).map((r) => {
     const poly = roomPolygon(r, floor.nodes, floor.walls);
-    return poly ? `${roomLabel(tips, r)} ${formatArea(polygonArea(poly), units)}` : roomLabel(tips, r);
+    return poly ? `${roomLabel(tips, r)} ${formatArea(polygonArea(poly), units, tips)}` : roomLabel(tips, r);
   });
   const planSummary = t(tips, 'plan.summary', {
     w: String(floor.walls.length),
@@ -2360,9 +2360,10 @@ function RoomLabel({
   dimFg: string;
   onPick: () => void;
 }) {
-  const label = roomLabel(useProjectStore((st) => tipLoc(st.doc.settings)), room);
+  const tagLoc = useProjectStore((st) => tipLoc(st.doc.settings));
+  const label = roomLabel(tagLoc, room);
   const furniture = useProjectStore((st) => st.doc.floors[0]?.furniture);
-  const area = poly ? formatArea(polygonArea(poly), units) : null;
+  const area = poly ? formatArea(polygonArea(poly), units, tagLoc) : null;
   const font = Math.max(0.38, 11 / zoom);
   // Size the tag from the letters at this zoom, so a name never breaks mid-word ("Kitch / en") when zoomed out (2.13.23).
   const w = Math.max(3.6, label.length * font * 0.64 + font * 1.4, (area?.length ?? 0) * font * 0.52 + font * 1.2);

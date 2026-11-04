@@ -54,7 +54,7 @@ export function RoomSidebar() {
             />
           </label>
           <p className="muted">
-            {editArea != null ? formatArea(editArea, units) : t(locale, 'rooms.openSpace')}
+            {editArea != null ? formatArea(editArea, units, locale) : t(locale, 'rooms.openSpace')}
           </p>
         </div>
       )}

@@ -1,5 +1,6 @@
 import type { FloorFinishId, FurnitureItem, Node, Opening, Point, Room, Wall } from '../types';
 import { dist } from './geometry';
+import { t, type Locale } from '../data/i18n';
 import { insetPoly, loopHalfWidth } from './wallJoin';
 
 export type Face = { poly: Point[]; area: number };
@@ -223,12 +224,13 @@ export function hitRoom(
   return best?.id ?? null;
 }
 
-export function formatArea(sqFt: number, units: 'ft' | 'm'): string {
+export function formatArea(sqFt: number, units: 'ft' | 'm', locale: Locale = 'en'): string {
   if (units === 'm') {
     const m2 = sqFt * 0.092903;
     return `${m2 < 10 ? m2.toFixed(1) : Math.round(m2)} m²`;
   }
-  return `${Math.round(sqFt)} sq ft`;
+  // 2.13.54: "sq ft" in the student's language (m² reads the same everywhere).
+  return t(locale, 'teach.areaVal', { n: String(Math.round(sqFt)) });
 }
 
 /** Flatten polygon for Konva Line. */

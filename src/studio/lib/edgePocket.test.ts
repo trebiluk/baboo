@@ -9,9 +9,19 @@ import { upperBody } from './stories.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.13.53 challenge words, 2.13.52 teach words, 2.13.51 dog house words, 2.13.50 access words, 2.13.49 sturdier, 2.13.48 tips and labels, 2.13.47 settings words, 2.13.46 one room one name, 2.13.45 new plan on phones, 2.13.44 join walls, 2.13.43 more rooms, 2.13.42 real rooms, 2.13.41 house looks, 2.13.40 screen readers, 2.13.39 one font, 2.13.38 clear sizes, 2.13.37 sizes on top, 2.13.36 lighter walk, 2.13.35 speed readout, 2.13.34 furniture, 2.13.33 soft shade, 2.13.32 glass, 2.13.31 crown, 2.13.30 lamps, 2.13.29 fixtures, 2.13.28 roof tag, 2.13.27 tidy, 2.13.26 touch 3d, 2.13.25 polish, 2.13.24 finishes, 2.13.23 frames, 2.13.22 inside 3d, 2.13.21 modes, 2.13.20 grand mansion, 2.13.19 2d tools, 2.13.18 richer 3d, 2.13.17 furniture list, 2.13.16 3d and dollhouse fixes, 2.13.15 more languages, 2.13.14 save status, 2.13.13 3d viewer update, 2.13.12 drawing engine update, 2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
-  it('chips 2.13.53 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.13.53');
+describe('2.13.54 wall units, 2.13.53 challenge words, 2.13.52 teach words, 2.13.51 dog house words, 2.13.50 access words, 2.13.49 sturdier, 2.13.48 tips and labels, 2.13.47 settings words, 2.13.46 one room one name, 2.13.45 new plan on phones, 2.13.44 join walls, 2.13.43 more rooms, 2.13.42 real rooms, 2.13.41 house looks, 2.13.40 screen readers, 2.13.39 one font, 2.13.38 clear sizes, 2.13.37 sizes on top, 2.13.36 lighter walk, 2.13.35 speed readout, 2.13.34 furniture, 2.13.33 soft shade, 2.13.32 glass, 2.13.31 crown, 2.13.30 lamps, 2.13.29 fixtures, 2.13.28 roof tag, 2.13.27 tidy, 2.13.26 touch 3d, 2.13.25 polish, 2.13.24 finishes, 2.13.23 frames, 2.13.22 inside 3d, 2.13.21 modes, 2.13.20 grand mansion, 2.13.19 2d tools, 2.13.18 richer 3d, 2.13.17 furniture list, 2.13.16 3d and dollhouse fixes, 2.13.15 more languages, 2.13.14 save status, 2.13.13 3d viewer update, 2.13.12 drawing engine update, 2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
+  it('chips 2.13.54 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.13.54');
+    for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) assert.notEqual(t(l, 'news.wallUnits'), t('en', 'news.wallUnits'), l);
+    const wf54 = readFileSync(join(studio, 'components/WallFlyout.tsx'), 'utf8');
+    assert.doesNotMatch(wf54, /^\s+\{mm\}mm$|^\s+\{m\.toFixed\(1\)\}m$/m);
+    assert.match(wf54, /thicknessLabel\(mm, units\)/);
+    assert.match(wf54, /<details className="wall-flyout-fold">/);
+    assert.ok(!wf54.includes("t(locale, 'wall.tip')"));
+    for (const l of ['en', 'es', 'ar', 'uk', 'rw', 'ti', 'fa-AF'] as const) assert.match(t(l, 'tooltip.wall'), /\s\([A-Z]\)$/, l);
+    const rooms54 = readFileSync(join(studio, 'lib/rooms.ts'), 'utf8');
+    assert.ok(!rooms54.includes('} sq ft`'));
+    assert.match(readFileSync(join(studio, 'data/changelog.ts'), 'utf8'), /version:\s*'2\.13\.53'/);
     for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) {
       for (const k of ['news.challengeWords', 'ch.ch-scale-room.title', 'ch.C-BRIEF.prompt', 'ch.C-DOG-HOUSE-CONTEST.r2']) assert.notEqual(t(l, k), t('en', k), `${l} ${k}`);
     }
@@ -497,7 +507,7 @@ describe('2.13.53 challenge words, 2.13.52 teach words, 2.13.51 dog house words,
     assert.match(rail, /is-fancy/);
     assert.match(fly, /WALL_THICKNESS_MM/);
     assert.match(fly, /WALL_HEIGHT_M/);
-    assert.match(fly, /wall\.tip/);
+    assert.match(fly, /tooltip\.wall/); // 2.13.54: the card tip matches the corner-to-corner Wall tool
     assert.match(draft, /120, 200, 300/);
     assert.match(draft, /2\.4, 2\.7, 3\.0/);
   });

@@ -3,6 +3,12 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.54 — 2026-11-04 — Wall units
+- Wall options on a feet plan read 5" · 8" · 12" thick and 7'-10" · 8'-10" · 9'-10" tall (they said mm and m while the plan said feet). Metric plans keep mm and m. The sizes underneath are unchanged.
+- Room areas say sq ft in your language on the plan, in panels and in the screen-reader summary.
+- On phones the wall options fold to one line, so they no longer cover a quarter of the grid.
+- The wall options tip said "drag to draw", which draws nothing. It now says to click each corner, like the Wall tool's own tip.
+
 ## 2.13.53 — 2026-11-04 — Challenge words
 - Teach panel challenges and their scoring lines are in your language.
 - A test keeps every English lesson key equal to the lesson text in teaching.ts.
