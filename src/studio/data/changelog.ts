@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.62',
+    date: '2026-11-04',
+    bullets: [
+      'Photo mode works in the Walkthrough too, and template room names like Parlor and Porch show in your language.',
+    ],
+  },
+  {
     version: '2.13.61',
     date: '2026-11-04',
     bullets: [

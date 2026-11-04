@@ -31,8 +31,13 @@ export function roomType(kind: RoomKind): RoomType {
 export const DEFAULT_ROOM_KIND: RoomKind = 'living';
 
 /** A room still named like its type shows the name in the kid's language; a renamed room keeps its own name (2.13.19). */
+/** Room names the house templates use. edgePocket.test checks new ones are here. */
+export const ROOM_NICKS = new Set(['Parlor', 'Hall', 'Library', 'Porch', 'Stair hall', 'Dining room', 'Tiny home']);
+
 export function roomLabel(locale: Parameters<typeof t>[0], room: { kind: RoomKind; name: string }): string {
   const c = ROOM_CATALOG.find((x) => x.id === room.kind);
   if (c && (!room.name || room.name === c.name)) return t(locale, `room.kind.${room.kind}`);
+  // 2.13.62: template nicknames (Parlor, Hall, Porch…) show in the student's language; a name the student typed stays.
+  if (locale && locale !== 'en' && ROOM_NICKS.has(room.name)) return t(locale, `room.nick.${room.name}`);
   return room.name;
 }

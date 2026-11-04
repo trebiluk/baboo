@@ -454,7 +454,7 @@ export const EngineView = forwardRef<EngineHandle, Props>(function EngineView({ 
     const down = (e: PointerEvent) => {
       const cam = camRef.current;
       if (!cam) return;
-      renderer.domElement.setPointerCapture(e.pointerId);
+      try { renderer.domElement.setPointerCapture(e.pointerId); } catch { /* a pointer that already left; keep going */ }
       touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
       if (touches.size === 2) {
         drag = null;

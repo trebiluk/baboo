@@ -9,9 +9,19 @@ import { upperBody } from './stories.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.13.61 postcard, 2.13.60 photo mode, 2.13.59 new york code, 2.13.58 rtl sizes, 2.13.57 fit in view, 2.13.56 readable tags, 2.13.55 plan names, 2.13.54 wall units, 2.13.53 challenge words, 2.13.52 teach words, 2.13.51 dog house words, 2.13.50 access words, 2.13.49 sturdier, 2.13.48 tips and labels, 2.13.47 settings words, 2.13.46 one room one name, 2.13.45 new plan on phones, 2.13.44 join walls, 2.13.43 more rooms, 2.13.42 real rooms, 2.13.41 house looks, 2.13.40 screen readers, 2.13.39 one font, 2.13.38 clear sizes, 2.13.37 sizes on top, 2.13.36 lighter walk, 2.13.35 speed readout, 2.13.34 furniture, 2.13.33 soft shade, 2.13.32 glass, 2.13.31 crown, 2.13.30 lamps, 2.13.29 fixtures, 2.13.28 roof tag, 2.13.27 tidy, 2.13.26 touch 3d, 2.13.25 polish, 2.13.24 finishes, 2.13.23 frames, 2.13.22 inside 3d, 2.13.21 modes, 2.13.20 grand mansion, 2.13.19 2d tools, 2.13.18 richer 3d, 2.13.17 furniture list, 2.13.16 3d and dollhouse fixes, 2.13.15 more languages, 2.13.14 save status, 2.13.13 3d viewer update, 2.13.12 drawing engine update, 2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
-  it('chips 2.13.61 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.13.61');
+describe('2.13.62 photo in the walk, 2.13.61 postcard, 2.13.60 photo mode, 2.13.59 new york code, 2.13.58 rtl sizes, 2.13.57 fit in view, 2.13.56 readable tags, 2.13.55 plan names, 2.13.54 wall units, 2.13.53 challenge words, 2.13.52 teach words, 2.13.51 dog house words, 2.13.50 access words, 2.13.49 sturdier, 2.13.48 tips and labels, 2.13.47 settings words, 2.13.46 one room one name, 2.13.45 new plan on phones, 2.13.44 join walls, 2.13.43 more rooms, 2.13.42 real rooms, 2.13.41 house looks, 2.13.40 screen readers, 2.13.39 one font, 2.13.38 clear sizes, 2.13.37 sizes on top, 2.13.36 lighter walk, 2.13.35 speed readout, 2.13.34 furniture, 2.13.33 soft shade, 2.13.32 glass, 2.13.31 crown, 2.13.30 lamps, 2.13.29 fixtures, 2.13.28 roof tag, 2.13.27 tidy, 2.13.26 touch 3d, 2.13.25 polish, 2.13.24 finishes, 2.13.23 frames, 2.13.22 inside 3d, 2.13.21 modes, 2.13.20 grand mansion, 2.13.19 2d tools, 2.13.18 richer 3d, 2.13.17 furniture list, 2.13.16 3d and dollhouse fixes, 2.13.15 more languages, 2.13.14 save status, 2.13.13 3d viewer update, 2.13.12 drawing engine update, 2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
+  it('chips 2.13.62 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.13.62');
+    for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) {
+      for (const k of ['news.photoWalk', 'room.nick.Parlor', 'room.nick.Porch']) assert.notEqual(t(l, k), t('en', k), `${l} ${k}`);
+    }
+    // Every template room nickname translates outside English.
+    const rooms62 = readFileSync(join(studio, 'data/rooms.ts'), 'utf8');
+    for (const m of readFileSync(join(studio, 'data/templates.ts'), 'utf8').matchAll(/room\('[a-z]+', [^)]*?, '([A-Z][^']*)'/g)) {
+      if (!['Kitchen', 'Bath', 'Living', 'Dining', 'Entry', 'Bedroom', 'Office', 'Utility', 'Storage', 'Outdoor', 'Other'].includes(m[1])) assert.ok(rooms62.includes(`'${m[1]}'`), `room nickname ${m[1]} is not in ROOM_NICKS`);
+    }
+    assert.match(readFileSync(join(studio, 'components/EngineView.tsx'), 'utf8'), /try \{ renderer\.domElement\.setPointerCapture/);
+    assert.match(readFileSync(join(studio, 'data/changelog.ts'), 'utf8'), /version:\s*'2\.13\.61'/);
     for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'rw', 'ti'] as const) {
       for (const k of ['news.postcard', 'photo.card', 'photo.madeWith']) assert.notEqual(t(l, k), t('en', k), `${l} ${k}`);
     }

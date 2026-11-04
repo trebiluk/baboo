@@ -43,3 +43,13 @@ describe('postcard caption (2.13.61)', () => {
     assert.equal(photoNote({ styleId: 'blank', roofStyleId: null, roofLabel: '' }, 'en', when), 'November 4, 2026');
   });
 });
+
+describe('template room nicknames (2.13.62)', () => {
+  it('show in the student\'s language; typed names stay', async () => {
+    const { roomLabel } = await import('../data/rooms');
+    assert.equal(roomLabel('en', { kind: 'living', name: 'Parlor' }), 'Parlor');
+    assert.equal(roomLabel('es', { kind: 'living', name: 'Parlor' }), 'Salón');
+    assert.equal(roomLabel('ar', { kind: 'entry', name: 'Porch' }), 'شرفة');
+    assert.equal(roomLabel('ar', { kind: 'living', name: "Maya's room" }), "Maya's room");
+  });
+});

@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.62 — 2026-11-04 — Photo in the walk
+- Photo mode works in the Walkthrough too, and template room names like Parlor and Porch show in your language. Pinch-zoom keeps working while you frame a shot on a phone; a stray touch no longer throws.
+- Checked by a test that snaps real pictures in 3D, Walkthrough and Dollhouse on laptop and phone sizes.
+
 ## 2.13.61 — 2026-11-04 — Postcard
 - Postcard: in 3D or the Dollhouse, tap Photo then Postcard for your house on a cream card with its name, the date, style and roof. Cards are always 1200×900 so a class board lines up; a footer says “Made with Baboo · v…”. Right-to-left languages mirror the captions.
 - Photo mode now works in the Dollhouse too (Photo button in its toolbar).
