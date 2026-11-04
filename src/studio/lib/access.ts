@@ -1,6 +1,9 @@
 import type { Floor, FurnitureItem, Opening, Point, Wall, Node } from '../types';
 import { dist, formatLength, pointOnWall, wallAngle, wallEnds } from './geometry';
 import { centroid, pointInPoly, polygonArea, roomPolygon } from './rooms';
+import { t, type Locale } from '../data/i18n';
+import { roomLabel } from '../data/rooms';
+import { furnLabel } from '../data/furniture';
 
 /** Classroom ADA reminders (2010 Standards, simplified). Not a legal review. */
 export const ADA = {
@@ -149,7 +152,39 @@ export function tightestHall(walls: Wall[], nodes: Node[]): { dist: number; a: s
   return best;
 }
 
-export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft'): AccessReport {
+/** Box of a piece on the plan; a quarter turn swaps width and depth. */
+function footprint(i: FurnitureItem) {
+  const q = Math.round((((i.rot ?? 0) % 360) + 360) % 360 / 90) % 2;
+  const w = q ? i.h : i.w;
+  const h = q ? i.w : i.h;
+  return { minX: i.x - w / 2, maxX: i.x + w / 2, minY: i.y - h / 2, maxY: i.y + h / 2, facesY: q === 0 };
+}
+
+/**
+ * Floor between two kitchen pieces that face each other across an aisle, in feet.
+ * null when they sit side by side in one row, or at an angle (no straight aisle between them).
+ */
+export function aisleGap(p: FurnitureItem, q: FurnitureItem): number | null {
+  const A = footprint(p);
+  const B = footprint(q);
+  const sepX = Math.max(A.minX, B.minX) - Math.min(A.maxX, B.maxX); // > 0 gap, < 0 overlap
+  const sepY = Math.max(A.minY, B.minY) - Math.min(A.maxY, B.maxY);
+  if (sepX < -0.1 && sepY < -0.1) return 0; // really on top of each other
+  const gapX = Math.max(0, sepX);
+  const gapY = Math.max(0, sepY);
+  const overlapX = sepX < -0.1;
+  const overlapY = sepY < -0.1;
+  if (A.facesY !== B.facesY) return null;
+  // Facing each other: lined up across the floor, with the gap between their fronts.
+  if (A.facesY) return overlapX ? gapY : null;
+  return overlapY ? gapX : null;
+}
+
+export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft', locale: Locale = 'en'): AccessReport {
+  // 2.13.50: every sentence comes from i18n.ts, in the student's language.
+  const tr = (key: string, vars?: Record<string, string>) => t(locale, key, vars);
+  const roomName = (r: Parameters<typeof roomLabel>[1]) => roomLabel(locale, r);
+  const itemName = (i: FurnitureItem) => furnLabel(locale, i.catalogId, i.label);
   const checks: AccessCheck[] = [];
   if (!floor) {
     return { checks, pass: 0, warn: 0, fail: 0, skip: 0 };
@@ -164,18 +199,18 @@ export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft'): AccessRe
   if (doors.length === 0) {
     checks.push({
       id: 'entry',
-      title: 'A way in',
+      title: tr('acc.entry.title'),
       status: 'fail',
-      detail: 'No door yet. A wheelchair (and everyone else) needs a way in.',
-      tip: 'Door tool → click a wall.',
+      detail: tr('acc.entry.none'),
+      tip: tr('acc.entry.noneTip'),
     });
   } else {
     checks.push({
       id: 'entry',
-      title: 'A way in',
+      title: tr('acc.entry.title'),
       status: 'pass',
-      detail: `${doors.length} door${doors.length === 1 ? '' : 's'} on the plan.`,
-      tip: 'Keep a clear path from the door to kitchen, bath, and sleep.',
+      detail: doors.length === 1 ? tr('acc.entry.one') : tr('acc.entry.many', { n: String(doors.length) }),
+      tip: tr('acc.entry.tip'),
       hit: { kind: 'opening', id: doors[0].id },
     });
   }
@@ -185,38 +220,38 @@ export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft'): AccessRe
   if (doors.length === 0) {
     checks.push({
       id: 'door-width',
-      title: 'Door clear width (32")',
+      title: tr('acc.dw.title'),
       status: 'skip',
-      detail: 'Place a door and we’ll measure it.',
-      tip: 'ADA wants 32" of clear opening. A 3\'-0" door usually gets you there.',
+      detail: tr('acc.dw.skip'),
+      tip: tr('acc.dw.skipTip'),
     });
   } else if (tightDoors.length) {
     const d = tightDoors[0];
     checks.push({
       id: 'door-width',
-      title: 'Door clear width (32")',
+      title: tr('acc.dw.title'),
       status: 'fail',
-      detail: `A door is only ${len(d.width)} wide. ADA asks for 32" clear (${len(ADA.doorClearFt)}).`,
-      tip: 'Use a 3\'-0" door. Baboo’s Door tool places that size.',
+      detail: tr('acc.dw.fail', { w: len(d.width), c: len(ADA.doorClearFt) }),
+      tip: tr('acc.dw.failTip'),
       hit: { kind: 'opening', id: d.id },
     });
   } else if (okDoors.length === doors.length) {
     checks.push({
       id: 'door-width',
-      title: 'Door clear width (32")',
+      title: tr('acc.dw.title'),
       status: 'pass',
-      detail: `Doors are ${len(doors[0].width)} — wider than the 32" clear opening.`,
-      tip: 'Nice. Leave the swing side empty so the leaf can open.',
+      detail: tr('acc.dw.pass', { w: len(doors[0].width) }),
+      tip: tr('acc.dw.passTip'),
       hit: { kind: 'opening', id: doors[0].id },
     });
   } else {
     const d = doors.find((x) => x.width < ADA.doorNiceFt) ?? doors[0];
     checks.push({
       id: 'door-width',
-      title: 'Door clear width (32")',
+      title: tr('acc.dw.title'),
       status: 'warn',
-      detail: `A door is ${len(d.width)}. It meets 32" but a 3'-0" leaf is easier to use.`,
-      tip: 'When in doubt, draw doors at 3 feet.',
+      detail: tr('acc.dw.warn', { w: len(d.width) }),
+      tip: tr('acc.dw.warnTip'),
       hit: { kind: 'opening', id: d.id },
     });
   }
@@ -236,27 +271,27 @@ export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft'): AccessRe
   if (doors.length === 0) {
     checks.push({
       id: 'swing',
-      title: 'Door swing is clear',
+      title: tr('acc.sw.title'),
       status: 'skip',
-      detail: 'No door to check yet.',
-      tip: 'Keep sofas and beds out of the quarter-circle.',
+      detail: tr('acc.sw.skip'),
+      tip: tr('acc.sw.skipTip'),
     });
   } else if (blocked) {
     checks.push({
       id: 'swing',
-      title: 'Door swing is clear',
+      title: tr('acc.sw.title'),
       status: 'fail',
-      detail: `${blocked.item.label} sits in a door swing.`,
-      tip: 'Move the piece, or swing the door the other way, so someone can open it.',
+      detail: tr('acc.sw.fail', { item: itemName(blocked.item) }),
+      tip: tr('acc.sw.failTip'),
       hit: { kind: 'furniture', id: blocked.item.id },
     });
   } else {
     checks.push({
       id: 'swing',
-      title: 'Door swing is clear',
+      title: tr('acc.sw.title'),
       status: 'pass',
-      detail: 'Nothing is sitting in a door swing.',
-      tip: 'The quarter-circle on the plan is the swing. Keep it empty.',
+      detail: tr('acc.sw.pass'),
+      tip: tr('acc.sw.passTip'),
     });
   }
 
@@ -264,27 +299,27 @@ export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft'): AccessRe
   if (!hall) {
     checks.push({
       id: 'hall',
-      title: 'Hall / route width (36")',
+      title: tr('acc.hall.title'),
       status: 'skip',
-      detail: 'No skinny parallel walls to measure yet.',
-      tip: 'Interior walls make halls. Leave 3 feet so a wheelchair can roll.',
+      detail: tr('acc.hall.skip'),
+      tip: tr('acc.hall.skipTip'),
     });
   } else if (hall.dist + 1e-6 < ADA.routeFt) {
     checks.push({
       id: 'hall',
-      title: 'Hall / route width (36")',
+      title: tr('acc.hall.title'),
       status: 'fail',
-      detail: `Tightest gap between walls is ${len(hall.dist)}. Accessible routes want 3'-0".`,
-      tip: 'Nudge a wall. Halls feel better at 3\'-6" or 4\'.',
+      detail: tr('acc.hall.fail', { w: len(hall.dist) }),
+      tip: tr('acc.hall.failTip'),
       hit: { kind: 'wall', id: hall.a },
     });
   } else {
     checks.push({
       id: 'hall',
-      title: 'Hall / route width (36")',
+      title: tr('acc.hall.title'),
       status: 'pass',
-      detail: `Tightest wall gap is ${len(hall.dist)} — at least 36" to roll through.`,
-      tip: 'Keep that path free of furniture too.',
+      detail: tr('acc.hall.pass', { w: len(hall.dist) }),
+      tip: tr('acc.hall.passTip'),
       hit: { kind: 'wall', id: hall.a },
     });
   }
@@ -293,10 +328,10 @@ export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft'): AccessRe
   if (baths.length === 0) {
     checks.push({
       id: 'turn',
-      title: '5-foot turn in the bath',
+      title: tr('acc.turn.title'),
       status: 'skip',
-      detail: 'Name a bath and we’ll check for a 60" turning circle.',
-      tip: 'Room tool → Bath → click inside the walls.',
+      detail: tr('acc.turn.skip'),
+      tip: tr('acc.turn.skipTip'),
     });
   } else {
     let worst: { roomId: string; status: AccessStatus; detail: string } | null = null;
@@ -306,7 +341,7 @@ export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft'): AccessRe
         worst = {
           roomId: room.id,
           status: 'warn',
-          detail: `${room.name} isn’t a closed shape yet — finish the walls.`,
+          detail: tr('acc.turn.open', { room: roomName(room) }),
         };
         continue;
       }
@@ -317,20 +352,20 @@ export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft'): AccessRe
         const next = {
           roomId: room.id,
           status: 'pass' as AccessStatus,
-          detail: `${room.name} can fit a 5'-0" turn (${len(minSide)} short side · ${Math.round(area)} sq ft).`,
+          detail: tr('acc.turn.pass', { room: roomName(room), w: len(minSide), a: String(Math.round(area)) }),
         };
         if (!worst || worst.status === 'skip') worst = next;
       } else if (circleFitsInPoly(poly, ADA.turnWarnFt) || minSide >= ADA.turnWarnFt) {
         worst = {
           roomId: room.id,
           status: 'warn',
-          detail: `${room.name} is tight (short side ${len(minSide)}). A 5'-0" circle is the usual turn.`,
+          detail: tr('acc.turn.warn', { room: roomName(room), w: len(minSide) }),
         };
       } else {
         worst = {
           roomId: room.id,
           status: 'fail',
-          detail: `${room.name} is only ${len(minSide)} on the short side. Wheelchairs need a 5'-0" turn.`,
+          detail: tr('acc.turn.fail', { room: roomName(room), w: len(minSide) }),
         };
         break;
       }
@@ -338,10 +373,10 @@ export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft'): AccessRe
     const w = worst!;
     checks.push({
       id: 'turn',
-      title: '5-foot turn in the bath',
+      title: tr('acc.turn.title'),
       status: w.status,
       detail: w.detail,
-      tip: 'Grow the bath, or keep the middle empty for the circle.',
+      tip: tr('acc.turn.tip'),
       hit: { kind: 'room', id: w.roomId },
     });
   }
@@ -350,41 +385,52 @@ export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft'): AccessRe
   if (kitchen.length < 2) {
     checks.push({
       id: 'kitchen',
-      title: 'Kitchen aisle (40")',
+      title: tr('acc.k.title'),
       status: 'skip',
-      detail: 'Place sink, stove, or fridge and we’ll check the work aisle.',
-      tip: 'Leave about 3\'-4" between counters so someone can turn.',
+      detail: tr('acc.k.skip'),
+      tip: tr('acc.k.skipTip'),
     });
   } else {
+    // 2.13.50: an aisle is the floor between pieces that face each other. Pieces side by side on one
+    // counter are a row, not an aisle (the Ranch sink and stove used to fail at 1'-3").
     let minGap = Infinity;
     let a = kitchen[0];
     let b = kitchen[1];
     for (let i = 0; i < kitchen.length; i++) {
       for (let j = i + 1; j < kitchen.length; j++) {
-        const gap = dist(kitchen[i], kitchen[j]) - (Math.max(kitchen[i].w, kitchen[i].h) + Math.max(kitchen[j].w, kitchen[j].h)) / 4;
-        if (gap < minGap) {
+        const gap = aisleGap(kitchen[i], kitchen[j]);
+        if (gap !== null && gap < minGap) {
           minGap = gap;
           a = kitchen[i];
           b = kitchen[j];
         }
       }
     }
-    if (minGap + 1e-6 < ADA.kitchenAisleFt) {
+    if (minGap === Infinity) {
       checks.push({
         id: 'kitchen',
-        title: 'Kitchen aisle (40")',
+        title: tr('acc.k.title'),
+        status: 'pass',
+        detail: tr('acc.k.row'),
+        tip: tr('acc.k.passTip'),
+        hit: { kind: 'furniture', id: kitchen[0].id },
+      });
+    } else if (minGap + 1e-6 < ADA.kitchenAisleFt) {
+      checks.push({
+        id: 'kitchen',
+        title: tr('acc.k.title'),
         status: 'fail',
-        detail: `${a.label} and ${b.label} are about ${len(Math.max(0, minGap))} apart. Work aisles like 40".`,
-        tip: 'Spread the kitchen triangle. Sink · stove · fridge need room to work.',
+        detail: tr('acc.k.fail', { a: itemName(a), b: itemName(b), w: len(Math.max(0, minGap)) }),
+        tip: tr('acc.k.failTip'),
         hit: { kind: 'furniture', id: a.id },
       });
     } else {
       checks.push({
         id: 'kitchen',
-        title: 'Kitchen aisle (40")',
+        title: tr('acc.k.title'),
         status: 'pass',
-        detail: `Kitchen pieces have about ${len(minGap)} between them.`,
-        tip: 'That’s the work aisle. Keep it a path, not storage.',
+        detail: tr('acc.k.pass', { w: len(minGap) }),
+        tip: tr('acc.k.passTip'),
         hit: { kind: 'furniture', id: a.id },
       });
     }

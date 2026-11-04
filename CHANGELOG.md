@@ -3,6 +3,12 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.50 — 2026-11-04 — Access check words
+- The Access check is in your language, with room and furniture names translated too.
+- The headline, the check titles, the details, the tips and the ADA note all come from the translation table.
+- The kitchen aisle check measures the floor between counters that face each other. A sink and stove side by side on one counter no longer fail (the Ranch failed its own check).
+- Template furniture nicknames (Sink, Ice box, WC…) show the translated name outside English.
+
 ## 2.13.49 — 2026-11-04 — Sturdier
 - Plan files with broken pieces now open safely: Baboo leaves out the broken parts and tells you how many.
 - If 3D cannot start on a computer (no WebGL, graphics dropped, or the 3D download failed), the rest of Baboo keeps working and offers the Dollhouse, 2D, or Try 3D again.

@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { ADA, circleFitsInPoly, runAccessCheck, tightestHall } from './access';
+import { ADA, aisleGap, circleFitsInPoly, runAccessCheck, tightestHall } from './access';
 import type { Floor, Node, Wall } from '../types';
 
 function boxFloor(w: number, h: number): Floor {
@@ -109,5 +109,55 @@ describe('access checker', () => {
     ];
     assert.equal(circleFitsInPoly(poly, 3.5), true);
     assert.equal(circleFitsInPoly(poly, 5), false);
+  });
+});
+
+describe('access checker in other languages (2.13.50)', () => {
+  it('speaks the student\'s language and names rooms and furniture in it', () => {
+    const f = boxFloor(12, 10);
+    f.rooms = [{ id: 'r1', kind: 'bath', name: 'Bath', x: 6, y: 5 }];
+    f.openings = [{ id: 'o1', wallId: 'w1', t: 0.5, width: 3, type: 'door', symbolKind: 'swingDoor' }];
+    const en = runAccessCheck(f, 'ft', 'en');
+    for (const loc of ['es', 'uk', 'ar', 'fa-AF', 'rw', 'ti'] as const) {
+      const r = runAccessCheck(f, 'ft', loc);
+      assert.deepEqual(r.checks.map((c) => c.status), en.checks.map((c) => c.status), loc);
+      for (let i = 0; i < r.checks.length; i++) {
+        assert.notEqual(r.checks[i].title, en.checks[i].title, `${loc} title ${r.checks[i].id}`);
+        assert.notEqual(r.checks[i].detail, en.checks[i].detail, `${loc} detail ${r.checks[i].id}`);
+        assert.ok(!/\{\w+\}/.test(r.checks[i].detail), `${loc} left a {slot} in ${r.checks[i].id}`);
+      }
+    }
+    const es = runAccessCheck(f, 'ft', 'es');
+    assert.match(es.checks.find((c) => c.id === 'turn')!.detail, /Baño/);
+    assert.match(en.checks.find((c) => c.id === 'turn')!.detail, /^Bath can fit/);
+  });
+});
+
+describe('kitchen aisle (2.13.50)', () => {
+  const piece = (id: string, catalogId: string, x: number, y: number, w: number, h: number, rot = 0) =>
+    ({ id, catalogId, x, y, w, h, rot, zIndex: 1, label: '' });
+  it('does not call pieces side by side on one counter an aisle', () => {
+    const stove = piece('s', 'stove', 38, 36.5, 2.5, 2.2);
+    const sink = piece('k', 'sink', 42.5, 37.2, 3, 1.6);
+    assert.equal(aisleGap(stove, sink), null);
+    // Ranch: fridge, stove and sink touching in one run.
+    assert.equal(aisleGap(piece('s', 'stove', 24, 1.8, 2.5, 2.5), piece('k', 'sink', 26.5, 1.8, 2.5, 2)), null);
+    const f = boxFloor(20, 20);
+    f.furniture = [stove, sink];
+    assert.equal(runAccessCheck(f).checks.find((c) => c.id === 'kitchen')?.status, 'pass');
+  });
+  it('measures pieces facing each other across the floor', () => {
+    const fridge = piece('f', 'fridge', 40, 29, 3, 2.2);
+    const stove = piece('s', 'stove', 38, 36.5, 2.5, 2.2);
+    assert.ok(Math.abs((aisleGap(fridge, stove) ?? 0) - 5.3) < 0.01);
+    const f = boxFloor(20, 20);
+    f.furniture = [piece('a', 'stove', 5, 2, 2.5, 2.5), piece('b', 'sink', 5, 5, 2.5, 2)];
+    const k = runAccessCheck(f).checks.find((c) => c.id === 'kitchen')!;
+    assert.equal(k.status, 'fail');
+    assert.match(k.detail, /Stove and Kitchen Sink/);
+  });
+  it('turns a rotated row the same way', () => {
+    assert.equal(aisleGap(piece('a', 'stove', 2, 5, 2.5, 2.5, 90), piece('b', 'sink', 2, 8, 3, 2, 90)), null);
+    assert.ok((aisleGap(piece('a', 'stove', 2, 5, 2.5, 2.5, 90), piece('b', 'sink', 7, 5, 3, 2, 90)) ?? -1) > 0);
   });
 });

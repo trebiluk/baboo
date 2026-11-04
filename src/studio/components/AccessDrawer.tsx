@@ -3,11 +3,8 @@ import { useProjectStore } from '../store/useProjectStore';
 import { t, tipLoc } from '../data/i18n';
 import { useEscape } from '../hooks/useEscape';
 
-function mark(status: AccessCheck['status']) {
-  if (status === 'pass') return 'Looks good';
-  if (status === 'warn') return 'Take a look';
-  if (status === 'fail') return 'Needs a fix';
-  return 'Not yet';
+function mark(locale: Parameters<typeof t>[0], status: AccessCheck['status']) {
+  return t(locale, `teach.read.${status}`);
 }
 
 function selectHit(hit: AccessHit) {
@@ -31,17 +28,17 @@ export function AccessDrawer() {
 
   let report;
   try {
-    report = runAccessCheck(floor, units);
+    report = runAccessCheck(floor, units, locale);
   } catch {
     report = { checks: [], pass: 0, warn: 0, fail: 0, skip: 0 };
   }
   const headline = report.fail
-    ? `${report.fail} thing${report.fail === 1 ? '' : 's'} to fix`
+    ? report.fail === 1 ? t(locale, 'acc.head.fail1') : t(locale, 'acc.head.fail', { n: String(report.fail) })
     : report.warn
-      ? `${report.warn} thing${report.warn === 1 ? '' : 's'} to look at`
+      ? report.warn === 1 ? t(locale, 'acc.head.warn1') : t(locale, 'acc.head.warn', { n: String(report.warn) })
       : report.pass
-        ? 'This plan is being kind to more people'
-        : 'Draw a little more and we’ll check again';
+        ? t(locale, 'acc.head.good')
+        : t(locale, 'acc.head.more');
 
   return (
     <>
@@ -55,13 +52,13 @@ export function AccessDrawer() {
         <div className="drawer-head">
           <div className="drawer-head-title">
             <span className="sheet-handle" aria-hidden="true" />
-            <h2>Access</h2>
+            <h2>{t(locale, 'chrome.access')}</h2>
           </div>
           <button type="button" className="ghost-btn secondary-btn aw-pressable" onClick={toggle}>
-            Close
+            {t(locale, 'chrome.close')}
           </button>
         </div>
-        <p className="muted teach-hello">{headline}. Classroom check — not a legal stamp.</p>
+        <p className="muted teach-hello">{headline}. {t(locale, 'acc.disclaimer')}</p>
         <ul className="access-list">
           {report.checks.map((c) => (
             <li key={c.id}>
@@ -71,7 +68,7 @@ export function AccessDrawer() {
                 onClick={() => { if (c.hit) selectHit(c.hit); }}
                 disabled={!c.hit}
               >
-                <span className="access-mark">{mark(c.status)}</span>
+                <span className="access-mark">{mark(locale, c.status)}</span>
                 <strong>{c.title}</strong>
                 <span>{c.detail}</span>
                 <em>{c.tip}</em>
@@ -79,11 +76,7 @@ export function AccessDrawer() {
             </li>
           ))}
         </ul>
-        <p className="muted access-legal">
-          Baboo checks door width (32"), halls (36"), bath turning circles (5'), kitchen aisles (40"),
-          and whether furniture sits in a door swing. Real ADA is bigger than this list — talk with
-          your teacher.
-        </p>
+        <p className="muted access-legal">{t(locale, 'acc.legal')}</p>
       </aside>
     </>
   );

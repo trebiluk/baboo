@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.50',
+    date: '2026-11-04',
+    bullets: [
+      'The Access check is in your language, with room and furniture names translated too.',
+      'The kitchen aisle check measures the floor between counters that face each other, not pieces side by side.',
+    ],
+  },
+  {
     version: '2.13.49',
     date: '2026-11-04',
     bullets: [

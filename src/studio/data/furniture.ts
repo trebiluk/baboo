@@ -38,7 +38,19 @@ export const FURNITURE_CATALOG: CatalogItem[] = [
 ];
 
 /** A piece still named like the catalog shows its name in the kid's language; a renamed piece keeps its own name. */
+/**
+ * Short English names the house templates give furniture ("Sink", "Ice box"). English keeps them; every other
+ * language shows the translated catalog name instead (2.13.50). edgePocket.test checks new template names are here.
+ */
+export const STOCK_LABELS = new Set([
+  'Bed', 'Bookcase', 'Chair', 'Coat closet', 'Column', 'Dining', 'Dining chandelier', 'Dining table', 'Fridge',
+  'Hall chandelier', 'Ice box', 'Lamp', 'Library desk', 'Mech', 'Paneling', 'Parlor rug', 'Portrait', 'Range',
+  'Reading lamp', 'Shelf', 'Sink', 'Table', 'Tub', 'WC', 'Settee', 'Desk chair', 'Hall runner',
+]);
+
 export function furnLabel(locale: Parameters<typeof t>[0], catalogId: string, label: string): string {
   const cat = FURNITURE_CATALOG.find((c) => c.id === catalogId);
-  return cat && (!label || label === cat.name) ? t(locale, `furn.item.${catalogId}`) : label;
+  if (!cat) return label;
+  const stock = !label || label === cat.name || (!!locale && locale !== 'en' && STOCK_LABELS.has(label));
+  return stock ? t(locale, `furn.item.${catalogId}`) : label;
 }
