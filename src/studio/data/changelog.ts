@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.53',
+    date: '2026-11-04',
+    bullets: [
+      'Teach panel challenges and their scoring lines are in your language.',
+    ],
+  },
+  {
     version: '2.13.52',
     date: '2026-11-04',
     bullets: [

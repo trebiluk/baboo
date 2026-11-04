@@ -201,11 +201,11 @@ export function TeachingDrawer() {
             <h3>{t(locale, 'teach.challenges')}</h3>
             {challenges.map((c) => (
               <article key={c.id} className="challenge-card">
-                <h4>{c.title}</h4>
-                <p className="teach-multiline">{c.prompt}</p>
+                <h4>{t(locale, `ch.${c.id}.title`)}</h4>
+                <p className="teach-multiline">{t(locale, `ch.${c.id}.prompt`)}</p>
                 <ul>
                   {c.rubric.map((r) => (
-                    <li key={r.id}>{r.text} <em>({r.points} pts)</em></li>
+                    <li key={r.id}>{t(locale, `ch.${c.id}.${r.id}`)} <em>{t(locale, 'teach.pts', { n: String(r.points) })}</em></li>
                   ))}
                 </ul>
               </article>

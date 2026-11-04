@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.53 — 2026-11-04 — Challenge words
+- Teach panel challenges and their scoring lines are in your language.
+- A test keeps every English lesson key equal to the lesson text in teaching.ts.
+
 ## 2.13.52 — 2026-11-04 — Teach panel words
 - The Teach panel’s plan reading, unit steps and reflections are in your language.
 - The “Read this plan” checks name rooms and kitchen pieces in your language. Challenges are still English.
