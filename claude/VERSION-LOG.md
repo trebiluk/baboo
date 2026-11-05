@@ -16,4 +16,5 @@ Pick the next version here BEFORE opening a PR. Never reuse. `src/studio/version
 | 2.13.75 | 2026-11-05 | Teach panel roof line + full ar/rw word list | PR (this) | awaiting OK |
 | 2.13.76 | 2026-11-05 | top-bar words wrap instead of … | PR (this) | awaiting OK |
 | 2.13.77 | 2026-11-05 | Export on screen on phones (uk) | PR (this) | awaiting OK |
-| 2.13.78 | — | next hourly round (reserved by BABOOOOO) | — | reserved |
+| 2.13.78 | 2026-11-05 | hint steps aside under a toast on phones | PR (this) | awaiting OK |
+| 2.13.79 | — | next hourly round (reserved by BABOOOOO) | — | reserved |
