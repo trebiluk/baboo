@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.81',
+    date: '2026-11-05',
+    bullets: [
+      'In Arabic and Dari, the photo bar buttons on a phone stay on one line instead of breaking into three.',
+    ],
+  },
+  {
     version: '2.13.80',
     date: '2026-11-05',
     bullets: [

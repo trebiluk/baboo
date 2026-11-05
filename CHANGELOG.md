@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.81 — 2026-11-05 — photo bar on one line
+- In Arabic and Dari, the photo bar buttons on a phone stay on one line instead of breaking into three.
+- The Snap / Postcard / Done buttons wrapped ("بطاقة بريدية" became three lines, 74 px tall, buttons of three heights). They are nowrap now and all 44 px. Checker: rb/photobar.mjs (Photo bar on a phone per language).
+
 ## 2.13.80 — 2026-11-05 — Class section and the postcard caption
 - A new Class section in Settings: school, class or period, and a nickname you choose. They go on your postcard — Baboo never asks for your real name.
 - Diego's decision (2026-11-05): the postcard caption may carry the school name and the class or period, and a nickname only if the kid chose one — never a kid's name. Settings gains a Class section (three 44 px text boxes, 40 chars each, trimmed on load); the postcard prints school · class · nickname under the plan name; the class-card alias box starts from the chosen nickname. Nothing new is exported in the class card file.
