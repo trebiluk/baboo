@@ -11,11 +11,11 @@ Pick the next version here BEFORE opening a PR. Never reuse. `src/studio/version
 | 2.13.70 | 2026-11-04 | shed and gambrel roof builders | main ff | live |
 | 2.13.71 | 2026-11-04 | wall chip off the job card on phones | main ff | live |
 | 2.13.72 | 2026-11-04 | roof names in every language; 'Imported image' | main ff | live |
-| 2.13.73 | 2026-11-04 | What's new + wallpaper names in every language | PR (this) | awaiting OK |
-| 2.13.74 | 2026-11-04 | Blank card roof line (regression from 2.13.72) | PR (this) | awaiting OK |
-| 2.13.75 | 2026-11-05 | Teach panel roof line + full ar/rw word list | PR (this) | awaiting OK |
-| 2.13.76 | 2026-11-05 | top-bar words wrap instead of … | PR (this) | awaiting OK |
-| 2.13.77 | 2026-11-05 | Export on screen on phones (uk) | PR (this) | awaiting OK |
-| 2.13.78 | 2026-11-05 | hint steps aside under a toast on phones | PR (this) | awaiting OK |
-| 2.13.79 | 2026-11-05 | Settings boxes 44 px tall | PR (this) | awaiting OK |
+| 2.13.73 | 2026-11-04 | What's new + wallpaper names in every language | PR | merged · live |
+| 2.13.74 | 2026-11-04 | Blank card roof line (regression from 2.13.72) | PR | merged · live |
+| 2.13.75 | 2026-11-05 | Teach panel roof line + full ar/rw word list | PR | merged · live |
+| 2.13.76 | 2026-11-05 | top-bar words wrap instead of … | PR | merged · live |
+| 2.13.77 | 2026-11-05 | Export on screen on phones (uk) | PR | merged · live |
+| 2.13.78 | 2026-11-05 | hint steps aside under a toast on phones | PR | merged · live |
+| 2.13.79 | 2026-11-05 | Settings boxes 44 px tall | PR | merged · live |
 | 2.13.80 | — | next hourly round (reserved by BABOOOOO) | — | reserved |
