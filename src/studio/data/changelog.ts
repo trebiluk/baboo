@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.73',
+    date: '2026-11-04',
+    bullets: [
+      'What\'s new reads fully in your language, and wallpaper names like Linen and Subway tile do too.',
+    ],
+  },
+  {
     version: '2.13.72',
     date: '2026-11-04',
     bullets: [

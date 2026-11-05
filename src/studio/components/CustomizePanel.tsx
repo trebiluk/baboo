@@ -1,13 +1,13 @@
 import { useRef, useState } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
 import { ROOF_STYLE_OPTIONS, roofStyleName } from '../lib/roof';
-import { TEXTURE_PACKS } from '../data/textures';
+import { TEXTURE_PACKS, textureName } from '../data/textures';
 import { FLOOR_FINISHES, asFloorFinish, asFloorGrain } from '../data/flooring';
 import type { GuiThemeId, Locale, RoofStyleId, SiteFinish, SkyPreset, TypologyShell, WallTintId } from '../types';
 import { DEFAULT_SKILL_LEVEL, skillRank } from '../data/skill';
 import { SkillPicker } from './SkillPicker';
 import { THEME_OPTIONS } from '../data/themes';
-import { LOCALE_OPTIONS, asLocale, roofShown, roofWord, t, tipLoc } from '../data/i18n';
+import { LOCALE_OPTIONS, asLocale, roofShown, roofWord, t, texShown, tipLoc } from '../data/i18n';
 import { DOLL_PROJS, type DollProj } from '../lib/iso';
 import {
   SKY_OPTIONS,
@@ -407,7 +407,7 @@ export function CustomizePanel() {
             {t(tipLoc(settings), 'set2.current', { name: '' })}
             <strong>
               {activeTex
-                ? (settings.textureLabel?.trim() || t(tipLoc(settings), `tex.${activeTex.replace(':', '.')}`))
+                ? texShown(settings, tipLoc(settings), textureName)
                 : t(tipLoc(settings), 'tex.pack.plain')}
             </strong>
             {activeTex === 'import:local'

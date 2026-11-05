@@ -1,0 +1,15 @@
+# VERSION-LOG — Baboo (BABOOOOO lane)
+
+Pick the next version here BEFORE opening a PR. Never reuse. `src/studio/version.ts` wins over README.
+
+| Version | Date (ET) | Job | PR | State |
+|---|---|---|---|---|
+| 2.13.66 | 2026-11-04 | every message in your language (crash screen, toasts, catalog tip) | main ff | live |
+| 2.13.67 | 2026-11-04 | class card in your language + fits in Help | main ff | live |
+| 2.13.68 | 2026-11-04 | real cone roof; toast off the plan sheet on phones | main ff | live |
+| 2.13.69 | 2026-11-04 | turf mound; ground past the fog; camera far 900 | main ff | live |
+| 2.13.70 | 2026-11-04 | shed and gambrel roof builders | main ff | live |
+| 2.13.71 | 2026-11-04 | wall chip off the job card on phones | main ff | live |
+| 2.13.72 | 2026-11-04 | roof names in every language; 'Imported image' | main ff | live |
+| 2.13.73 | 2026-11-04 | What's new + wallpaper names in every language | PR (this) | awaiting OK |
+| 2.13.74 | — | next hourly round (reserved by BABOOOOO) | — | reserved |
