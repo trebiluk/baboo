@@ -11,6 +11,14 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.75',
+    date: '2026-11-05',
+    bullets: [
+      'The Teach panel says "No roof" in your language when a plan has no roof.',
+      'Every word in the Teach panel\'s word list has an Arabic and Kinyarwanda meaning now, not just eight of them.',
+    ],
+  },
+  {
     version: '2.13.74',
     date: '2026-11-04',
     bullets: [

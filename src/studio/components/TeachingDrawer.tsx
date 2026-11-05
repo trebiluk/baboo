@@ -20,7 +20,7 @@ export function TeachingDrawer() {
   const style = STYLE_TEMPLATES.find((t) => t.id === styleId);
   const floor = doc.floors[0];
   const area = exteriorFloorAreaSqFt(floor.nodes, floor.walls);
-  const roofName = roofShown(doc.settings, tipLoc(doc.settings), roofStyleName) || roofStyleName(null);
+  const roofName = roofShown(doc.settings, tipLoc(doc.settings), roofStyleName) || t(tipLoc(doc.settings), 'chip.roofNone');
 
   const catalogIds = new Set(floor.furniture.map((f) => f.catalogId));
   const hasUtility = (ids: string[]) => ids.some((id) => catalogIds.has(id));
