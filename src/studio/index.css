@@ -1388,7 +1388,9 @@ html[data-ell-english] {
   background:var(--aw-elevated);
   border:1px solid var(--aw-border);
   border-radius:8px;
-  padding:8px
+  padding:8px;
+  min-height:44px; /* 2.13.79: Settings boxes were 40 px tall (27 px for the roof name) — under the 44 px tap rule */
+  box-sizing:border-box
 }
 .field.check {
   flex-direction:row;

@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.79 — 2026-11-05 — Settings boxes 44 px
+- Every box in Settings is tall enough to tap (44 px), including the grid size and the roof name.
+- The Settings drawer's number boxes, pickers (units, drawing method, roof) and the roof-name box were 40 px tall (27 px for the roof name) — under the 44 px tap rule. Checker: rb/settings.mjs (Settings per language on a phone: direction, overflow, targets under 44 px, English-looking words).
+
 ## 2.13.78 — 2026-11-05 — hint steps aside
 - On a phone, the hint line at the bottom steps aside while a message shows, instead of peeking out from behind it.
 - Same move as the plan sheet in 2.13.68: on screens ≤ 1100 px the canvas hint fades while a toast is up. Landscape phone (882×411) scanned in 8 languages: no clipped or off-screen buttons.

@@ -43,3 +43,9 @@ Did: 2.13.78 — on phones the bottom hint line peeked out from behind every toa
 Ran: tsc 0; strip-types 149/149; jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15; phone2 ok; fin clean; rb/phonetrunc.mjs landscape 8 languages clean; phone Yurt shot clean.
 Open: Diego — OK #6–#11 and this PR by number, in order? Postcard caption with school/class name?
 For other lanes: none crossed.
+
+## 2026-11-05 4:20 AM ET · BABOOOOO
+Did: 2.13.79 — Settings boxes (grid size, units/method/roof pickers, roof name) were 40 px tall (27 px for the roof name), under the 44 px tap rule; all 44 px now. PR stacked on #12. Settings checked on a phone in ar/fa-AF/uk/rw: rtl right, no overflow; English-in-parens words there are the ELL style by design.
+Ran: tsc 0; strip-types 149/149; jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15; phone2 ok; fin clean; setar (desktop ar) clean; rb/settings.mjs 0 targets under 44 px (hidden file input excluded).
+Open: Diego — OK #6–#12 and this PR by number, in order? Postcard caption with school/class name?
+For other lanes: none crossed.
