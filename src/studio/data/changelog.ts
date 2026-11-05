@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.74',
+    date: '2026-11-04',
+    bullets: [
+      'The Blank card in New plan says "Roof: No roof" again instead of a blank space.',
+    ],
+  },
+  {
     version: '2.13.73',
     date: '2026-11-04',
     bullets: [

@@ -12,4 +12,5 @@ Pick the next version here BEFORE opening a PR. Never reuse. `src/studio/version
 | 2.13.71 | 2026-11-04 | wall chip off the job card on phones | main ff | live |
 | 2.13.72 | 2026-11-04 | roof names in every language; 'Imported image' | main ff | live |
 | 2.13.73 | 2026-11-04 | What's new + wallpaper names in every language | PR (this) | awaiting OK |
-| 2.13.74 | — | next hourly round (reserved by BABOOOOO) | — | reserved |
+| 2.13.74 | 2026-11-04 | Blank card roof line (regression from 2.13.72) | PR (this) | awaiting OK |
+| 2.13.75 | — | next hourly round (reserved by BABOOOOO) | — | reserved |
