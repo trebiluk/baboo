@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.83',
+    date: '2026-11-05',
+    bullets: [
+      'New plan has an empty Tiny House, 14 ft by 7 ft with 7 ft walls, the same size as the class worksheet. Contests and the Mansion now have their own section.',
+    ],
+  },
+  {
     version: '2.13.82',
     date: '2026-11-05',
     bullets: [

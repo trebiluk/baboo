@@ -5719,3 +5719,9 @@ body.aw-photo .doll-proj, body.aw-photo .canvas-hint, body.aw-photo .plan-sheet 
   .view3d-hud .view3d-hint { display: none; }
   .view3d-hud-btns .ghost-btn { min-height: 40px; padding: 0 10px; font-size: 12px; }
 }
+
+/* 2.13.83: one scroll for the New plan window; contests and the Mansion in their own section. */
+.template-scroll { max-height: min(55vh, 420px); overflow-y: auto; margin: 14px 0; }
+.template-scroll .template-grid { max-height: none; overflow: visible; margin: 0; }
+.template-section-head { font-size: 14px; font-weight: 600; margin: 18px 0 8px; color: var(--aw-fg); }
+@media (max-width: 720px) { .template-scroll { max-height: min(50vh, 360px); } }

@@ -17,6 +17,7 @@ export type StyleId =
   | 'tudor'
   | 'yurt'
   | 'tiny-home'
+  | 'tiny-class'
   | 'dog-house'
   | 'mansion';
 
@@ -374,4 +375,6 @@ export interface StyleTemplate {
   blurb: string;
   /** Optional contest / assignment tag shown on card. */
   badge?: string;
+  /** 'more' = the Contests and the Mansion section of the New plan window (2.13.83). */
+  group?: 'more';
 }

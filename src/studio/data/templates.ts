@@ -14,13 +14,16 @@ export const STYLE_TEMPLATES: StyleTemplate[] = [
   { id: 'hobbit', name: 'Hobbit', blurb: 'Storybook cottage · round door · green living roof.' },
   { id: 'ranch', name: 'Ranch', blurb: 'Long one-story · rooms in a line · yard all around.' },
   { id: 'victorian', name: 'Victorian', blurb: 'Tall fancy house · steep fancy roof (mansard).' },
-  { id: 'mansion', name: 'The Mansion', blurb: 'Victorian mansion · brick, bay window, columns, and grounds.' },
   { id: 'cape-cod', name: 'Cape Cod', blurb: 'Compact rectangle — steep gable feel, simple rooms.' },
   { id: 'modern', name: 'Modern', blurb: 'Clean rectangle — open plan, flat roof default.' },
   { id: 'tudor', name: 'Tudor', blurb: 'Compact L-ish starter — steep gable vocabulary.' },
   { id: 'yurt', name: 'Yurt', blurb: 'Round tent-house · cone roof · open middle.' },
-  { id: 'tiny-home', name: 'Tiny Home', blurb: 'Small contest house · trailer or container type · checklist of parts.', badge: 'Contest' },
-  { id: 'dog-house', name: 'Dog House', blurb: 'Baboo’s contest · a snug outdoor den · she judges from the book.', badge: 'Contest' },
+  // 2.13.83: same size as the class worksheet net (7 × 14 squares, walls 7 squares tall; 1 square = 1 ft). Empty on purpose.
+  { id: 'tiny-class', name: 'Tiny House 7 × 14', blurb: 'Empty 14 ft × 7 ft room · 7 ft walls · same size as the class worksheet.' },
+  // Contests and the Mansion sit in their own section of the New plan window (2.13.83).
+  { id: 'tiny-home', name: 'Tiny Home', blurb: 'Small contest house · trailer or container type · checklist of parts.', badge: 'Contest', group: 'more' },
+  { id: 'dog-house', name: 'Dog House', blurb: 'Baboo’s contest · a snug outdoor den · she judges from the book.', badge: 'Contest', group: 'more' },
+  { id: 'mansion', name: 'The Mansion', blurb: 'Victorian mansion · brick, bay window, columns, and grounds.', group: 'more' },
 ];
 
 function emptyFloor(name = 'Floor 1'): Floor {
@@ -744,14 +747,20 @@ export function buildTemplateProject(styleId: StyleId, title?: string): ProjectD
     floor.rooms = [room('living', 9, 5, 'Tiny home')];
     challengeIds.push('C-TINY-HOME-CONTEST');
     assignmentId = 'tiny-home-contest';
+  } else if (styleId === 'tiny-class') {
+    // The class worksheet: a 14 × 7 floor and four 7-ft walls. No door, windows or furniture —
+    // kids add the checklist themselves and measure as they go (2.13.83).
+    const outer = rectPlan(0, 0, 14, 7);
+    floor.nodes = outer.nodes;
+    floor.walls = outer.walls;
   } else if (styleId === 'dog-house') {
     challengeIds.push('C-DOG-HOUSE-CONTEST');
     assignmentId = 'dog-house-contest';
   }
 
   const roofStyleId = DEFAULT_ROOF_BY_STYLE[styleId] ?? null;
-  const wallH = styleId === 'mansion' ? 10 : DEFAULT_WALL_HEIGHT_FT;
-  if (styleId !== 'dog-house' && styleId !== 'tiny-home' && styleId !== 'mansion' && floor.walls.length > 2) furnishYard(floor);
+  const wallH = styleId === 'mansion' ? 10 : styleId === 'tiny-class' ? 7 : DEFAULT_WALL_HEIGHT_FT;
+  if (styleId !== 'dog-house' && styleId !== 'tiny-home' && styleId !== 'tiny-class' && styleId !== 'mansion' && floor.walls.length > 2) furnishYard(floor);
   splitAtJunctions(floor);
   const wallTintId = dressOutside(styleId, floor);
   floor.roof = generateRoof(floor.nodes, floor.walls, roofStyleId, wallH);
