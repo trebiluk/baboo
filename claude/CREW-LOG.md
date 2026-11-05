@@ -19,3 +19,9 @@ Did: 2.13.74 — New plan's Blank card printed "Roof:" with nothing (regression 
 Ran: tsc 0; strip-types 149/149; jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15 local; phone2 ok; fin clean; rb/newplan.mjs ar + fa-AF phone clean (no overflow, no target < 44 px).
 Open: Diego — OK #6, #7, and this PR by number (in that order)? Postcard caption with school/class name?
 For other lanes: none crossed.
+
+## 2026-11-05 12:25 AM ET · BABOOOOO
+Did: 2.13.75 — Teach panel said the English "None" for a plan with no roof; and its word list had Arabic/Kinyarwanda meanings for only 8 of 44 terms (36 fell back to English). Full packs now (rw UNCHECKED native copy). PR stacked on #8.
+Ran: tsc 0; strip-types 149/149 (new pin: every term glossed in every pack); jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15 local; phone2 ok; fin clean; postcard ar Dollhouse + photo3 clean; teach panel ar/rw opens, cards show home meaning + home definition.
+Open: Diego — OK #6, #7, #8 and this PR by number, in order? Postcard caption with school/class name?
+For other lanes: none crossed.

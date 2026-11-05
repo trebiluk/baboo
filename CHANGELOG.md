@@ -3,6 +3,11 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.75 — 2026-11-05 — Teach panel roof line
+- The Teach panel says "No roof" in your language when a plan has no roof.
+- Every word in the Teach panel's word list has an Arabic and Kinyarwanda meaning now, not just eight of them. (rw UNCHECKED native copy.)
+- Same family as 2.13.74: the Teach panel fell back to the English "None" for a plan without a roof. Postcard (ar, Dollhouse) and photo-in-the-walk checks re-run after the roof-name change: clean, note reads date · style · translated roof.
+
 ## 2.13.74 — 2026-11-04 — Blank card roof line
 - The Blank card in New plan says "Roof: No roof" again instead of a blank space.
 - 2.13.72 switched the New plan cards to translated roof names; a template with no roof (Blank) then printed "Roof:" and nothing. It reads "Roof: No roof" in every language now. Checker: rb/newplan.mjs (New plan on a phone, ar/fa-AF: dir, overflow, 44 px targets).
