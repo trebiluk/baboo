@@ -31,3 +31,9 @@ Did: 2.13.76 — desktop top-bar words were cut with "…" in es/uk/ru/rw (Casa 
 Ran: tsc 0; strip-types 149/149; jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15 (sideways 0 ×15); phone2 ok; fin clean; rb/trunc.mjs 0 clipped in rw/uk/ru/es at 1366 and 1000; rb/barfit.mjs no overflow at 1366/1100/1000/915.
 Open: Diego — OK #6, #7, #8, #9 and this PR by number, in order? Postcard caption with school/class name?
 For other lanes: none crossed.
+
+## 2026-11-05 2:25 AM ET · BABOOOOO
+Did: 2.13.77 — on a 411 px phone in Ukrainian the Export button sat 5 px off-screen (the version chip "v2.13.76 · Що нового" pushed it); the chip now gives way, Export never shrinks. PR stacked on #10. Phone tool rail labels are hidden by design (folded rail), not truncated.
+Ran: tsc 0; strip-types 149/149; jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15; phone2 ok (sideways 0); fin clean; rb/phonetrunc.mjs 0 off-screen buttons in uk/ru/es/rw (was 1 in uk).
+Open: Diego — OK #6, #7, #8, #9, #10 and this PR by number, in order? Postcard caption with school/class name?
+For other lanes: none crossed.
