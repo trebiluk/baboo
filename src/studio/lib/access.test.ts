@@ -190,7 +190,8 @@ describe('every house template passes the Access check (2.13.63)', () => {
   it('no fails on doors, swings or halls', async () => {
     const { STYLE_TEMPLATES, buildTemplateProject } = await import('../data/templates');
     for (const tpl of STYLE_TEMPLATES) {
-      if (tpl.id === 'blank' || tpl.id === 'dog-house') continue;
+      // tiny-class is empty on purpose (kids add the front door), like blank (2.13.83).
+      if (tpl.id === 'blank' || tpl.id === 'dog-house' || tpl.id === 'tiny-class') continue;
       const f = buildTemplateProject(tpl.id).floors[0];
       const fails = runAccessCheck(f).checks.filter((c) => c.status === 'fail').map((c) => `${tpl.id}:${c.id}: ${c.detail}`);
       assert.deepEqual(fails, []);

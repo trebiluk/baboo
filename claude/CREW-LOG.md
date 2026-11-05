@@ -73,3 +73,9 @@ Did: 2.13.82 — the Tigrinya phone menu showed "ሓድሽ" for both What's new 
 Ran: tsc 0; strip-types 150/150 (new pin); jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15; phone2 ok; fin clean; Tigrinya phone: 0 off-screen buttons.
 Open: Diego — OK #17 (docs) and this PR by number. Tigrinya native check still needs a person.
 For other lanes: none crossed.
+
+## 2026-11-05 15:00 ET · BABOOOOO
+Did: 2.13.83 — empty class Tiny House (14 × 7 ft, 7 ft walls, sized from the teacher's "Rough Draft: Blueprints" net) replaces the Tiny Home card; Tiny Home contest, Dog House and Mansion moved to a "Contests and the Mansion" section (PR stacked on #18).
+Ran: tsc clean; strip-types 150/150; jiti 52/52; object-art 1/1; eslint 7 old no-regex-spaces (same 7 on base, 0 new); rb/tinyclass.mjs en 1366, ar 411, ti 411 + rb/newplan.mjs ar/fa-AF 411 — 2 sections, 0 cards < 44 px, 0 overflow, 0 page errors; picked by keyboard → 14' × 7' empty box.
+Open: 1 square = 1 ft assumed (sheet prints no scale); the novice job line still says "16 by 24 box" on this plan; #17, #18, this PR await OK by number.
+For other lanes: none.
