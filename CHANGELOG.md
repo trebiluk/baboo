@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.78 — 2026-11-05 — hint steps aside
+- On a phone, the hint line at the bottom steps aside while a message shows, instead of peeking out from behind it.
+- Same move as the plan sheet in 2.13.68: on screens ≤ 1100 px the canvas hint fades while a toast is up. Landscape phone (882×411) scanned in 8 languages: no clipped or off-screen buttons.
+
 ## 2.13.77 — 2026-11-05 — Export on screen on phones
 - On a phone in Ukrainian, the Export button sits fully on the screen again.
 - The phone view row (views · version chip · saved tick · Export) overflowed by 5 px in Ukrainian ("v2.13.76 · Що нового"); the version chip now gives way (shrinks with …) and Export never does. Checker: rb/phonetrunc.mjs (clipped/off-screen buttons per language on a 411 px phone).

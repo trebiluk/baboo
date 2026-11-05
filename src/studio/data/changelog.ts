@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.78',
+    date: '2026-11-05',
+    bullets: [
+      'On a phone, the hint line at the bottom steps aside while a message shows, instead of peeking out from behind it.',
+    ],
+  },
+  {
     version: '2.13.77',
     date: '2026-11-05',
     bullets: [

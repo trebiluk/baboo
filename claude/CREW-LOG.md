@@ -37,3 +37,9 @@ Did: 2.13.77 — on a 411 px phone in Ukrainian the Export button sat 5 px off-s
 Ran: tsc 0; strip-types 149/149; jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15; phone2 ok (sideways 0); fin clean; rb/phonetrunc.mjs 0 off-screen buttons in uk/ru/es/rw (was 1 in uk).
 Open: Diego — OK #6, #7, #8, #9, #10 and this PR by number, in order? Postcard caption with school/class name?
 For other lanes: none crossed.
+
+## 2026-11-05 3:20 AM ET · BABOOOOO
+Did: 2.13.78 — on phones the bottom hint line peeked out from behind every toast; it steps aside with the plan sheet now. Landscape phone (882×411) scanned in 8 languages: nothing clipped or off-screen. PR stacked on #11.
+Ran: tsc 0; strip-types 149/149; jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15; phone2 ok; fin clean; rb/phonetrunc.mjs landscape 8 languages clean; phone Yurt shot clean.
+Open: Diego — OK #6–#11 and this PR by number, in order? Postcard caption with school/class name?
+For other lanes: none crossed.
