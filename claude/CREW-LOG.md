@@ -61,3 +61,9 @@ Did: merged #14 on Diego's OK (via Main Guy). 2.13.80 — Class section in Setti
 Ran: tsc 0; strip-types 150/150 (new classLine test); jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15; phone2 ok; fin clean; rb/classcard.mjs en + ar: three 44 px boxes, values survive reload, postcard shows the byline (RTL mirrored); rb/settings.mjs ar/rw clean.
 Open: Diego — OK the 2.13.80 PR by number? Then live-check.
 For other lanes: @Main-Guy please mirror this lane's CREW-LOG into the project copy if that's where the crew reads it; not reachable from this session.
+
+## 2026-11-05 9:25 AM ET · BABOOOOO
+Did: 2.13.81 — on a phone in Arabic/Dari the photo bar's Snap / Postcard / Done buttons wrapped into three lines (74 px tall, three heights); nowrap now, all 44 px. PR stacked on #15. Desktop icon-only sweep: only Zoom −/+ and the "?" job button carry a symbol instead of a word (aria-labelled, 44 px) — left as is.
+Ran: tsc 0; strip-types 150/150; jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15; phone2 ok; fin clean; rb/photobar.mjs ar/fa-AF one line 44 px; rb/iconsweep.mjs 0 small targets.
+Open: Diego — OK #15 then this PR by number? 
+For other lanes: none crossed.
