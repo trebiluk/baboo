@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.79',
+    date: '2026-11-05',
+    bullets: [
+      'Every box in Settings is tall enough to tap (44 px), including the grid size and the roof name.',
+    ],
+  },
+  {
     version: '2.13.78',
     date: '2026-11-05',
     bullets: [
