@@ -5406,6 +5406,15 @@ html.kb-framed body.kb-on .app-shell.is-phone .chrome {
   .app-shell.is-phone .ver-row {
     padding: 0 6px;
     font-size: 10px;
+    /* 2.13.77: the chip gives way, not the Export button — in Ukrainian "Що нового" pushed Export 5 px off a 411 px phone. */
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .app-shell.is-phone .chrome-right > .save-export > .chrome-primary {
+    flex: 0 0 auto;
   }
 }
 /* 2.13.24 — phone bottom edge: the hint gets the full width under the plan card; the piece count (a tech number) stays off phones. */

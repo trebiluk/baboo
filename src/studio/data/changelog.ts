@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.77',
+    date: '2026-11-05',
+    bullets: [
+      'On a phone in Ukrainian, the Export button sits fully on the screen again.',
+    ],
+  },
+  {
     version: '2.13.76',
     date: '2026-11-05',
     bullets: [
