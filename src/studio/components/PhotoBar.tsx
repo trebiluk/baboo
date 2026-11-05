@@ -10,13 +10,14 @@ import { APP_VERSION } from '../version';
  * Photo mode bar (2.13.60–61): Snap · Postcard · Done. The view that opens it hands over a
  * `getPicture()` that draws its current picture sharp; this bar does the card and the sharing.
  */
-export function PhotoBar({ open, onClose, loc, getPicture, title, note }: {
+export function PhotoBar({ open, onClose, loc, getPicture, title, note, byline = '' }: {
   open: boolean;
   onClose: () => void;
   loc: Locale;
   getPicture: () => HTMLCanvasElement | null;
   title: string;
   note: string;
+  byline?: string;
 }) {
   const showToast = useProjectStore((s) => s.showToast);
   useEscape(open, onClose);
@@ -29,7 +30,7 @@ export function PhotoBar({ open, onClose, loc, getPicture, title, note }: {
     const picture = getPicture();
     if (!picture) { showToast(t(loc, 'photo.fail')); return; }
     const out = postcard
-      ? makePostcard(picture, { title, note, footer: `${t(loc, 'photo.madeWith')} · v${APP_VERSION}`, rtl: localeOption(loc).dir === 'rtl' })
+      ? makePostcard(picture, { title, note, byline, footer: `${t(loc, 'photo.madeWith')} · v${APP_VERSION}`, rtl: localeOption(loc).dir === 'rtl' })
       : picture;
     const r = await handOverPhoto(out, title);
     if (r === 'downloaded') showToast(t(loc, postcard ? 'photo.cardSaved' : 'photo.saved'));

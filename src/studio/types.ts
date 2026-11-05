@@ -290,6 +290,12 @@ export interface ProjectSettings {
   textureId: string | null;
   /** Student-facing label mirroring roofLabel. */
   textureLabel: string;
+  /** 2.13.80 — Class section (Diego, 2026-11-05): what the postcard may carry. Never a kid's real name. */
+  schoolName: string;
+  /** Class or period, e.g. "Period 3" or "Tech Ed 7B". */
+  className: string;
+  /** A nickname the kid chose. Empty unless they typed one. */
+  alias: string;
   /**
    * Opaque id into IndexedDB `archworks-blobs` for import:local.
    * Never inline bytes in JSON — Chromebook lean-save law.

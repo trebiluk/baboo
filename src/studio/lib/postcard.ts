@@ -10,11 +10,18 @@ export type PostcardText = {
   title: string;
   /** Small caption: date · style · roof, already in the student's language. */
   note: string;
+  /** 2.13.80: under the title — school · class · nickname (empty = none). */
+  byline?: string;
   /** Tiny footer: "Made with Baboo · v…". */
   footer: string;
   /** Right-to-left language: title on the right, note on the left. */
   rtl: boolean;
 };
+
+/** 2.13.80: the second caption line — school · class or period · the kid's chosen nickname. Never a real name. */
+export function classLine(settings: { schoolName?: string | null; className?: string | null; alias?: string | null }): string {
+  return [settings.schoolName, settings.className, settings.alias].map((s) => (s ?? '').trim()).filter(Boolean).join(' · ');
+}
 
 export function postcardLayout(w = POSTCARD_W, h = POSTCARD_H) {
   const border = Math.round(w * 0.04);
@@ -72,7 +79,13 @@ export function makePostcard(picture: HTMLCanvasElement, text: PostcardText, w =
   const noteW = Math.min(ctx.measureText(text.note).width, pic.w * 0.6);
   const titleMax = pic.w - noteW - band * 0.6;
   ctx.font = `700 ${Math.round(band * 0.42)}px Outfit, "Segoe UI", system-ui, sans-serif`;
-  ctx.fillText(fitText(ctx, text.title, titleMax), text.rtl ? right : left, y);
+  const byline = (text.byline ?? '').trim();
+  ctx.fillText(fitText(ctx, text.title, titleMax), text.rtl ? right : left, byline ? y - band * 0.17 : y);
+  if (byline) {
+    ctx.fillStyle = '#6b625a';
+    ctx.font = `500 ${Math.round(band * 0.24)}px Outfit, "Segoe UI", system-ui, sans-serif`;
+    ctx.fillText(fitText(ctx, byline, titleMax), text.rtl ? right : left, y + band * 0.24);
+  }
   // note
   ctx.fillStyle = '#6b625a';
   ctx.font = `500 ${Math.round(band * 0.26)}px Outfit, "Segoe UI", system-ui, sans-serif`;
