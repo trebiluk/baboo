@@ -13,3 +13,9 @@ Did: 2.13.73 — five What's new bullets had no translation key (showed English 
 Ran: tsc 0; strip-types 149/149; jiti 52/52; object-art 1/1; eslint 0 new errors (4 old in edgePocket.test.ts); matrix 15/15 local; phone2 ok; fin clean; rb/modals.mjs ar + fa-AF clean.
 Open: Diego — OK #6 (crew docs) and this PR by number? Postcard caption with school/class name?
 For other lanes: none crossed.
+
+## 2026-11-04 11:20 PM ET · BABOOOOO
+Did: 2.13.74 — New plan's Blank card printed "Roof:" with nothing (regression from 2.13.72's translated roof names, live now); says "Roof: No roof" in every language. PR opened on top of #7, awaiting Diego's OK by number. 9 PM and 10 PM rounds found nothing real → no PR.
+Ran: tsc 0; strip-types 149/149; jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15 local; phone2 ok; fin clean; rb/newplan.mjs ar + fa-AF phone clean (no overflow, no target < 44 px).
+Open: Diego — OK #6, #7, and this PR by number (in that order)? Postcard caption with school/class name?
+For other lanes: none crossed.

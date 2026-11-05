@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.74 — 2026-11-04 — Blank card roof line
+- The Blank card in New plan says "Roof: No roof" again instead of a blank space.
+- 2.13.72 switched the New plan cards to translated roof names; a template with no roof (Blank) then printed "Roof:" and nothing. It reads "Roof: No roof" in every language now. Checker: rb/newplan.mjs (New plan on a phone, ar/fa-AF: dir, overflow, 44 px targets).
+
 ## 2.13.73 — 2026-11-04 — What's new and wallpaper names in your language
 - What's new reads fully in your language, and wallpaper names like Linen and Subway tile do too.
 - Five What's new bullets since 2.13.48 (2.13.49 ×2, 2.13.50, 2.13.51, 2.13.67) had no translation key and showed in English in every locale; keys added and a test now pins every bullet from 2.13.48 on. The stored English wallpaper name (textureLabel) showed in Settings' summary, the class card and the wallpaper toast; texShown() translates it, a typed name still wins.

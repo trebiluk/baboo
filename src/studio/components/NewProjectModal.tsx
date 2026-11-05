@@ -60,7 +60,7 @@ export function NewProjectModal() {
                   {tpl.badge ? <span className="template-badge">{tpl.badge}</span> : null}
                 </strong>
                 <span>{t(locale, `tpl.${tpl.id}`)}</span>
-                <em className="template-roof">{t(locale, 'chip.roof')}: {roofWord(roof, locale)}</em>
+                <em className="template-roof">{t(locale, 'chip.roof')}: {roof ? roofWord(roof, locale) : t(locale, 'chip.roofNone')}</em>
               </button>
             );
           })}
