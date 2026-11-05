@@ -34,6 +34,11 @@ function getDb() {
   return dbPromise;
 }
 
+/** 2.13.80: a Class field is a short trimmed string (40 chars), never anything else. */
+function classField(v: unknown): string {
+  return typeof v === 'string' ? v.trim().slice(0, 40) : '';
+}
+
 function normalizeDoc(input: ProjectDocument, report: RepairReport = { dropped: 0 }): ProjectDocument {
   // 2.13.49: a file can say anything. Make meta and settings objects before reading them.
   const isObj = (v: unknown) => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -121,6 +126,9 @@ function normalizeDoc(input: ProjectDocument, report: RepairReport = { dropped: 
         showRoof: data.settings?.showRoof !== false,
         textureId: data.settings?.textureId ?? null,
         textureLabel: data.settings?.textureLabel ?? '',
+        schoolName: classField((data.settings as { schoolName?: unknown })?.schoolName),
+        className: classField((data.settings as { className?: unknown })?.className),
+        alias: classField((data.settings as { alias?: unknown })?.alias),
         imageBlobRef: data.settings?.imageBlobRef ?? null,
         ortho: data.settings?.ortho !== false,
         osnap: (data.settings as { osnap?: unknown })?.osnap !== false,

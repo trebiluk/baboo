@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.80',
+    date: '2026-11-05',
+    bullets: [
+      'A new Class section in Settings: school, class or period, and a nickname you choose. They go on your postcard — Baboo never asks for your real name.',
+    ],
+  },
+  {
     version: '2.13.79',
     date: '2026-11-05',
     bullets: [

@@ -290,6 +290,24 @@ export function CustomizePanel() {
           {t(tipLoc(settings), 'set2.roofNote')}
         </p>
 
+        {/* 2.13.80 — Class section: what the postcard may carry (Diego, 2026-11-05). Never a kid's real name. */}
+        <section className="aw-class" aria-labelledby="class-title">
+          <h3 id="class-title">{t(tipLoc(settings), 'set2.classTitle')}</h3>
+          <p className="muted">{t(tipLoc(settings), 'set2.classNote')}</p>
+          <label className="field">
+            <span>{t(tipLoc(settings), 'set2.school')}</span>
+            <input type="text" value={settings.schoolName ?? ''} maxLength={40} autoComplete="off" onChange={(e) => setSettings({ schoolName: e.target.value })} />
+          </label>
+          <label className="field">
+            <span>{t(tipLoc(settings), 'set2.className')}</span>
+            <input type="text" value={settings.className ?? ''} maxLength={40} autoComplete="off" onChange={(e) => setSettings({ className: e.target.value })} />
+          </label>
+          <label className="field">
+            <span>{t(tipLoc(settings), 'set2.alias')}</span>
+            <input type="text" value={settings.alias ?? ''} maxLength={40} autoComplete="off" placeholder={t(tipLoc(settings), 'set2.aliasHint')} onChange={(e) => setSettings({ alias: e.target.value })} />
+          </label>
+        </section>
+
         {isTinyHome ? (
           <section className="aw-typology" aria-labelledby="typology-title">
             <h3 id="typology-title">{t(tipLoc(settings), 'set2.tinyTitle')}</h3>

@@ -55,3 +55,9 @@ Did: merged #6, #7, #8, #9, #10, #11, #12, #13 in order on Diego's OK by number 
 Ran: live https://baboo.kulibert.net — phone2 chip v2.13.79, errs 0; matrix 15/15 clean. Each PR's own checks: tsc 0, 149/52/1, eslint 0 new (in the PR bodies).
 Open: postcard caption decided (school yes, class/period yes, alias only if the kid chose one) — building it next round as 2.13.80. Where should this lane mirror CREW-LOG into the crew copy (project_read)? Not reachable from this session.
 For other lanes: @Main-Guy thanks for the relay; Baboo stays self-contained.
+
+## 2026-11-05 8:50 AM ET · BABOOOOO
+Did: merged #14 on Diego's OK (via Main Guy). 2.13.80 — Class section in Settings (school, class/period, nickname; 44 px boxes; 40 chars, trimmed on load) and the postcard byline "school · class · nickname" under the plan name, per Diego's 2026-11-05 decision; the class-card alias box starts from the chosen nickname; nothing new in the class-card export file. PR opened. The 8:00 round's schedule had dropped — rebooked for 9:00 and hourly after.
+Ran: tsc 0; strip-types 150/150 (new classLine test); jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15; phone2 ok; fin clean; rb/classcard.mjs en + ar: three 44 px boxes, values survive reload, postcard shows the byline (RTL mirrored); rb/settings.mjs ar/rw clean.
+Open: Diego — OK the 2.13.80 PR by number? Then live-check.
+For other lanes: @Main-Guy please mirror this lane's CREW-LOG into the project copy if that's where the crew reads it; not reachable from this session.

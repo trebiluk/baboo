@@ -29,6 +29,7 @@ import { DEFAULT_GUI_THEME } from '../data/themes';
 import { planTitle, t } from '../data/i18n';
 import { PhotoBar } from './PhotoBar';
 import { photoNote } from '../lib/photoNote';
+import { classLine } from '../lib/postcard';
 import { roomLabel } from '../data/rooms';
 import { houseHasUpper, wallStories } from '../lib/stories';
 import type { LandscapeItem } from '../types';
@@ -80,6 +81,7 @@ export function DollhouseCanvas() {
   const [photo, setPhoto] = useState(false);
   const photoTitle = planTitle(useProjectStore((s) => s.doc.meta.title), settings.locale);
   const photoNoteText = photoNote(settings, settings.locale);
+  const photoByline = classLine(settings);
   const setSettings = useProjectStore((s) => s.setSettings);
   const selected = useProjectStore((s) => s.selected);
   const setSelected = useProjectStore((s) => s.setSelected);
@@ -780,6 +782,7 @@ export function DollhouseCanvas() {
         loc={settings.locale}
         title={photoTitle}
         note={photoNoteText}
+        byline={photoByline}
         getPicture={() => { try { return stageRef.current?.toCanvas({ pixelRatio: 2 }) ?? null; } catch { return null; } }}
       />
       <div className="canvas-hint">

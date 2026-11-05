@@ -22,7 +22,7 @@ export function GalleryCardPreview({
   // 2.13.67: the card reads in the student's language.
   const locale = tipLoc(settings);
   const exportGalleryCard = useProjectStore((s) => s.exportGalleryCard);
-  const [alias, setAlias] = useState(DEFAULT_GALLERY_ALIAS);
+  const [alias, setAlias] = useState(settings.alias?.trim() || DEFAULT_GALLERY_ALIAS); // 2.13.80: the nickname from Settings, if the kid chose one
   const [reflection, setReflection] = useState('');
 
   const styleName =

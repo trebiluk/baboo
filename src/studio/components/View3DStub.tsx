@@ -9,6 +9,7 @@ import type { HouseLook } from '../lib/engine3d';
 import { saveProject } from '../lib/storage';
 import { PhotoBar } from './PhotoBar';
 import { photoNote } from '../lib/photoNote';
+import { classLine } from '../lib/postcard';
 
 // A fresh lazy loader per try, so "Try 3D again" downloads again after the wifi comes back (2.13.49).
 const makeEngine = () => lazy(() => import('./EngineView').then((m) => ({ default: m.EngineView })));
@@ -132,6 +133,7 @@ export function View3DStub() {
   const [photo, setPhoto] = useState(false);
   const title = useProjectStore((s) => planTitle(s.doc.meta.title, loc));
   const note = useProjectStore((s) => photoNote(s.doc.settings, loc));
+  const byline = useProjectStore((s) => classLine(s.doc.settings));
 
   const look = useMemo<HouseLook>(() => ({
     wallH: asWallHeightFt(settings.wallHeight),
@@ -200,7 +202,7 @@ export function View3DStub() {
             ) : null}
           </div>
         </div>
-        <PhotoBar open={photo} onClose={() => setPhoto(false)} loc={loc} title={title} note={note} getPicture={() => engineRef.current?.snapshot(2) ?? null} />
+        <PhotoBar open={photo} onClose={() => setPhoto(false)} loc={loc} title={title} note={note} byline={byline} getPicture={() => engineRef.current?.snapshot(2) ?? null} />
       </div>
     </div>
   );

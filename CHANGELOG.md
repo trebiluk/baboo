@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.80 — 2026-11-05 — Class section and the postcard caption
+- A new Class section in Settings: school, class or period, and a nickname you choose. They go on your postcard — Baboo never asks for your real name.
+- Diego's decision (2026-11-05): the postcard caption may carry the school name and the class or period, and a nickname only if the kid chose one — never a kid's name. Settings gains a Class section (three 44 px text boxes, 40 chars each, trimmed on load); the postcard prints school · class · nickname under the plan name; the class-card alias box starts from the chosen nickname. Nothing new is exported in the class card file.
+
 ## 2.13.79 — 2026-11-05 — Settings boxes 44 px
 - Every box in Settings is tall enough to tap (44 px), including the grid size and the roof name.
 - The Settings drawer's number boxes, pickers (units, drawing method, roof) and the roof-name box were 40 px tall (27 px for the roof name) — under the 44 px tap rule. Checker: rb/settings.mjs (Settings per language on a phone: direction, overflow, targets under 44 px, English-looking words).
