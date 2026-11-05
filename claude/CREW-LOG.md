@@ -7,3 +7,9 @@ Did: 2.13.66–2.13.72 shipped live today by fast-forward of main (approved hour
 Ran: strip-types 149/149, jiti 52/52, object-art 1/1, tsc 0, eslint 0 new (4 old no-regex-spaces in edgePocket.test.ts), matrix 15/15 live, phone2 live chip v2.13.72.
 Open: Diego — postcard caption: include school/class name? (caption = plan name only until answered). Where do the crew copies of CREW-LOG / VERSION-LOG / DECISIONS-DIGEST live for this lane?
 For other lanes: @Main-Guy none; Baboo is self-contained (trebiluk/baboo, Vercel auto-deploys main).
+
+## 2026-11-04 8:25 PM ET · BABOOOOO
+Did: 2.13.73 — five What's new bullets had no translation key (showed English in every language); wallpaper names (stored English textureLabel) translated in Settings, class card, toast. PR opened, awaiting Diego's OK by number.
+Ran: tsc 0; strip-types 149/149; jiti 52/52; object-art 1/1; eslint 0 new errors (4 old in edgePocket.test.ts); matrix 15/15 local; phone2 ok; fin clean; rb/modals.mjs ar + fa-AF clean.
+Open: Diego — OK #6 (crew docs) and this PR by number? Postcard caption with school/class name?
+For other lanes: none crossed.

@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.73 — 2026-11-04 — What's new and wallpaper names in your language
+- What's new reads fully in your language, and wallpaper names like Linen and Subway tile do too.
+- Five What's new bullets since 2.13.48 (2.13.49 ×2, 2.13.50, 2.13.51, 2.13.67) had no translation key and showed in English in every locale; keys added and a test now pins every bullet from 2.13.48 on. The stored English wallpaper name (textureLabel) showed in Settings' summary, the class card and the wallpaper toast; texShown() translates it, a typed name still wins.
+
 ## 2.13.72 — 2026-11-04 — roof names in your language
 - Roof names like Gable, Shed and Grass read in your language now — on the plan chip, in Settings, on the sheet and on the postcard.
 - The eight roof style names were English in every locale (roof chip menu, Settings picker, plan sheet, Teach panel, New plan cards, class card, postcard note, toasts). New roof.name.* keys with roofWord()/roofShown() in i18n; a roof name the student typed still wins. 'Imported image' wallpaper label translated too.

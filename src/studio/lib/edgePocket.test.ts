@@ -4,14 +4,34 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { APP_VERSION } from '../version.ts';
-import { LOCALES, roofShown, roofWord, t } from '../data/i18n.ts';
+import { LOCALES, roofShown, roofWord, t, texShown } from '../data/i18n.ts';
 import { upperBody } from './stories.ts';
 
 const studio = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('2.13.72 roof names in your language, 2.13.71 wall chip off the job card, 2.13.70 shed and gambrel roofs, 2.13.69 turf mound, 2.13.68 a real cone roof, 2.13.67 class card in your language, 2.13.66 every message in your language, 2.13.65 3d on phones, 2.13.64 phone menu name, 2.13.63 templates pass, 2.13.62 photo in the walk, 2.13.61 postcard, 2.13.60 photo mode, 2.13.59 new york code, 2.13.58 rtl sizes, 2.13.57 fit in view, 2.13.56 readable tags, 2.13.55 plan names, 2.13.54 wall units, 2.13.53 challenge words, 2.13.52 teach words, 2.13.51 dog house words, 2.13.50 access words, 2.13.49 sturdier, 2.13.48 tips and labels, 2.13.47 settings words, 2.13.46 one room one name, 2.13.45 new plan on phones, 2.13.44 join walls, 2.13.43 more rooms, 2.13.42 real rooms, 2.13.41 house looks, 2.13.40 screen readers, 2.13.39 one font, 2.13.38 clear sizes, 2.13.37 sizes on top, 2.13.36 lighter walk, 2.13.35 speed readout, 2.13.34 furniture, 2.13.33 soft shade, 2.13.32 glass, 2.13.31 crown, 2.13.30 lamps, 2.13.29 fixtures, 2.13.28 roof tag, 2.13.27 tidy, 2.13.26 touch 3d, 2.13.25 polish, 2.13.24 finishes, 2.13.23 frames, 2.13.22 inside 3d, 2.13.21 modes, 2.13.20 grand mansion, 2.13.19 2d tools, 2.13.18 richer 3d, 2.13.17 furniture list, 2.13.16 3d and dollhouse fixes, 2.13.15 more languages, 2.13.14 save status, 2.13.13 3d viewer update, 2.13.12 drawing engine update, 2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
-  it('chips 2.13.72 and keeps the tap row and the first step', () => {
-    assert.equal(APP_VERSION, '2.13.72');
+describe('2.13.73 what\'s new and wallpaper names, 2.13.72 roof names in your language, 2.13.71 wall chip off the job card, 2.13.70 shed and gambrel roofs, 2.13.69 turf mound, 2.13.68 a real cone roof, 2.13.67 class card in your language, 2.13.66 every message in your language, 2.13.65 3d on phones, 2.13.64 phone menu name, 2.13.63 templates pass, 2.13.62 photo in the walk, 2.13.61 postcard, 2.13.60 photo mode, 2.13.59 new york code, 2.13.58 rtl sizes, 2.13.57 fit in view, 2.13.56 readable tags, 2.13.55 plan names, 2.13.54 wall units, 2.13.53 challenge words, 2.13.52 teach words, 2.13.51 dog house words, 2.13.50 access words, 2.13.49 sturdier, 2.13.48 tips and labels, 2.13.47 settings words, 2.13.46 one room one name, 2.13.45 new plan on phones, 2.13.44 join walls, 2.13.43 more rooms, 2.13.42 real rooms, 2.13.41 house looks, 2.13.40 screen readers, 2.13.39 one font, 2.13.38 clear sizes, 2.13.37 sizes on top, 2.13.36 lighter walk, 2.13.35 speed readout, 2.13.34 furniture, 2.13.33 soft shade, 2.13.32 glass, 2.13.31 crown, 2.13.30 lamps, 2.13.29 fixtures, 2.13.28 roof tag, 2.13.27 tidy, 2.13.26 touch 3d, 2.13.25 polish, 2.13.24 finishes, 2.13.23 frames, 2.13.22 inside 3d, 2.13.21 modes, 2.13.20 grand mansion, 2.13.19 2d tools, 2.13.18 richer 3d, 2.13.17 furniture list, 2.13.16 3d and dollhouse fixes, 2.13.15 more languages, 2.13.14 save status, 2.13.13 3d viewer update, 2.13.12 drawing engine update, 2.13.11 own 3d decoders, 2.13.10 menu close, 2.13.9 one menu, 2.13.8 bottom edge, 2.13.7 view buttons, More menu, Ink', () => {
+  it('chips 2.13.73 and keeps the tap row and the first step', () => {
+    assert.equal(APP_VERSION, '2.13.73');
+    for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'ti'] as const) {
+      for (const k of ['news.newsWords', 'news.cardFits', 'news.dogDoors', 'news.aisle', 'news.robust2', 'news.escape']) assert.notEqual(t(l, k), t('en', k), `${l} ${k}`);
+    }
+    // Every What's new bullet from 2.13.48 on has a translation key (the modal matches bullets by their English text).
+    const modal73 = readFileSync(join(studio, 'components/ChangelogModal.tsx'), 'utf8');
+    const keys73 = [...(modal73.match(/const NEWS_KEYS = \[([^\]]*)\]/)?.[1] ?? '').matchAll(/'([^']+)'/g)].map((m) => m[1]);
+    const english73 = new Set(keys73.map((k) => t('en', k)));
+    const cmp = (a: string, b: string) => a.split('.').map(Number).reduce((r, n, i) => r || Math.sign(n - Number(b.split('.')[i] ?? 0)), 0);
+    const log73 = readFileSync(join(studio, 'data/changelog.ts'), 'utf8');
+    for (const m of log73.matchAll(/version: '([\d.]+)',[\s\S]*?bullets: \[([\s\S]*?)\]/g)) {
+      if (cmp(m[1], '2.13.48') < 0) continue;
+      for (const b of m[2].matchAll(/'((?:[^'\\]|\\.)*)'/g)) {
+        const line = b[1].replace(/\\'/g, "'");
+        assert.ok(english73.has(line), `${m[1]} bullet has no news key: ${line.slice(0, 60)}`);
+      }
+    }
+    assert.equal(texShown({ textureId: 'pack:linen', textureLabel: 'Linen' }, 'es', () => 'Linen'), t('es', 'tex.pack.linen'));
+    assert.equal(texShown({ textureId: 'pack:linen', textureLabel: 'Papel de la abuela' }, 'es', () => 'Linen'), 'Papel de la abuela');
+    assert.equal(texShown({ textureId: 'import:local', textureLabel: 'Imported image' }, 'ar', () => 'Imported image'), t('ar', 'tex.imported'));
+    assert.match(readFileSync(join(studio, 'data/changelog.ts'), 'utf8'), /version:\s*'2\.13\.72'/);
     for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'ti'] as const) {
       for (const k of ['news.roofWords', 'roof.name.gable', 'roof.name.shed', 'roof.name.grass', 'roof.name.conical', 'tex.imported']) assert.notEqual(t(l, k), t('en', k), `${l} ${k}`);
     }

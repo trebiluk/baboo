@@ -23,7 +23,7 @@ import { findEnclosedFace, formatArea, hitRoom, pointInPoly, polygonArea, listIn
 import { DEFAULT_ROOM_KIND, roomType } from '../data/rooms';
 import { defaultFloorForKind } from '../data/flooring';
 import {
-  t, tipLoc, planTitle, roofWord, readLocalePref, readTipsLocalePref, readUdlFatPref, readUdlTypePref,
+  t, tipLoc, planTitle, roofWord, texShown, readLocalePref, readTipsLocalePref, readUdlFatPref, readUdlTypePref,
   readUdlContrastPref, readEllEnglishPref, writeLocalePref, writeTipsLocalePref,
   writeUdlFatPref, writeUdlTypePref, writeUdlContrastPref, writeEllEnglishPref,
   readHubLocale, publishHubLocale,
@@ -606,7 +606,7 @@ export const useProjectStore = create<Store>((set, get) => ({
       forgetImportPattern(prevRef);
     }
     get().showToast(
-      textureId ? t(tip(get), 'toast.wallpaper', { name: textureId === 'import:local' ? t(tip(get), 'tex.imported') : label }) : t(tip(get), 'toast.wallpaperOff'),
+      textureId ? t(tip(get), 'toast.wallpaper', { name: texShown({ textureId, textureLabel: label }, tip(get), textureName) }) : t(tip(get), 'toast.wallpaperOff'),
     );
   },
   clearTexture: () => {
