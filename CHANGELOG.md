@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.76 — 2026-11-05 — bar words wrap
+- Long words on the top bar, like Casa de muñecas or Igenamiterere, wrap to two lines instead of being cut off with "…".
+- Desktop bar tiles were a fixed 68 px with nowrap+ellipsis labels: Spanish, Ukrainian, Russian and Kinyarwanda words were truncated (Casa de muñ…, Кукольный д…, Igenamite…). Tiles now size 68–88 px and labels wrap to two lines. Checkers: rb/trunc.mjs (clipped labels per language) and rb/barfit.mjs (bar fits at 1366/1100/1000/915, no overflow, no clipped two-liners).
+
 ## 2.13.75 — 2026-11-05 — Teach panel roof line
 - The Teach panel says "No roof" in your language when a plan has no roof.
 - Every word in the Teach panel's word list has an Arabic and Kinyarwanda meaning now, not just eight of them. (rw UNCHECKED native copy.)
