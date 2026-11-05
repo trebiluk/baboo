@@ -67,3 +67,9 @@ Did: 2.13.81 — on a phone in Arabic/Dari the photo bar's Snap / Postcard / Don
 Ran: tsc 0; strip-types 150/150; jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15; phone2 ok; fin clean; rb/photobar.mjs ar/fa-AF one line 44 px; rb/iconsweep.mjs 0 small targets.
 Open: Diego — OK #15 then this PR by number? 
 For other lanes: none crossed.
+
+## 2026-11-05 10:25 AM ET · BABOOOOO
+Did: merged #15 (2.13.80 Class section + postcard byline) and #16 (2.13.81 photo bar one line) on Diego's OK by number (via Main Guy 10:15 AM), each while green; #16 retargeted to main. main ac8a49c = 2.13.81, auto-deployed.
+Ran: live — phone2 chip v2.13.81, errs 0; matrix 15/15; rb/classcard.mjs against live: Class section fills, postcard carries school · class · nickname.
+Open: none. Rounds stay hourly but lean: a round with nothing real to fix opens no PR and runs no build.
+For other lanes: none crossed.
