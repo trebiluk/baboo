@@ -25,3 +25,9 @@ Did: 2.13.75 — Teach panel said the English "None" for a plan with no roof; an
 Ran: tsc 0; strip-types 149/149 (new pin: every term glossed in every pack); jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15 local; phone2 ok; fin clean; postcard ar Dollhouse + photo3 clean; teach panel ar/rw opens, cards show home meaning + home definition.
 Open: Diego — OK #6, #7, #8 and this PR by number, in order? Postcard caption with school/class name?
 For other lanes: none crossed.
+
+## 2026-11-05 1:25 AM ET · BABOOOOO
+Did: 2.13.76 — desktop top-bar words were cut with "…" in es/uk/ru/rw (Casa de muñ…, Кукольный д…, Igenamite…); tiles now 68–88 px and labels wrap to two lines. PR stacked on #9. What's new in ti/rw desktop and the Dog House contest drawer in rw checked clean.
+Ran: tsc 0; strip-types 149/149; jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15 (sideways 0 ×15); phone2 ok; fin clean; rb/trunc.mjs 0 clipped in rw/uk/ru/es at 1366 and 1000; rb/barfit.mjs no overflow at 1366/1100/1000/915.
+Open: Diego — OK #6, #7, #8, #9 and this PR by number, in order? Postcard caption with school/class name?
+For other lanes: none crossed.

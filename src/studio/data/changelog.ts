@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.76',
+    date: '2026-11-05',
+    bullets: [
+      'Long words on the top bar, like Casa de muñecas or Igenamiterere, wrap to two lines instead of being cut off with "…".',
+    ],
+  },
+  {
     version: '2.13.75',
     date: '2026-11-05',
     bullets: [

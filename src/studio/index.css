@@ -5051,9 +5051,9 @@ html:not(.kb-framed) body.kb-on .menu-drawer {
     justify-content: center;
     align-items: center;
     gap: 1px;
-    width: 68px;
-    min-width: 52px;
-    max-width: 76px;
+    width: auto; /* 2.13.76: long words (Igenamiterere, Кукольный дом, Casa de muñecas) were cut with "…" */
+    min-width: 68px;
+    max-width: 88px;
     min-height: 44px;
     height: auto;
     padding: 4px 4px;
@@ -5069,10 +5069,11 @@ html:not(.kb-framed) body.kb-on .menu-drawer {
   .chrome-ess .chrome-label {
     display: block !important;
     width: 100%;
-    max-width: 72px;
+    max-width: 80px;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: normal; /* 2.13.76: wrap to two lines instead of cutting the word */
+    overflow-wrap: normal;
+    max-height: 2.2em;
     font-size: 10px;
     font-weight: 700;
     line-height: 1.05;
