@@ -364,7 +364,7 @@ export const STR: Record<string, Gloss> = {
     es: 'Cerrar', cu: 'Cerrar', uk: 'Закрити', ru: 'Закрыть', ti: 'ዕጸው', fa: 'بستن',
   }),
   'chrome.new': g('New', {
-    es: 'Nuevo', cu: 'Nuevo', uk: 'Новий', ru: 'Новый', ti: 'ሓድሽ', fa: 'جدید',
+    es: 'Nuevo', cu: 'Nuevo', uk: 'Новий', ru: 'Новый', ti: 'ሓድሽ ትልሚ', fa: 'جدید',
   }),
   'chrome.save': g('Export', {
     es: 'Exportar', cu: 'Exportar', uk: 'Експорт', ru: 'Экспорт', ti: 'ኣውጽእ', fa: 'خروجی',
@@ -1636,6 +1636,8 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.82: Tigrinya menu words. ti, fa-AF and rw are UNCHECKED native copy.
+  'news.tiNew': g('In Tigrinya, the menu no longer shows the same word for "What\'s new" and "New plan".', { es: 'En tigriña, el menú ya no muestra la misma palabra para «Novedades» y «Plano nuevo».', cu: 'En tigriña, el menú ya no muestra la misma palabra para «Novedades» y «Plano nuevo».', uk: 'Тигринья: меню більше не показує одне слово для «Що нового» і «Новий план».', ru: 'Тигринья: меню больше не показывает одно слово для «Что нового» и «Новый план».', ti: 'ኣብ ትግርኛ፣ እቲ ምናሌ ን«ሓድሽ»ን ን«ሓድሽ ትልሚ»ን ሓደ ቃል ኣየርእን።', fa: 'در تیگرینیا، منو دیگر یک واژه را برای «چه جدید است» و «نقشه جدید» نشان نمی‌دهد.', 'fa-AF': 'در تیگرینیا، منو دیگر یک واژه را برای «چه جدید است» و «نقشه جدید» نشان نمی‌دهد.', ar: 'بالتغرينية، لم تعد القائمة تعرض الكلمة نفسها لـ«الجديد» و«مخطط جديد».', rw: 'Mu Gitigirinya, ibikubiyemo ntibikigaragaza ijambo rimwe kuri «Ikishya» na «Igishushanyo gishya».' }),
   // 2.13.81: photo bar on one line. ti, fa-AF and rw are UNCHECKED native copy.
   'news.photoBarLine': g('In Arabic and Dari, the photo bar buttons on a phone stay on one line instead of breaking into three.', { es: 'En árabe y dari, los botones de la barra de foto en el teléfono se quedan en una línea en vez de partirse en tres.', cu: 'En árabe y dari, los botones de la barra de foto en el teléfono se quedan en una línea en vez de partirse en tres.', uk: 'Арабською і дарі кнопки фотопанелі на телефоні лишаються в один рядок замість трьох.', ru: 'На арабском и дари кнопки фотопанели на телефоне остаются в одну строку вместо трёх.', ti: 'ብዓረብኛን ዳሪን፣ መልጎማት ባር ስእሊ ኣብ ተሌፎን ኣብ ክንዲ ናብ ሰለስተ ምስባር ኣብ ሓደ መስመር ይጸንሑ።', fa: 'در عربی و دری، دکمه‌های نوار عکس روی گوشی در یک خط می‌مانند به جای اینکه سه خطی شوند.', 'fa-AF': 'در عربی و دری، دکمه‌های نوار عکس روی موبایل در یک خط می‌مانند به جای اینکه سه خطی شوند.', ar: 'بالعربية والدرية، تبقى أزرار شريط الصور على الهاتف في سطر واحد بدل أن تنكسر إلى ثلاثة.', rw: 'Mu Cyarabu no mu Kidari, buto z\'akabari k\'ifoto kuri telefoni ziguma ku murongo umwe aho gucikamo itatu.' }),
   // 2.13.80: Class section. ti, fa-AF and rw are UNCHECKED native copy.

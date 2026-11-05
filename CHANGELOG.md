@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.82 — 2026-11-05 — Tigrinya menu: two different words
+- In Tigrinya, the menu no longer shows the same word for "What's new" and "New plan".
+- The phone menu listed "ሓድሽ" twice: What's new (chrome.whatsNew) and New (chrome.new). New now reads "ሓድሽ ትልሚ" (new plan). Tigrinya is UNCHECKED native copy. Found by dumping the phone menu per language on the live site.
+
 ## 2.13.81 — 2026-11-05 — photo bar on one line
 - In Arabic and Dari, the photo bar buttons on a phone stay on one line instead of breaking into three.
 - The Snap / Postcard / Done buttons wrapped ("بطاقة بريدية" became three lines, 74 px tall, buttons of three heights). They are nowrap now and all 44 px. Checker: rb/photobar.mjs (Photo bar on a phone per language).
