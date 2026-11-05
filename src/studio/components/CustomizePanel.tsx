@@ -7,7 +7,7 @@ import type { GuiThemeId, Locale, RoofStyleId, SiteFinish, SkyPreset, TypologySh
 import { DEFAULT_SKILL_LEVEL, skillRank } from '../data/skill';
 import { SkillPicker } from './SkillPicker';
 import { THEME_OPTIONS } from '../data/themes';
-import { LOCALE_OPTIONS, asLocale, t, tipLoc } from '../data/i18n';
+import { LOCALE_OPTIONS, asLocale, roofShown, roofWord, t, tipLoc } from '../data/i18n';
 import { DOLL_PROJS, type DollProj } from '../lib/iso';
 import {
   SKY_OPTIONS,
@@ -262,7 +262,7 @@ export function CustomizePanel() {
           >
             <option value="">{t(tipLoc(settings), 'set2.roofNone')}</option>
             {ROOF_STYLE_OPTIONS.map((o) => (
-              <option key={o.id} value={o.id}>{o.name}</option>
+              <option key={o.id} value={o.id}>{roofWord(o.id, tipLoc(settings))}</option>
             ))}
           </select>
         </label>
@@ -279,14 +279,14 @@ export function CustomizePanel() {
           <input
             type="text"
             value={settings.roofLabel ?? ''}
-            placeholder={roofStyleName(settings.roofStyleId)}
+            placeholder={roofWord(settings.roofStyleId, tipLoc(settings))}
             onChange={(e) => setRoofLabel(e.target.value)}
             disabled={!settings.roofStyleId}
           />
         </label>
         <p className="muted">
           {t(tipLoc(settings), 'chip.roof')}:{' '}
-          <strong>{settings.roofLabel?.trim() || (settings.roofStyleId ? roofStyleName(settings.roofStyleId) : t(tipLoc(settings), 'chip.roofNone'))}</strong>.{' '}
+          <strong>{settings.roofStyleId ? roofShown(settings, tipLoc(settings), roofStyleName) : t(tipLoc(settings), 'chip.roofNone')}</strong>.{' '}
           {t(tipLoc(settings), 'set2.roofNote')}
         </p>
 

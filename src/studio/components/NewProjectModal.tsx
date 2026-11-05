@@ -3,8 +3,8 @@ import { useProjectStore } from '../store/useProjectStore';
 import type { StyleId } from '../types';
 import { DEFAULT_SKILL_LEVEL } from '../data/skill';
 import { SkillPicker } from './SkillPicker';
-import { roofDefaultForStyle, roofStyleName } from '../lib/roof';
-import { t } from '../data/i18n';
+import { roofDefaultForStyle } from '../lib/roof';
+import { t, roofWord } from '../data/i18n';
 import { usePhoneChrome } from '../hooks/usePhoneChrome';
 import { useEscape } from '../hooks/useEscape';
 
@@ -60,7 +60,7 @@ export function NewProjectModal() {
                   {tpl.badge ? <span className="template-badge">{tpl.badge}</span> : null}
                 </strong>
                 <span>{t(locale, `tpl.${tpl.id}`)}</span>
-                <em className="template-roof">{t(locale, 'chip.roof')}: {roofStyleName(roof)}</em>
+                <em className="template-roof">{t(locale, 'chip.roof')}: {roofWord(roof, locale)}</em>
               </button>
             );
           })}

@@ -23,7 +23,7 @@ import { exteriorBounds, ROOF_STYLE_OPTIONS, roofStyleName } from '../lib/roof';
 import { roomLabel, roomType } from '../data/rooms';
 import { furnLabel } from '../data/furniture';
 import type { FurnitureItem, Opening, Wall, Node, Room, DimItem, NoteItem, LandscapeItem, Locale } from '../types';
-import { localeOption, planTitle, t, tipLoc } from '../data/i18n';
+import { localeOption, planTitle, roofShown, roofWord, t, tipLoc } from '../data/i18n';
 import { bloomSpots } from '../data/landscape';
 import {
   loadImportPattern,
@@ -1151,7 +1151,7 @@ export function PlanCanvas() {
             aria-pressed={!!settings.roofStyleId}
             onClick={() => setRoofOpen((v) => !v)}
           >
-            {settings.roofStyleId ? roofStyleName(settings.roofStyleId) : t(tips, 'chip.roof')}
+            {settings.roofStyleId ? roofWord(settings.roofStyleId, tips) : t(tips, 'chip.roof')}
           </button>
           {roofOpen && (
             <div className="plan-roof-menu" role="listbox" aria-label={t(tips, 'chip.roof')}>
@@ -1179,7 +1179,7 @@ export function PlanCanvas() {
                     setRoofOpen(false);
                   }}
                 >
-                  {o.name}
+                  {roofWord(o.id, tips)}
                 </button>
               ))}
             </div>
@@ -1263,7 +1263,7 @@ export function PlanCanvas() {
         gridSize={gridSize}
         locale={tips}
         updatedAt={doc.meta.updatedAt}
-        roof={(settings.roofLabel ?? '').trim() || (settings.roofStyleId ? roofStyleName(settings.roofStyleId) : '')}
+        roof={roofShown(settings, tipLoc(settings), roofStyleName)}
       />
       <PlanLoadChip
         objectCount={objectCount}

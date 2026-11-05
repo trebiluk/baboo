@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.72 — 2026-11-04 — roof names in your language
+- Roof names like Gable, Shed and Grass read in your language now — on the plan chip, in Settings, on the sheet and on the postcard.
+- The eight roof style names were English in every locale (roof chip menu, Settings picker, plan sheet, Teach panel, New plan cards, class card, postcard note, toasts). New roof.name.* keys with roofWord()/roofShown() in i18n; a roof name the student typed still wins. 'Imported image' wallpaper label translated too.
+
 ## 2.13.71 — 2026-11-04 — wall chip off the job card
 - On a phone, the wall chip no longer sits on top of the job card words.
 - With the Wall tool on a phone, the folded wall chip (Wall · 8" · 8'-10") rendered over the job card's text. When a job card is up, the chip now sits at the foot of the tool rail. Checker: rb/flyout.mjs. Drawing on phone (en, ar) and desktop (ar) re-verified; Dollhouse hides roofs by design.

@@ -1636,6 +1636,8 @@ export const STR: Record<string, Gloss> = {
     ti: 'ኣብ 2D መናድቕ ስኣል ምእንቲ ኣብ 3D ክትርእዮም',
     fa: 'در ۲بعدی دیوار بکش تا در سه‌بعدی ببینی',
   }),
+  // 2.13.72: roof names in your language. ti, fa-AF and rw are UNCHECKED native copy.
+  'news.roofWords': g('Roof names like Gable, Shed and Grass read in your language now — on the plan chip, in Settings, on the sheet and on the postcard.', { es: 'Los nombres de techo como A dos aguas, De un agua y Césped ya se leen en tu idioma: en la ficha del plano, en Ajustes, en la hoja y en la postal.', cu: 'Los nombres de techo como A dos aguas, De un agua y Césped ya se leen en tu idioma: en la ficha del plano, en Ajustes, en la hoja y en la postal.', uk: 'Назви дахів, як-от Двосхилий, Односхилий і Трав\'яний, тепер читаються твоєю мовою: на плашці плану, у Налаштуваннях, на аркуші й на листівці.', ru: 'Названия крыш — Двускатная, Односкатная, Травяная — теперь читаются на твоём языке: на плашке плана, в Настройках, на листе и на открытке.', ti: 'ስማት ናሕሲ ከም ጋብል፣ ሸድን ሳዕርን ሕጂ ብቋንቋኻ ይንበቡ — ኣብ ቺፕ ትልሚ፣ ኣብ ቅንብራት፣ ኣብ ወረቐትን ኣብ ፖስትካርድን።', fa: 'نام سقف‌ها مثل شیروانی، یک‌شیب و چمنی حالا به زبان خودت خوانده می‌شوند — روی چیپ نقشه، در تنظیمات، روی برگه و روی کارت‌پستال.', 'fa-AF': 'نام سقف‌ها مثل شیروانی، یک‌شیب و چمنی حالا به زبان خودت خوانده می‌شوند — روی چیپ نقشه، در تنظیمات، روی برگه و روی کارت‌پستال.', ar: 'أسماء الأسقف مثل جملوني وميل واحد وعشبي تُقرأ الآن بلغتك — على شريحة المخطط، وفي الإعدادات، وعلى الورقة، وعلى البطاقة البريدية.', rw: 'Amazina y\'ibisenge nka Gable, Shed n\'Ibyatsi ubu asomwa mu rurimi rwawe — ku kamenyetso k\'igishushanyo, mu Igenamiterere, ku rupapuro no ku ikarita.' }),
   // 2.13.71: wall chip off the job card. ti, fa-AF and rw are UNCHECKED native copy.
   'news.wallChip': g('On a phone, the wall chip no longer sits on top of the job card words.', { es: 'En el teléfono, la ficha de pared ya no se pone encima de las palabras de la tarjeta del trabajo.', cu: 'En el teléfono, la ficha de pared ya no se pone encima de las palabras de la tarjeta del trabajo.', uk: 'На телефоні плашка стіни більше не лягає на слова картки завдання.', ru: 'На телефоне плашка стены больше не ложится на слова карточки задания.', ti: 'ኣብ ተሌፎን፣ ቺፕ መንደቕ ኣብ ልዕሊ ቃላት ካርድ ስራሕ ኣይቅመጥን።', fa: 'روی گوشی، چیپ دیوار دیگر روی نوشته‌های کارت کار نمی‌نشیند.', 'fa-AF': 'روی موبایل، چیپ دیوار دیگر روی نوشته‌های کارت کار نمی‌نشیند.', ar: 'على الهاتف، لم تعد شريحة الجدار تجلس فوق كلمات بطاقة المهمة.', rw: 'Kuri telefoni, akamenyetso k\'urukuta ntikakicara ku magambo y\'ikarita y\'akazi.' }),
   // 2.13.70: shed and gambrel roofs. ti, fa-AF and rw are UNCHECKED native copy.
@@ -2595,6 +2597,16 @@ export const STR: Record<string, Gloss> = {
   'chip.roof': g('Roof', {
     es: 'Techo', cu: 'Techo', uk: 'Дах', ru: 'Крыша', ti: 'ናሕሲ', fa: 'سقف',
   }),
+  // 2.13.72: roof style names everywhere (chip, Settings, sheet, card, toasts). ti, fa-AF and rw are UNCHECKED native copy.
+  'tex.imported': g('Imported image', { es: 'Imagen importada', cu: 'Imagen importada', uk: 'Імпортоване зображення', ru: 'Импортированная картинка', ti: 'ዝኣተወ ስእሊ', fa: 'تصویر واردشده', 'fa-AF': 'تصویر واردشده', ar: 'صورة مستوردة', rw: 'Ifoto yinjijwe' }),
+  'roof.name.gable': g('Gable', { es: 'A dos aguas', cu: 'A dos aguas', uk: 'Двосхилий', ru: 'Двускатная', ti: 'ጋብል', fa: 'شیروانی دوطرفه', 'fa-AF': 'شیروانی دوطرفه', ar: 'جملوني', rw: 'Gable' }),
+  'roof.name.hip': g('Hip', { es: 'A cuatro aguas', cu: 'A cuatro aguas', uk: 'Вальмовий', ru: 'Вальмовая', ti: 'ሂፕ', fa: 'چهارشیب', 'fa-AF': 'چهارشیب', ar: 'هرمي', rw: 'Hip' }),
+  'roof.name.gambrel': g('Gambrel', { es: 'Gambrel (granero)', cu: 'Gambrel (granero)', uk: 'Гамбрель', ru: 'Гамбрель', ti: 'ጋምብረል', fa: 'گامبرل', 'fa-AF': 'گامبرل', ar: 'جملوني مزدوج', rw: 'Gambrel' }),
+  'roof.name.shed': g('Shed', { es: 'De un agua', cu: 'De un agua', uk: 'Односхилий', ru: 'Односкатная', ti: 'ሸድ', fa: 'یک‌شیب', 'fa-AF': 'یک‌شیب', ar: 'ميل واحد', rw: 'Shed' }),
+  'roof.name.flat': g('Flat', { es: 'Plano', cu: 'Plano', uk: 'Плаский', ru: 'Плоская', ti: 'ጽፍሕ', fa: 'تخت', 'fa-AF': 'تخت', ar: 'مسطّح', rw: 'Igororotse' }),
+  'roof.name.mansard': g('Mansard', { es: 'Mansarda', cu: 'Mansarda', uk: 'Мансардний', ru: 'Мансардная', ti: 'ማንሳርድ', fa: 'مانسارد', 'fa-AF': 'مانسارد', ar: 'مانسارد', rw: 'Mansard' }),
+  'roof.name.grass': g('Grass / sod', { es: 'Césped', cu: 'Césped', uk: 'Трав\'яний', ru: 'Травяная', ti: 'ሳዕሪ', fa: 'چمنی', 'fa-AF': 'چمنی', ar: 'عشبي', rw: 'Ibyatsi' }),
+  'roof.name.conical': g('Conical', { es: 'Cónico', cu: 'Cónico', uk: 'Конічний', ru: 'Коническая', ti: 'ኮን', fa: 'مخروطی', 'fa-AF': 'مخروطی', ar: 'مخروطي', rw: 'Koni' }),
   'chip.roofNone': g('No roof', {
     es: 'Sin techo', cu: 'Sin techo', uk: 'Без даху', ru: 'Без крыши', ti: 'ናሕሲ የለን', fa: 'بدون سقف', 'fa-AF': 'بدون بام', ar: 'بلا سقف', rw: 'Nta gisenge',
   }),
@@ -3489,4 +3501,23 @@ export function readEllEnglishPref(): boolean {
 
 export function writeEllEnglishPref(on: boolean): void {
   try { localStorage.setItem(ELL_EN_PREF, on ? '1' : '0'); } catch { /* ignore */ }
+}
+
+/** 2.13.72: a roof style's name in the student's language. */
+export function roofWord(id: string | null | undefined, locale: Locale | null | undefined): string {
+  if (!id) return '';
+  const key = `roof.name.${id}`;
+  const out = t(locale, key);
+  return out === key ? id : out;
+}
+/** The roof to show for a plan: the student's own roof name if they typed one, else the translated style name. */
+export function roofShown(
+  settings: { roofStyleId?: string | null; roofLabel?: string | null },
+  locale: Locale | null | undefined,
+  english: (id: any) => string, // roofStyleName takes RoofStyleId
+): string {
+  const label = (settings.roofLabel ?? '').trim();
+  const id = settings.roofStyleId ?? null;
+  if (label && (!id || label !== english(id))) return label;
+  return roofWord(id, locale);
 }

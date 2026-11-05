@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.72',
+    date: '2026-11-04',
+    bullets: [
+      'Roof names like Gable, Shed and Grass read in your language now — on the plan chip, in Settings, on the sheet and on the postcard.',
+    ],
+  },
+  {
     version: '2.13.71',
     date: '2026-11-04',
     bullets: [

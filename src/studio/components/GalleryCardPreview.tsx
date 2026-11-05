@@ -6,7 +6,7 @@ import { textureName } from '../data/textures';
 import { shellDisplayName } from '../data/typology';
 import { DEFAULT_GALLERY_ALIAS } from '../lib/galleryExport';
 import { judgeDogHouse } from '../lib/contest';
-import { t, tipLoc, planTitle } from '../data/i18n';
+import { t, tipLoc, planTitle, roofShown } from '../data/i18n';
 
 /** Share-gallery card — aliases only (SHARE-GALLERY.md · FERPA). */
 export function GalleryCardPreview({
@@ -28,8 +28,8 @@ export function GalleryCardPreview({
   const styleName =
     STYLE_TEMPLATES.find((t) => t.id === settings.styleId)?.name ?? settings.styleId;
   const roof =
-    settings.roofLabel?.trim() || (settings.roofStyleId ? roofStyleName(settings.roofStyleId) : t(locale, 'card.none'));
-  const tex = settings.textureId ? textureName(settings.textureId) : t(locale, 'card.none');
+    settings.roofStyleId ? roofShown(settings, locale, roofStyleName) : t(locale, 'card.none');
+  const tex = !settings.textureId ? t(locale, 'card.none') : settings.textureId === 'import:local' ? t(locale, 'tex.imported') : textureName(settings.textureId);
   const isTiny = settings.styleId === 'tiny-home' || settings.typology?.kind === 'tiny-home';
   const shellLabel = isTiny ? shellDisplayName(settings.typology?.shell ?? 'trailer') : '';
   const floor = useProjectStore((s) => s.doc.floors[0]);

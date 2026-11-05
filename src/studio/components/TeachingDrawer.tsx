@@ -5,7 +5,7 @@ import { useProjectStore } from '../store/useProjectStore';
 import { exteriorFloorAreaSqFt, roofStyleName } from '../lib/roof';
 import { FURNITURE_CATALOG } from '../data/furniture';
 import { DEFAULT_SKILL_LEVEL, NOVICE_UNIT_STEPS, skillRank } from '../data/skill';
-import { t, localeOption, asLocale, tipLoc } from '../data/i18n';
+import { t, localeOption, asLocale, tipLoc, roofShown } from '../data/i18n';
 import type { Locale, Floor, StyleId } from '../types';
 import { runArchitectCheck, type ArchCheck, type ArchHit } from '../lib/architect';
 import { useEscape } from '../hooks/useEscape';
@@ -20,7 +20,7 @@ export function TeachingDrawer() {
   const style = STYLE_TEMPLATES.find((t) => t.id === styleId);
   const floor = doc.floors[0];
   const area = exteriorFloorAreaSqFt(floor.nodes, floor.walls);
-  const roofName = (doc.settings.roofLabel?.trim() || roofStyleName(doc.settings.roofStyleId));
+  const roofName = roofShown(doc.settings, tipLoc(doc.settings), roofStyleName) || roofStyleName(null);
 
   const catalogIds = new Set(floor.furniture.map((f) => f.catalogId));
   const hasUtility = (ids: string[]) => ids.some((id) => catalogIds.has(id));
