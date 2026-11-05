@@ -49,3 +49,9 @@ Did: 2.13.79 — Settings boxes (grid size, units/method/roof pickers, roof name
 Ran: tsc 0; strip-types 149/149; jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15; phone2 ok; fin clean; setar (desktop ar) clean; rb/settings.mjs 0 targets under 44 px (hidden file input excluded).
 Open: Diego — OK #6–#12 and this PR by number, in order? Postcard caption with school/class name?
 For other lanes: none crossed.
+
+## 2026-11-05 7:25 AM ET · BABOOOOO
+Did: merged #6, #7, #8, #9, #10, #11, #12, #13 in order on Diego's OK by number (via Main Guy 7:02 AM), each only while green; #7 needed main merged in first (add/add on the claude/ docs after #6 — kept the branch copies, no rebase). main 67d4714 = 2.13.79, auto-deployed.
+Ran: live https://baboo.kulibert.net — phone2 chip v2.13.79, errs 0; matrix 15/15 clean. Each PR's own checks: tsc 0, 149/52/1, eslint 0 new (in the PR bodies).
+Open: postcard caption decided (school yes, class/period yes, alias only if the kid chose one) — building it next round as 2.13.80. Where should this lane mirror CREW-LOG into the crew copy (project_read)? Not reachable from this session.
+For other lanes: @Main-Guy thanks for the relay; Baboo stays self-contained.

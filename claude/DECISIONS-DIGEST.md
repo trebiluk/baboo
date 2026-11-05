@@ -8,4 +8,5 @@ Diego's answers that bind this lane. Don't re-ask these.
 - Postcard and photo mode "like boutique has": planned and built (2.13.60–2.13.62). The Movie Boutique repo is read-only reference — never change it.
 - @tanstack/react-start stays ≥ 1.168.60 (CVE-2026-102989). 3D models never load from outside sites (school wifi). Plants stay parked. README untouched; version.ts wins.
 - New user-facing strings go through src/studio/data/i18n.ts for every locale; ti, fa-AF, rw marked UNCHECKED native copy. Product rules: Menu top-left; drawers from the left ≤12px; ≥44px targets with words; plan canvas LTR in RTL; version chip "v{APP_VERSION} · What's new"; no sideways scroll; saved state next to Export.
-- Open (not decided): postcard caption with school/class name? Caption = plan name only until answered.
+- Postcard caption (Diego via Main Guy, 2026-11-05 7:02 AM ET): school name YES, class or period YES, never a kid's name — alias only, and only if the kid chose one.
+- Merges (Diego via Main Guy, 2026-11-05 7:02 AM ET): #6–#13 OK'd by number, in order, each only while green. Standing rule stays: merge only PRs Diego OK'd by number.
