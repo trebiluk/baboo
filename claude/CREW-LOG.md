@@ -67,3 +67,9 @@ Did: 2.13.81 — on a phone in Arabic/Dari the photo bar's Snap / Postcard / Don
 Ran: tsc 0; strip-types 150/150; jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15; phone2 ok; fin clean; rb/photobar.mjs ar/fa-AF one line 44 px; rb/iconsweep.mjs 0 small targets.
 Open: Diego — OK #15 then this PR by number? 
 For other lanes: none crossed.
+
+## 2026-11-05 11:20 AM ET · BABOOOOO
+Did: 2.13.82 — the Tigrinya phone menu showed "ሓድሽ" for both What's new and New; New reads "ሓድሽ ትልሚ" (new plan) now, and a test pins that no language reuses one word for both. PR opened (one i18n line + bump). Lean round: one look-over (menu labels per language on the live site, no build until the fix).
+Ran: tsc 0; strip-types 150/150 (new pin); jiti 52/52; object-art 1/1; eslint 0 new; matrix 15/15; phone2 ok; fin clean; Tigrinya phone: 0 off-screen buttons.
+Open: Diego — OK #17 (docs) and this PR by number. Tigrinya native check still needs a person.
+For other lanes: none crossed.

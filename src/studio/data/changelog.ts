@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.82',
+    date: '2026-11-05',
+    bullets: [
+      'In Tigrinya, the menu no longer shows the same word for "What\'s new" and "New plan".',
+    ],
+  },
+  {
     version: '2.13.81',
     date: '2026-11-05',
     bullets: [

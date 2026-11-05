@@ -20,4 +20,5 @@ Pick the next version here BEFORE opening a PR. Never reuse. `src/studio/version
 | 2.13.79 | 2026-11-05 | Settings boxes 44 px tall | PR | merged · live |
 | 2.13.80 | 2026-11-05 | Class section + postcard caption (Diego's decision) | PR (this) | awaiting OK |
 | 2.13.81 | 2026-11-05 | photo bar buttons on one line (ar/fa-AF phones) | PR (this) | awaiting OK |
-| 2.13.82 | — | next hourly round (reserved by BABOOOOO) | — | reserved |
+| 2.13.82 | 2026-11-05 | Tigrinya menu: What's new ≠ New | PR (this) | awaiting OK |
+| 2.13.83 | — | next hourly round (reserved by BABOOOOO) | — | reserved |
