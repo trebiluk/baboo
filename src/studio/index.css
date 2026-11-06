@@ -5057,7 +5057,7 @@ html:not(.kb-framed) body.kb-on .menu-drawer {
     gap: 1px;
     width: auto; /* 2.13.76: long words (Igenamiterere, Кукольный дом, Casa de muñecas) were cut with "…" */
     min-width: 68px;
-    max-width: 88px;
+    max-width: 100px; /* 2.13.88: room for 12px labels */
     min-height: 44px;
     height: auto;
     padding: 4px 4px;
@@ -5073,14 +5073,16 @@ html:not(.kb-framed) body.kb-on .menu-drawer {
   .chrome-ess .chrome-label {
     display: block !important;
     width: 100%;
-    max-width: 80px;
+    max-width: 94px;
     overflow: hidden;
     white-space: normal; /* 2.13.76: wrap to two lines instead of cutting the word */
-    overflow-wrap: normal;
-    max-height: 2.2em;
-    font-size: 10px;
-    font-weight: 700;
-    line-height: 1.05;
+    overflow-wrap: anywhere; /* 2.13.88: a very long word (Налаштування) breaks instead of being cut */
+    max-height: 2.3em;
+    /* 2.13.88 (Diego): 10px/700 clumped the letters; bigger and lighter reads better */
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.08;
     text-align: center;
   }
 }

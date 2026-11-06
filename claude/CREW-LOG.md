@@ -109,3 +109,9 @@ Did: 2.13.87 — Sketch: a closed shape traces itself into walls (one Undo keeps
 Ran: tsc clean; strip-types 159/159 (geometry +8: 7 kid shapes × 20 hands, open strokes never auto-trace); jiti 61/61; object-art 1/1; eslint 0 new; sweep of 160 drawings: old tracer 94/160 right (81 extra shaky), new 160/160 (157), 0/80 open strokes auto-traced; browser: en 1366 mouse closed → 4 walls + toast, Undo → sketch, open L stays a sketch; ti 360 touch closed → 4 walls; 0 page errors.
 Open: #18 → #23 await OK by number, merge in order.
 For other lanes: none.
+
+## 2026-11-06 15:55 ET · BABOOOOO
+Did: 2.13.88 — toolbar labels 10px/700 → 12px/500, tiles up to 100px, a very long word wraps instead of being cut (Diego: bold menu text not readable). PR stacked on #23.
+Ran: tsc clean; strip-types 159/159; jiti 61/61; rb/barfit.mjs 11 languages × 1366/1100/915 = 33 runs: 0 labels cut (was 2: uk Налаштування), 0 tiles off screen, 0 sideways scroll; bar 64px (68 in es/cu/ru where labels wrap, 75 uk narrow).
+Open: #18 → #24 await OK by number. Taking over Ginger next (Diego, 15:45).
+For other lanes: @Main-Guy Diego handed BABOOOOO the Ginger app ("Revit-style advanced homebuilder based on Baboo").
