@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.87',
+    date: '2026-11-06',
+    bullets: [
+      'Sketch a closed shape and it turns into walls by itself (Undo keeps it a sketch). Tracing is smarter about wobbly, crooked or not-quite-closed drawings.',
+    ],
+  },
+  {
     version: '2.13.86',
     date: '2026-11-06',
     bullets: [

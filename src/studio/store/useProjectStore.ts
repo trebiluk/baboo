@@ -13,7 +13,7 @@ import {
   dist, findOrCreateNode, hitFurniture, hitOpening, hitWall, nearestWall,
   snapPoint, uid, hitDimension, hitNote, hitLandscape, hitSketch,
   snapWallEnd, splitWallsAtNode, wallLength, wallAngle,
-  simplifyPolyline, polylineLength, fitWallsFromStroke,
+  simplifyPolyline, polylineLength, fitWallsFromStroke, closedLoopOf,
   nodesAfterWallEnd, nodesAfterWallLength, wallEnds, formatLength,
 } from '../lib/geometry';
 import { chamferCorner, nearestChamferable } from '../lib/chamfer';
@@ -223,7 +223,7 @@ interface Store {
   renameNote: (id: string, text: string) => void;
   placePlant: (p: Point) => void;
   addSketch: (points: number[]) => void;
-  traceSketch: (id?: string) => void;
+  traceSketch: (id?: string, auto?: boolean) => void;
   selectAt: (p: Point) => void;
   hitAt: (p: Point) => { kind: 'furniture' | 'landscape' | 'note' | 'dim' | 'opening' | 'wall' | 'sketch' | 'room'; id: string } | null;
   moveSelected: (dx: number, dy: number) => void;
@@ -1657,13 +1657,18 @@ export const useProjectStore = create<Store>((set, get) => ({
       selected: { kind: 'sketch', id: item.id },
     });
     get().markDirty();
+    // 2.13.87: a closed shape traces itself (one Undo turns it back into a sketch)
+    if (closedLoopOf(points)) {
+      get().traceSketch(item.id, true);
+      return;
+    }
     const skill = get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL;
     if (skillRank(skill) <= 1) {
       get().showToast(t(get().doc.settings.locale, 'toast.sketchIn'), toastMs(skill, 3200));
     }
   },
 
-  traceSketch: (id) => {
+  traceSketch: (id, auto) => {
     const selected = get().selected;
     const sketches = get().floor().sketches ?? [];
     const sketchId = id
@@ -1731,6 +1736,8 @@ export const useProjectStore = create<Store>((set, get) => ({
     get().markDirty();
     if (added === 0) {
       get().showToast(t(get().doc.settings.locale, 'toast.traceNeed'), 3200);
+    } else if (auto) {
+      get().showToast(t(get().doc.settings.locale, 'toast.autoTrace', { n: String(added) }), toastMs(get().doc.settings.skillLevel ?? DEFAULT_SKILL_LEVEL, 3600), 'ok');
     } else if (!toastIfJustClosed(get, beforeFloor)) {
       get().showToast(
         added === 1
