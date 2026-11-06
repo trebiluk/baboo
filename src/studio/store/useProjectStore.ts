@@ -206,7 +206,7 @@ interface Store {
   patchOpening: (id: string, patch: Partial<Pick<Opening, 'width' | 'swing' | 'symbolKind' | 't'>>) => void;
   patchWall: (id: string, patch: Partial<Pick<Wall, 'kind' | 'finishId' | 'thickness' | 'drawStyle' | 'faces'>>) => void;
   setRoomWallKind: (roomId: string, kind: 'interior' | 'exterior') => void;
-  patchFurniture: (id: string, patch: Partial<Pick<FurnitureItem, 'color' | 'x' | 'y' | 'w' | 'h' | 'rot'>>) => void;
+  patchFurniture: (id: string, patch: Partial<Pick<FurnitureItem, 'color' | 'x' | 'y' | 'w' | 'h' | 'rot' | 'elev'>>) => void;
   patchLandscape: (id: string, patch: Partial<Pick<LandscapeItem, 'x' | 'y' | 'w' | 'h'>>) => void;
   moveWallEnd: (wallId: string, end: 'a' | 'b', p: Point, forceOrtho?: boolean) => void;
   setWallLength: (wallId: string, length: number) => void;

@@ -4,6 +4,7 @@ import { centroid, pointInPoly, polygonArea, roomPolygon } from './rooms';
 import { t, type Locale } from '../data/i18n';
 import { roomLabel } from '../data/rooms';
 import { furnLabel } from '../data/furniture';
+import { furnHeightOffFloor } from './furnShape';
 
 /** Classroom ADA reminders (2010 Standards, simplified). Not a legal review. */
 export const ADA = {
@@ -276,6 +277,8 @@ export function runAccessCheck(floor: Floor, units: 'ft' | 'm' = 'ft', locale: L
     if (!geo) continue;
     for (const item of furniture) {
       if (NOT_IN_THE_WAY.has(item.catalogId)) continue;
+      // lifted above the door's head (6'-8"): the door swings under it (2.13.86)
+      if (furnHeightOffFloor(item) >= 6.7) continue;
       if (furnitureInSwing(item, geo.hinge, geo.ang, geo.swing, geo.radius)) {
         blocked = { door, item };
         break;

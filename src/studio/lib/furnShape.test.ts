@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { furnitureParts, partWorldCorners, partWorldRing } from './furnShape.ts';
+import { elevForHeight, furnBaseHeight, furnHeightOffFloor, furnitureParts, partWorldCorners, partWorldRing } from './furnShape.ts';
 import { FURNITURE_CATALOG } from '../data/furniture.ts';
 import { objectSvg } from '../data/objectArt.ts';
 import { symbolSrc } from '../data/objectSymbols.ts';
@@ -93,5 +93,35 @@ describe('furniture parts', () => {
       const shapes = text.match(/<(rect|ellipse) /g) ?? [];
       assert.ok(shapes.length >= 2, `${cat.id} shapes ${shapes.length}`);
     }
+  });
+});
+
+describe('height off the floor (2.13.86)', () => {
+  const low = (parts: ReturnType<typeof furnitureParts>) => Math.min(...parts.map((p) => p.z0));
+  it('a microwave sits at counter height and can go on the floor or a shelf', () => {
+    const m = item('microwave', 1.75, 1.25);
+    assert.ok(Math.abs(furnBaseHeight(m) - 3.08) < 0.01);
+    assert.ok(Math.abs(furnHeightOffFloor(m) - 3.08) < 0.01);
+    const onFloor = { ...m, elev: elevForHeight(m, 0) };
+    assert.ok(Math.abs(low(furnitureParts(onFloor))) < 0.001);
+    const onShelf = { ...m, elev: elevForHeight(m, 5) };
+    assert.ok(Math.abs(low(furnitureParts(onShelf)) - 5) < 0.001);
+    assert.ok(Math.abs(furnHeightOffFloor(onShelf) - 5) < 0.001);
+  });
+  it('lifts every part, in plan, dollhouse and 3D alike, and keeps the parts the same size', () => {
+    const bed = item('bed-twin', 3.25, 6.25);
+    const a = furnitureParts(bed);
+    const b = furnitureParts({ ...bed, elev: 5 });
+    assert.equal(a.length, b.length);
+    a.forEach((p, i) => { assert.ok(Math.abs(b[i].z0 - p.z0 - 5) < 1e-9); assert.ok(Math.abs(b[i].z1 - p.z1 - 5) < 1e-9); });
+    const s = furnitureParts({ ...bed, elev: 5 }, 'simple');
+    assert.ok(low(s) >= 5 - 1e-9);
+  });
+  it('never goes under the floor or past 20 ft, and ignores junk', () => {
+    const m = item('microwave', 1.75, 1.25);
+    assert.ok(low(furnitureParts({ ...m, elev: -50 })) >= -1e-9);
+    assert.ok(furnHeightOffFloor({ ...m, elev: 99 }) <= 20 + 1e-9);
+    assert.ok(Math.abs(furnHeightOffFloor({ ...m, elev: Number.NaN }) - 3.08) < 0.01);
+    assert.equal(elevForHeight(item('sofa', 7, 3), -3), 0);
   });
 });

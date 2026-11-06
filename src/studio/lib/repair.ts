@@ -74,6 +74,8 @@ export function repairFloor(input: unknown, report: RepairReport = { dropped: 0 
         rot: num(i.rot) ? i.rot : 0,
         zIndex: num(i.zIndex) ? i.zIndex : 0,
         label: str(i.label, ''),
+        // 2.13.86: a bad lift is dropped, a wild one is capped
+        ...(num(i.elev) && i.elev !== 0 ? { elev: Math.max(-20, Math.min(20, i.elev)) } : { elev: undefined }),
       })),
   );
   count(rawFurn, furniture);

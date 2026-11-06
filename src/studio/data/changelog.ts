@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.86',
+    date: '2026-11-06',
+    bullets: [
+      'Every piece of furniture has a Height off floor setting: put the microwave on a counter or a shelf, a TV on a desk, or a loft bed over a desk.',
+    ],
+  },
+  {
     version: '2.13.85',
     date: '2026-11-06',
     bullets: [

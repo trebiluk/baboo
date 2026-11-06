@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.86 — 2026-11-06 — Height off the floor for furniture (stack things)
+- Every piece of furniture has a Height off floor setting: put the microwave on a counter or a shelf, a TV on a desk, or a loft bed over a desk.
+- Diego: the microwave, and anything that can sit above or below another item, needs an elevation. The item panel shows Height off floor (where the piece's lowest part sits) with On the floor / On a counter buttons; plan, dollhouse and 3D all lift the piece; higher pieces draw on top in the plan; anything lifted above the door head no longer counts as in the door's swing. Saved as an optional elev (feet), capped 0–20 ft; bad values are dropped on load. Strings in every language; ti, fa-AF and rw UNCHECKED.
+
 ## 2.13.85 — 2026-11-06 — Worksheet items: bathroom sink, mirror, counter, microwave, TV or computer
 - New furniture from the class worksheet: bathroom sink, mirror, counter, microwave, and TV or computer.
 - The class Tiny House worksheet checklist had 5 items Baboo did not: each now has a plan picture, a 3D shape and a name in every language (ti, fa-AF and rw UNCHECKED). The mirror hangs on the wall and the microwave sits at counter height, so neither counts as in a door's way.

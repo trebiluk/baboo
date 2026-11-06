@@ -133,7 +133,38 @@ function legs(w: number, h: number, inset: number, thick: number, z1: number, fi
 
 export function furnitureParts(item: FurnitureItem, lod: FurnLod = 'full'): FurnPart[] {
   const raw = lod === 'simple' ? furnitureSilhouette(item) : furniturePartsFull(item);
-  return paintFurnParts(raw, item.color);
+  const painted = paintFurnParts(raw, item.color);
+  const e = furnLift(item);
+  return e ? painted.map((p) => ({ ...p, z0: p.z0 + e, z1: p.z1 + e })) : painted;
+}
+
+/** Highest a piece may sit, feet off the floor (2.13.86). */
+export const FURN_MAX_HEIGHT_FT = 20;
+
+/** How far up a piece sits by its own design: a bed is on the floor, a microwave at counter height, a painting on the wall. */
+export function furnBaseHeight(item: Pick<FurnitureItem, 'catalogId' | 'w' | 'h'>): number {
+  const parts = furniturePartsFull({ id: 'b', x: 0, y: 0, rot: 0, zIndex: 0, label: '', ...item } as FurnitureItem);
+  return parts.length ? Math.max(0, Math.min(...parts.map((p) => p.z0))) : 0;
+}
+
+/** The kid's lift, kept so the piece never goes below the floor or above the limit. */
+export function furnLift(item: FurnitureItem): number {
+  const e = Number(item.elev);
+  if (!Number.isFinite(e) || e === 0) return 0;
+  const base = furnBaseHeight(item);
+  return Math.min(FURN_MAX_HEIGHT_FT - base, Math.max(-base, e));
+}
+
+/** Height off the floor of the lowest part, as the item panel shows it (2.13.86). */
+export function furnHeightOffFloor(item: FurnitureItem): number {
+  return furnBaseHeight(item) + furnLift(item);
+}
+
+/** Turn a height off the floor the kid typed into the stored lift. */
+export function elevForHeight(item: FurnitureItem, heightFt: number): number {
+  const base = furnBaseHeight(item);
+  const h = Math.min(FURN_MAX_HEIGHT_FT, Math.max(0, heightFt));
+  return Math.round((h - base) * 1000) / 1000;
 }
 
 function furniturePartsFull(item: FurnitureItem): FurnPart[] {
