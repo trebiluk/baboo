@@ -424,6 +424,47 @@ function furniturePartsFull(item: FurnitureItem): FurnPart[] {
         box(0, 0, w * 0.92, h * 0.8, 1.15, 1.55, UPH),
         box(0, -hh * 0.15, w * 0.7, h * 0.35, 1.5, 1.85, PILLOW),
       ];
+    case 'bath-sink':
+      // a vanity: cabinet, white top, oval basin, faucet at the back (2.13.85)
+      return [
+        box(0, 0.05, w * 0.94, h * 0.9, 0, 2.62, WOOD_LT),
+        box(0, h * 0.42, w * 0.9, 0.06, 0.3, 2.3, WOOD_DK),
+        box(0, 0, w, h, 2.62, 2.78, WHITE),
+        oval(0, 0.1, w * 0.56, h * 0.5, 2.5, 2.8, PORC),
+        oval(0, 0.12, w * 0.4, h * 0.34, 2.56, 2.8, WATER),
+        cyl(0, -hh + 0.18, 0.12, 2.78, 3.2, CHROME),
+        box(0, -hh + 0.3, 0.08, 0.3, 3.1, 3.2, CHROME),
+      ];
+    case 'mirror':
+      // hangs on the wall above the sink; a door swings past it (2.13.85)
+      return [
+        box(0, 0, w, h, 3.6, 6.2, WOOD_DK),
+        box(0, h * 0.1, w * 0.86, h * 0.5, 3.75, 6.05, '#CFE3EE'),
+      ];
+    case 'counter':
+      return [
+        box(0, 0.06, w * 0.98, h * 0.92, 0.35, 2.92, WOOD_LT),
+        box(0, 0.1, w * 0.94, h * 0.84, 0, 0.35, WOOD_DK),
+        box(0, 0, w, h, 2.92, 3.08, '#B8B0A4'),
+        box(-w * 0.25, hh - 0.06, w * 0.3, 0.06, 2.5, 2.6, CHROME),
+        box(w * 0.25, hh - 0.06, w * 0.3, 0.06, 2.5, 2.6, CHROME),
+      ];
+    case 'microwave':
+      // sits on a counter: its bottom is at counter height (2.13.85)
+      return [
+        box(0, 0, w, h, 3.08, 4.05, STEEL_DK),
+        box(-w * 0.12, hh - 0.04, w * 0.62, 0.06, 3.2, 3.92, BLACK),
+        box(w * 0.36, hh - 0.04, w * 0.18, 0.06, 3.25, 3.9, STEEL),
+      ];
+    case 'tv':
+      // a low stand with a screen on top — a TV or a computer (2.13.85)
+      return [
+        box(0, 0, w, h, 0, 1.75, WOOD_DK),
+        box(0, h * 0.1, w * 0.9, h * 0.6, 0.15, 1.6, WOOD),
+        box(0, -hh * 0.2, w * 0.24, 0.3, 1.75, 2.0, IRON),
+        box(0, -hh * 0.2, w * 0.92, 0.12, 2.0, 3.85, BLACK),
+        box(0, -hh * 0.2 + 0.07, w * 0.84, 0.02, 2.1, 3.75, '#3E5A78'),
+      ];
     case 'painting':
       return [
         box(0, 0, w, h, 4.2, 6.4, WOOD_DK),
@@ -494,6 +535,16 @@ function furnitureSilhouette(item: FurnitureItem): FurnPart[] {
       return [cyl(0, 0, Math.max(w, h), 0, 9, '#F4F0E8')];
     case 'window-seat':
       return [box(0, 0, w, h, 0, 1.5, UPH)];
+    case 'bath-sink':
+      return [box(0, 0, w, h, 0, 2.62, WOOD_LT), oval(0, 0.1, w * 0.56, h * 0.5, 2.62, 2.8, PORC)];
+    case 'mirror':
+      return [box(0, 0, w, h, 3.6, 6.2, WOOD_DK)];
+    case 'counter':
+      return [box(0, 0, w, h, 0, 3.08, WOOD_LT)];
+    case 'microwave':
+      return [box(0, 0, w, h, 3.08, 4.05, STEEL_DK)];
+    case 'tv':
+      return [box(0, 0, w, h, 0, 1.75, WOOD_DK), box(0, -hh * 0.2, w * 0.92, 0.12, 2.0, 3.85, BLACK)];
     case 'painting':
       return [box(0, 0, w, h, 4.2, 6.3, WOOD_DK)];
     default: {

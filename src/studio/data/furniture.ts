@@ -35,6 +35,12 @@ export const FURNITURE_CATALOG: CatalogItem[] = [
   { id: 'column', name: 'Porch column', category: 'Entry', w: 0.8, h: 0.8, color: '#F4F0E8' },
   { id: 'window-seat', name: 'Window seat', category: 'Living', w: 6, h: 1.8, color: '#6E2E3A' },
   { id: 'painting', name: 'Painting', category: 'Living', w: 3, h: 0.3, color: '#C4A574' },
+  /* 2.13.85: the class worksheet checklist */
+  { id: 'bath-sink', name: 'Bathroom Sink', category: 'Bath', w: 2, h: 1.75, color: '#E8EEF2' },
+  { id: 'mirror', name: 'Mirror', category: 'Bath', w: 2, h: 0.2, color: '#CFE3EE' },
+  { id: 'counter', name: 'Counter', category: 'Kitchen', w: 4, h: 2, color: '#B8B0A4' },
+  { id: 'microwave', name: 'Microwave', category: 'Kitchen', w: 1.75, h: 1.25, color: '#6A7888' },
+  { id: 'tv', name: 'TV or Computer', category: 'Living', w: 3, h: 1.25, color: '#2A2A2E' },
 ];
 
 /** A piece still named like the catalog shows its name in the kid's language; a renamed piece keeps its own name. */

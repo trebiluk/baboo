@@ -47,9 +47,9 @@ export type AccessReport = {
   skip: number;
 };
 
-const KITCHEN_IDS = new Set(['fridge', 'stove', 'sink', 'dining-table']);
+const KITCHEN_IDS = new Set(['fridge', 'stove', 'sink', 'dining-table', 'counter', 'microwave']);
 /** Things on a wall or ceiling, or flat on the floor: a door swings past them (2.13.63). */
-export const NOT_IN_THE_WAY = new Set(['sconce', 'painting', 'chandelier', 'wainscot', 'rug', 'wall-paneling']);
+export const NOT_IN_THE_WAY = new Set(['sconce', 'painting', 'chandelier', 'wainscot', 'rug', 'wall-paneling', 'mirror', 'microwave']);
 
 function doorHinge(opening: Opening, walls: Wall[], nodes: Node[]): {
   hinge: Point;

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.155 -0.905 2.31 1.81" role="img" aria-label="Microwave">
+<rect x="-1.155" y="-0.905" width="2.31" height="1.81" fill="#ffffff"/>
+<rect x="-0.875" y="-0.625" width="1.75" height="1.25" rx="0.06" fill="#6A7888" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<rect x="-0.752" y="0.555" width="1.085" height="0.06" rx="0.06" fill="#2A2A2E" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<rect x="0.473" y="0.555" width="0.315" height="0.06" rx="0.06" fill="#9AA8B8" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+</svg>

@@ -23,3 +23,4 @@ Pick the next version here BEFORE opening a PR. Never reuse. `src/studio/version
 | 2.13.82 | 2026-11-05 | Tigrinya menu: What's new ≠ New | PR (this) | awaiting OK |
 | 2.13.83 | 2026-11-05 | Empty class tiny house (14 × 7 ft, 7 ft walls) + Contests and the Mansion section | PR (this) | awaiting OK |
 | 2.13.84 | 2026-11-06 | Windows and furniture at every help level | PR (this) | awaiting OK |
+| 2.13.85 | 2026-11-06 | Worksheet items: bathroom sink, mirror, counter, microwave, TV or computer | PR (this) | awaiting OK |
