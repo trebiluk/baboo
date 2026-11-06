@@ -22,4 +22,4 @@ Pick the next version here BEFORE opening a PR. Never reuse. `src/studio/version
 | 2.13.81 | 2026-11-05 | photo bar buttons on one line (ar/fa-AF phones) | PR (this) | awaiting OK |
 | 2.13.82 | 2026-11-05 | Tigrinya menu: What's new ≠ New | PR (this) | awaiting OK |
 | 2.13.83 | 2026-11-05 | Empty class tiny house (14 × 7 ft, 7 ft walls) + Contests and the Mansion section | PR (this) | awaiting OK |
-| 2.13.84 | — | next round (reserved by BABOOOOO) | — | reserved |
+| 2.13.84 | 2026-11-06 | Windows and furniture at every help level | PR (this) | awaiting OK |
