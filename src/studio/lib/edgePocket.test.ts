@@ -92,7 +92,7 @@ describe('2.13.88 readable bar labels, 2.13.87 auto-trace closed sketches, 2.13.
     for (const l of ['es', 'uk', 'ru', 'ar', 'fa-AF', 'ti'] as const) assert.notEqual(t(l, 'news.barWrap'), t('en', 'news.barWrap'), l);
     const css76 = readFileSync(join(studio, 'index.css'), 'utf8');
     const tile = css76.slice(css76.indexOf('.chrome-right .chrome-ico,\n  .chrome-right .chrome-more-btn {'));
-    assert.match(tile.slice(0, 600), /width: auto;[^}]*min-width: 68px;[^}]*max-width: 88px;/s, 'bar tiles grow for long words');
+    assert.match(tile.slice(0, 600), /width: auto;[^}]*min-width: 68px;[^}]*max-width: 100px;/s, 'bar tiles grow for long words (100px since 2.13.88)');
     const label = css76.slice(css76.indexOf('.chrome-ess .chrome-label {\n    display: block !important;'));
     assert.match(label.slice(0, 500), /white-space: normal;[^}]*max-height: 2\.2em;/s, 'bar labels wrap to two lines');
     assert.ok(!/display: block !important;[^}]*text-overflow: ellipsis/s.test(label.slice(0, 500)), 'no ellipsis on bar labels');
