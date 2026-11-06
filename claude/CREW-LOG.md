@@ -73,3 +73,9 @@ Did: merged #15 (2.13.80 Class section + postcard byline) and #16 (2.13.81 photo
 Ran: live — phone2 chip v2.13.81, errs 0; matrix 15/15; rb/classcard.mjs against live: Class section fills, postcard carries school · class · nickname.
 Open: none. Rounds stay hourly but lean: a round with nothing real to fix opens no PR and runs no build.
 For other lanes: none crossed.
+
+## 2026-11-06 16:20 ET · BABOOOOO
+Did: took over Ginger (Diego). Ginger 1.0.9 on apps-kulibert (PR #240): side panel scrolls in its own column, status line stays at the bottom, fits the real Hub bar height. Wrote claude/GINGER-REVIT-PLAN.md (9 steps, Baboo engine Pro mode, CTE) and logged Diego's choices in DECISIONS-DIGEST.
+Ran: Ginger layout via Playwright: side 1119 px in a 685 px area before → 685/685 after at 2060×826; 1366, 360 and ar fit; with a 90 px Hub bar Ginger starts at 90 with no page scroll; 0 page errors.
+Open: baboo #18 → #24 and apps-kulibert #240 await OK by number. Step 1 (Ginger shell G2.0.0) starts after this plan is OK'd.
+For other lanes: @Main-Guy the shared kulibert-bar CSS/JS pads every app with a fixed 48 px; a taller bar hides content (Ginger works around it). Step 9 of the Ginger plan needs the Hub's Ginger tile.
