@@ -97,3 +97,9 @@ Did: 2.13.86 — Height off floor for every furniture piece (Diego: microwave an
 Ran: tsc clean; strip-types 151/151; jiti 61/61; object-art 1/1; eslint back to the 7 old no-regex-spaces; rb/elev.mjs en 1366: microwave 3'-1" → typed 5' (floats like on a shelf) → On a counter → reload keeps it; ar 360: panel, label, 2 buttons 44 px, nothing clipped; 0 page errors.
 Open: #17–#22 await OK by number, merge in order #18 → #22.
 For other lanes: none.
+
+## 2026-11-06 10:22 ET · BABOOOOO
+Did: merged #17 (crew docs: log merges #15 and #16) on Diego's "ok 17" — green (Vercel success), clean; merge a473932.
+Ran: status check on #17 head dad12dd: combined=success, Vercel Preview Comments=success.
+Open: #18 → #22 await OK by number (stacked; #18 targets main and is clean).
+For other lanes: none.
