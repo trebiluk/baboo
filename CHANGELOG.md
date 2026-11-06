@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.88 — 2026-11-06 — Readable toolbar labels (12px, not 10px bold)
+- The words under the toolbar buttons are bigger and lighter, so they are easier to read.
+- Diego: the bold menu text needed to be more readable. The labels under the bar icons (Undo, Redo, 2D Plan, Dollhouse, 3D View, Export, Import, Settings, More) went from 10px weight 700 to 12px weight 500; tiles may grow to 100px; a very long word wraps instead of being cut (Налаштування was cut before this change). 11 languages × 1366/1100/915: 0 labels cut, 0 overflow.
+
 ## 2.13.87 — 2026-11-06 — Sketch: closed shapes trace themselves; the tracer tries harder
 - Sketch a closed shape and it turns into walls by itself (Undo keeps it a sketch). Tracing is smarter about wobbly, crooked or not-quite-closed drawings.
 - Diego: Sketch & Trace should auto-trace a closed shape, and it didn't try very hard. New closed-shape fitter: finds the loop (trims running past the start, bridges a small gap), starts at a real corner, fits one straight line per side (0/45/90, snapped to the grid), drops rounded corners and the closing gap, meets the lines at clean corners. Same 160-drawing sweep: old tracer 94/160 right (81 extra shaky), new 160/160 (157); 0/80 open strokes or scribbles auto-traced. Open strokes keep the old tracer. Hints and the new toast in every language; ti, fa-AF and rw UNCHECKED.

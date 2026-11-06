@@ -26,3 +26,4 @@ Pick the next version here BEFORE opening a PR. Never reuse. `src/studio/version
 | 2.13.85 | 2026-11-06 | Worksheet items: bathroom sink, mirror, counter, microwave, TV or computer | PR (this) | awaiting OK |
 | 2.13.86 | 2026-11-06 | Height off the floor for furniture (stack things) | PR (this) | awaiting OK |
 | 2.13.87 | 2026-11-06 | Sketch: closed shapes trace themselves; the tracer tries harder | PR (this) | awaiting OK |
+| 2.13.88 | 2026-11-06 | Readable toolbar labels (12px, not 10px bold) | PR (this) | awaiting OK |

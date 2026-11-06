@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.88',
+    date: '2026-11-06',
+    bullets: [
+      'The words under the toolbar buttons are bigger and lighter, so they are easier to read.',
+    ],
+  },
+  {
     version: '2.13.87',
     date: '2026-11-06',
     bullets: [
