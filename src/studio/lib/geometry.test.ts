@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { dist, fitWallsFromStroke, furnitureFingerPad, hitSketch, polylineLength, readableAngle, simplifyPolyline, parseFeet, hitWallGrip, nodesAfterWallLength, nodesAfterWallEnd } from './geometry.ts';
+import { closedLoopOf, dist, fitWallsFromStroke, furnitureFingerPad, hitSketch, polylineLength, readableAngle, simplifyPolyline, parseFeet, hitWallGrip, nodesAfterWallLength, nodesAfterWallEnd } from './geometry.ts';
 import type { Wall, Node } from '../types.ts';
 
 describe('sketch geometry', () => {
@@ -113,6 +113,69 @@ describe('fit walls from a wiggly sketch', () => {
   it('leaves a tiny scribble untraced', () => {
     const verts = fitWallsFromStroke([0, 0, 0.4, 0.3, 0.8, 0.1], opts);
     assert.equal(wallCount(verts), 0);
+  });
+});
+
+describe('closed sketches trace themselves, and the tracer tries harder (2.13.87)', () => {
+  const kid = (path: [number, number][], amp: number, seed: number): number[] => {
+    const out: number[] = [];
+    let k = 0;
+    for (let i = 0; i < path.length - 1; i++) {
+      const [x0, y0] = path[i];
+      const [x1, y1] = path[i + 1];
+      const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) / 0.15));
+      for (let j = 0; j < n; j++, k++) {
+        const t = j / n;
+        const jx = amp * (Math.sin(k * 0.37 + seed) * 0.6 + Math.sin(k * 0.11 + seed * 2.3) * 0.4);
+        const jy = amp * (Math.cos(k * 0.29 + seed * 1.7) * 0.6 + Math.cos(k * 0.07 + seed * 3.1) * 0.4);
+        out.push(x0 + (x1 - x0) * t + jx, y0 + (y1 - y0) * t + jy);
+      }
+    }
+    return out;
+  };
+  const rot = (p: [number, number][], deg: number): [number, number][] => {
+    const a = (deg * Math.PI) / 180;
+    return p.map(([x, y]) => [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)]);
+  };
+  const outline = (v: { x: number; y: number }[]) => {
+    const xs = v.map((p) => p.x);
+    const ys = v.map((p) => p.y);
+    return { walls: wallCount(v), closed: v.length > 3 && dist(v[0], v[v.length - 1]) < 0.01, w: Math.max(...xs) - Math.min(...xs), d: Math.max(...ys) - Math.min(...ys) };
+  };
+  const cases: [string, (s: number) => [number, number][], number, number, number, number][] = [
+    ['starts mid-wall and runs past the start', () => [[12, 0], [24, 0], [24, 16], [0, 16], [0, 0], [15, 0.4]], 0.5, 4, 24, 16],
+    ['leaves a gap at the last corner', () => [[0, 2.5], [0, 12], [20, 12], [20, 0], [2.5, 0]], 0.45, 4, 20, 12],
+    ['is drawn a little crooked', (s) => rot([[0, 0], [22, 0], [22, 14], [0, 14], [0, 0.2]], s % 2 ? 7 : -7), 0.45, 4, -1, -1],
+    ['is an L-shaped room', () => [[0, 0], [24, 0], [24, 9], [12, 9], [12, 18], [0, 18], [0, 0.3]], 0.45, 6, 24, 18],
+    ['is the 14 x 7 class tiny house', () => [[0, 0], [14, 0], [14, 7], [0, 7], [0, 0.2]], 0.3, 4, 14, 7],
+    ['is a 6 x 4 closet', () => [[0, 0], [6, 0], [6, 4], [0, 4], [0, 0.15]], 0.18, 4, 6, 4],
+    ['has real 45° walls', () => [[6, 0], [24, 0], [30, 6], [30, 14], [24, 20], [6, 20], [0, 14], [0, 6], [6, 0.2]], 0.4, 8, 30, 20],
+  ];
+  for (const [name, path, amp, walls, w, d] of cases) {
+    it(`a closed shape that ${name} → ${walls} clean walls, 20 different hands`, () => {
+      for (let seed = 1; seed <= 20; seed++) {
+        const flat = kid(path(seed), amp, seed);
+        assert.ok(closedLoopOf(flat), `seed ${seed}: not seen as closed`);
+        const o = outline(fitWallsFromStroke(flat, opts));
+        assert.ok(o.closed, `seed ${seed}: outline not closed`);
+        assert.equal(o.walls, walls, `seed ${seed}`);
+        if (w > 0) {
+          assert.ok(Math.abs(o.w - w) <= 1 && Math.abs(o.d - d) <= 1, `seed ${seed}: ${o.w} x ${o.d}`);
+        }
+      }
+    });
+  }
+  it('never auto-traces an open stroke or a scribble', () => {
+    const open: [number, number][][] = [
+      [[0, 0], [0, 16], [24, 16], [24, 0]],
+      [[0, 0], [0, 16], [24, 16]],
+      [[0, 0], [20, 0], [0, 0.8], [20, 1.2], [1, 1.5]],
+      [[0, 0], [20, 0]],
+    ];
+    for (const path of open) {
+      for (let seed = 1; seed <= 20; seed++) assert.equal(closedLoopOf(kid(path, 0.7, seed)), null, `${JSON.stringify(path)} seed ${seed}`);
+    }
+    assert.equal(closedLoopOf([0, 0, 0.5, 0.4, 0.9, 0, 0.1, 0.1]), null, 'a dot is not a room');
   });
 });
 

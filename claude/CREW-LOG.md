@@ -103,3 +103,9 @@ Did: merged #17 (crew docs: log merges #15 and #16) on Diego's "ok 17" — green
 Ran: status check on #17 head dad12dd: combined=success, Vercel Preview Comments=success.
 Open: #18 → #22 await OK by number (stacked; #18 targets main and is clean).
 For other lanes: none.
+
+## 2026-11-06 15:45 ET · BABOOOOO
+Did: 2.13.87 — Sketch: a closed shape traces itself into walls (one Undo keeps it a sketch); new closed-shape tracer (finds the loop, trims overshoot, bridges a small gap, starts at a real corner, one straight line per side, drops rounded corners and the closing gap). Hints + toast in every language. PR stacked on #22.
+Ran: tsc clean; strip-types 159/159 (geometry +8: 7 kid shapes × 20 hands, open strokes never auto-trace); jiti 61/61; object-art 1/1; eslint 0 new; sweep of 160 drawings: old tracer 94/160 right (81 extra shaky), new 160/160 (157), 0/80 open strokes auto-traced; browser: en 1366 mouse closed → 4 walls + toast, Undo → sketch, open L stays a sketch; ti 360 touch closed → 4 walls; 0 page errors.
+Open: #18 → #23 await OK by number, merge in order.
+For other lanes: none.

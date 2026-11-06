@@ -490,6 +490,238 @@ function maxDev(pts: Point[], a: number, b: number, from: Point, to: Point): num
   return maxD;
 }
 
+/* ---------- 2.13.87: closed sketches trace themselves, and the tracer tries harder ---------- */
+
+function loopArea(pts: Point[]): number {
+  let a = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i];
+    const q = pts[(i + 1) % pts.length];
+    a += p.x * q.y - q.x * p.y;
+  }
+  return Math.abs(a) / 2;
+}
+
+function resample(pts: Point[], step: number): Point[] {
+  if (pts.length < 2) return pts.slice();
+  const out: Point[] = [pts[0]];
+  let carry = 0;
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1];
+    const b = pts[i];
+    const L = dist(a, b);
+    let t = step - carry;
+    while (t <= L) {
+      out.push({ x: a.x + ((b.x - a.x) * t) / L, y: a.y + ((b.y - a.y) * t) / L });
+      t += step;
+    }
+    carry = L - (t - step);
+  }
+  return out;
+}
+
+/**
+ * Where a sketch closes on itself: the stroke comes back near where it started
+ * (a small gap, or running past the start). Returns the loop's points, start to the
+ * closing point, or null when the stroke is open or a back-and-forth scribble.
+ */
+export function closedLoopOf(flat: number[]): Point[] | null {
+  const raw = polylinePoints(flat);
+  if (raw.length < 6) return null;
+  const span = strokeSpan(raw);
+  if (span < 2.5) return null;
+  const pts = resample(raw, Math.max(0.1, span / 400));
+  if (pts.length < 12) return null;
+  const reach = Math.max(1.6, Math.min(5, span * 0.2));
+  const start = pts[0];
+  // the stroke must first get well away from the start…
+  let far = 0;
+  let farAt = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const d = dist(start, pts[i]);
+    if (d > far) { far = d; farAt = i; }
+  }
+  if (far < span * 0.45) return null;
+  // …then come back: the nearest approach after the far point closes the loop (trims overshoot)
+  let best = Infinity;
+  let bestAt = -1;
+  for (let i = farAt + 1; i < pts.length; i++) {
+    const d = dist(start, pts[i]);
+    if (d < best) { best = d; bestAt = i; }
+  }
+  if (bestAt < 0 || best > reach) return null;
+  const loop = pts.slice(0, bestAt + 1);
+  let len = 0;
+  for (let i = 1; i < loop.length; i++) len += dist(loop[i - 1], loop[i]);
+  len += dist(loop[loop.length - 1], loop[0]);
+  // a real room encloses space; a scribble back over itself does not
+  if (loopArea(loop) < Math.max(3, (len * len) * 0.025)) return null;
+  return loop;
+}
+
+function closedCorners(loop: Point[], eps: number): number[] {
+  const n = loop.length;
+  let cx = 0;
+  let cy = 0;
+  for (const p of loop) { cx += p.x; cy += p.y; }
+  cx /= n; cy /= n;
+  // start at the point farthest from the middle — always a corner, never mid-wall
+  let s0 = 0;
+  let dm = -1;
+  for (let i = 0; i < n; i++) {
+    const d = Math.hypot(loop[i].x - cx, loop[i].y - cy);
+    if (d > dm) { dm = d; s0 = i; }
+  }
+  let s1 = s0;
+  dm = -1;
+  for (let i = 0; i < n; i++) {
+    const d = dist(loop[s0], loop[i]);
+    if (d > dm) { dm = d; s1 = i; }
+  }
+  const keep = new Set<number>([s0, s1]);
+  const at = (k: number) => loop[((k % n) + n) % n];
+  const rec = (a: number, b: number) => {
+    let maxD = 0;
+    let idx = -1;
+    for (let k = a + 1; k < b; k++) {
+      const d = projectOnSegment(at(a), at(b), at(k)).d;
+      if (d > maxD) { maxD = d; idx = k; }
+    }
+    if (maxD > eps && idx >= 0) {
+      keep.add(((idx % n) + n) % n);
+      rec(a, idx);
+      rec(idx, b);
+    }
+  };
+  const lo = Math.min(s0, s1);
+  const hi = Math.max(s0, s1);
+  rec(lo, hi);
+  rec(hi, lo + n);
+  return [...keep].sort((a, b) => a - b);
+}
+
+type Line = { nx: number; ny: number; c: number; dir: number };
+
+function intersect(a: Line, b: Line): Point | null {
+  const det = a.nx * b.ny - a.ny * b.nx;
+  if (Math.abs(det) < 1e-6) return null;
+  return { x: (a.c * b.ny - b.c * a.ny) / det, y: (a.nx * b.c - b.nx * a.c) / det };
+}
+
+/**
+ * Fit a closed sketch as a closed outline: find the corners, give every side one
+ * straight line through all of its pencil points (0/45/90 when ortho, snapped to
+ * the grid), and meet the lines at clean corners. Returns corners with the first
+ * repeated at the end, or [] when it cannot make a sensible shape.
+ */
+export function fitClosedStroke(loop: Point[], opts: FitWallsOpts): Point[] {
+  const span = strokeSpan(loop);
+  const minLen = Math.max(1, Math.min(opts.minLen ?? 1.25, span * 0.12));
+  for (const frac of [0.06, 0.09, 0.045, 0.12]) {
+    const eps = Math.max(0.35, Math.min(3.2, span * frac));
+    const idx = closedCorners(loop, eps);
+    if (idx.length < 3) continue;
+    const n = loop.length;
+    // each side = its corner-to-corner points
+    let sides: { pts: Point[]; ang: number; len: number; gap: boolean }[] = [];
+    for (let k = 0; k < idx.length; k++) {
+      const a = idx[k];
+      const b = idx[(k + 1) % idx.length] + (k + 1 === idx.length ? n : 0);
+      const pts: Point[] = [];
+      // leave the rounded ends of each side out of the line fit
+      const trim = Math.floor((b - a) * 0.15);
+      for (let i = a + trim; i <= b - trim; i++) pts.push(loop[i % n]);
+      if (pts.length < 2) continue;
+      const p0 = loop[a % n];
+      const p1 = loop[b % n];
+      // mostly one jump with no pencil along it: the gap the kid left when closing the shape
+      let jump = 0;
+      for (let i = a + 1; i <= b; i++) jump = Math.max(jump, dist(loop[(i - 1) % n], loop[i % n]));
+      const len = dist(p0, p1);
+      sides.push({ pts, ang: Math.atan2(p1.y - p0.y, p1.x - p0.x), len, gap: jump > 0.8 && jump >= len * 0.6 });
+    }
+    const step = opts.ortho ? Math.PI / 4 : 0;
+    const snapAng = (ang: number) => {
+      const a = ((ang % Math.PI) + Math.PI) % Math.PI;
+      if (!step) return a;
+      // prefer square corners: diagonals only when the side is clearly diagonal
+      const toAxis = Math.min(Math.abs(a), Math.abs(a - Math.PI / 2), Math.abs(a - Math.PI));
+      if (toAxis <= Math.PI / 7) return Math.round(a / (Math.PI / 2)) * (Math.PI / 2) % Math.PI;
+      return Math.round(a / step) * step % Math.PI;
+    };
+    // a short side between two longer ones is a rounded corner or the closing gap, not a wall
+    if (step) {
+      const isDiag = (a: number) => Math.abs(snapAng(a) % (Math.PI / 2)) > 1e-6;
+      const m = sides.length;
+      const cut = sides.map((sd, k) => {
+        const near = Math.min(sides[(k - 1 + m) % m].len, sides[(k + 1) % m].len);
+        return sd.gap || sd.len < minLen || (isDiag(sd.ang) && sd.len < Math.min(5, near * 0.5));
+      });
+      if (m - cut.filter(Boolean).length >= 3) sides = sides.filter((_, k) => !cut[k]);
+    }
+    // merge neighbours that run the same way (a wobble mid-wall is not a corner)
+    let merged = true;
+    while (merged && sides.length > 3) {
+      merged = false;
+      for (let k = 0; k < sides.length; k++) {
+        const nx = (k + 1) % sides.length;
+        if (step && Math.abs(snapAng(sides[k].ang) - snapAng(sides[nx].ang)) < 1e-6) {
+          const pts = [...sides[k].pts, ...sides[nx].pts];
+          const ang = Math.atan2(pts[pts.length - 1].y - pts[0].y, pts[pts.length - 1].x - pts[0].x);
+          sides.splice(k, 2, { pts, ang, len: sides[k].len + sides[nx].len, gap: false });
+          if (nx === 0) sides.unshift(sides.pop()!);
+          merged = true;
+          break;
+        }
+      }
+    }
+    if (sides.length < 3) continue;
+    const lines: Line[] = sides.map((sd) => {
+      let ang: number;
+      if (step) {
+        ang = snapAng(sd.ang);
+      } else {
+        // free angle: least-squares direction of the side's points
+        let mx = 0; let my = 0;
+        for (const p of sd.pts) { mx += p.x; my += p.y; }
+        mx /= sd.pts.length; my /= sd.pts.length;
+        let sxx = 0; let sxy = 0; let syy = 0;
+        for (const p of sd.pts) { sxx += (p.x - mx) ** 2; sxy += (p.x - mx) * (p.y - my); syy += (p.y - my) ** 2; }
+        ang = 0.5 * Math.atan2(2 * sxy, sxx - syy);
+      }
+      const nx = -Math.sin(ang);
+      const ny = Math.cos(ang);
+      let c = 0;
+      for (const p of sd.pts) c += nx * p.x + ny * p.y;
+      c /= sd.pts.length;
+      const axis = Math.abs(nx) < 1e-6 || Math.abs(ny) < 1e-6;
+      if (opts.snap && axis) c = Math.round(c / opts.gridSize) * opts.gridSize;
+      return { nx, ny, c, dir: ang };
+    });
+    const corners: Point[] = [];
+    let bad = false;
+    for (let k = 0; k < lines.length; k++) {
+      const p = intersect(lines[(k - 1 + lines.length) % lines.length], lines[k]);
+      if (!p) { bad = true; break; }
+      corners.push(opts.snap && !step ? snapPoint(p, opts.gridSize, true) : p);
+    }
+    if (bad) continue;
+    // corners must stay near the drawing; sides must be wall-sized
+    let minX = Infinity; let minY = Infinity; let maxX = -Infinity; let maxY = -Infinity;
+    for (const p of loop) { minX = Math.min(minX, p.x); minY = Math.min(minY, p.y); maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y); }
+    const pad = Math.max(2, span * 0.15);
+    if (corners.some((p) => p.x < minX - pad || p.x > maxX + pad || p.y < minY - pad || p.y > maxY + pad)) continue;
+    const clean = collapseClose(corners, minLen * 0.5);
+    if (clean.length >= 2 && dist(clean[0], clean[clean.length - 1]) < minLen * 0.5) clean.pop();
+    if (clean.length < 3) continue;
+    const out = clean.map((p) => ({ x: Math.round(p.x * 1000) / 1000, y: Math.round(p.y * 1000) / 1000 }));
+    if (loopArea(out) < loopArea(loop) * 0.5) continue;
+    out.push({ x: out[0].x, y: out[0].y });
+    return out;
+  }
+  return [];
+}
+
 /**
  * Turn a wiggly pencil stroke into grid-snapped wall corners (0/45/90 when ortho).
  * Classroom sketches wander a few feet — we keep the long runs, not the wobble.
@@ -497,6 +729,12 @@ function maxDev(pts: Point[], a: number, b: number, from: Point, to: Point): num
 export function fitWallsFromStroke(flat: number[], opts: FitWallsOpts): Point[] {
   const raw = polylinePoints(flat);
   if (raw.length < 2) return [];
+  // 2.13.87: a closed sketch is fitted as one closed outline first
+  const loop = closedLoopOf(flat);
+  if (loop) {
+    const closed = fitClosedStroke(loop, opts);
+    if (closed.length >= 4) return closed;
+  }
   const span = strokeSpan(raw);
   if (span < 1.75) return [];
 
