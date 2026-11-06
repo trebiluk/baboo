@@ -79,3 +79,9 @@ Did: 2.13.83 — empty class Tiny House (14 × 7 ft, 7 ft walls, sized from the 
 Ran: tsc clean; strip-types 150/150; jiti 52/52; object-art 1/1; eslint 7 old no-regex-spaces (same 7 on base, 0 new); rb/tinyclass.mjs en 1366, ar 411, ti 411 + rb/newplan.mjs ar/fa-AF 411 — 2 sections, 0 cards < 44 px, 0 overflow, 0 page errors; picked by keyboard → 14' × 7' empty box.
 Open: 1 square = 1 ft assumed (sheet prints no scale); the novice job line still says "16 by 24 box" on this plan; #17, #18, this PR await OK by number.
 For other lanes: none.
+
+## 2026-11-06 09:05 ET · BABOOOOO
+Did: 2.13.84 — Window and Furniture tools at every help level (Diego: "libraries of items available for all users, keep the directions simple"); level help text in every language. Found by sweeping the class Tiny House (PR #19): Novice kids could not add the worksheet's windows or furniture. PR stacked on #19.
+Ran: tsc clean; strip-types 150/150; jiti 57/57 (now incl. skill.test 5); sweep of #19 = 11 languages × 1366×768 and 360×740, 22/22 clean (2 sections, 0 overflow, plan/dollhouse/3D draw, survives reload, 0 page errors); rb/novice.mjs en/ar 1366, en/ti 360: Novice rail 9 buttons, 0 under 44 px, 0 off screen, furniture list 32 cards; rb/novwin.mjs placed a window and a door at Novice.
+Open: #17, #18, #19, this PR await OK by number; 2.13.85 (5 worksheet items) next.
+For other lanes: none.

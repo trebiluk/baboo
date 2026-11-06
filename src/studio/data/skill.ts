@@ -13,19 +13,19 @@ export const SKILL_LEVELS: {
     id: 'novice',
     label: 'Novice',
     blurb: 'First time — we go slow',
-    help: 'Extra tips. Sketch, walls, doors, and pan.',
+    help: 'Extra tips. Walls, doors, windows, and furniture.',
   },
   {
     id: 'beginner',
     label: 'Beginner',
     blurb: 'Learning — extra hints',
-    help: 'Adds windows, room names, and size labels, with a next-step coach.',
+    help: 'Adds room names and size labels, with a next-step coach.',
   },
   {
     id: 'moderate',
     label: 'Moderate',
     blurb: 'Rolling — full toolkit',
-    help: 'Furniture and plants plus the usual tools. Tips stay quiet.',
+    help: 'Adds plants. Tips stay quiet.',
   },
   {
     id: 'expert',
@@ -52,11 +52,12 @@ const TOOL_MIN_RANK: Record<Tool, number> = {
   box: 1,
   door: 0,
   pan: 0,
-  window: 1,
+  // 2.13.84 (Diego): the item libraries — windows and furniture — are open at every level; the tips stay simple.
+  window: 0,
   room: 1,
   dim: 1,
   note: 1,
-  furniture: 2,
+  furniture: 0,
   plant: 2,
 };
 

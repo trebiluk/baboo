@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.84',
+    date: '2026-11-06',
+    bullets: [
+      'Windows and furniture work at every help level, even Novice. The tips stay simple.',
+    ],
+  },
+  {
     version: '2.13.83',
     date: '2026-11-05',
     bullets: [

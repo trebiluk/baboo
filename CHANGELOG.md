@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.84 — 2026-11-06 — Windows and furniture at every help level
+- Windows and furniture work at every help level, even Novice. The tips stay simple.
+- Diego: the item libraries are for everyone; keep the directions simple. Window and Furniture tools now unlock at Novice (were Beginner and Moderate). Plants unchanged (parked). Level help text updated in every language; ti, fa-AF and rw UNCHECKED. Found by the class Tiny House sweep: the worksheet needs 2 windows and furniture, which a Novice kid could not add.
+
 ## 2.13.83 — 2026-11-05 — the class tiny house
 - New plan has an empty Tiny House, 14 ft by 7 ft with 7 ft walls, the same size as the class worksheet. Contests and the Mansion now have their own section.
 - Sized from the "Rough Draft: Blueprints" worksheet net (floor 7 × 14 squares, walls 7 squares tall; 1 square = 1 ft assumed — the sheet prints no scale). No door, windows, furniture, yard or roof: kids add the checklist. The Tiny Home contest, Dog House and the Mansion moved under "Contests and the Mansion". Strings in every language; ti, fa-AF and rw UNCHECKED.
