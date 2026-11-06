@@ -85,3 +85,9 @@ Did: 2.13.84 — Window and Furniture tools at every help level (Diego: "librari
 Ran: tsc clean; strip-types 150/150; jiti 57/57 (now incl. skill.test 5); sweep of #19 = 11 languages × 1366×768 and 360×740, 22/22 clean (2 sections, 0 overflow, plan/dollhouse/3D draw, survives reload, 0 page errors); rb/novice.mjs en/ar 1366, en/ti 360: Novice rail 9 buttons, 0 under 44 px, 0 off screen, furniture list 32 cards; rb/novwin.mjs placed a window and a door at Novice.
 Open: #17, #18, #19, this PR await OK by number; 2.13.85 (5 worksheet items) next.
 For other lanes: none.
+
+## 2026-11-06 09:10 ET · BABOOOOO
+Did: 2.13.85 — 5 worksheet items Baboo lacked: bathroom sink, mirror, counter, microwave, TV or computer (catalog, 3D parts, plan pictures, names in every language; mirror/microwave not "in a door's way"). Diego chose "add all 5". PR stacked on 2.13.84.
+Ran: tsc clean; strip-types 150/150; jiti 57/57; object-art 1/1 (37 pictures, 32 old ones unchanged); eslint 0 new (1 old unused-var warning in furnShape); rb/items85.mjs: furniture list 37 cards en + ar, 0 broken pictures, 0 under 44 px; all 5 placed in the class Tiny House at Novice and drawn in plan, dollhouse and 3D, 0 page errors.
+Open: #17–#21 await OK by number, merge in order (#18 → #19 → #20 → #21 retarget to main as each lands). Microwave floats at counter height if dropped on the floor.
+For other lanes: none.

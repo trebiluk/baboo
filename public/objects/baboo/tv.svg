@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.78 -0.905 3.56 1.81" role="img" aria-label="TV or Computer">
+<rect x="-1.78" y="-0.905" width="3.56" height="1.81" fill="#ffffff"/>
+<rect x="-1.5" y="-0.625" width="3" height="1.25" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-1.35" y="-0.25" width="2.7" height="0.75" rx="0.06" fill="#8B6914" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-0.36" y="-0.275" width="0.72" height="0.3" rx="0.06" fill="#3A3A40" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<rect x="-1.38" y="-0.185" width="2.76" height="0.12" rx="0.06" fill="#2A2A2E" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<rect x="-1.26" y="-0.065" width="2.52" height="0.02" rx="0.06" fill="#3E5A78" stroke="#2a2e34" stroke-width="0.05"/>
+</svg>

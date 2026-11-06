@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.28 -1.155 2.56 2.31" role="img" aria-label="Bathroom Sink">
+<rect x="-1.28" y="-1.155" width="2.56" height="2.31" fill="#ffffff"/>
+<rect x="-0.94" y="-0.737" width="1.88" height="1.575" rx="0.06" fill="#C4A074" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-0.9" y="0.705" width="1.8" height="0.06" rx="0.06" fill="#5C4030" stroke="#2a2e34" stroke-width="0.05" data-tex="wood"/>
+<rect x="-1" y="-0.875" width="2" height="1.75" rx="0.06" fill="#EEF2F6" stroke="#2a2e34" stroke-width="0.05" data-tex="ceramic"/>
+<ellipse cx="0" cy="0.1" rx="0.56" ry="0.438" fill="#E8EEF2" stroke="#2a2e34" stroke-width="0.05" data-tex="ceramic"/>
+<ellipse cx="0" cy="0.12" rx="0.4" ry="0.298" fill="#7EB3D4" stroke="#2a2e34" stroke-width="0.05" data-tex="glass"/>
+<ellipse cx="0" cy="-0.695" rx="0.06" ry="0.06" fill="#D0D8E0" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+<rect x="-0.04" y="-0.725" width="0.08" height="0.3" rx="0.06" fill="#D0D8E0" stroke="#2a2e34" stroke-width="0.05" data-tex="metal"/>
+</svg>

@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.85 — 2026-11-06 — Worksheet items: bathroom sink, mirror, counter, microwave, TV or computer
+- New furniture from the class worksheet: bathroom sink, mirror, counter, microwave, and TV or computer.
+- The class Tiny House worksheet checklist had 5 items Baboo did not: each now has a plan picture, a 3D shape and a name in every language (ti, fa-AF and rw UNCHECKED). The mirror hangs on the wall and the microwave sits at counter height, so neither counts as in a door's way.
+
 ## 2.13.84 — 2026-11-06 — Windows and furniture at every help level
 - Windows and furniture work at every help level, even Novice. The tips stay simple.
 - Diego: the item libraries are for everyone; keep the directions simple. Window and Furniture tools now unlock at Novice (were Beginner and Moderate). Plants unchanged (parked). Level help text updated in every language; ti, fa-AF and rw UNCHECKED. Found by the class Tiny House sweep: the worksheet needs 2 windows and furniture, which a Novice kid could not add.
