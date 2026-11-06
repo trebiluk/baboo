@@ -9,6 +9,7 @@ import { Icon } from '../icons';
 import { TEXTURE_PACKS } from '../data/textures';
 import { FLOOR_FINISHES, asFloorFinish } from '../data/flooring';
 import { FURN_PAINTS, samePaint } from '../data/furnPaint';
+import { elevForHeight, furnHeightOffFloor } from '../lib/furnShape';
 import { ModelPeek } from './ModelPeek';
 import { WALL_PAINTS, WALL_SKINS, faceLookup, storedFace, wallFaces, withFace } from '../lib/finishes';
 
@@ -30,6 +31,9 @@ const WIN_WIDTHS = [
 function near(a: number, b: number) {
   return Math.abs(a - b) < 0.04;
 }
+
+/** Top of the Counter piece, so "On a counter" lines up with it (2.13.86). */
+const COUNTER_TOP_FT = 3.08;
 
 function FeetField({
   label, feet, units, onCommit, allowZero = false,
@@ -430,6 +434,12 @@ export function ObjectMenu() {
             </div>
             <div className="object-menu-grid">
               <DegField label={t(locale, 'obj.angle')} rad={f.rot || 0} onCommit={(n) => patchFurniture(f.id, { rot: n })} />
+              {/* 2.13.86: stack things — a microwave on a counter or shelf, a TV on a desk, a loft bed */}
+              <FeetField label={t(locale, 'obj.elev')} feet={furnHeightOffFloor(f)} units={units} allowZero onCommit={(n) => patchFurniture(f.id, { elev: elevForHeight(f, n) })} />
+            </div>
+            <div className="object-menu-row" role="group" aria-label={t(locale, 'obj.elev')}>
+              <button type="button" className="object-chip aw-pressable" aria-pressed={Math.abs(furnHeightOffFloor(f)) < 0.05} onClick={() => patchFurniture(f.id, { elev: elevForHeight(f, 0) })}>{t(locale, 'obj.onFloor')}</button>
+              <button type="button" className="object-chip aw-pressable" aria-pressed={Math.abs(furnHeightOffFloor(f) - COUNTER_TOP_FT) < 0.05} onClick={() => patchFurniture(f.id, { elev: elevForHeight(f, COUNTER_TOP_FT) })}>{t(locale, 'obj.onCounter')}</button>
             </div>
             <div className="object-menu-row">
               <button type="button" className="object-chip aw-pressable" onClick={() => rotateSelected(1)}><Icon name="rotate" /> {t(locale, 'obj.rotate')}</button>

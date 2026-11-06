@@ -111,6 +111,8 @@ export interface FurnitureItem {
   label: string;
   /** Optional paint hex. Natural catalog colors when omitted. */
   color?: string | null;
+  /** Feet moved up (or down) from where the piece normally sits — a microwave on a shelf, a loft bed over a desk (2.13.86). */
+  elev?: number;
 }
 
 /** Two-click size string that stays on the plan. */

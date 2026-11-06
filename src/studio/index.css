@@ -5725,3 +5725,9 @@ body.aw-photo .doll-proj, body.aw-photo .canvas-hint, body.aw-photo .plan-sheet 
 .template-scroll .template-grid { max-height: none; overflow: visible; margin: 0; }
 .template-section-head { font-size: 14px; font-weight: 600; margin: 18px 0 8px; color: var(--aw-fg); }
 @media (max-width: 720px) { .template-scroll { max-height: min(50vh, 360px); } }
+
+/* 2.13.86: item panel buttons and boxes are 44 px on Chromebooks too; the chosen height says so with a check, not colour alone */
+.object-chip { min-height: 44px; }
+.object-menu-field input, .object-menu-field select { min-height: 44px; }
+.object-chip[aria-pressed="true"] { background: var(--aw-royal); border-color: var(--aw-royal); color: var(--aw-on-accent); }
+.object-chip[aria-pressed="true"]::before { content: "✓"; }

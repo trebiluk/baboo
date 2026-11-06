@@ -36,6 +36,7 @@ import { asFloorFinish, asFloorGrain, floorFinish, floorTileCanvas } from '../da
 import { DEFAULT_GUI_THEME } from '../data/themes';
 import { DEFAULT_SKILL_LEVEL, planIsClosed, skillRank } from '../data/skill';
 import { furnitureLod } from '../lib/perf';
+import { furnHeightOffFloor } from '../lib/furnShape';
 import { useCanvasToolsPocket } from '../hooks/useCanvasToolsPocket';
 
 function zoomPlan(dir: 1 | -1) {
@@ -819,7 +820,8 @@ export function PlanCanvas() {
             />
           ))}
 
-          {floor.layers.furniture && floor.furniture.map((f) => (
+          {/* higher pieces draw on top: the microwave over the counter (2.13.86) */}
+          {floor.layers.furniture && [...floor.furniture].sort((a, b) => furnHeightOffFloor(a) - furnHeightOffFloor(b)).map((f) => (
             <FurnitureMark
               key={f.id}
               item={f}

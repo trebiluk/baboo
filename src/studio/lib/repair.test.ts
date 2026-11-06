@@ -81,3 +81,20 @@ describe('repairFloor (2.13.49)', () => {
     assert.equal(out.walls[0].b, 'b');
   });
 });
+
+describe('height off the floor survives a reload (2.13.86)', () => {
+  it('keeps a lift, caps a wild one, drops junk', () => {
+    const f = structuredClone(good) as typeof good & { furniture: Record<string, unknown>[] };
+    f.furniture = [
+      { ...good.furniture[0], id: 'k', elev: 4.5 },
+      { ...good.furniture[0], id: 'w', elev: 900 },
+      { ...good.furniture[0], id: 'j', elev: 'up' },
+    ];
+    const out = repairFloor(f);
+    const by = Object.fromEntries(out.furniture.map((i) => [i.id, i.elev]));
+    assert.equal(by.k, 4.5);
+    assert.equal(by.w, 20);
+    assert.equal(by.j, undefined);
+  });
+});
+

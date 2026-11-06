@@ -81,6 +81,19 @@ describe('access checker', () => {
     assert.equal(r.checks.find((c) => c.id === 'swing')?.status, 'fail');
   });
 
+  it('a piece lifted above the door head is not in its swing (2.13.86)', () => {
+    const f = boxFloor(12, 10);
+    f.openings.push({
+      id: 'd1', wallId: 'w1', t: 0.5, width: 3, type: 'door', symbolKind: 'swingDoor', swing: 'left',
+    });
+    f.furniture.push({
+      id: 's1', catalogId: 'storage-shelf', x: 6, y: 1.4, w: 3, h: 1.5, rot: 0, zIndex: 1, label: 'Shelf', elev: 7,
+    });
+    assert.equal(runAccessCheck(f).checks.find((c) => c.id === 'swing')?.status, 'pass');
+    f.furniture[0].elev = 2;
+    assert.equal(runAccessCheck(f).checks.find((c) => c.id === 'swing')?.status, 'fail');
+  });
+
   it('flags a tight hall between parallel walls', () => {
     const f = boxFloor(20, 12);
     f.nodes.push({ id: 'e', x: 8, y: 0 }, { id: 'f', x: 8, y: 12 });

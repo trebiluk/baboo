@@ -91,3 +91,9 @@ Did: 2.13.85 — 5 worksheet items Baboo lacked: bathroom sink, mirror, counter,
 Ran: tsc clean; strip-types 150/150; jiti 57/57; object-art 1/1 (37 pictures, 32 old ones unchanged); eslint 0 new (1 old unused-var warning in furnShape); rb/items85.mjs: furniture list 37 cards en + ar, 0 broken pictures, 0 under 44 px; all 5 placed in the class Tiny House at Novice and drawn in plan, dollhouse and 3D, 0 page errors.
 Open: #17–#21 await OK by number, merge in order (#18 → #19 → #20 → #21 retarget to main as each lands). Microwave floats at counter height if dropped on the floor.
 For other lanes: none.
+
+## 2026-11-06 10:20 ET · BABOOOOO
+Did: 2.13.86 — Height off floor for every furniture piece (Diego: microwave and anything above/below another item needs an elevation): item panel field + On the floor / On a counter buttons; plan, dollhouse, 3D lift the piece; higher pieces draw on top; lifted above the door head = not in the swing; saved as optional elev, capped on load. Item panel buttons/boxes now 44 px on Chromebooks. Also fixed 3 no-regex-spaces errors my 2.13.84 pins added. PR stacked on #21.
+Ran: tsc clean; strip-types 151/151; jiti 61/61; object-art 1/1; eslint back to the 7 old no-regex-spaces; rb/elev.mjs en 1366: microwave 3'-1" → typed 5' (floats like on a shelf) → On a counter → reload keeps it; ar 360: panel, label, 2 buttons 44 px, nothing clipped; 0 page errors.
+Open: #17–#22 await OK by number, merge in order #18 → #22.
+For other lanes: none.
