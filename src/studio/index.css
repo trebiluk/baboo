@@ -5733,3 +5733,47 @@ body.aw-photo .doll-proj, body.aw-photo .canvas-hint, body.aw-photo .plan-sheet 
 .object-menu-field input, .object-menu-field select { min-height: 44px; }
 .object-chip[aria-pressed="true"] { background: var(--aw-royal); border-color: var(--aw-royal); color: var(--aw-on-accent); }
 .object-chip[aria-pressed="true"]::before { content: "✓"; }
+
+/* 2.13.90: phone chrome turns on for touch screens up to 1099px (a phone on "Desktop site", big tablets),
+   but these hides only ran to 914px — both button sets showed and Undo fell off the edge. Tie them to phone mode. */
+@media (min-width: 915px) {
+  .app-shell.is-phone .chrome-right .chrome-ico,
+  .app-shell.is-phone .chrome-right .chrome-view,
+  .app-shell.is-phone .chrome-right .chrome-more {
+    display: none !important;
+  }
+
+  .app-shell.is-phone .chrome-right > .save-export {
+    display: inline-flex !important;
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+    order: 0;
+  }
+  .app-shell.is-phone .chrome-right > .save-export > .chrome-ess {
+    display: inline-flex !important;
+    flex: 0 0 auto;
+    flex-direction: row;
+    width: auto;
+    min-width: 44px;
+    max-width: none;
+    height: 44px;
+    padding: 0 10px;
+    gap: 4px;
+  }
+  .app-shell.is-phone .chrome-right > .save-export > .chrome-ess .chrome-label {
+    display: inline !important;
+    width: auto;
+    max-width: none;
+    font-size: 13px;
+    line-height: 1;
+    text-align: start;
+  }
+  .app-shell.is-phone .chrome-right > .save-export > .save-status.save-chip {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+  }
+}

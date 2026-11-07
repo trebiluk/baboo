@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.90 — 2026-11-06 — Touch screens 915–1099px: one set of view buttons, Undo on screen; Desktop-site tip
+- On a phone set to Desktop site or a big touch tablet, the bar shows one set of view buttons and Undo stays on screen. A phone on Desktop site gets a tip on how to turn it off.
+- Diego's phone screenshot (live 2.13.81): phone chrome turns on for touch screens up to 1099px, but the rules that hide the desktop buttons stopped at 914px, so 2D Plan / Dollhouse / 3D View showed twice and Undo fell off the left edge. The same hides now follow phone mode from 915px up (phones under 915px unchanged). A page cannot turn off Chrome's Desktop site, so a phone-sized touch screen drawn 900px+ wide gets a one-time tip (Chrome ⋮ → Desktop site).
+
 ## 2.13.89 — 2026-11-06 — Installed app: named Baboo, light colours, real app icons
 - Installed on a phone or Chromebook, Baboo is now named Baboo, opens light (not black), and installs as a real app instead of a browser shortcut.
 - Diego: the app version stuck in dark mode and desktop-site mode. The builder's manifest named the app "Grok App", painted the splash, theme and status bar black, and had only a 180 px icon, so Chrome made a browser shortcut (which keeps the tab's Desktop site setting) instead of an app. Now: name Baboo, #FFFFFF background/theme, light status bar, 192/512 and maskable 512 icons from the Baboo favicon. Re-install once to pick it up.

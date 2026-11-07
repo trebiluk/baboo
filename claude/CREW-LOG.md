@@ -121,3 +121,9 @@ Did: 2.13.89 — installed app was the builder's "Grok App" manifest (black spla
 Ran: tsc clean; strip-types 159/159; jiti 61/61; object-art 1/1; grok-pwa tests 40 pass / 8 fail (the same 8 fail on the base branch; new installed-app test passes); Chrome CDP on the local build: 0 installability errors, manifest name Baboo, theme #FFFFFF, status bar default, 412 px phone layout. Live (2.13.81): name Grok App, status bar black.
 Open: #18 → #26 await OK by number; Ginger #240 (apps-kulibert), plan #25.
 For other lanes: @Main-Guy the Tech Room app manifest is dark (#050814) by design; anything opened inside the installed Tech Room window gets a dark title bar. If Diego's "stuck in dark mode" was the Tech Room app, that's the Hub's call.
+
+## 2026-11-06 21:20 ET · BABOOOOO
+Did: 2.13.90 — from Diego's phone screenshot: touch screens 915–1099px (a phone on Chrome "Desktop site", big tablets) showed both view-button sets and pushed Undo off screen; phone-mode hides now apply from 915px up (under 915 unchanged). A phone on Desktop site gets a one-time tip to turn it off (a page cannot). PR stacked on #26.
+Ran: tsc clean; strip-types 159/159; jiti 61/61; new desktopSite.test 1/1 (5 cases); rb: touch 980/1024/1099 → 3 view buttons, 0 off screen (live 2.13.81 at 980: 6 buttons, Undo off); phones 412/800/900 and desktops 1024/1366 unchanged; tip shows on a 412px-screen phone drawn 980 wide (en, ar), once per session, not on a normal phone or tablet; 0 page errors.
+Open: #18 → #27 await OK by number. Live is still 2.13.81 — none of this reaches kids until the chain merges.
+For other lanes: none.
