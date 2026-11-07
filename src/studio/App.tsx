@@ -24,7 +24,8 @@ import { ObjectMenu } from './components/ObjectMenu';
 import { usePhoneChrome } from './hooks/usePhoneChrome';
 import { useProjectStore } from './store/useProjectStore';
 import { applyGuiTheme, DEFAULT_GUI_THEME } from './data/themes';
-import { applyDocumentLocale, asLocale, localeOption, readHubLocale, tipLoc } from './data/i18n';
+import { applyDocumentLocale, asLocale, localeOption, readHubLocale, t, tipLoc } from './data/i18n';
+import { looksLikeDesktopSiteOnPhone } from './hooks/usePhoneChrome';
 
 export default function App() {
   const init = useProjectStore((s) => s.init);
@@ -100,6 +101,23 @@ export default function App() {
   useEffect(() => {
     applyGuiTheme(guiTheme ?? DEFAULT_GUI_THEME);
   }, [guiTheme]);
+
+  // 2.13.90: a phone on Chrome's "Desktop site" draws Baboo 980px wide and tiny. A page
+  // cannot turn that off, so say once how to (Chrome ⋮ → Desktop site).
+  useEffect(() => {
+    if (!looksLikeDesktopSiteOnPhone()) return;
+    try {
+      if (sessionStorage.getItem('baboo-desktop-site-tip') === '1') return;
+      sessionStorage.setItem('baboo-desktop-site-tip', '1');
+    } catch {
+      /* private mode: show it anyway */
+    }
+    const id = window.setTimeout(() => {
+      const st = useProjectStore.getState();
+      st.showToast(t(st.doc.settings.locale, 'toast.desktopSite'), 12000, 'info');
+    }, 1500);
+    return () => window.clearTimeout(id);
+  }, []);
 
   useEffect(() => {
     applyDocumentLocale(tipsLocale);

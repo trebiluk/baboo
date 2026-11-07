@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.90',
+    date: '2026-11-06',
+    bullets: [
+      'On a phone set to Desktop site or a big touch tablet, the bar shows one set of view buttons and Undo stays on screen. A phone on Desktop site gets a tip on how to turn it off.',
+    ],
+  },
+  {
     version: '2.13.89',
     date: '2026-11-06',
     bullets: [

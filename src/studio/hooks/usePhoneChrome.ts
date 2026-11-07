@@ -32,3 +32,15 @@ export function usePhoneChrome(): boolean {
   }, []);
   return phone;
 }
+
+/**
+ * 2.13.90: a phone showing Chrome's "Desktop site": a touch screen whose own width is
+ * phone-sized, drawn into a page 900px or wider.
+ */
+export function looksLikeDesktopSiteOnPhone(
+  w: { innerWidth: number; screen: { width: number; height: number }; matchMedia: (q: string) => { matches: boolean } } = window,
+): boolean {
+  const coarse = w.matchMedia('(pointer: coarse)').matches || w.matchMedia('(hover: none)').matches;
+  const short = Math.min(w.screen.width, w.screen.height);
+  return coarse && short > 0 && short <= 600 && w.innerWidth >= 900;
+}

@@ -28,3 +28,4 @@ Pick the next version here BEFORE opening a PR. Never reuse. `src/studio/version
 | 2.13.87 | 2026-11-06 | Sketch: closed shapes trace themselves; the tracer tries harder | PR (this) | awaiting OK |
 | 2.13.88 | 2026-11-06 | Readable toolbar labels (12px, not 10px bold) | PR (this) | awaiting OK |
 | 2.13.89 | 2026-11-06 | Installed app: named Baboo, light colours, real app icons | PR (this) | awaiting OK |
+| 2.13.90 | 2026-11-06 | Touch screens 915–1099px: one set of view buttons, Undo on screen; Desktop-site tip | PR (this) | awaiting OK |
