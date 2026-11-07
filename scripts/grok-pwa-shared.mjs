@@ -7,6 +7,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 export const DEFAULT_APP_NAME = "Grok App";
+/** 2.13.89: the name on a phone or Chromebook home screen when the host has no grok.me slug. */
+export const INSTALLED_APP_NAME = "Baboo";
 export const OG_SERVICE_URL_DEFAULT = "https://og.grok.me";
 export const OG_SITE_REL_PATH = "src/lib/og/site.json";
 
@@ -158,7 +160,8 @@ export function renderInstallPageHtml(template, { host, url } = {}) {
 }
 
 export function renderWebManifest(hostHeader) {
-  const name = appNameFromHost(hostHeader);
+  const fromHost = appNameFromHost(hostHeader);
+  const name = fromHost === DEFAULT_APP_NAME ? INSTALLED_APP_NAME : fromHost;
   return JSON.stringify(
     {
       name,
@@ -166,15 +169,18 @@ export function renderWebManifest(hostHeader) {
       id: "/",
       start_url: "/",
       scope: "/",
+      // 2.13.89: Baboo is a light app. Black colours made the installed app look stuck
+      // in dark mode, and with no 192/512 icons Chrome made a browser shortcut instead of an app.
+      description: "Classroom floor-plan studio",
       display: "standalone",
-      background_color: "#000000",
-      theme_color: "#000000",
+      orientation: "any",
+      background_color: "#FFFFFF",
+      theme_color: "#FFFFFF",
       icons: [
-        {
-          src: "/__grok/icon-180.png",
-          sizes: "180x180",
-          type: "image/png",
-        },
+        { src: "/__grok/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+        { src: "/__grok/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+        { src: "/__grok/icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+        { src: "/__grok/icon-180.png", sizes: "180x180", type: "image/png" },
       ],
     },
     null,
@@ -194,9 +200,9 @@ export function grokPwaHeadTags(appName = DEFAULT_APP_NAME) {
     ],
     [
       "apple-mobile-web-app-status-bar-style",
-      '<meta name="apple-mobile-web-app-status-bar-style" content="black">',
+      '<meta name="apple-mobile-web-app-status-bar-style" content="default">',
     ],
-    ["theme-color", '<meta name="theme-color" content="#000000">'],
+    ["theme-color", '<meta name="theme-color" content="#FFFFFF">'],
   ];
 }
 

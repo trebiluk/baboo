@@ -13,6 +13,7 @@ import {
   isInstallQuery,
   publicAppHost,
   renderWebManifest,
+  grokPwaHeadTags,
   resolveOgCardAsset,
   snapshotOgIdentity,
   stripInstallParams,
@@ -477,7 +478,25 @@ test("renders the manifest with the per-app name", () => {
   const manifest = JSON.parse(renderWebManifest("wild-race.grok.me"));
   assert.equal(manifest.name, "Wild Race");
   assert.equal(manifest.short_name, "Wild Race");
-  assert.equal(manifest.icons[0].src, "/__grok/icon-180.png");
+  assert.ok(manifest.icons.some((i) => i.src === "/__grok/icon-180.png"));
+});
+
+test("2.13.89: Baboo installs as a light app named Baboo, with 192 and 512 icons", () => {
+  for (const host of ["baboo.kulibert.net", "localhost:3000"]) {
+    const m = JSON.parse(renderWebManifest(host));
+    assert.equal(m.name, "Baboo");
+    assert.equal(m.short_name, "Baboo");
+    assert.equal(m.display, "standalone");
+    assert.equal(m.background_color, "#FFFFFF");
+    assert.equal(m.theme_color, "#FFFFFF");
+    for (const size of ["192x192", "512x512"]) assert.ok(m.icons.some((i) => i.sizes === size && i.purpose === "any"), size);
+    assert.ok(m.icons.some((i) => i.purpose === "maskable"));
+    for (const i of m.icons) readFileSync(join(TEMPLATE_ROOT, "public", i.src));
+  }
+  const tags = grokPwaHeadTags("Baboo").map(([, tag]) => tag).join("");
+  assert.match(tags, /status-bar-style" content="default"/);
+  assert.match(tags, /theme-color" content="#FFFFFF"/);
+  assert.doesNotMatch(tags, /#000000|content="black"/);
 });
 
 // Tripwires: the deployed-app path only works if Nitro scans server/ — an

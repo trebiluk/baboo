@@ -3,6 +3,10 @@
 App version matches `src/studio/version.ts` (`APP_VERSION`). Newest first.
 In-app notes live in `src/studio/data/changelog.ts`. Student product = **Baboo**; files stay `.archworks.json`.
 
+## 2.13.89 — 2026-11-06 — Installed app: named Baboo, light colours, real app icons
+- Installed on a phone or Chromebook, Baboo is now named Baboo, opens light (not black), and installs as a real app instead of a browser shortcut.
+- Diego: the app version stuck in dark mode and desktop-site mode. The builder's manifest named the app "Grok App", painted the splash, theme and status bar black, and had only a 180 px icon, so Chrome made a browser shortcut (which keeps the tab's Desktop site setting) instead of an app. Now: name Baboo, #FFFFFF background/theme, light status bar, 192/512 and maskable 512 icons from the Baboo favicon. Re-install once to pick it up.
+
 ## 2.13.88 — 2026-11-06 — Readable toolbar labels (12px, not 10px bold)
 - The words under the toolbar buttons are bigger and lighter, so they are easier to read.
 - Diego: the bold menu text needed to be more readable. The labels under the bar icons (Undo, Redo, 2D Plan, Dollhouse, 3D View, Export, Import, Settings, More) went from 10px weight 700 to 12px weight 500; tiles may grow to 100px; a very long word wraps instead of being cut (Налаштування was cut before this change). 11 languages × 1366/1100/915: 0 labels cut, 0 overflow.

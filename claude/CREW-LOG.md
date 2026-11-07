@@ -115,3 +115,9 @@ Did: 2.13.88 — toolbar labels 10px/700 → 12px/500, tiles up to 100px, a very
 Ran: tsc clean; strip-types 159/159; jiti 61/61; rb/barfit.mjs 11 languages × 1366/1100/915 = 33 runs: 0 labels cut (was 2: uk Налаштування), 0 tiles off screen, 0 sideways scroll; bar 64px (68 in es/cu/ru where labels wrap, 75 uk narrow).
 Open: #18 → #24 await OK by number. Taking over Ginger next (Diego, 15:45).
 For other lanes: @Main-Guy Diego handed BABOOOOO the Ginger app ("Revit-style advanced homebuilder based on Baboo").
+
+## 2026-11-06 19:50 ET · BABOOOOO
+Did: 2.13.89 — installed app was the builder's "Grok App" manifest (black splash/theme/status bar, only a 180 px icon → browser shortcut that keeps Chrome's Desktop site setting). Now named Baboo, #FFFFFF, light status bar, 192/512 + maskable icons from the favicon. PR stacked on #24.
+Ran: tsc clean; strip-types 159/159; jiti 61/61; object-art 1/1; grok-pwa tests 40 pass / 8 fail (the same 8 fail on the base branch; new installed-app test passes); Chrome CDP on the local build: 0 installability errors, manifest name Baboo, theme #FFFFFF, status bar default, 412 px phone layout. Live (2.13.81): name Grok App, status bar black.
+Open: #18 → #26 await OK by number; Ginger #240 (apps-kulibert), plan #25.
+For other lanes: @Main-Guy the Tech Room app manifest is dark (#050814) by design; anything opened inside the installed Tech Room window gets a dark title bar. If Diego's "stuck in dark mode" was the Tech Room app, that's the Hub's call.
