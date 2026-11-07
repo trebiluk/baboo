@@ -11,6 +11,13 @@ export { APP_VERSION };
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '2.13.89',
+    date: '2026-11-06',
+    bullets: [
+      'Installed on a phone or Chromebook, Baboo is now named Baboo, opens light (not black), and installs as a real app instead of a browser shortcut.',
+    ],
+  },
+  {
     version: '2.13.88',
     date: '2026-11-06',
     bullets: [
